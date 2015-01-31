@@ -178,6 +178,7 @@ namespace MeGUI.core.details.audio
 				fas.AutoGain = autoGain.Checked;
                 fas.ApplyDRC = applyDRC.Checked;
                 fas.Normalize = (int)normalize.Value;
+                fas.CustomEncoderOptions = tbAudioCLI.Text.Trim();
 				return fas;
 			}
 			set
@@ -190,6 +191,7 @@ namespace MeGUI.core.details.audio
 				autoGain.Checked = fas.AutoGain;
                 applyDRC.Checked = fas.ApplyDRC;
                 normalize.Value = fas.Normalize;
+                tbAudioCLI.Text = fas.CustomEncoderOptions;
                 CodecSettings = fas;
 			}
 		}

@@ -49,6 +49,8 @@ namespace MeGUI.core.details.audio
         private void InitializeComponent()
         {
             this.encoderGroupBox = new System.Windows.Forms.GroupBox();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.Page1 = new System.Windows.Forms.TabPage();
             this.besweetOptionsGroupbox = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.cbTimeModification = new System.Windows.Forms.ComboBox();
@@ -62,9 +64,17 @@ namespace MeGUI.core.details.audio
             this.normalize = new System.Windows.Forms.NumericUpDown();
             this.applyDRC = new System.Windows.Forms.CheckBox();
             this.lbTimeModification = new System.Windows.Forms.Label();
+            this.Page2 = new System.Windows.Forms.TabPage();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.tbAudioCLI = new System.Windows.Forms.TextBox();
+            this.tabControl1.SuspendLayout();
+            this.Page1.SuspendLayout();
             this.besweetOptionsGroupbox.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.normalize)).BeginInit();
+            this.Page2.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // encoderGroupBox
@@ -72,22 +82,42 @@ namespace MeGUI.core.details.audio
             this.encoderGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.encoderGroupBox.Location = new System.Drawing.Point(4, 184);
+            this.encoderGroupBox.Location = new System.Drawing.Point(4, 212);
             this.encoderGroupBox.Name = "encoderGroupBox";
-            this.encoderGroupBox.Size = new System.Drawing.Size(402, 100);
+            this.encoderGroupBox.Size = new System.Drawing.Size(402, 106);
             this.encoderGroupBox.TabIndex = 9;
             this.encoderGroupBox.TabStop = false;
             this.encoderGroupBox.Text = "placeholder for encoder options";
             // 
+            // tabControl1
+            // 
+            this.tabControl1.Controls.Add(this.Page1);
+            this.tabControl1.Controls.Add(this.Page2);
+            this.tabControl1.Location = new System.Drawing.Point(4, 3);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(404, 203);
+            this.tabControl1.TabIndex = 10;
+            // 
+            // Page1
+            // 
+            this.Page1.Controls.Add(this.besweetOptionsGroupbox);
+            this.Page1.Location = new System.Drawing.Point(4, 22);
+            this.Page1.Name = "Page1";
+            this.Page1.Padding = new System.Windows.Forms.Padding(3);
+            this.Page1.Size = new System.Drawing.Size(396, 177);
+            this.Page1.TabIndex = 0;
+            this.Page1.Text = "General";
+            this.Page1.UseVisualStyleBackColor = true;
+            // 
             // besweetOptionsGroupbox
             // 
             this.besweetOptionsGroupbox.Controls.Add(this.tableLayoutPanel1);
-            this.besweetOptionsGroupbox.Location = new System.Drawing.Point(4, 0);
+            this.besweetOptionsGroupbox.Location = new System.Drawing.Point(3, 0);
             this.besweetOptionsGroupbox.Name = "besweetOptionsGroupbox";
-            this.besweetOptionsGroupbox.Size = new System.Drawing.Size(402, 178);
-            this.besweetOptionsGroupbox.TabIndex = 8;
+            this.besweetOptionsGroupbox.Size = new System.Drawing.Size(387, 174);
+            this.besweetOptionsGroupbox.TabIndex = 9;
             this.besweetOptionsGroupbox.TabStop = false;
-            this.besweetOptionsGroupbox.Text = " Audio Options ";
             // 
             // tableLayoutPanel1
             // 
@@ -116,7 +146,7 @@ namespace MeGUI.core.details.audio
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(396, 159);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(381, 155);
             this.tableLayoutPanel1.TabIndex = 13;
             // 
             // cbTimeModification
@@ -127,7 +157,7 @@ namespace MeGUI.core.details.audio
             this.cbTimeModification.FormattingEnabled = true;
             this.cbTimeModification.Location = new System.Drawing.Point(103, 81);
             this.cbTimeModification.Name = "cbTimeModification";
-            this.cbTimeModification.Size = new System.Drawing.Size(290, 21);
+            this.cbTimeModification.Size = new System.Drawing.Size(275, 21);
             this.cbTimeModification.TabIndex = 17;
             // 
             // cbSampleRate
@@ -138,7 +168,7 @@ namespace MeGUI.core.details.audio
             this.cbSampleRate.FormattingEnabled = true;
             this.cbSampleRate.Location = new System.Drawing.Point(103, 55);
             this.cbSampleRate.Name = "cbSampleRate";
-            this.cbSampleRate.Size = new System.Drawing.Size(290, 21);
+            this.cbSampleRate.Size = new System.Drawing.Size(275, 21);
             this.cbSampleRate.TabIndex = 15;
             // 
             // primaryDecoding
@@ -149,7 +179,7 @@ namespace MeGUI.core.details.audio
             this.primaryDecoding.FormattingEnabled = true;
             this.primaryDecoding.Location = new System.Drawing.Point(103, 3);
             this.primaryDecoding.Name = "primaryDecoding";
-            this.primaryDecoding.Size = new System.Drawing.Size(290, 21);
+            this.primaryDecoding.Size = new System.Drawing.Size(275, 21);
             this.primaryDecoding.TabIndex = 13;
             // 
             // cbDownmixMode
@@ -159,7 +189,7 @@ namespace MeGUI.core.details.audio
             this.cbDownmixMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbDownmixMode.Location = new System.Drawing.Point(103, 29);
             this.cbDownmixMode.Name = "cbDownmixMode";
-            this.cbDownmixMode.Size = new System.Drawing.Size(290, 21);
+            this.cbDownmixMode.Size = new System.Drawing.Size(275, 21);
             this.cbDownmixMode.TabIndex = 3;
             // 
             // label1
@@ -199,15 +229,14 @@ namespace MeGUI.core.details.audio
             this.autoGain.AutoSize = true;
             this.autoGain.Location = new System.Drawing.Point(103, 133);
             this.autoGain.Name = "autoGain";
-            this.autoGain.Size = new System.Drawing.Size(117, 23);
+            this.autoGain.Size = new System.Drawing.Size(117, 20);
             this.autoGain.TabIndex = 6;
             this.autoGain.Text = "Normalize Peaks to";
-            this.autoGain.CheckedChanged += new System.EventHandler(this.autoGain_CheckedChanged);
             // 
             // normalize
             // 
             this.normalize.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.normalize.Location = new System.Drawing.Point(226, 134);
+            this.normalize.Location = new System.Drawing.Point(226, 133);
             this.normalize.Name = "normalize";
             this.normalize.Size = new System.Drawing.Size(52, 20);
             this.normalize.TabIndex = 10;
@@ -228,7 +257,6 @@ namespace MeGUI.core.details.audio
             this.applyDRC.TabIndex = 9;
             this.applyDRC.Text = "Apply Dynamic Range Compression";
             this.applyDRC.UseVisualStyleBackColor = true;
-            this.applyDRC.CheckedChanged += new System.EventHandler(this.applyDRC_CheckedChanged);
             // 
             // lbTimeModification
             // 
@@ -240,18 +268,60 @@ namespace MeGUI.core.details.audio
             this.lbTimeModification.TabIndex = 18;
             this.lbTimeModification.Text = "Time Modification";
             // 
+            // Page2
+            // 
+            this.Page2.Controls.Add(this.groupBox1);
+            this.Page2.Location = new System.Drawing.Point(4, 22);
+            this.Page2.Name = "Page2";
+            this.Page2.Padding = new System.Windows.Forms.Padding(3);
+            this.Page2.Size = new System.Drawing.Size(396, 177);
+            this.Page2.TabIndex = 1;
+            this.Page2.Text = "Extra";
+            this.Page2.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.label2);
+            this.groupBox1.Controls.Add(this.tbAudioCLI);
+            this.groupBox1.Location = new System.Drawing.Point(3, 0);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(387, 174);
+            this.groupBox1.TabIndex = 0;
+            this.groupBox1.TabStop = false;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(4, 18);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(121, 13);
+            this.label2.TabIndex = 1;
+            this.label2.Text = "Custom Command Line :";
+            // 
+            // tbAudioCLI
+            // 
+            this.tbAudioCLI.Location = new System.Drawing.Point(6, 36);
+            this.tbAudioCLI.Name = "tbAudioCLI";
+            this.tbAudioCLI.Size = new System.Drawing.Size(372, 20);
+            this.tbAudioCLI.TabIndex = 0;
+            // 
             // AudioConfigurationPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.encoderGroupBox);
-            this.Controls.Add(this.besweetOptionsGroupbox);
             this.Name = "AudioConfigurationPanel";
-            this.Size = new System.Drawing.Size(411, 287);
+            this.Size = new System.Drawing.Size(411, 321);
+            this.tabControl1.ResumeLayout(false);
+            this.Page1.ResumeLayout(false);
             this.besweetOptionsGroupbox.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.normalize)).EndInit();
+            this.Page2.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -259,19 +329,25 @@ namespace MeGUI.core.details.audio
         #endregion
 
         protected System.Windows.Forms.GroupBox encoderGroupBox;
-        private System.Windows.Forms.CheckBox autoGain;
-        private System.Windows.Forms.ComboBox cbDownmixMode;
-        private System.Windows.Forms.Label BesweetChannelsLabel;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage Page1;
         protected System.Windows.Forms.GroupBox besweetOptionsGroupbox;
-        private System.Windows.Forms.CheckBox applyDRC;
-        private System.Windows.Forms.NumericUpDown normalize;
-        private System.Windows.Forms.Label lbSampleRate;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.ComboBox primaryDecoding;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ComboBox cbSampleRate;
         private System.Windows.Forms.ComboBox cbTimeModification;
+        private System.Windows.Forms.ComboBox cbSampleRate;
+        private System.Windows.Forms.ComboBox primaryDecoding;
+        private System.Windows.Forms.ComboBox cbDownmixMode;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label BesweetChannelsLabel;
+        private System.Windows.Forms.Label lbSampleRate;
+        private System.Windows.Forms.CheckBox autoGain;
+        private System.Windows.Forms.NumericUpDown normalize;
+        private System.Windows.Forms.CheckBox applyDRC;
         private System.Windows.Forms.Label lbTimeModification;
+        private System.Windows.Forms.TabPage Page2;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox tbAudioCLI;
 
     }
 }

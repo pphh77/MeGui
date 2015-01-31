@@ -177,7 +177,7 @@ namespace MeGUI.packages.audio.qaac
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.Name = "qaacConfigurationPanel";
-            this.Size = new System.Drawing.Size(412, 316);
+            this.Size = new System.Drawing.Size(412, 344);
             this.encoderGroupBox.ResumeLayout(false);
             this.encoderGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar)).EndInit();

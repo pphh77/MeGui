@@ -85,7 +85,7 @@ namespace MeGUI.packages.audio.ffac3
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.Name = "AC3ConfigurationPanel";
-            this.Size = new System.Drawing.Size(411, 245);
+            this.Size = new System.Drawing.Size(411, 272);
             this.encoderGroupBox.ResumeLayout(false);
             this.encoderGroupBox.PerformLayout();
             this.ResumeLayout(false);

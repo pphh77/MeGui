@@ -59,7 +59,7 @@ namespace MeGUI.packages.audio.vorbis
             this.encoderGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
             this.encoderGroupBox.Controls.Add(this.vQuality);
             this.encoderGroupBox.Controls.Add(this.label1);
-            this.encoderGroupBox.Size = new System.Drawing.Size(402, 90);
+            this.encoderGroupBox.Size = new System.Drawing.Size(402, 84);
             this.encoderGroupBox.TabIndex = 1;
             this.encoderGroupBox.Text = " Ogg Vorbis Options ";
             // 
@@ -70,7 +70,7 @@ namespace MeGUI.packages.audio.vorbis
             // vQuality
             // 
             this.vQuality.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.vQuality.Location = new System.Drawing.Point(3, 42);
+            this.vQuality.Location = new System.Drawing.Point(3, 36);
             this.vQuality.Maximum = 1000;
             this.vQuality.Minimum = -200;
             this.vQuality.Name = "vQuality";
@@ -95,7 +95,7 @@ namespace MeGUI.packages.audio.vorbis
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.Name = "OggVorbisConfigurationPanel";
-            this.Size = new System.Drawing.Size(411, 278);
+            this.Size = new System.Drawing.Size(411, 302);
             this.encoderGroupBox.ResumeLayout(false);
             this.encoderGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.vQuality)).EndInit();

@@ -132,6 +132,7 @@ namespace MeGUI
         private AudioCodec audioCodec;
         private AudioEncoderType audioEncoderType;
         private AudioDecodingEngine preferredDecoder;
+        private string customEncoderOptions;
 
         [XmlIgnore()]
         public AudioCodec Codec
@@ -336,6 +337,15 @@ namespace MeGUI
         public string[] RequiredProfiles
         {
             get { return new string[0]; }
+        }
+
+        /// <summary>
+        /// gets / set custom commandline options for the encoder
+        /// </summary>
+        public string CustomEncoderOptions
+        {
+            get { return customEncoderOptions; }
+            set { customEncoderOptions = value; }
         }
     }
 }

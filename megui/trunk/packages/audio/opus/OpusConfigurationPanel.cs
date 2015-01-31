@@ -55,7 +55,7 @@ namespace MeGUI.packages.audio.opus
             this.encoderGroupBox.Controls.Add(this.label2);
             this.encoderGroupBox.Controls.Add(this.trackBar);
             this.encoderGroupBox.Controls.Add(this.cbMode);
-            this.encoderGroupBox.Size = new System.Drawing.Size(402, 111);
+            this.encoderGroupBox.Size = new System.Drawing.Size(402, 105);
             this.encoderGroupBox.Text = "Opus Options";
             // 
             // trackBar
@@ -93,7 +93,7 @@ namespace MeGUI.packages.audio.opus
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.Name = "OpusConfigurationPanel";
-            this.Size = new System.Drawing.Size(410, 301);
+            this.Size = new System.Drawing.Size(410, 322);
             this.encoderGroupBox.ResumeLayout(false);
             this.encoderGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar)).EndInit();

@@ -85,7 +85,7 @@ namespace MeGUI.packages.audio.ffmp2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.Name = "MP2ConfigurationPanel";
-            this.Size = new System.Drawing.Size(412, 241);
+            this.Size = new System.Drawing.Size(412, 268);
             this.encoderGroupBox.ResumeLayout(false);
             this.encoderGroupBox.PerformLayout();
             this.ResumeLayout(false);

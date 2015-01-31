@@ -68,7 +68,7 @@ namespace MeGUI.packages.audio.lame
             this.encoderGroupBox.Controls.Add(this.vbrMode);
             this.encoderGroupBox.Controls.Add(this.abrMode);
             this.encoderGroupBox.Controls.Add(this.cbrMode);
-            this.encoderGroupBox.Size = new System.Drawing.Size(402, 112);
+            this.encoderGroupBox.Size = new System.Drawing.Size(402, 100);
             this.encoderGroupBox.Text = "  Lame MP3 Encoding Mode  ";
             // 
             // cbrMode
@@ -169,7 +169,7 @@ namespace MeGUI.packages.audio.lame
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.Name = "lameConfigurationPanel";
-            this.Size = new System.Drawing.Size(410, 302);
+            this.Size = new System.Drawing.Size(410, 317);
             this.encoderGroupBox.ResumeLayout(false);
             this.encoderGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.vbrValue)).EndInit();

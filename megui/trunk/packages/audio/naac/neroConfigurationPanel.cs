@@ -172,7 +172,7 @@ namespace MeGUI.packages.audio.naac
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.Name = "neroConfigurationPanel";
-            this.Size = new System.Drawing.Size(410, 404);
+            this.Size = new System.Drawing.Size(410, 428);
             this.encoderGroupBox.ResumeLayout(false);
             this.encoderGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.vQuality)).EndInit();

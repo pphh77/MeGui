@@ -96,7 +96,7 @@ namespace MeGUI.packages.audio.flac
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.Name = "FlacConfigurationPanel";
-            this.Size = new System.Drawing.Size(410, 270);
+            this.Size = new System.Drawing.Size(410, 297);
             this.encoderGroupBox.ResumeLayout(false);
             this.encoderGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tbQuality)).EndInit();

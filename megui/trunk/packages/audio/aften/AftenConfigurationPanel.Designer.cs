@@ -85,7 +85,7 @@ namespace MeGUI.packages.audio.aften
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.Name = "AftenConfigurationPanel";
-            this.Size = new System.Drawing.Size(413, 250);
+            this.Size = new System.Drawing.Size(413, 279);
             this.encoderGroupBox.ResumeLayout(false);
             this.encoderGroupBox.PerformLayout();
             this.ResumeLayout(false);
