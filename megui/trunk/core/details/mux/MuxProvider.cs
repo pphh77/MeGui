@@ -1219,6 +1219,7 @@ namespace MeGUI
             RegisterEncoder(new FlacEncodingProvider());
             RegisterEncoder(new QaacEncodingProvider());
             RegisterEncoder(new OpusEncodingProvider());
+            RegisterEncoder(new FdkaacEncodingProvider());
         }
     }
     #endregion
@@ -1373,6 +1374,18 @@ namespace MeGUI
             supportedCodecs.Add(AudioCodec.OPUS);
             supportedTypes.Add(AudioType.OPUS);
             supportedEncoderTypes.Add(AudioEncoderType.OPUS);
+        }
+    }
+
+    public class FdkaacEncodingProvider : AudioEncodingProvider
+    {
+        public FdkaacEncodingProvider()
+            : base()
+        {
+            supportedCodecs.Add(AudioCodec.AAC);
+            supportedTypes.Add(AudioType.M4A);
+            supportedTypes.Add(AudioType.MP4AAC);
+            supportedEncoderTypes.Add(AudioEncoderType.FDKAAC);
         }
     }
     #endregion

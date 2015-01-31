@@ -163,8 +163,9 @@ namespace MeGUI
         public static readonly AudioEncoderType FFMP2  = new AudioEncoderType("FFMP2", AudioCodec.MP2);
         public static readonly AudioEncoderType AFTEN  = new AudioEncoderType("AFTEN", AudioCodec.AC3);
         public static readonly AudioEncoderType FLAC   = new AudioEncoderType("FLAC", AudioCodec.FLAC);
-        public static readonly AudioEncoderType QAAC = new AudioEncoderType("QAAC", AudioCodec.AAC);
-        public static readonly AudioEncoderType OPUS = new AudioEncoderType("OPUS", AudioCodec.OPUS);
+        public static readonly AudioEncoderType QAAC   = new AudioEncoderType("QAAC", AudioCodec.AAC);
+        public static readonly AudioEncoderType OPUS   = new AudioEncoderType("OPUS", AudioCodec.OPUS);
+        public static readonly AudioEncoderType FDKAAC = new AudioEncoderType("FDK-AAC", AudioCodec.AAC); 
     }
     #endregion
     
@@ -216,6 +217,7 @@ namespace MeGUI
                 AudioEncoderTypes.Register(AudioEncoderType.FLAC)   &&
                 AudioEncoderTypes.Register(AudioEncoderType.AFTEN)  &&
                 AudioEncoderTypes.Register(AudioEncoderType.QAAC)   &&
+                AudioEncoderTypes.Register(AudioEncoderType.FDKAAC) &&
                 AudioEncoderTypes.Register(AudioEncoderType.OPUS)))
                 throw new Exception("Failed to register a standard audio encoder type");
                 

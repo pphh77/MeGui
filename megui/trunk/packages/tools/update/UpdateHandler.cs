@@ -462,9 +462,9 @@ namespace MeGUI
             string strQuestionText;
 
             if (bRestartRequired)
-                strQuestionText = "MeGUI cannot find at least one required component. Without these components, MeGUI will not run properly (e.g. no job can be started).\n\nDo you want to restart MeGUI now?";
+                strQuestionText = "MeGUI cannot find at least one required component. Without these components, MeGUI will not run properly (e.g. specific jobs cannot be started).\n\nDo you want to restart MeGUI now?";
             else
-                strQuestionText = "MeGUI cannot find at least one required component. Without these components, MeGUI will not run properly (e.g. no job can be started).\n\nDo you want to search now online for updates?";
+                strQuestionText = "MeGUI cannot find at least one required component. Without these components, MeGUI will not run properly (e.g. specific jobs cannot be started).\n\nDo you want to search now online for updates?";
 
             if (MessageBox.Show(strQuestionText, "MeGUI component(s) missing", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                 return true;
@@ -510,8 +510,6 @@ namespace MeGUI
                     updateableFileCount++;
 
             _abortUpdate = false;
-
-            
 
             // Now update the files we can
             foreach (UpdateWindow.iUpgradeable file in UpdateData)

@@ -128,6 +128,9 @@ namespace MeGUI.core.gui
                 if ((oProfile.Data.BaseSettings is NeroAACSettings) && !MainForm.Instance.Settings.UseNeroAacEnc)
                     continue;
 
+                if ((oProfile.Data.BaseSettings is FDKAACSettings) && !MainForm.Instance.Settings.UseFDKAac)
+                    continue;
+
                 if ((oProfile.Data.BaseSettings is QaacSettings) && !MainForm.Instance.Settings.UseQAAC)
                     continue;
 

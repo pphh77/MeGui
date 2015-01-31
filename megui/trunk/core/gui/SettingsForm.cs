@@ -192,6 +192,7 @@ namespace MeGUI
                 
                 settings.SourceDetectorSettings = sdSettings;
                 settings.NeroAacEncPath = neroaacencLocation.Filename;
+                settings.FDKAacPath = fdkaacLocation.Filename;
                 settings.VideoExtension = videoExtension.Text;
                 settings.AudioExtension = audioExtension.Text;
 				settings.DefaultLanguage1 = defaultLanguage1.Text;
@@ -260,6 +261,10 @@ namespace MeGUI
                     UpdateCacher.CheckPackage("neroaacenc", useNeroAacEnc.Checked, false);
                 settings.UseNeroAacEnc = useNeroAacEnc.Checked;
 
+                if (useFDKAac.Checked != internalSettings.UseFDKAac)
+                    UpdateCacher.CheckPackage("fdkaac", useFDKAac.Checked, false);
+                settings.UseFDKAac = useFDKAac.Checked;
+
                 if (useQAAC.Checked != internalSettings.UseQAAC)
                     UpdateCacher.CheckPackage("qaac", useQAAC.Checked, false);
                 settings.UseQAAC = useQAAC.Checked;
@@ -279,6 +284,7 @@ namespace MeGUI
                 acceptableFPSError.Value = settings.AcceptableFPSError;
                 useAutoUpdateCheckbox.Checked = settings.AutoUpdate;
                 neroaacencLocation.Filename = settings.NeroAacEncPath;
+                fdkaacLocation.Filename = settings.FDKAacPath;
                 sdSettings = settings.SourceDetectorSettings;
                 videoExtension.Text = settings.VideoExtension;
                 audioExtension.Text = settings.AudioExtension;
@@ -334,6 +340,7 @@ namespace MeGUI
                 cbUseITUValues.Checked = settings.UseITUValues;
                 useDGIndexNV.Checked = settings.UseDGIndexNV;
                 useNeroAacEnc.Checked = settings.UseNeroAacEnc;
+                useFDKAac.Checked = settings.UseFDKAac;
                 useQAAC.Checked = settings.UseQAAC;
                 useX265.Checked = settings.UseX265;
                 chx264ExternalMuxer.Checked = settings.UseExternalMuxerX264;
@@ -387,6 +394,13 @@ namespace MeGUI
             neroaacencLocation.Enabled = lblNero.Enabled = useNeroAacEnc.Checked;
             if (useNeroAacEnc.Checked && !internalSettings.UseNeroAacEnc)
                 MessageBox.Show("You have to restart MeGUI in order to get access to NeroAacEnc.\r\nAlso the program files are not available on the MeGUI update server. They have to be downloaded from:\r\nhttp://www.nero.com/eng/downloads-nerodigital-nero-aac-codec.php", "Restart required", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void useFDKAac_CheckedChanged(object sender, EventArgs e)
+        {
+            fdkaacLocation.Enabled = lblFDK.Enabled = useFDKAac.Checked;
+            if (useFDKAac.Checked && !internalSettings.UseFDKAac)
+                MessageBox.Show("You have to restart MeGUI in order to get access to FDK-AAC.\r\nAlso the program files are not available on the MeGUI update server. They have to be downloaded/compiled manually because of the license. It will not be available with the online updater.", "Restart required", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void useQAAC_CheckedChanged(object sender, EventArgs e)

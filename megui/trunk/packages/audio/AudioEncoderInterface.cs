@@ -51,7 +51,8 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 ((j as AudioJob).Settings is FlacSettings) ||
                 ((j as AudioJob).Settings is AftenSettings) ||
                 ((j as AudioJob).Settings is QaacSettings) ||
-                ((j as AudioJob).Settings is OpusSettings)))
+                ((j as AudioJob).Settings is OpusSettings) ||
+                ((j as AudioJob).Settings is FDKAACSettings)))
                 return new AviSynthAudioEncoder(mf.Settings);
             return null;
         }
@@ -338,6 +339,11 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             else if (audioJob.Settings is AC3Settings || audioJob.Settings is MP2Settings)
             {
                 if (System.Text.RegularExpressions.Regex.IsMatch(line.ToLowerInvariant(), @"^size= "))
+                    return;
+            }
+            else if (audioJob.Settings is FDKAACSettings)
+            {
+                if (System.Text.RegularExpressions.Regex.IsMatch(line, @"^[0-9%]*"))
                     return;
             }
 
@@ -1426,7 +1432,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 {
                     sb.Append(" " + audioJob.Settings.CustomEncoderOptions.ToString());
                 }
-                
+
                 sb.Append(" - -o \"{0}\"");
 
                 _encoderCommandLine = sb.ToString();
@@ -1453,6 +1459,42 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 }
 
                 sb.Append(" - \"{0}\"");
+
+                _encoderCommandLine = sb.ToString();
+            }
+            else if (audioJob.Settings is FDKAACSettings)
+            {
+                UpdateCacher.CheckPackage("fdkaac");
+                FDKAACSettings f = audioJob.Settings as FDKAACSettings;
+                _encoderExecutablePath = this._settings.Fdkaac.Path;
+                _mustSendWavHeaderToEncoderStdIn = true;
+                StringBuilder sb = new StringBuilder("--ignorelength ");
+
+                switch (f.Mode)
+                {
+                    case FdkAACMode.CBR: sb.Append("-m 0 -b " + f.Bitrate); break;
+                    case FdkAACMode.VBR: sb.Append("-m 1 -b " + f.Bitrate); break;
+                }
+                
+                switch (f.Profile)
+                {
+                    case FdkAACProfile.M4LC:  sb.Append(" -p 2"); break;
+                    case FdkAACProfile.M4HE:  sb.Append(" -p 5"); break;
+                    case FdkAACProfile.M4HE2: sb.Append(" -p 29"); break;
+                    case FdkAACProfile.M4LD:  sb.Append(" -p 23"); break;
+                    case FdkAACProfile.M4ELD: sb.Append(" -p 39"); break;
+                    case FdkAACProfile.M2LC:  sb.Append(" -p 129"); break;
+                    case FdkAACProfile.M2HE:  sb.Append(" -p 132"); break;
+                    case FdkAACProfile.M2HE2: sb.Append(" -p 156"); break;
+                }
+
+                // Custom Command Line
+                if (!string.IsNullOrEmpty(audioJob.Settings.CustomEncoderOptions))
+                {
+                    sb.Append(" " + audioJob.Settings.CustomEncoderOptions.ToString());
+                }
+
+                sb.Append(" - -o \"{0}\"");
 
                 _encoderCommandLine = sb.ToString();
             }

@@ -50,12 +50,12 @@ namespace MeGUI
         private DateTime lastUpdateCheck;
         private string strMainAudioFormat, strMainFileFormat, meguiupdatecache,
                        defaultLanguage1, defaultLanguage2, afterEncodingCommand, videoExtension, audioExtension,
-                       strLastDestinationPath, strLastSourcePath, tempDirMP4, neroAacEncPath,
+                       strLastDestinationPath, strLastSourcePath, tempDirMP4, neroAacEncPath, fdkAacPath,
                        httpproxyaddress, httpproxyport, httpproxyuid, httpproxypwd, defaultOutputDir,
                        appendToForcedStreams, lastUsedOneClickFolder, lastUpdateServer;
         private bool autoForceFilm, autoStartQueue, autoOpenScript, bUseQAAC, bUseX265, bUseDGIndexNV,
                      overwriteStats, keep2of3passOutput, autoUpdate, deleteCompletedJobs, deleteIntermediateFiles,
-                     deleteAbortedOutput, openProgressWindow, autoSelectHDStreams,
+                     deleteAbortedOutput, openProgressWindow, autoSelectHDStreams, bUseFDKAac,
                      alwaysOnTop, addTimePosition, alwaysbackupfiles, bUseITU, bEac3toLastUsedFileMode,
                      bAutoLoadDG, bAutoStartQueueStartup, bAlwaysMuxMKV, b64bitX264, bAlwayUsePortableAviSynth,
                      bEnsureCorrectPlaybackSpeed, bOpenAVSInThread, bExternalMuxerX264, bUseNeroAacEnc;
@@ -80,7 +80,7 @@ namespace MeGUI
         private ProxyMode httpProxyMode;
         private ProgramSettings aften, avimuxgui, avisynth, avisynthplugins, besplit, dgavcindex, dgindex, dgindexnv,
                                 eac3to, ffmpeg, ffms, flac, lame, lsmash, mkvmerge, mp4box, neroaacenc, oggenc,
-                                opus, pgcdemux, qaac, tsmuxer, vobsub, x264, x264_10b, x265, xvid;
+                                opus, pgcdemux, qaac, fdkaac, tsmuxer, vobsub, x264, x264_10b, x265, xvid;
         #endregion
         public MeGUISettings()
 		{
@@ -171,7 +171,7 @@ namespace MeGUI
             bUseITU = true;
             bOpenAVSInThread = true;
             lastUsedOneClickFolder = "";
-            bUseNeroAacEnc = bUseQAAC = bUseX265 = bUseDGIndexNV = false;
+            bUseNeroAacEnc = bUseFDKAac = bUseQAAC = bUseX265 = bUseDGIndexNV = false;
             chapterCreatorMinimumLength = 900;
             bEac3toLastUsedFileMode = false;
             bExternalMuxerX264 = true;
@@ -980,6 +980,26 @@ namespace MeGUI
             }
         }
 
+        /// <summary>
+        /// filename and full path of the fdkaac executable
+        /// </summary>
+        public string FDKAacPath
+        {
+            get
+            {
+                if (!File.Exists(fdkAacPath))
+                    fdkAacPath = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\fdkaac\fdkaac.exe");
+                return fdkAacPath;
+            }
+            set
+            {
+                if (!File.Exists(value))
+                    fdkAacPath = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\fdkaac\fdkaac.exe");
+                else
+                    fdkAacPath = value;
+            }
+        }
+
         public bool UseDGIndexNV
         {
             get { return bUseDGIndexNV; }
@@ -990,6 +1010,12 @@ namespace MeGUI
         {
             get { return bUseNeroAacEnc; }
             set { bUseNeroAacEnc = value; }
+        }
+
+        public bool UseFDKAac
+        {
+            get { return bUseFDKAac; }
+            set { bUseFDKAac = value; }
         }
 
         public bool UseQAAC
@@ -1177,6 +1203,12 @@ namespace MeGUI
             get { return xvid; }
             set { xvid = value; }
         }
+
+        public ProgramSettings Fdkaac
+        {
+            get { return fdkaac; }
+            set { fdkaac = value; }
+        }
         #endregion
 
         private bool bPortableAviSynth;
@@ -1264,6 +1296,8 @@ namespace MeGUI
                 pgcdemux = new ProgramSettings("pgcdemux");
             if (qaac == null)
                 qaac = new ProgramSettings("qaac");
+            if (fdkaac == null)
+                fdkaac = new ProgramSettings("fdkaac");
             if (tsmuxer == null)
                 tsmuxer = new ProgramSettings("tsmuxer");
             if (vobsub == null)
@@ -1332,6 +1366,7 @@ namespace MeGUI
             opus.UpdateInformation("opus", "Opus", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\opus\opusenc.exe"));
             pgcdemux.UpdateInformation("pgcdemux", "PgcDemux", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\pgcdemux\pgcdemux.exe"));
             qaac.UpdateInformation("qaac", "QAAC", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\qaac\qaac.exe"));
+            fdkaac.UpdateInformation("fdkaac", "FDK-AAC", FDKAacPath);
             tsmuxer.UpdateInformation("tsmuxer", "tsMuxeR", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\tsmuxer\tsmuxer.exe"));
             vobsub.UpdateInformation("vobsub", "VobSub", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\vobsub\vobsub.dll"));
 #if x64
