@@ -37,8 +37,6 @@ namespace MeGUI
 {
     class UpdateCacher
     {
-        public const int REMOVE_PACKAGE_AFTER_DAYS = 14;
-
         public static void flushOldCachedFilesAsync(UpdateWindow.iUpgradeableCollection upgradeData)
         {
             if (MainForm.Instance.Settings.AlwaysBackUpFiles)
@@ -64,7 +62,7 @@ namespace MeGUI
                 if (urls.IndexOf(f.Name.ToLowerInvariant()) >= 0)
                     continue;
 
-                if (DateTime.Now - f.LastWriteTime > new TimeSpan(REMOVE_PACKAGE_AFTER_DAYS, 0, 0, 0, 0))
+                if (DateTime.Now - f.LastWriteTime > new TimeSpan(MainForm.Instance.Settings.DisablePackageInterval, 0, 0, 0, 0))
                 {
                     f.Delete();
                     MainForm.Instance.UpdateHandler.AddTextToLog("Deleted cached file " + f.Name, ImageType.Information, false);
@@ -76,7 +74,7 @@ namespace MeGUI
                 if (urls.IndexOf(f.Name.ToLowerInvariant()) >= 0)
                     continue;
 
-                if (DateTime.Now - f.LastWriteTime > new TimeSpan(REMOVE_PACKAGE_AFTER_DAYS, 0, 0, 0, 0))
+                if (DateTime.Now - f.LastWriteTime > new TimeSpan(MainForm.Instance.Settings.DisablePackageInterval, 0, 0, 0, 0))
                 {
                     f.Delete();
                     MainForm.Instance.UpdateHandler.AddTextToLog("Deleted cached file " + f.Name, ImageType.Information, false);
@@ -353,7 +351,6 @@ namespace MeGUI
                 }
                 catch
                 {
-                    //MainForm.Instance.UpdateHandler.AddTextToLog("Invalid or missing update file.", ImageType.Error);
                     DeleteCacheFile(file);
                     return false;
                 }

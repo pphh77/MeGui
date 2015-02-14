@@ -19,6 +19,7 @@
 // ****************************************************************************
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -43,7 +44,6 @@ namespace MeGUI
         private StringBuilder _updateLogText = new StringBuilder();
         private XmlDocument _updateXML;
         private UpdateWindow _updateWindow;
-        private int _updateCheckEveryXHours;
         private Dictionary<string, CommandlineUpgradeData> filesToReplace = new Dictionary<string, CommandlineUpgradeData>();
         private UpdateWindow.iUpgradeableCollection _updateData = null;
         private System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
@@ -733,17 +733,8 @@ namespace MeGUI
         /// </summary>
         private UpdateWindow.ErrorState GetUpdateData()
         {
-            // get the value how often the update server can be checked
-            // check more often when the development update server is selected
-            _updateCheckEveryXHours = 240;
-            if (MainForm.Instance.Settings.AutoUpdateServerSubList > 0)
-                _updateCheckEveryXHours = 48;
-#if DEBUG
-            _updateCheckEveryXHours = 0;
-#endif
-
             UpdateWindow.ErrorState result = UpdateWindow.ErrorState.Successful;
-            if (MainForm.Instance.Settings.LastUpdateCheck.AddHours(_updateCheckEveryXHours).CompareTo(DateTime.Now.ToUniversalTime()) > 0)
+            if (MainForm.Instance.Settings.LastUpdateCheck.AddHours(MainForm.Instance.Settings.UpdateCheckInterval).CompareTo(DateTime.Now.ToUniversalTime()) > 0)
             {
                 // update server used within the last _updateCheckEveryXHours hours - therefore no new check if possible
                 if (_updateXML != null)
@@ -861,7 +852,7 @@ namespace MeGUI
             List<string> sortedServerList = new List<string>(MainForm.Instance.Settings.AutoUpdateServerLists[MainForm.Instance.Settings.AutoUpdateServerSubList]);
             sortedServerList.RemoveAt(0); // remove header
 
-            if (MainForm.Instance.Settings.LastUpdateCheck.AddHours(_updateCheckEveryXHours).CompareTo(DateTime.Now.ToUniversalTime()) > 0)
+            if (MainForm.Instance.Settings.LastUpdateCheck.AddHours(MainForm.Instance.Settings.UpdateCheckInterval).CompareTo(DateTime.Now.ToUniversalTime()) > 0)
             {
                 // update server used within the last _updateCheckEveryXHours hours
                 // therefore no new server will be selected - at first the current one must be tried
@@ -898,9 +889,55 @@ namespace MeGUI
             if (_updateXML == null)
                 return;
 
-            XmlNode node = _updateXML.SelectSingleNode("/UpdateableFiles");
+            XmlNode node = _updateXML.SelectSingleNode("/UpdateableFiles/Server");
+            if (node != null) // xml file could be dodgy.
+                ParseUpdateXmlServerData(node);
+
+            node = _updateXML.SelectSingleNode("/UpdateableFiles");
             if (node != null) // xml file could be dodgy.
                 ParseUpdateXml(node, null, node.Name);
+        }
+
+        /// <summary>
+        /// Parses the upgrade XML file to get the update server configuration. 
+        /// </summary>
+        /// <param name="currentNode">The node that the function should work on</param>
+        private void ParseUpdateXmlServerData(XmlNode currentNode)
+        {
+            var nameAttribute = currentNode.Attributes["disable"];
+            if (nameAttribute != null)
+                MainForm.Instance.Settings.DisablePackageInterval = Convert.ToInt32(currentNode.Attributes["disable"].Value);
+
+            ArrayList serverList;
+            foreach (XmlNode childNode in currentNode.ChildNodes)
+            {
+                if (childNode.Name.Equals("stable"))
+                {
+                    nameAttribute = childNode.Attributes["check"];
+                    if (nameAttribute != null && MainForm.Instance.Settings.AutoUpdateServerSubList == 0)
+                        MainForm.Instance.Settings.UpdateCheckInterval = Convert.ToInt32(childNode.Attributes["check"].Value);
+                    
+                    serverList = new ArrayList();
+                    serverList.Add("Stable");
+                    foreach (XmlNode serverNode in childNode.ChildNodes)
+                        serverList.Add(serverNode.InnerText + "/");
+                    if (serverList.Count > 1)
+                        MainForm.Instance.Settings.AutoUpdateServerLists[0] = (string[])serverList.ToArray(typeof(string));
+                }
+                else if (childNode.Name.Equals("test"))
+                {
+                    nameAttribute = childNode.Attributes["check"];
+                    if (nameAttribute != null && MainForm.Instance.Settings.AutoUpdateServerSubList > 0)
+                        MainForm.Instance.Settings.UpdateCheckInterval = Convert.ToInt32(childNode.Attributes["check"].Value);
+
+                    serverList = new ArrayList();
+                    serverList.Add("Development");
+                    foreach (XmlNode serverNode in childNode.ChildNodes)
+                        serverList.Add(serverNode.InnerText + "/");
+                    if (serverList.Count > 1)
+                        MainForm.Instance.Settings.AutoUpdateServerLists[1] = (string[])serverList.ToArray(typeof(string));
+                }
+            }
         }
 
         /// <summary>

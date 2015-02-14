@@ -65,7 +65,8 @@ namespace MeGUI
                     modeColumnWidth, statusColumnWidth, ownerColumnWidth, startColumnWidth, endColumnWidth, fpsColumnWidth,
                     updateFormUpdateColumnWidth, updateFormNameColumnWidth, updateFormLocalVersionColumnWidth, 
                     updateFormServerVersionColumnWidth, updateFormLocalDateColumnWidth, updateFormServerDateColumnWidth, 
-                    updateFormLastUsedColumnWidth, updateFormStatusColumnWidth, ffmsThreads, chapterCreatorMinimumLength;
+                    updateFormLastUsedColumnWidth, updateFormStatusColumnWidth, ffmsThreads, chapterCreatorMinimumLength,
+                    updateCheckInterval, disablePackageInterval;
         private SourceDetectorSettings sdSettings;
         private AutoEncodeDefaultsSettings aedSettings;
         private DialogSettings dialogSettings;
@@ -95,8 +96,10 @@ namespace MeGUI
 
             autoUpdateServerLists = new string[][] { new string[] { "Stable", "http://megui.org/auto/stable/" },
                 new string[] { "Development", "http://megui.org/auto/" }, new string[] { "Custom"}};
-            lastUpdateCheck = DateTime.Now.AddDays(-7).ToUniversalTime();
+            lastUpdateCheck = DateTime.Now.AddDays(-77).ToUniversalTime();
             lastUpdateServer = "http://megui.org/auto/stable/";
+            disablePackageInterval = 14;
+            updateCheckInterval = 240;
             acceptableFPSError = 0.01M;
             autoUpdateServerSubList = 0;
             autoUpdate = true;
@@ -408,25 +411,37 @@ namespace MeGUI
         }
 
         /// <summary>
+        /// Disable package after X days
+        /// </summary>
+        public int DisablePackageInterval
+        {
+            get { return disablePackageInterval; }
+            set { disablePackageInterval = value; }
+        }
+
+        /// <summary>
+        /// Check update server max every X hours
+        /// </summary>
+        public int UpdateCheckInterval
+        {
+            get 
+            {
+#if DEBUG
+                return 0;
+#else
+                return updateCheckInterval; 
+#endif
+            }
+            set { updateCheckInterval = value; }
+        }
+
+        /// <summary>
         /// List of servers to use for autoupdate
         /// </summary>
         public string[][] AutoUpdateServerLists
         {
             get
             {
-#if x86 && !DEBUG
-                if (autoUpdateServerLists.Length > 2)
-                {
-                    autoUpdateServerLists[0] = new string[] { "Stable", "http://megui.org/auto/stable/" };
-                    autoUpdateServerLists[1] = new string[] { "Development", "http://megui.org/auto/" };
-                }
-                else
-                {
-                    autoUpdateServerLists = new string[][] { new string[] { "Stable", "http://megui.org/auto/stable/" },
-                                                             new string[] { "Development", "http://megui.org/auto/" }, 
-                                                             new string[] { "Custom"}};
-                }
-#endif
 #if x64 && !DEBUG
                 autoUpdateServerLists = new string[][] { new string[] { "Stable", "http://megui.org/auto/" },
                                                          new string[] { "Development", "http://megui.org/auto/" },

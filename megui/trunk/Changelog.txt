@@ -1,10 +1,11 @@
+2523 [Update]               get update server configuration data from the update server itself
 2522 [FDK-AAC Encoder]      added FDK-AAC encoder support
                             due to the FDK-AAC license the encoder will not be available in the online updater
 2521 [Audio Encoder]        added custom command line support
 2520 [Chapter Creator]      fixed sometimes incorrect duration (regression of 2516)
 2519 [Update]               if an outdated package is enabled the update will be downloaded automatically (if auto update is not disabled)
      [Update]               reduced time after an inactive package will be disabled to 14 days
-                            a lot of the last changes in the update handling are caused by the fact that the remaining update server has to be protected
+                            a lot of the last changes in the update handling are caused by the fact that the remaining update servers have to be protected
                             if you want to help please have a look here: http://forum.doom9.org/showpost.php?p=1706329&postcount=4410
 2518                        updated copyright year to 2015
 2517 [HD Streams Extractor] cosmetics

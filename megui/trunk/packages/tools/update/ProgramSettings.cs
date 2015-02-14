@@ -85,7 +85,7 @@ namespace MeGUI
             set
             {
                 _lastused = value;
-                if (_lastused.AddDays(UpdateCacher.REMOVE_PACKAGE_AFTER_DAYS) <= DateTime.Now)
+                if (_lastused.AddDays(MainForm.Instance.Settings.DisablePackageInterval) <= DateTime.Now)
                     _enabled = false;
             }
         }
@@ -171,7 +171,7 @@ namespace MeGUI
 
         public bool UpdateAllowed()
         {
-            if (_required || (_enabled && _lastused.AddDays(UpdateCacher.REMOVE_PACKAGE_AFTER_DAYS) > DateTime.Now))
+            if (_required || (_enabled && _lastused.AddDays(MainForm.Instance.Settings.DisablePackageInterval) > DateTime.Now))
                 return true;
             else
                 return false;
