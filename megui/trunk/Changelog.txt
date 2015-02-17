@@ -1,3 +1,4 @@
+2524 [FDK-AAC Encoder]      fixed update handling (regression of 2522)
 2523 [Update]               get update server configuration data from the update server itself
 2522 [FDK-AAC Encoder]      added FDK-AAC encoder support
                             due to the FDK-AAC license the encoder will not be available in the online updater

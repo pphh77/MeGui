@@ -104,6 +104,11 @@ namespace MeGUI
                         if (currentVersion != null && currentVersion.FileVersion != null && currentVersion.FileVersion.Equals(latest.FileVersion))
                             latest.UploadDate = currentVersion.UploadDate;
                     }
+                    else if (this.name == "fdkaac")
+                    {
+                        if (MainForm.Instance.Settings.UseFDKAac && File.Exists(MainForm.Instance.Settings.Fdkaac.Path))
+                            latest.UploadDate = currentVersion.UploadDate;
+                    }
                     return latest != null && (latest.CompareTo(currentVersion) != 0);
                 }
             }
@@ -132,11 +137,26 @@ namespace MeGUI
                     case "neroaacenc":
                         if (MainForm.Instance.Settings.UseNeroAacEnc)
                         {
-                            arrPath.Add(MainForm.Instance.Settings.NeroAacEnc.Path);
+                            if (MainForm.Instance.Settings.NeroAacEnc.UpdateAllowed())
+                                arrPath.AddRange(MainForm.Instance.Settings.NeroAacEnc.Files);
                             if (File.Exists(MainForm.Instance.Settings.NeroAacEnc.Path))
                             {
                                 System.Diagnostics.FileVersionInfo finfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(MainForm.Instance.Settings.NeroAacEnc.Path);
                                 FileInfo fi = new FileInfo(MainForm.Instance.Settings.NeroAacEnc.Path);
+                                CurrentVersion.FileVersion = finfo.FileMajorPart + "." + finfo.FileMinorPart + "." + finfo.FileBuildPart + "." + finfo.FilePrivatePart;
+                                CurrentVersion.UploadDate = fi.LastWriteTimeUtc;
+                            }
+                        }
+                        break;
+                    case "fdkaac":
+                        if (MainForm.Instance.Settings.UseFDKAac)
+                        {
+                            if (MainForm.Instance.Settings.Fdkaac.UpdateAllowed())
+                                arrPath.AddRange(MainForm.Instance.Settings.Fdkaac.Files);
+                            if (File.Exists(MainForm.Instance.Settings.Fdkaac.Path))
+                            {
+                                System.Diagnostics.FileVersionInfo finfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(MainForm.Instance.Settings.Fdkaac.Path);
+                                FileInfo fi = new FileInfo(MainForm.Instance.Settings.Fdkaac.Path);
                                 CurrentVersion.FileVersion = finfo.FileMajorPart + "." + finfo.FileMinorPart + "." + finfo.FileBuildPart + "." + finfo.FilePrivatePart;
                                 CurrentVersion.UploadDate = fi.LastWriteTimeUtc;
                             }

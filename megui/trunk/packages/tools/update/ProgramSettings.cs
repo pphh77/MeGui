@@ -138,7 +138,7 @@ namespace MeGUI
                 else if (!_enabled)
                 {
                     MeGUI.UpdateWindow.iUpgradeable file = MainForm.Instance.UpdateHandler.UpdateData.FindByName(this._name);
-                    if (file.AvailableVersion != null && file.CurrentVersion == null || file.AvailableVersion.CompareTo(file.CurrentVersion) != 0)
+                    if (file != null && file.AvailableVersion != null && (file.CurrentVersion == null || file.AvailableVersion.CompareTo(file.CurrentVersion) != 0))
                         bUpdateNeeded = true;
                 }
             }

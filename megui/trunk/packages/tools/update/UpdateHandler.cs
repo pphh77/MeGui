@@ -451,6 +451,11 @@ namespace MeGUI
                     if (upgradeable.CurrentVersion.FileVersion != null && upgradeable.CurrentVersion.FileVersion.Equals(upgradeable.AvailableVersion.FileVersion))
                         upgradeable.AvailableVersion.UploadDate = upgradeable.CurrentVersion.UploadDate;
                 }
+                else if (upgradeable.Name.Equals("fdkaac"))
+                {
+                    if (MainForm.Instance.Settings.UseFDKAac && File.Exists(MainForm.Instance.Settings.Fdkaac.Path))
+                        upgradeable.AvailableVersion.UploadDate = upgradeable.CurrentVersion.UploadDate;
+                }
                 if (upgradeable.DownloadChecked)
                     numUpdateableFiles++;
             }
@@ -531,7 +536,7 @@ namespace MeGUI
                         strText = "MeGUI cannot find " + file.DisplayName + " on your system or it is outdated.\nDue to the licensing the component is not included on the MeGUI update server.\n\nTherefore please download the file on your own and extract neroaacenc.exe to:\n" + strPath + "\n\nIf necessary change the path in the settings:\n\"Settings\\External Program Settings\"\n\nWould you like to download it now?";
                     }
                     else
-                        strText = "MeGUI cannot find " + file.DisplayName + " on your system or it is outdated.\nDue to the licensing the component is not included on the MeGUI update server.\n\nTherefore please download the file on your own, extract it and set the path to the " + file.Name + ".exe in the MeGUI settings\n(\"Settings\\External Program Settings\").\n\nWould you like to download it now?";
+                        strText = "MeGUI cannot find " + file.DisplayName + " on your system or it is outdated.\nDue to the licensing the component is not included on the MeGUI update server.\n\nTherefore please download the file on your own, extract & compile it and set the path to the " + file.Name + ".exe in the MeGUI settings\n(\"Settings\\External Program Settings\").\n\nWould you like to download it now?";
 
                     if (MessageBox.Show(strText, "Component not found", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                     {
