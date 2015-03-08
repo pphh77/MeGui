@@ -1049,7 +1049,6 @@ namespace MeGUI
             CommandlineParser parser = new CommandlineParser();
             parser.Parse(args);
             MainForm mainForm = new MainForm();
-            mainForm.UpdateHandler = new UpdateHandler();
             mainForm.handleCommandline(parser);
             if (parser.start)
                 Application.Run(mainForm);
@@ -1311,6 +1310,8 @@ namespace MeGUI
                 i.LogEvent(".Net Framework 4.0 not installed. It will be required in the future.", ImageType.Warning);
             else
                 i.LogValue(".Net Framework", string.Format("{0}", version));
+
+            this.UpdateHandler = new UpdateHandler();
 
             FileUtil.CheckAviSynth(i);
             FileUtil.GetFileInformation("AvisynthWrapper", Path.GetDirectoryName(Application.ExecutablePath) + @"\AvisynthWrapper.dll", ref i);

@@ -1,3 +1,4 @@
+2525 [Update]               fixed startup crash (regression of 2519)
 2524 [FDK-AAC Encoder]      fixed update handling (regression of 2522)
 2523 [Update]               get update server configuration data from the update server itself
 2522 [FDK-AAC Encoder]      added FDK-AAC encoder support
