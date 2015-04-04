@@ -71,7 +71,7 @@ namespace eac3to
 
             Stream stream = null;
 
-            if (s.Contains("AVC") || s.Contains("VC-1") || s.Contains("MPEG") || s.Contains("DIRAC") || s.Contains("THEORA"))
+            if (s.Contains("AVC") || s.Contains("MVC") || s.Contains("VC-1") || s.Contains("MPEG") || s.Contains("DIRAC") || s.Contains("THEORA"))
                 stream = VideoStream.Parse(s);
             else if (s.Contains("AC3") || s.Contains("TrueHD") || s.Contains("DTS") || 
                      s.Contains("RAW") || s.Contains("PCM") || s.Contains("MP") || s.Contains("AAC") ||
