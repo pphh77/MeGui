@@ -770,6 +770,11 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
 
         private bool OpenSourceWithNicAudio(out StringBuilder sbOpen, MediaInfoFile oInfo, bool bForce)
         {
+            string size = String.Empty;
+            FileInfo fi = new FileInfo(audioJob.Input);
+            if (fi.Length / Math.Pow(1024, 3) > 2) 
+                size = ", 1";
+
             sbOpen = new StringBuilder();
             switch (Path.GetExtension(audioJob.Input).ToLowerInvariant())
             {
@@ -832,12 +837,12 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                                         sbOpen.AppendFormat("){0}", Environment.NewLine);
                                 }
                                 else
-                                    sbOpen.AppendFormat("RaWavSource(\"{0}\"){1}", audioJob.Input, Environment.NewLine);
+                                    sbOpen.AppendFormat("RaWavSource(\"{0}\"{2}){1}", audioJob.Input, Environment.NewLine, size);
                                 break;
                             case 0x0003:         // IEEE Float
                             case 0xFFFE:         // WAVE_FORMAT_EXTENSIBLE header
                                 sbOpen.AppendFormat("LoadPlugin(\"{0}\"){1}", Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "NicAudio.dll"), Environment.NewLine);
-                                sbOpen.AppendFormat("RaWavSource(\"{0}\"){1}", audioJob.Input, Environment.NewLine);
+                                sbOpen.AppendFormat("RaWavSource(\"{0}\"{2}){1}", audioJob.Input, Environment.NewLine, size);
                                 break;
                             case 0x0055:         // MPEG Layer 3
                                 sbOpen.AppendFormat("LoadPlugin(\"{0}\"){1}", Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "NicAudio.dll"), Environment.NewLine);
@@ -872,7 +877,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 case ".caf":
                 case ".bwf":
                     sbOpen.AppendFormat("LoadPlugin(\"{0}\"){1}", Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "NicAudio.dll"), Environment.NewLine);
-                    sbOpen.AppendFormat("RaWavSource(\"{0}\", 2){1}", audioJob.Input, Environment.NewLine);
+                    sbOpen.AppendFormat("RaWavSource(\"{0}\"{2}){1}", audioJob.Input, Environment.NewLine, size);
                     break;
             }
 

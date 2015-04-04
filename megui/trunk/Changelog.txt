@@ -1,3 +1,4 @@
+2527 [Audio Encoder]        fixed RaWavSource() for 64bit files >2GB. Bug #792
 2526 [HD Streams Extractor] fixed 3D Blu-Ray processing (regression of eac3to 3.28+). Bug #795
 
 
@@ -11,7 +12,7 @@ Features/Changes:
 
 Enhancements/Fixes:
 [Chapter Creator]      cosmetics
-[Chapter Creator]      improved error handling  
+[Chapter Creator]      improved error handling
 [HD Streams Extractor] cosmetics
 [OneClick]             better support for Blu-ray playlist where eac3to and mediainfo report different track information
 [OneClick]             fixed removing the wrong subtitle track when using the DEL key
