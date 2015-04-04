@@ -601,15 +601,39 @@ namespace MeGUI
         {
             if (DialogManager.useOneClick())
             {
-                OneClickWindow ocmt = new OneClickWindow(this);
-                ocmt.setInput(fileName);
-                ocmt.ShowDialog();
+                if (this.InvokeRequired)
+                {
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        OneClickWindow ocmt = new OneClickWindow(this);
+                        ocmt.setInput(fileName);
+                        ocmt.ShowDialog();
+                    });
+                }
+                else
+                {
+                    OneClickWindow ocmt = new OneClickWindow(this);
+                    ocmt.setInput(fileName);
+                    ocmt.ShowDialog();
+                }
             }
             else
             {
-                FileIndexerWindow mpegInput = new FileIndexerWindow(this);
-                mpegInput.setConfig(fileName, null, 2, true, true, true, false);
-                mpegInput.Show();
+                if (this.InvokeRequired)
+                {
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        FileIndexerWindow mpegInput = new FileIndexerWindow(this);
+                        mpegInput.setConfig(fileName, null, 2, true, true, true, false);
+                        mpegInput.Show();
+                    });
+                }
+                else
+                {
+                    FileIndexerWindow mpegInput = new FileIndexerWindow(this);
+                    mpegInput.setConfig(fileName, null, 2, true, true, true, false);
+                    mpegInput.Show();
+                }
             }
         }
         public bool openFile(string file, bool openVideo)
@@ -648,11 +672,13 @@ namespace MeGUI
                     }
                     else
                         openOtherVideoFile(file);
+                    this.tabControl1.SelectedIndex = 0;
                 }
             }
             else if (iFile.HasAudio)
             {
                 audioEncodingComponent1.openAudioFile(file);
+                this.tabControl1.SelectedIndex = 0;
             }
             else if (Path.GetExtension(iFile.FileName).ToLowerInvariant().Equals(".avs"))
             {
@@ -681,11 +707,8 @@ namespace MeGUI
         private void MeGUI_DragDrop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-            Invoke(new MethodInvoker(delegate
-            {
-                openFile(files[0], false);
-            }));
-            this.tabControl1.SelectedIndex = 0;
+            Thread openFileThread = new Thread((ThreadStart)delegate { openFile(files[0], false); });
+            openFileThread.Start();
         }
 
         private void MeGUI_DragEnter(object sender, DragEventArgs e)
