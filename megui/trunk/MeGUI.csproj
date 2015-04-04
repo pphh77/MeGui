@@ -143,7 +143,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="core\details\mux\baseMuxWindow.resx">
       <DependentUpon>baseMuxWindow.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="core\details\mux\MuxStreamControl.resx">
       <SubType>Designer</SubType>
@@ -207,6 +206,9 @@
     <Compile Include="core\details\MeGUISettings.cs" />
     <Compile Include="core\details\mux\baseMuxWindow.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="core\details\mux\baseMuxWindow.Designer.cs">
+      <DependentUpon>baseMuxWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="core\details\mux\MuxJob.cs" />
     <Compile Include="core\details\mux\MuxPath.cs" />

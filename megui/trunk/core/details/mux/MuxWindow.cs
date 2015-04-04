@@ -79,6 +79,9 @@ namespace MeGUI
                 cbType.Enabled = false;
             muxedInput.Filter = muxer.GetMuxedInputFilter();
 
+            if (this.muxer.MuxerType == MuxerType.AVIMUXGUI)
+                fps.Enabled = false;
+
             audioTracks[0].Filter = muxer.GetAudioInputFilter();
             output.Filter = muxer.GetOutputTypeFilter();
             subtitleTracks[0].Filter = muxer.GetSubtitleInputFilter();

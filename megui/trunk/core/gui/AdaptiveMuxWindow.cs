@@ -142,6 +142,11 @@ namespace MeGUI
             else
                 this.cbType.Enabled = true;
 
+            if (this.cbContainer.Text == "AVI")
+                fps.Enabled = false;
+            else
+                fps.Enabled = true;
+
             List<DeviceType> supportedOutputDeviceTypes = this.muxProvider.GetSupportedDevices((ContainerType)cbContainer.SelectedItem);
             this.cbType.Items.Clear();
             this.cbType.Items.Add("Standard");
