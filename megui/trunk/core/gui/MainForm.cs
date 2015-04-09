@@ -601,39 +601,15 @@ namespace MeGUI
         {
             if (DialogManager.useOneClick())
             {
-                if (this.InvokeRequired)
-                {
-                    this.Invoke((MethodInvoker)delegate
-                    {
-                        OneClickWindow ocmt = new OneClickWindow(this);
-                        ocmt.setInput(fileName);
-                        ocmt.ShowDialog();
-                    });
-                }
-                else
-                {
-                    OneClickWindow ocmt = new OneClickWindow(this);
-                    ocmt.setInput(fileName);
-                    ocmt.ShowDialog();
-                }
+                OneClickWindow ocmt = new OneClickWindow(this);
+                ocmt.setInput(fileName);
+                ocmt.ShowDialog();
             }
             else
             {
-                if (this.InvokeRequired)
-                {
-                    this.Invoke((MethodInvoker)delegate
-                    {
-                        FileIndexerWindow mpegInput = new FileIndexerWindow(this);
-                        mpegInput.setConfig(fileName, null, 2, true, true, true, false);
-                        mpegInput.Show();
-                    });
-                }
-                else
-                {
-                    FileIndexerWindow mpegInput = new FileIndexerWindow(this);
-                    mpegInput.setConfig(fileName, null, 2, true, true, true, false);
-                    mpegInput.Show();
-                }
+                FileIndexerWindow mpegInput = new FileIndexerWindow(this);
+                mpegInput.setConfig(fileName, null, 2, true, true, true, false);
+                mpegInput.Show();
             }
         }
         public bool openFile(string file, bool openVideo)
@@ -707,7 +683,13 @@ namespace MeGUI
         private void MeGUI_DragDrop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-            Thread openFileThread = new Thread((ThreadStart)delegate { openFile(files[0], false); });
+            Thread openFileThread = new Thread((ThreadStart)delegate 
+            {
+                if (this.InvokeRequired)
+                    Invoke(new MethodInvoker(delegate { openFile(files[0], false); }));
+                else
+                    openFile(files[0], false); 
+            });
             openFileThread.Start();
         }
 

@@ -1,3 +1,4 @@
+2530 [MainForm]             fixed Drag & Drop handling of some file types (regression of 2529)
 2529 [MainForm]             improved Drag & Drop handling. Bug #786
 2528 [AVI Muxer]            disabled FPS change option as it is not supported. Bug #785
 2527 [Audio Encoder]        fixed RaWavSource() for 64bit files >2GB. Bug #792
