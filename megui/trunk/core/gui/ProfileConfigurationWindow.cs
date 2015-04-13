@@ -141,16 +141,16 @@ namespace MeGUI.core.gui
             set
             {
                 videoProfile.Items.Clear();
-                foreach (GenericProfile<TSettings> p in value.a)
+                foreach (GenericProfile<TSettings> p in value.Item1)
                     videoProfile.Items.Add(p.clone());
 
-                SelectedProfile = value.b;
+                SelectedProfile = value.Item2;
             }
         }
 
         private GenericProfile<TSettings> byName(string profileName)
         {
-            foreach (GenericProfile<TSettings> p in Profiles.a)
+            foreach (GenericProfile<TSettings> p in Profiles.Item1)
                 if (p.Name == profileName)
                     return p;
 

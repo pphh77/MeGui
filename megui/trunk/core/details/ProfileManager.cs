@@ -481,11 +481,11 @@ namespace MeGUI
             get { return new Tuple<IEnumerable<Profile>, Profile>(profiles, selectedProfile); }
             set
             {
-                profiles = new List<Profile>(value.a);
+                profiles = new List<Profile>(value.Item1);
                 if (profiles.Count == 0)
                     profiles.Add(genScratchpad());
 
-                selectedProfile = value.b ?? profiles[0];
+                selectedProfile = value.Item2 ?? profiles[0];
 
                 raiseChangedEvent();
             }
@@ -493,7 +493,7 @@ namespace MeGUI
 
         public IEnumerable<Profile> Profiles
         {
-            get { return ProfilesAndSelected.a; }
+            get { return ProfilesAndSelected.Item1; }
             set { ProfilesAndSelected = new Tuple<IEnumerable<Profile>,Profile>(value, null); }
         }
 
@@ -598,14 +598,14 @@ namespace MeGUI
                 Tuple<IEnumerable<Profile>, Profile> p = ProfilesAndSelected;
 
                 return new Tuple<IEnumerable<GenericProfile<TSettings>>, GenericProfile<TSettings>>(
-                    Util.CastAll<Profile, GenericProfile<TSettings>>(p.a),
-                    (GenericProfile<TSettings>)p.b);
+                    Util.CastAll<Profile, GenericProfile<TSettings>>(p.Item1),
+                    (GenericProfile<TSettings>)p.Item2);
             }
             set
             {
                 ProfilesAndSelected = new Tuple<IEnumerable<Profile>, Profile>(
-                    Util.CastAll<GenericProfile<TSettings>, Profile>(value.a),
-                    value.b);
+                    Util.CastAll<GenericProfile<TSettings>, Profile>(value.Item1),
+                    value.Item2);
             }
         }
 

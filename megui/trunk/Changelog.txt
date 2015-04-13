@@ -1,3 +1,4 @@
+2531                        switched to .NET 4.0 so that instead of .NET 2.0 now 4.0 has to be installed
 2530 [MainForm]             fixed Drag & Drop handling of some file types (regression of 2529)
 2529 [MainForm]             improved Drag & Drop handling. Bug #786
 2528 [AVI Muxer]            disabled FPS change option as it is not supported. Bug #785

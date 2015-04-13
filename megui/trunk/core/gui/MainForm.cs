@@ -1305,16 +1305,15 @@ namespace MeGUI
 #endif
             i.LogValue("Operating System", string.Format("{0}{1} ({2}.{3}.{4}.{5})", OSInfo.GetOSName(), OSInfo.GetOSServicePack(), OSInfo.OSMajorVersion, OSInfo.OSMinorVersion, OSInfo.OSRevisionVersion, OSInfo.OSBuildVersion));
 
-            string version = OSInfo.GetDotNetVersion("2.0");
+            string version = OSInfo.GetDotNetVersion("4.0");
             if (String.IsNullOrEmpty(version))
-                i.LogEvent(".Net Framework 2.0 not installed", ImageType.Warning);
+                i.LogEvent(".NET Framework 4.0 not installed", ImageType.Warning);
             else
-                i.LogValue(".Net Framework", string.Format("{0}", version));
-            version = OSInfo.GetDotNetVersion("4.0");
-            if (String.IsNullOrEmpty(version))
-                i.LogEvent(".Net Framework 4.0 not installed. It will be required in the future.", ImageType.Warning);
-            else
-                i.LogValue(".Net Framework", string.Format("{0}", version));
+                i.LogValue(".NET Framework", string.Format("{0}", version));
+
+            version = OSInfo.GetDotNetVersion();
+            if (!String.IsNullOrEmpty(version))
+                i.LogValue(".NET Framework", string.Format("{0}", version));
 
             this.UpdateHandler = new UpdateHandler();
 

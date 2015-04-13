@@ -421,7 +421,7 @@ namespace MeGUI
                     foreach (string version in versions)
                     {
                         if (!String.IsNullOrEmpty(getSpecificVersion) && (version.StartsWith(getSpecificVersion) || DotNetVersionFormated(version).StartsWith(getSpecificVersion)) )
-                            return version;
+                            return DotNetVersionFormated(version);
                         fv = version;
                     }
 
@@ -433,7 +433,7 @@ namespace MeGUI
                     return null;
                 }
             }
-            return fv;
+            return DotNetVersionFormated(fv);
         }
 
         /// <summary>
@@ -555,6 +555,7 @@ namespace MeGUI
                                             {
                                                 case "50709": dnvf = "4.5"; break;
                                                 case "51641": dnvf = "4.5.1"; break;
+                                                case "51650": dnvf = "4.5.2"; break;
                                                 default: dnvf = "4.5.x"; break;
                                             }
                                         }
