@@ -356,7 +356,7 @@ namespace MeGUI
         }
 
         /// <summary>
-        /// Returns the name of the dotNet Framework running on this computer.
+        /// Returns the name of the highest .NET Framework running on this computer.
         /// </summary>
         /// <returns>A string containing the Name of the Framework Version.</returns>
         /// 
