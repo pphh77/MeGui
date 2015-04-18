@@ -35,7 +35,7 @@ namespace MeGUI.core.details.video
         #region variables
         protected bool updating = false;
         private double bytesPerFrame;
-        protected int lastEncodingMode = 0;
+        protected VideoCodecSettings.VideoEncodingMode lastEncodingMode = 0;
         protected int lastBitrateEncodingValue = 1000;
         protected int lastQuantizerEncodingValue = 32;
 

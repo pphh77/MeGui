@@ -83,7 +83,7 @@ namespace MeGUI
         public xvidSettings()
             : base(ID, VideoEncoderType.XVID)
         {
-            EncodingMode = 0;
+            VideoEncodingType = VideoEncodingMode.CBR;
             quantizer = 0;
             BitrateQuantizer = 700;
             KeyframeInterval = 300;
@@ -371,7 +371,7 @@ namespace MeGUI
                this.ChromaMotion != otherSettings.ChromaMotion ||
                this.ClosedGOP != otherSettings.ClosedGOP ||
                this.CustomEncoderOptions != otherSettings.CustomEncoderOptions ||
-               this.EncodingMode != otherSettings.EncodingMode ||
+               this.VideoEncodingType != otherSettings.VideoEncodingType ||
                this.FrameDropRatio != otherSettings.FrameDropRatio ||
                this.GMC != otherSettings.GMC ||
                this.HighBitrateDegradation != otherSettings.HighBitrateDegradation ||

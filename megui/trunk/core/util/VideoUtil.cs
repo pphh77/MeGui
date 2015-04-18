@@ -90,7 +90,7 @@ namespace MeGUI
                     outputDirectory = Path.GetDirectoryName(fileName);
 
                 // we check the main IFO
-                if (fileNameNoPath.Substring(0, 4).ToUpper(System.Globalization.CultureInfo.InvariantCulture) == "VTS_")
+                if (fileNameNoPath.Substring(0, 4).ToUpperInvariant() == "VTS_")
                     ifoFile = fileName.Substring(0, fileName.LastIndexOf("_")) + "_0.IFO";
                 else 
                     ifoFile = Path.ChangeExtension(fileName, ".IFO");
@@ -487,12 +487,13 @@ namespace MeGUI
         {
             if (desiredSize.HasValue && String.IsNullOrEmpty(videoFileToMux))
             {
-                if (video.Settings.EncodingMode != 4 && video.Settings.EncodingMode != 8) // no automated 2/3 pass
+                if (video.Settings.VideoEncodingType != VideoCodecSettings.VideoEncodingMode.twopassAutomated
+                    && video.Settings.VideoEncodingType != VideoCodecSettings.VideoEncodingMode.threepassAutomated) // no automated 2/3 pass
                 {
                     if (this.mainForm.Settings.NbPasses == 2)
-                        video.Settings.EncodingMode = 4; // automated 2 pass
+                        video.Settings.VideoEncodingType = VideoCodecSettings.VideoEncodingMode.twopassAutomated; // automated 2 pass
                     else if (video.Settings.MaxNumberOfPasses == 3)
-                        video.Settings.EncodingMode = 8;
+                        video.Settings.VideoEncodingType = VideoCodecSettings.VideoEncodingMode.threepassAutomated;
                 }
             }
 

@@ -332,6 +332,13 @@ namespace MeGUI.packages.video.x265
             this.x265EncodingMode.Items.AddRange(new object[] {
             "ABR",
             "Const. Quantizer",
+            "2pass - 1st pass",
+            "2pass - 2nd pass",
+            "Automated 2pass",
+            "3pass - 1st pass",
+            "3pass - 2nd pass",
+            "3pass - 3rd pass",
+            "Automated 3pass",
             "Const. Quality"});
             this.x265EncodingMode.Location = new System.Drawing.Point(15, 19);
             this.x265EncodingMode.MaxDropDownItems = 2;

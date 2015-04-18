@@ -55,14 +55,31 @@ namespace MeGUI
             return 0;
         }
 
-        public enum Mode : int { CBR = 0, CQ, twopass1, twopass2, twopassAutomated, threepass1, threepass2, threepass3, threepassAutomated, quality };
-        int encodingMode, bitrateQuantizer, keyframeInterval, nbBframes, minQuantizer, maxQuantizer, fourCC,
+        /// <summary>
+        /// video encoding mode
+        /// </summary>
+        public enum VideoEncodingMode : int
+        { 
+            CBR = 0,
+            CQ = 1,
+            twopass1,
+            twopass2,
+            twopassAutomated,
+            threepass1,
+            threepass2,
+            threepass3,
+            threepassAutomated,
+            quality
+        };
+
+        private int bitrateQuantizer, keyframeInterval, nbBframes, minQuantizer, maxQuantizer, fourCC,
             maxNumberOfPasses, nbThreads;
-		bool v4mv, qpel, trellis;
-		decimal creditsQuantizer;
+		private bool v4mv, qpel, trellis;
+		private decimal creditsQuantizer;
 		private string logfile, customEncoderOptions, videoName;
         private string[] fourCCs;
         private VideoEncoderType vet;
+        private VideoEncodingMode videoEncodyingType;
 
         public abstract bool UsesSAR
         {
@@ -87,16 +104,41 @@ namespace MeGUI
         {
             get { return vet; }
         }
-		public int EncodingMode
-		{
-			get 
+        public VideoEncodingMode VideoEncodingType
+        {
+            get { return videoEncodyingType; }
+            set { videoEncodyingType = value; }
+        }
+        public string EncodingMode
+        {
+            get { return "migrated"; }
+            set
             {
-                if (id.Equals("x265") && encodingMode > 2)
-                    encodingMode = 2;
-                return encodingMode; 
+                if (value.Equals("migrated"))
+                    return;
+
+                if (value.Equals("0"))
+                    videoEncodyingType = VideoEncodingMode.CBR;
+                else if (value.Equals("1"))
+                    videoEncodyingType = VideoEncodingMode.CQ;
+                else if (value.Equals("2") && !id.Equals("x265"))
+                    videoEncodyingType = VideoEncodingMode.twopass1;
+                else if (value.Equals("3") && !id.Equals("x265"))
+                    videoEncodyingType = VideoEncodingMode.twopass2;
+                else if (value.Equals("4") && !id.Equals("x265"))
+                    videoEncodyingType = VideoEncodingMode.twopassAutomated;
+                else if (value.Equals("5") && !id.Equals("x265"))
+                    videoEncodyingType = VideoEncodingMode.threepass1;
+                else if (value.Equals("6") && !id.Equals("x265"))
+                    videoEncodyingType = VideoEncodingMode.threepass2;
+                else if (value.Equals("7") && !id.Equals("x265"))
+                    videoEncodyingType = VideoEncodingMode.threepass3;
+                else if (value.Equals("8") && !id.Equals("x265"))
+                    videoEncodyingType = VideoEncodingMode.threepassAutomated;
+                else
+                    videoEncodyingType = VideoEncodingMode.quality;
             }
-			set { encodingMode = value; }
-		}
+        }
 		public int BitrateQuantizer
 		{
 			get { return bitrateQuantizer; }
@@ -174,19 +216,19 @@ namespace MeGUI
 		{
 			get 
             {
-                if (EncoderType.ID.ToLower(System.Globalization.CultureInfo.InvariantCulture).Equals("x264"))
+                if (EncoderType.ID.ToLowerInvariant().Equals("x264"))
                 {
                     // update custom command line if necessary
                     String strNewCommandLine = "", strNewCommand = "";
                     foreach (String strCommand in System.Text.RegularExpressions.Regex.Split(customEncoderOptions, "--"))
                     {
-                        if (strCommand.Trim().ToLower(System.Globalization.CultureInfo.InvariantCulture).Equals("nal-hrd"))
+                        if (strCommand.Trim().ToLowerInvariant().Equals("nal-hrd"))
                             strNewCommand = "nal-hrd vbr";
-                        else if (strCommand.Trim().ToLower(System.Globalization.CultureInfo.InvariantCulture).Equals("open-gop none"))
+                        else if (strCommand.Trim().ToLowerInvariant().Equals("open-gop none"))
                             strNewCommand = String.Empty;
-                        else if (strCommand.Trim().ToLower(System.Globalization.CultureInfo.InvariantCulture).Equals("open-gop normal"))
+                        else if (strCommand.Trim().ToLowerInvariant().Equals("open-gop normal"))
                             strNewCommand = "open-gop";
-                        else if (strCommand.Trim().ToLower(System.Globalization.CultureInfo.InvariantCulture).Equals("open-gop bluray"))
+                        else if (strCommand.Trim().ToLowerInvariant().Equals("open-gop bluray"))
                             strNewCommand = "open-gop --bluray-compat";
                         else
                             strNewCommand = strCommand.Trim();

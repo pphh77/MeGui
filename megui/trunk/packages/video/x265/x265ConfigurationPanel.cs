@@ -533,14 +533,16 @@ namespace MeGUI.packages.video.x265
         /// </summary>
         /// <param name="mode">selected encoding mode</param>
         /// <returns>true if the mode is a bitrate mode, false otherwise</returns>
-        private bool isBitrateMode(int mode)
+        private bool isBitrateMode(VideoCodecSettings.VideoEncodingMode mode)
         {
-            return !(mode == 1 || mode == 2);
+            return !(mode == VideoCodecSettings.VideoEncodingMode.CQ ||
+                mode == VideoCodecSettings.VideoEncodingMode.quality);
         }
 
         private void doEncodingModeAdjustments()
         {
-            if (x265EncodingMode.SelectedIndex == 0)
+            if ((VideoCodecSettings.VideoEncodingMode)x265EncodingMode.SelectedIndex != VideoCodecSettings.VideoEncodingMode.CQ
+                && (VideoCodecSettings.VideoEncodingMode)x265EncodingMode.SelectedIndex != VideoCodecSettings.VideoEncodingMode.quality)
             {
                 this.x265BitrateQuantizerLabel.Text = "Bitrate";
                 x265BitrateQuantizer.Maximum = 500000;
@@ -551,7 +553,7 @@ namespace MeGUI.packages.video.x265
             }
             else
             {
-                if (x265EncodingMode.SelectedIndex == 1)
+                if ((VideoCodecSettings.VideoEncodingMode)x265EncodingMode.SelectedIndex == VideoCodecSettings.VideoEncodingMode.CQ)
                 {
                     this.x265BitrateQuantizerLabel.Text = "Quantizer";
                     tooltipHelp.SetToolTip(x265BitrateQuantizer, SelectHelpText("qp"));
@@ -561,7 +563,7 @@ namespace MeGUI.packages.video.x265
                     x265BitrateQuantizer.DecimalPlaces = 0;
                     x265BitrateQuantizer.Increment = 1;
                 }
-                if (x265EncodingMode.SelectedIndex == 2)
+                if ((VideoCodecSettings.VideoEncodingMode)x265EncodingMode.SelectedIndex == VideoCodecSettings.VideoEncodingMode.quality)
                 {
                     this.x265BitrateQuantizerLabel.Text = "Quality";
                     tooltipHelp.SetToolTip(x265BitrateQuantizer, SelectHelpText("crf"));
@@ -572,18 +574,19 @@ namespace MeGUI.packages.video.x265
                 }
             }
 
-
             // We check whether the bitrate/quality text needs to be changed
-            if (isBitrateMode(lastEncodingMode) != isBitrateMode(x265EncodingMode.SelectedIndex))
+            if (isBitrateMode(lastEncodingMode) != isBitrateMode((VideoCodecSettings.VideoEncodingMode)x265EncodingMode.SelectedIndex))
             {
-                if (x265EncodingMode.SelectedIndex==0)
+                if ((VideoCodecSettings.VideoEncodingMode)x265EncodingMode.SelectedIndex != VideoCodecSettings.VideoEncodingMode.CQ
+                    && (VideoCodecSettings.VideoEncodingMode)x265EncodingMode.SelectedIndex != VideoCodecSettings.VideoEncodingMode.quality)
                     this.x265BitrateQuantizer.Value = lastBitrateEncodingValue;
                 else
                     this.x265BitrateQuantizer.Value = lastQuantizerEncodingValue;
             }
 
-            lastEncodingMode = x265EncodingMode.SelectedIndex;
-            if (x265EncodingMode.SelectedIndex == 0)
+            lastEncodingMode = (VideoCodecSettings.VideoEncodingMode)x265EncodingMode.SelectedIndex;
+            if ((VideoCodecSettings.VideoEncodingMode)x265EncodingMode.SelectedIndex != VideoCodecSettings.VideoEncodingMode.CQ
+                && (VideoCodecSettings.VideoEncodingMode)x265EncodingMode.SelectedIndex != VideoCodecSettings.VideoEncodingMode.quality)
                 lastBitrateEncodingValue = (int)this.x265BitrateQuantizer.Value;
             else
                 lastQuantizerEncodingValue = (int)this.x265BitrateQuantizer.Value;
@@ -642,8 +645,9 @@ namespace MeGUI.packages.video.x265
                 x265Tunes.SelectedIndex = 0; // Default
             if (cbBPyramid.SelectedIndex == -1)
                 cbBPyramid.SelectedIndex = 2;
-            lastEncodingMode = this.x265EncodingMode.SelectedIndex;
-            if (x265EncodingMode.SelectedIndex==0)
+            lastEncodingMode = (VideoCodecSettings.VideoEncodingMode)this.x265EncodingMode.SelectedIndex;
+            if ((VideoCodecSettings.VideoEncodingMode)x265EncodingMode.SelectedIndex != VideoCodecSettings.VideoEncodingMode.CQ
+                && (VideoCodecSettings.VideoEncodingMode)x265EncodingMode.SelectedIndex != VideoCodecSettings.VideoEncodingMode.quality)
                 lastBitrateEncodingValue = (int)this.x265BitrateQuantizer.Value;
             else
                 lastQuantizerEncodingValue = (int)this.x265BitrateQuantizer.Value;
@@ -696,7 +700,7 @@ namespace MeGUI.packages.video.x265
                 xs.NoDCTDecimate = this.noDCTDecimateOption.Checked;
                 xs.NoFastPSkip = noFastPSkip.Checked;
                 xs.NoMixedRefs = x265MixedReferences.Checked;
-                xs.EncodingMode = x265EncodingMode.SelectedIndex;
+                xs.VideoEncodingType = (VideoCodecSettings.VideoEncodingMode)x265EncodingMode.SelectedIndex;
                 xs.BitrateQuantizer = (int)x265BitrateQuantizer.Value;
                 xs.QuantizerCRF = x265BitrateQuantizer.Value;
                 xs.KeyframeInterval = (int)x265KeyframeInterval.Value;
@@ -775,13 +779,13 @@ namespace MeGUI.packages.video.x265
                 deadzoneInter.Value = xs.DeadZoneInter;
                 deadzoneIntra.Value = xs.DeadZoneIntra;
                 noDCTDecimateOption.Checked = xs.NoDCTDecimate;
-                x265EncodingMode.SelectedIndex = xs.EncodingMode;
+                x265EncodingMode.SelectedIndex = (int)xs.VideoEncodingType;
                 doEncodingModeAdjustments();
                 this.x265NumberOfRefFrames.Value = xs.NbRefFrames;
                 this.x265NumberOfBFrames.Value = xs.NbBframes;
                 noFastPSkip.Checked = xs.NoFastPSkip;
                 this.x265SubpelRefinement.SelectedIndex = xs.SubPelRefinement;
-                x265BitrateQuantizer.Value = (isBitrateMode(xs.EncodingMode) || xs.QuantizerCRF == 0) ? xs.BitrateQuantizer : xs.QuantizerCRF;
+                x265BitrateQuantizer.Value = (isBitrateMode(xs.VideoEncodingType) || xs.QuantizerCRF == 0) ? xs.BitrateQuantizer : xs.QuantizerCRF;
                 x265KeyframeInterval.Text = xs.KeyframeInterval.ToString() ;
                 x265NewAdaptiveBframes.SelectedIndex = xs.NewAdaptiveBFrames;
                 x265DeblockActive.Checked = xs.Deblock;

@@ -34,7 +34,7 @@ namespace MeGUI
             : base(ID, VideoEncoderType.HFYU)
         {
             base.BitrateQuantizer = 0;
-            base.EncodingMode = (int)Mode.CQ;
+            base.VideoEncodingType = VideoEncodingMode.CQ;
             base.FourCC = 0;
             FourCCs = m_fourCCs;
         }

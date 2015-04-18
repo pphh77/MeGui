@@ -699,7 +699,7 @@ namespace MeGUI
                 {
                     foreach (KeyValuePair<string, string> strLanguage in LanguageSelectionContainer.Languages)
                     {
-                        if (Path.GetFileNameWithoutExtension(stream.path).ToLower(System.Globalization.CultureInfo.InvariantCulture).Contains(strLanguage.Key.ToLower(System.Globalization.CultureInfo.InvariantCulture)))
+                        if (Path.GetFileNameWithoutExtension(stream.path).ToLowerInvariant().Contains(strLanguage.Key.ToLowerInvariant()))
                         {
                             stream.language = strLanguage.Key;
                             break;
@@ -828,7 +828,8 @@ namespace MeGUI
                 MessageBox.Show(error, "Unsupported audio configuration", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 return;
             }
-            if (info.Video.CurrentSettings.EncodingMode == 2 || info.Video.CurrentSettings.EncodingMode == 5)
+            if (info.Video.CurrentSettings.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.twopass1
+                || info.Video.CurrentSettings.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.threepass1)
             {
                 MessageBox.Show("First pass encoding is not supported for automated encoding as no output is generated.\nPlease choose another encoding mode", "Improper configuration",
                     MessageBoxButtons.OK, MessageBoxIcon.Stop);

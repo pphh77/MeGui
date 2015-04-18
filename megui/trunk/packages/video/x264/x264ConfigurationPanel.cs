@@ -950,15 +950,15 @@ namespace MeGUI.packages.video.x264
         /// </summary>
         /// <param name="mode">selected encoding mode</param>
         /// <returns>true if the mode is a bitrate mode, false otherwise</returns>
-        private bool isBitrateMode(int mode)
+        private bool isBitrateMode(VideoCodecSettings.VideoEncodingMode mode)
         {
-            return !(mode == (int)VideoCodecSettings.Mode.CQ ||
-                mode == (int)VideoCodecSettings.Mode.quality);
+            return !(mode == VideoCodecSettings.VideoEncodingMode.CQ ||
+                mode == VideoCodecSettings.VideoEncodingMode.quality);
         }
         private void doEncodingModeAdjustments()
         {
             this.gbAQ.Enabled = true;
-            if (isBitrateMode(x264EncodingMode.SelectedIndex))
+            if (isBitrateMode((VideoCodecSettings.VideoEncodingMode)x264EncodingMode.SelectedIndex))
             {
                 this.x264BitrateQuantizerLabel.Text = "Bitrate";
                 x264TempFrameComplexityBlur.Enabled = true;
@@ -980,20 +980,20 @@ namespace MeGUI.packages.video.x264
                 x264TempFrameComplexityBlurLabel.Enabled = false;
                 x264TempQuantBlur.Enabled = false;
                 x264TempQuantBlurLabel.Enabled = false;
-                if (x264EncodingMode.SelectedIndex == (int)VideoCodecSettings.Mode.CQ)
+                if (x264EncodingMode.SelectedIndex == (int)VideoCodecSettings.VideoEncodingMode.CQ)
                 {
                     this.x264BitrateQuantizerLabel.Text = "Quantizer";
                     this.gbAQ.Enabled = false;
                     tooltipHelp.SetToolTip(x264BitrateQuantizer, SelectHelpText("qp"));
                 }
-                if (x264EncodingMode.SelectedIndex == (int)VideoCodecSettings.Mode.quality)
+                if (x264EncodingMode.SelectedIndex == (int)VideoCodecSettings.VideoEncodingMode.quality)
                 {
                     this.x264BitrateQuantizerLabel.Text = "Quality";
                     cbTarget.Text = "Targeting quality";
                     tooltipHelp.SetToolTip(x264BitrateQuantizer, SelectHelpText("crf"));
                 }
               
-                if (x264EncodingMode.SelectedIndex == (int)VideoCodecSettings.Mode.quality) // crf
+                if (x264EncodingMode.SelectedIndex == (int)VideoCodecSettings.VideoEncodingMode.quality) // crf
                 {
                     x264BitrateQuantizer.Maximum = 51;
                     x264BitrateQuantizer.Minimum = 0.0M;
@@ -1010,51 +1010,51 @@ namespace MeGUI.packages.video.x264
                 }
 
             }
-            if (x264EncodingMode.SelectedIndex != (int)VideoCodecSettings.Mode.CQ)
+            if (x264EncodingMode.SelectedIndex != (int)VideoCodecSettings.VideoEncodingMode.CQ)
                 setNonQPOptionsEnabled(true);
             else
                 setNonQPOptionsEnabled(false);
 
             switch (x264EncodingMode.SelectedIndex)
             {
-                case (int)VideoCodecSettings.Mode.CBR: //Actually, ABR
+                case (int)VideoCodecSettings.VideoEncodingMode.CBR: //Actually, ABR
                     x264SlowFirstpass.Enabled = false;
                     x264RateTol.Enabled = true;
                     x264RateTolLabel.Enabled = true;
                     logfileOpenButton.Enabled = false;
                     break;
 
-                case (int)VideoCodecSettings.Mode.CQ:
+                case (int)VideoCodecSettings.VideoEncodingMode.CQ:
                     x264SlowFirstpass.Enabled = false;
                     x264RateTol.Enabled = false;
                     x264RateTolLabel.Enabled = false;
                     logfileOpenButton.Enabled = false;
                     break;
 
-                case (int)VideoCodecSettings.Mode.twopass1:
-                case (int)VideoCodecSettings.Mode.threepass1:
+                case (int)VideoCodecSettings.VideoEncodingMode.twopass1:
+                case (int)VideoCodecSettings.VideoEncodingMode.threepass1:
                     x264SlowFirstpass.Enabled = true;
                     x264RateTol.Enabled = true;
                     x264RateTolLabel.Enabled = true;
                     logfileOpenButton.Enabled = true;
                     break;
 
-                case (int)VideoCodecSettings.Mode.twopass2:
-                case (int)VideoCodecSettings.Mode.threepass2:
-                case (int)VideoCodecSettings.Mode.threepass3:
+                case (int)VideoCodecSettings.VideoEncodingMode.twopass2:
+                case (int)VideoCodecSettings.VideoEncodingMode.threepass2:
+                case (int)VideoCodecSettings.VideoEncodingMode.threepass3:
                     x264SlowFirstpass.Enabled = false;
                     x264RateTol.Enabled = true;
                     x264RateTolLabel.Enabled = true;
                     logfileOpenButton.Enabled = true;
                     break;
-                case (int)VideoCodecSettings.Mode.twopassAutomated:
-                case (int)VideoCodecSettings.Mode.threepassAutomated:
+                case (int)VideoCodecSettings.VideoEncodingMode.twopassAutomated:
+                case (int)VideoCodecSettings.VideoEncodingMode.threepassAutomated:
                     x264SlowFirstpass.Enabled = true;
                     x264RateTol.Enabled = true;
                     x264RateTolLabel.Enabled = true;
                     logfileOpenButton.Enabled = true;
                     break;
-                case (int)VideoCodecSettings.Mode.quality:
+                case (int)VideoCodecSettings.VideoEncodingMode.quality:
                     x264SlowFirstpass.Enabled = false;
                     logfileOpenButton.Enabled = false;
                     x264RateTol.Enabled = false;
@@ -1063,9 +1063,9 @@ namespace MeGUI.packages.video.x264
             }
 
             // We check whether the bitrate/quality text needs to be changed
-            if (isBitrateMode(lastEncodingMode) != isBitrateMode(x264EncodingMode.SelectedIndex))
+            if (isBitrateMode((VideoCodecSettings.VideoEncodingMode)lastEncodingMode) != isBitrateMode((VideoCodecSettings.VideoEncodingMode)x264EncodingMode.SelectedIndex))
             {
-                if (isBitrateMode(x264EncodingMode.SelectedIndex))
+                if (isBitrateMode((VideoCodecSettings.VideoEncodingMode)x264EncodingMode.SelectedIndex))
                     this.x264BitrateQuantizer.Value = 1000;
                 else
                     this.x264BitrateQuantizer.Value = 23;
@@ -1074,7 +1074,7 @@ namespace MeGUI.packages.video.x264
             // No Scenecut
             x264SCDSensitivity.Enabled = scenecut.Checked;
 
-            lastEncodingMode = x264EncodingMode.SelectedIndex;
+            lastEncodingMode = (VideoCodecSettings.VideoEncodingMode)x264EncodingMode.SelectedIndex;
         }
         #endregion
         #region level -> mb
@@ -1157,7 +1157,7 @@ namespace MeGUI.packages.video.x264
                 x264Tunes.SelectedIndex = 0; // Default
             if (cbBPyramid.SelectedIndex == -1)
                 cbBPyramid.SelectedIndex = 2;
-            lastEncodingMode = this.x264EncodingMode.SelectedIndex;
+            lastEncodingMode = (VideoCodecSettings.VideoEncodingMode)this.x264EncodingMode.SelectedIndex;
             
             try
             {
@@ -1212,7 +1212,7 @@ namespace MeGUI.packages.video.x264
                 xs.NoFastPSkip = noFastPSkip.Checked;
                 xs.X264SlowFirstpass = this.x264SlowFirstpass.Checked;
                 xs.NoMixedRefs = x264MixedReferences.Checked;
-                xs.EncodingMode = x264EncodingMode.SelectedIndex;
+                xs.VideoEncodingType = (VideoCodecSettings.VideoEncodingMode)x264EncodingMode.SelectedIndex;
                 xs.BitrateQuantizer = (int)x264BitrateQuantizer.Value;
                 xs.QuantizerCRF = x264BitrateQuantizer.Value;
                 xs.KeyframeInterval = (int)x264KeyframeInterval.Value;
@@ -1334,14 +1334,14 @@ namespace MeGUI.packages.video.x264
                 targetDevice.SelectedItem = xs.TargetDevice.Name;
                 updateDeviceBlocked = false;
                 chkBlurayCompat.Checked = xs.BlurayCompat;
-                x264EncodingMode.SelectedIndex = xs.EncodingMode;
+                x264EncodingMode.SelectedIndex = (int)xs.VideoEncodingType;
                 doEncodingModeAdjustments();
                 this.x264NumberOfRefFrames.Value = xs.NbRefFrames;
                 this.x264NumberOfBFrames.Value = xs.NbBframes;
                 noFastPSkip.Checked = xs.NoFastPSkip;
                 this.x264SubpelRefinement.SelectedIndex = xs.SubPelRefinement;
                 x264SlowFirstpass.Checked = xs.X264SlowFirstpass;
-                x264BitrateQuantizer.Value = (isBitrateMode(xs.EncodingMode) || xs.QuantizerCRF == 0) ? xs.BitrateQuantizer : xs.QuantizerCRF;
+                x264BitrateQuantizer.Value = (isBitrateMode(xs.VideoEncodingType) || xs.QuantizerCRF == 0) ? xs.BitrateQuantizer : xs.QuantizerCRF;
                 x264KeyframeInterval.Text = xs.KeyframeInterval.ToString() ;
                 x264NewAdaptiveBframes.SelectedIndex = xs.NewAdaptiveBFrames;
                 x264DeblockActive.Checked = xs.Deblock;
@@ -1616,8 +1616,8 @@ namespace MeGUI.packages.video.x264
         private void x264DialogTriStateAdjustment()
         {
             bool turboOptions = this.x264SlowFirstpass.Checked &&
-                (this.x264EncodingMode.SelectedIndex == (int)VideoCodecSettings.Mode.threepass1 ||
-                 this.x264EncodingMode.SelectedIndex == (int)VideoCodecSettings.Mode.twopass1);
+                (this.x264EncodingMode.SelectedIndex == (int)VideoCodecSettings.VideoEncodingMode.threepass1 ||
+                 this.x264EncodingMode.SelectedIndex == (int)VideoCodecSettings.VideoEncodingMode.twopass1);
 
             // First we do the Profile Adjustments
             #region profile adjustments
@@ -1852,7 +1852,7 @@ namespace MeGUI.packages.video.x264
         private void dSettings_Click(object sender, EventArgs e)
         {
             // Main Tab
-            this.x264EncodingMode.SelectedIndex = 9;
+            this.x264EncodingMode.SelectedIndex = (int)VideoCodecSettings.VideoEncodingMode.quality;
             this.x264BitrateQuantizer.Value = 23;
             this.x264Tunes.SelectedIndex = 0;
             this.tbx264Presets.Value = 5;
@@ -1985,13 +1985,13 @@ namespace MeGUI.packages.video.x264
             if (cbTarget.SelectedIndex == 0)
             {
                 if (MainForm.Instance.Settings.NbPasses == 3)
-                    x264EncodingMode.SelectedIndex = 8;
+                    x264EncodingMode.SelectedIndex = (int)VideoCodecSettings.VideoEncodingMode.threepassAutomated;
                 else
-                    x264EncodingMode.SelectedIndex = 4;
+                    x264EncodingMode.SelectedIndex = (int)VideoCodecSettings.VideoEncodingMode.twopassAutomated;
             }
             else
             {
-                x264EncodingMode.SelectedIndex = 9;
+                x264EncodingMode.SelectedIndex = (int)VideoCodecSettings.VideoEncodingMode.quality;
             }
         }
 

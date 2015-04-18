@@ -192,37 +192,37 @@ new JobProcessorFactory(new ProcessorFactory(init), "x264Encoder");
             }
 
             // Encoding Modes
-            switch (xs.EncodingMode)
+            switch (xs.VideoEncodingType)
             {
-                case 0: // ABR
+                case VideoCodecSettings.VideoEncodingMode.CBR:
                     if (!xs.CustomEncoderOptions.Contains("--bitrate ")) 
                         sb.Append("--bitrate " + xs.BitrateQuantizer + " ");
                     break;
-                case 1: // CQ
+                case VideoCodecSettings.VideoEncodingMode.CQ: // CQ
                     if (!xs.CustomEncoderOptions.Contains("--qp "))
                     {
                         qp = (int)xs.QuantizerCRF;
                         sb.Append("--qp " + qp.ToString(ci) + " ");
                     }
                     break;
-                case 2: // 2 pass first pass
+                case VideoCodecSettings.VideoEncodingMode.twopass1: // 2 pass first pass
                     sb.Append("--pass 1 --bitrate " + xs.BitrateQuantizer + " --stats " + "\"" + xs.Logfile + "\" ");
                     break;
-                case 3: // 2 pass second pass
-                case 4: // automated twopass
+                case VideoCodecSettings.VideoEncodingMode.twopass2: // 2 pass second pass
+                case VideoCodecSettings.VideoEncodingMode.twopassAutomated: // automated twopass
                     sb.Append("--pass 2 --bitrate " + xs.BitrateQuantizer + " --stats " + "\"" + xs.Logfile + "\" ");
                     break;
-                case 5: // 3 pass first pass
+                case VideoCodecSettings.VideoEncodingMode.threepass1: // 3 pass first pass
                     sb.Append("--pass 1 --bitrate " + xs.BitrateQuantizer + " --stats " + "\"" + xs.Logfile + "\" ");
                     break;
-                case 6: // 3 pass 2nd pass
+                case VideoCodecSettings.VideoEncodingMode.threepass2: // 3 pass 2nd pass
                     sb.Append("--pass 3 --bitrate " + xs.BitrateQuantizer + " --stats " + "\"" + xs.Logfile + "\" ");
                     break;
-                case 7: // 3 pass 3rd pass
-                case 8: // automated threepass, show third pass options
+                case VideoCodecSettings.VideoEncodingMode.threepass3: // 3 pass 3rd pass
+                case VideoCodecSettings.VideoEncodingMode.threepassAutomated: // automated threepass, show third pass options
                     sb.Append("--pass 3 --bitrate " + xs.BitrateQuantizer + " --stats " + "\"" + xs.Logfile + "\" ");
                     break;
-                case 9: // constant quality
+                case VideoCodecSettings.VideoEncodingMode.quality: // constant quality
                     if (!xs.CustomEncoderOptions.Contains("--crf "))
                         if (xs.QuantizerCRF != 23)
                             sb.Append("--crf " + xs.QuantizerCRF.ToString(ci) + " ");
@@ -232,10 +232,10 @@ new JobProcessorFactory(new ProcessorFactory(init), "x264Encoder");
             // Slow 1st Pass
             if (!xs.CustomEncoderOptions.Contains("--slow-firstpass"))
                 if ((xs.X264SlowFirstpass) && xs.x264PresetLevel < x264Settings.x264PresetLevelModes.placebo &&
-                   ((xs.EncodingMode == 2) || // 2 pass first pass
-                    (xs.EncodingMode == 4) || // automated twopass
-                    (xs.EncodingMode == 5) || // 3 pass first pass
-                    (xs.EncodingMode == 8)))  // automated threepass
+                   ((xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.twopass1) || // 2 pass first pass
+                    (xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.twopassAutomated) || // automated twopass
+                    (xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.threepass1) || // 3 pass first pass
+                    (xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.threepassAutomated)))  // automated threepass
                     sb.Append("--slow-firstpass ");
 
             // Threads
@@ -445,7 +445,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "x264Encoder");
                 if (xs.ChromaQPOffset != 0.0M)
                     sb.Append("--chroma-qp-offset " + xs.ChromaQPOffset.ToString(ci) + " ");
 
-            if (xs.EncodingMode != 1) // doesn't apply to CQ mode
+            if (xs.VideoEncodingType != VideoCodecSettings.VideoEncodingMode.CQ) // doesn't apply to CQ mode
             {
                 xs.VBVBufferSize = oSettingsHandler.getVBVBufsize(xs.AVCLevel, xs.Profile == 2);
                 if (xs.VBVBufferSize > 0)
@@ -470,7 +470,9 @@ new JobProcessorFactory(new ProcessorFactory(init), "x264Encoder");
                         sb.Append("--qcomp " + xs.QuantCompression.ToString(ci) + " ");
                 }
 
-                if (xs.EncodingMode > 1) // applies only to twopass
+                if (xs.VideoEncodingType != VideoCodecSettings.VideoEncodingMode.CBR 
+                    && xs.VideoEncodingType != VideoCodecSettings.VideoEncodingMode.CQ
+                    && xs.VideoEncodingType != VideoCodecSettings.VideoEncodingMode.quality) // applies only to twopass
                 {
                     if (!xs.CustomEncoderOptions.Contains("--cplxblur "))
                         if (xs.TempComplexityBlur != 20)
@@ -513,7 +515,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "x264Encoder");
                     sb.Append("--rc-lookahead " + xs.Lookahead + " ");
 
             // AQ-Mode
-            if (xs.EncodingMode != (int)VideoCodecSettings.Mode.CQ)
+            if (xs.VideoEncodingType != VideoCodecSettings.VideoEncodingMode.CQ)
             {
                 if (!xs.CustomEncoderOptions.Contains("--aq-mode "))
                     if (xs.AQmode != x264Settings.GetDefaultAQMode(xs.x264PresetLevel, xs.x264PsyTuning))
@@ -801,7 +803,11 @@ new JobProcessorFactory(new ProcessorFactory(init), "x264Encoder");
             {
                 if (xs.UseQPFile)
                 {
-                    if (xs.EncodingMode == 0 || xs.EncodingMode == 1 || xs.EncodingMode == 2 || xs.EncodingMode == 5 || xs.EncodingMode == 9)
+                    if (xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.CBR
+                        || xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.CQ
+                        || xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.twopass1
+                        || xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.threepass1
+                        || xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.quality)
                     {
                         if (log != null && !System.IO.File.Exists(xs.QPFile))
                             log.LogEvent(xs.QPFile + " not found. --qpfile will be skipped.", ImageType.Warning);
@@ -972,7 +978,8 @@ new JobProcessorFactory(new ProcessorFactory(init), "x264Encoder");
             }
             
             //add the rest of the commandline regarding the output
-            if (xs.EncodingMode == 2 || xs.EncodingMode == 5)
+            if (xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.twopass1
+                || xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.threepass1)
                 sb.Append("--output NUL ");
             else if (!String.IsNullOrEmpty(output))
                 sb.Append("--output " + "\"" + output + "\" ");

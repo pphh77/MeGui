@@ -240,8 +240,9 @@ namespace MeGUI
         /// </summary>
         private void updateIOConfig()
         {
-            int encodingMode = CurrentSettings.EncodingMode;
-            if (!(CurrentSettings is x265Settings) && encodingMode == 2 || encodingMode == 5) // first pass
+            VideoCodecSettings.VideoEncodingMode encodingMode = CurrentSettings.VideoEncodingType;
+            if (encodingMode == VideoCodecSettings.VideoEncodingMode.twopass1 
+                || encodingMode == VideoCodecSettings.VideoEncodingMode.threepass1) // first pass
             {
                 videoOutput.Enabled = false;
             }
@@ -325,7 +326,8 @@ namespace MeGUI
         private bool isFirstPass()
         {
             VideoCodecSettings settings = CurrentSettings;
-            if (settings.EncodingMode == 2 || settings.EncodingMode == 5)
+            if (settings.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.twopass1
+                || settings.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.threepass1)
                 return true;
             else
                 return false;

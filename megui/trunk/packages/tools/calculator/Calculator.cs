@@ -634,15 +634,16 @@ namespace MeGUI
 
                 VideoCodecSettings settings = info.Video.CurrentSettings;
 
-                if (settings.EncodingMode == 1 || settings.EncodingMode == 9)
+                if (settings.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.CQ
+                    || settings.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.quality)
                 {
                     dr = MessageBox.Show("Copy calculated bitrate into current video settings and change encoding mode to automated " + info.Settings.NbPasses + "-pass?", "Save calculated bitrate?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (dr != DialogResult.Yes)
                         return;
                     if (info.Settings.NbPasses == 3)
-                        settings.EncodingMode = 8;  // Automated 3-pass
+                        settings.VideoEncodingType = VideoCodecSettings.VideoEncodingMode.threepassAutomated;  // Automated 3-pass
                     else
-                        settings.EncodingMode = 4;  // Automated 2-pass
+                        settings.VideoEncodingType = VideoCodecSettings.VideoEncodingMode.twopassAutomated;  // Automated 2-pass
                 }
                 else
                 {

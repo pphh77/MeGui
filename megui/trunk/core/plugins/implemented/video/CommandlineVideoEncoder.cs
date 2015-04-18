@@ -49,7 +49,7 @@ namespace MeGUI
         protected override void checkJobIO()
         {
             base.checkJobIO();
-            if (File.Exists(job.Input) && Path.GetExtension(job.Input).ToLower(System.Globalization.CultureInfo.InvariantCulture).Equals(".avs"))
+            if (File.Exists(job.Input) && Path.GetExtension(job.Input).ToLowerInvariant().Equals(".avs"))
             {
                 string strAVSFile = String.Empty;
                 try
@@ -109,9 +109,9 @@ namespace MeGUI
 
                     LogItem stats = log.Info(string.Format("[{0:G}] {1}", DateTime.Now, "Final statistics"));
 
-                    if (job.Settings.EncodingMode == 1) // QP mode
+                    if (job.Settings.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.CQ) // CQ mode
                         stats.LogValue("Constant Quantizer Mode", "Quantizer " + job.Settings.BitrateQuantizer + " computed...");
-                    else if (job.Settings.EncodingMode == 9 || (job.Settings is x265Settings && job.Settings.EncodingMode == 2)) // CRF mode
+                    else if (job.Settings.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.quality)
                         stats.LogValue("Constant Quality Mode", "Quality " + job.Settings.BitrateQuantizer + " computed...");
                     else
                         stats.LogValue("Video Bitrate Desired", job.Settings.BitrateQuantizer + " kbit/s");

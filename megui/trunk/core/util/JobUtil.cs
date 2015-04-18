@@ -76,16 +76,16 @@ namespace MeGUI
 				settings.Logfile = Path.ChangeExtension(output, ".stats");
             if (job.Settings.SettingsID.Equals("x264"))
                 mbtreeFile = Path.ChangeExtension(output, ".stats.mbtree");
-			if (job.Settings.EncodingMode == 4) // automated 2 pass, change type to 2 pass 2nd pass
+			if (job.Settings.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.twopassAutomated) // automated 2 pass, change type to 2 pass 2nd pass
 			{
-				job.Settings.EncodingMode = 3;
+				job.Settings.VideoEncodingType = VideoCodecSettings.VideoEncodingMode.twopass2;
 			}
-			else if (job.Settings.EncodingMode == 8) // automated 3 pass, change type to 3 pass first pass
+            else if (job.Settings.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.threepassAutomated) // automated 3 pass, change type to 3 pass first pass
 			{
 				if (mainForm.Settings.OverwriteStats)
-					job.Settings.EncodingMode = 7;
+                    job.Settings.VideoEncodingType = VideoCodecSettings.VideoEncodingMode.threepass3;
 				else
-					job.Settings.EncodingMode = 3; // 2 pass 2nd pass.. doesn't overwrite the stats file
+                    job.Settings.VideoEncodingType = VideoCodecSettings.VideoEncodingMode.twopass2; // 2 pass 2nd pass.. doesn't overwrite the stats file
 			}
 
             if (!skipVideoCheck)
@@ -318,9 +318,9 @@ namespace MeGUI
                 return null;
 
 			bool twoPasses = false, threePasses = false;
-			if (settings.EncodingMode == 4) // automated twopass
+            if (settings.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.twopassAutomated) // automated twopass
 				twoPasses = true;
-			else if (settings.EncodingMode == 8) // automated threepass
+            else if (settings.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.threepassAutomated) // automated threepass
 				threePasses = true;
 
             VideoJob prerenderJob = null;
@@ -387,13 +387,13 @@ namespace MeGUI
                         job.FilesToDelete.Add(mbtreeFile);
                     firstpass = cloneJob(job);
 					firstpass.Output = ""; // the first pass has no output
-					firstpass.Settings.EncodingMode = 2;
+                    firstpass.Settings.VideoEncodingType = VideoCodecSettings.VideoEncodingMode.twopass1;
                     firstpass.DAR = dar;
 					if (threePasses)
 					{
-						firstpass.Settings.EncodingMode = 5; // change to 3 pass 3rd pass just for show
+                        firstpass.Settings.VideoEncodingType = VideoCodecSettings.VideoEncodingMode.threepass1; // change to 3 pass 3rd pass just for show
 						middlepass = cloneJob(job);
-						middlepass.Settings.EncodingMode = 6; // 3 pass 2nd pass
+                        middlepass.Settings.VideoEncodingType = VideoCodecSettings.VideoEncodingMode.threepass2; // 3 pass 2nd pass
                         if (mainForm.Settings.Keep2of3passOutput) // give the 2nd pass a new name
                         {
                             middlepass.Output = Path.Combine(Path.GetDirectoryName(job.Output), Path.GetFileNameWithoutExtension(job.Output)

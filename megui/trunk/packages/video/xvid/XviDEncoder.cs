@@ -81,23 +81,23 @@ new JobProcessorFactory(new ProcessorFactory(init), "XviDEncoder");
             StringBuilder sb = new StringBuilder();
             CultureInfo ci = new CultureInfo("en-us");
             sb.Append("-i \"" + input + "\" ");
-            switch (xs.EncodingMode)
+            switch (xs.VideoEncodingType)
             {
-                case 0: // CBR
+                case VideoCodecSettings.VideoEncodingMode.CBR:
                     sb.Append("-single -bitrate " + xs.BitrateQuantizer + " "); // add bitrate
                     break;
-                case 1: // CQ
+                case VideoCodecSettings.VideoEncodingMode.CQ:
                     sb.Append("-single -cq " + xs.Quantizer.ToString(ci) + " "); // add quantizer
                     break;
-                case 2: // 2 pass first pass
+                case VideoCodecSettings.VideoEncodingMode.twopass1: // 2 pass first pass
                     sb.Append("-pass1 " + "\"" + xs.Logfile + "\" -bitrate " + xs.BitrateQuantizer + " "); // add logfile
                     break;
-                case 3: // 2 pass second pass
-                case 4: // automated twopass
+                case VideoCodecSettings.VideoEncodingMode.twopass2: // 2 pass second pass
+                case VideoCodecSettings.VideoEncodingMode.twopassAutomated: // automated twopass
                     sb.Append("-pass2 " + "\"" + xs.Logfile + "\" -bitrate " + xs.BitrateQuantizer + " "); // add logfile
                     break;
             }
-            if (xs.EncodingMode <= 1) // 1 pass modes
+            if (xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.CQ || xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.CBR) // 1 pass modes
             {
                 if (!xs.CustomEncoderOptions.Contains("-reaction ") && xs.ReactionDelayFactor != 16)
                     sb.Append("-reaction " + xs.ReactionDelayFactor + " ");
@@ -246,7 +246,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "XviDEncoder");
             if (!xs.CustomEncoderOptions.Contains("-threads ") && xs.NbThreads > 0)
                 sb.Append("-threads " + xs.NbThreads + " ");
             if (zones != null && zones.Length > 0 && xs.CreditsQuantizer >= new decimal(1)
-                && xs.EncodingMode != 1) // only for non CQ mode at the moment
+                && xs.VideoEncodingType != VideoCodecSettings.VideoEncodingMode.CQ) // only for non CQ mode at the moment
             {
                 foreach (Zone zone in zones)
                 {
@@ -260,9 +260,9 @@ new JobProcessorFactory(new ProcessorFactory(init), "XviDEncoder");
                     }
                 }
             }
-            if (xs.EncodingMode != 2) // not 2 pass vbr first pass, add output filename and output type
+            if (xs.VideoEncodingType != VideoCodecSettings.VideoEncodingMode.twopass1) // not 2 pass vbr first pass, add output filename and output type
             {
-                string extension = Path.GetExtension(output).ToLower(System.Globalization.CultureInfo.InvariantCulture);
+                string extension = Path.GetExtension(output).ToLowerInvariant();
                 if (extension.Equals(".mkv"))
                     sb.Append("-mkv \"" + output + "\"");
                 else if (extension.Equals(".avi"))

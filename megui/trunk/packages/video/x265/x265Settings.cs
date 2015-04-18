@@ -102,7 +102,7 @@ namespace MeGUI
 			noFastPSkip = false;
             ssimCalc = false;
             psnrCalc = false;
-			EncodingMode = 2;
+			VideoEncodingType = VideoEncodingMode.quality;
 			BitrateQuantizer = 28;
 			KeyframeInterval = 250;
 			nbRefFrames = 3;
@@ -721,7 +721,7 @@ namespace MeGUI
                 this.ChromaQPOffset != otherSettings.ChromaQPOffset ||
                 this.CustomEncoderOptions != otherSettings.CustomEncoderOptions ||
                 this.Deblock != otherSettings.Deblock ||
-                this.EncodingMode != otherSettings.EncodingMode ||
+                this.VideoEncodingType != otherSettings.VideoEncodingType ||
                 this.I4x4mv != otherSettings.I4x4mv ||
                 this.I8x8mv != otherSettings.I8x8mv ||
                 this.IPFactor != otherSettings.IPFactor ||
@@ -824,7 +824,7 @@ namespace MeGUI
                     WeightedPPrediction = 1;
                     break;
             }
-            if (EncodingMode != 2 && EncodingMode != 5)
+            if (VideoEncodingType != VideoEncodingMode.twopass1 && VideoEncodingType != VideoEncodingMode.threepass1)
                 x265SlowFirstpass = false;
             if (NbBframes == 0)
             {
