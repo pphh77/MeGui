@@ -687,6 +687,7 @@ namespace MeGUI.core.util
                 sb.AppendLine("<TextSampleDescription>");
                 sb.AppendLine("</TextSampleDescription>");
                 sb.AppendLine("</TextStreamHeader>");
+                string lastTime = null;
 
                 using (StreamReader sr = new StreamReader(inFile))
                 {
@@ -697,14 +698,18 @@ namespace MeGUI.core.util
                     {
                         i++;
                         if (i % 2 == 1)
-                            sb.Append("<TextSample sampleTime=\"" + line.Substring(line.IndexOf("=") + 1) + "\"");
+                        {
+                            lastTime = line.Substring(line.IndexOf("=") + 1);
+                            sb.Append("<TextSample sampleTime=\"" + lastTime + "\"");
+                        }
                         else
                         {
                             chapTitle = System.Text.RegularExpressions.Regex.Replace(line.Substring(line.IndexOf("=") + 1), "\"", "&quot;");
-                            sb.Append(" text=\"" + chapTitle + "\"></TextSample>" + Environment.NewLine);
+                            sb.Append(" text=\"" + chapTitle + "\" />" + Environment.NewLine);
                         }
                     }
                 }
+                sb.AppendLine("<TextSample sampleTime=\"" + (TimeSpan.Parse(lastTime) + new TimeSpan(0, 0, 0, 0, 500)).ToString(@"hh\:mm\:ss\.fff") + "\" xml:space=\"preserve\" />");
                 sb.AppendLine("</TextStream>");
 
                 using (StreamWriter sw = new StreamWriter(Path.Combine(Path.GetDirectoryName(inFile), Path.GetFileNameWithoutExtension(inFile) + ".xml")))

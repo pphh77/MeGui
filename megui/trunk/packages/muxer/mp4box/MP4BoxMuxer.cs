@@ -241,7 +241,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "MP4BoxMuxer");
                     {
                         switch (settings.DeviceType)
                         {
-                            case "iPod": sb.Append("-ipod -brand M4V  "); break;
+                            case "iPod": sb.Append("-ipod -brand M4V "); break;
                             case "iPhone": sb.Append("-ipod -brand M4VP:1 "); break;
                             case "iPad":
                             case "Apple TV": sb.Append("-ipod -brand M4VH "); break;
@@ -377,12 +377,11 @@ new JobProcessorFactory(new ProcessorFactory(init), "MP4BoxMuxer");
                     {
                         FileUtil.CreateXMLFromOGGChapFile(settings.ChapterFile);
                         sb.Append(" -add \"" + Path.Combine(Path.GetDirectoryName(settings.ChapterFile), Path.GetFileNameWithoutExtension(settings.ChapterFile) + ".xml:name=:chap") + "\"");
-                        job.FilesToDelete.Add(Path.GetFileNameWithoutExtension(settings.ChapterFile) + ".xml");
+                        job.FilesToDelete.Add(Path.Combine(Path.GetDirectoryName(settings.ChapterFile), Path.GetFileNameWithoutExtension(settings.ChapterFile) + ".xml"));
                     }
                     else
-                    // Add Nero Style Chapters - this doesn't break Apple Devices playback  - just for better interoperability with other tools
-                    sb.Append(" -chap \"" + settings.ChapterFile + "\"");
-
+                        // Add Nero Style Chapters - this doesn't break Apple Devices playback  - just for better interoperability with other tools
+                        sb.Append(" -chap \"" + settings.ChapterFile + "\"");
                 }
 
                 if (settings.SplitSize.HasValue)

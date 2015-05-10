@@ -1,3 +1,5 @@
+2535 [MP4 Muxer]            fixed Apple chapters handling. Patch by Eli Bildirici #67
+                            fixed remaining temporay chapter file after mux
 2534 [x265]                 added n-pass support
 2533 [MainForm]             highest .NET version will only be shown if different from .NET 4.0 (regression of 2531)
 2532                        removed LinqBridge.dll
