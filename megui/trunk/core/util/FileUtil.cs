@@ -369,11 +369,11 @@ namespace MeGUI.core.util
                             File.Delete(file);
                             i.LogEvent("Successfully deleted " + file);
                         }
-                        catch (IOException e)
+                        catch (Exception ex)
                         {
                             if (++iCounter >= 3)
                             {
-                                i.LogValue("Problem deleting " + file, e.Message, ImageType.Warning);
+                                i.LogValue("Problem deleting " + file, ex.Message, ImageType.Warning);
                                 break;
                             }
                             else
@@ -400,9 +400,9 @@ namespace MeGUI.core.util
                             i.LogEvent("Did not delete " + file + " as the directory is not empty.", ImageType.Warning);
                     }
                 }
-                catch (IOException e)
+                catch (Exception ex)
                 {
-                    i.LogValue("Problem deleting directory " + file, e.Message, ImageType.Warning);
+                    i.LogValue("Problem deleting directory " + file, ex.Message, ImageType.Warning);
                 }
             }
             if (bAlwaysAddLog || bShowLog)

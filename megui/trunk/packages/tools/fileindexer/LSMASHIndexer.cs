@@ -182,7 +182,7 @@ namespace MeGUI
                         oAVSWriter.Write(strAVSScript);
                         oAVSWriter.Close();
                     }
-                    catch (IOException ex)
+                    catch (Exception ex)
                     {
                         log.LogValue("Error creating audio AVS file", ex);
                     }

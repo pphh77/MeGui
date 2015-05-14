@@ -437,7 +437,7 @@ namespace MeGUI
                     p.StartInfo = psi;
                     p.Start();
                 }
-                catch (IOException e) { MessageBox.Show("Error when attempting to run command: " + e.Message, "Run command failed", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+                catch (Exception ex) { MessageBox.Show("Error when attempting to run command: " + ex.Message, "Run command failed", MessageBoxButtons.OK, MessageBoxIcon.Error); }
             }
         }
 

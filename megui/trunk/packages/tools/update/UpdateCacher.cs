@@ -156,7 +156,7 @@ namespace MeGUI
                 if (File.Exists(localFilename))
                     File.Delete(localFilename);
             }
-            catch (IOException)
+            catch (Exception)
             {
                 MainForm.Instance.UpdateHandler.AddTextToLog("Could not delete file " + localFilename, ImageType.Error, true);
             }

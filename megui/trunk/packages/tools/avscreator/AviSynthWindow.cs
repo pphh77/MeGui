@@ -420,7 +420,7 @@ namespace MeGUI
 				    sw.Close();
                 }
 			}
-			catch (IOException i)
+			catch (Exception i)
 			{
 				MessageBox.Show("An error occurred when trying to save the AviSynth script:\r\n" + i.Message);
 			}

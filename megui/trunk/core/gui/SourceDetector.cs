@@ -395,7 +395,7 @@ namespace MeGUI
             {
                 instream = new StreamReader(logFileName);
             }
-            catch (IOException)
+            catch (Exception)
             {
                 error = true;
                 errorMessage = "Can't open analysis log file, \"" + logFileName + "\"\r\n" +

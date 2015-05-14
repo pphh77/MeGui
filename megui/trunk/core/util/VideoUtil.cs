@@ -438,7 +438,7 @@ namespace MeGUI
                 avsOut.Write("\r\nConvertToYV12()");
                 avsOut.Close();
             }
-            catch (IOException)
+            catch (Exception)
             {
                 return false; 
             }

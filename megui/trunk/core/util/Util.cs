@@ -110,7 +110,7 @@ namespace MeGUI.core.util
                     {
                         File.Delete(path);
                     }
-                    catch (IOException) { }
+                    catch (Exception) { }
                     LogItem _oLog = MainForm.Instance.Log.Info("Error");
                     _oLog.LogValue("XmlSerialize: " + path, e, ImageType.Error);
                 }

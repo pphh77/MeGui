@@ -743,7 +743,7 @@ namespace MeGUI
                 sw.Write(newScript);
                 sw.Close();
             }
-            catch (IOException i)
+            catch (Exception i)
             {
                 _log.LogValue("Error saving AviSynth script", i, ImageType.Error);
                 return "";

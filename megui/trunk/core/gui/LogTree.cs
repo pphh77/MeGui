@@ -147,7 +147,7 @@ namespace MeGUI.core.gui
                 File.WriteAllText(saveDialog.FileName, i.ToString());
                 MessageBox.Show("File saved successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.None);
             }
-            catch (IOException ie)
+            catch (Exception ie)
             {
                 MessageBox.Show("Error saving file: " + ie.Message, "Error saving file", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }

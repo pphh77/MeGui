@@ -254,7 +254,7 @@ namespace MeGUI
                 if (!Directory.Exists(filepath))
                     Directory.CreateDirectory(filepath);
             }
-            catch (IOException)
+            catch (Exception)
             {
                 AddTextToLog(string.Format("Could not create directory {0}.", filepath), ImageType.Error, true);
                 return UpdateWindow.ErrorState.CouldNotSaveNewFile;
