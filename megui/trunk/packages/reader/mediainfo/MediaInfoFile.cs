@@ -1055,11 +1055,12 @@ namespace MeGUI
                 return false;
 
             // only the following container formats are supported
+            // AVI removed as it may cause jittery motion
+            // http://forum.doom9.org/showthread.php?p=1679175#post1679175
             if (_strContainer.ToUpperInvariant().Equals("MATROSKA") ||
                 _strContainer.ToUpperInvariant().Equals("MPEG-TS") ||
                 _strContainer.ToUpperInvariant().Equals("MPEG-PS") ||
                 _strContainer.ToUpperInvariant().Equals("MPEG VIDEO") ||
-                _strContainer.ToUpperInvariant().Equals("AVI") ||
                 _strContainer.ToUpperInvariant().Equals("MPEG-4") ||
                 _strContainer.ToUpperInvariant().Equals("FLASH VIDEO") ||
                 _strContainer.ToUpperInvariant().Equals("OGG") ||

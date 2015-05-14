@@ -1,3 +1,4 @@
+2539 [FFMS Indexer]         disabled AVI file handling as FFMS may cause jittery motion
 2538                        improved handling of file access exceptions
 2537 [FDK-AAC Encoder]      fixed wrong bitrate value after preset loading
 2536 [Audio Encoder]        improved custom command line handling
