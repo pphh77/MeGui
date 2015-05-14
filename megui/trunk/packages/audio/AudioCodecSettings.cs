@@ -169,6 +169,7 @@ namespace MeGUI
             preferredDecoder = AudioDecodingEngine.NicAudio;
             timeModification = TimeModificationMode.KeepOriginal;
             sampleRate = SampleRateMode.KeepOriginal;
+            customEncoderOptions = string.Empty;
 		}
 
         [XmlIgnore()]
