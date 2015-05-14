@@ -1,3 +1,4 @@
+2537 [FDK-AAC Encoder]      fixed wrong bitrate value after preset loading
 2536 [Audio Encoder]        improved custom command line handling
 2535 [MP4 Muxer]            fixed Apple chapters handling. Patch by Eli Bildirici #67
                             fixed remaining temporay chapter file after mux

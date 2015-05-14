@@ -86,11 +86,6 @@ namespace MeGUI.packages.audio.fdkaac
 
         private void cbMode_SelectedIndexChanged(object sender, EventArgs e)
         {
-            trackBar_ValueChanged(sender, e);
-        }
-
-        private void trackBar_ValueChanged(object sender, EventArgs e)
-        {
             switch ((FdkAACMode)(cbMode.SelectedItem as EnumProxy).RealValue)
             {
                 case FdkAACMode.VBR:
@@ -99,7 +94,6 @@ namespace MeGUI.packages.audio.fdkaac
                     trackBar.Minimum = 0;
                     trackBar.Maximum = 320;
                     trackBar.TickFrequency = 20;
-                    encoderGroupBox.Text = String.Format(" FDK-AAC Options - Variable Bitrate @ {0} kbit/s ", trackBar.Value);
                     break;
                 case FdkAACMode.CBR:
                     trackBar.Visible = true;
@@ -107,11 +101,22 @@ namespace MeGUI.packages.audio.fdkaac
                     trackBar.Minimum = 0;
                     trackBar.Maximum = 320;
                     trackBar.TickFrequency = 20;
+                    break;
+            }
+            trackBar_ValueChanged(sender, e);
+        }
+
+        private void trackBar_ValueChanged(object sender, EventArgs e)
+        {
+            switch ((FdkAACMode)(cbMode.SelectedItem as EnumProxy).RealValue)
+            {
+                case FdkAACMode.VBR:
+                    encoderGroupBox.Text = String.Format(" FDK-AAC Options - Variable Bitrate @ {0} kbit/s ", trackBar.Value);
+                    break;
+                case FdkAACMode.CBR:
                     encoderGroupBox.Text = String.Format(" FDK-AAC Options - Constant Bitrate  @ {0} kbit/s ", trackBar.Value);
                     break;
             }
-            if (trackBar.Value == 129)
-                encoderGroupBox.Text = String.Format("FDK-AAC Options");
         }
     }
 }

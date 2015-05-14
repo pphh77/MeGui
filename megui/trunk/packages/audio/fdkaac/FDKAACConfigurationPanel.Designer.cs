@@ -94,6 +94,7 @@ namespace MeGUI.packages.audio.fdkaac
             this.cbMode.Name = "cbMode";
             this.cbMode.Size = new System.Drawing.Size(290, 21);
             this.cbMode.TabIndex = 8;
+            this.cbMode.SelectedIndexChanged += new System.EventHandler(this.cbMode_SelectedIndexChanged);
             // 
             // label4
             // 
@@ -107,10 +108,11 @@ namespace MeGUI.packages.audio.fdkaac
             // trackBar
             // 
             this.trackBar.Location = new System.Drawing.Point(4, 32);
-            this.trackBar.Maximum = 127;
+            this.trackBar.Maximum = 320;
             this.trackBar.Name = "trackBar";
             this.trackBar.Size = new System.Drawing.Size(393, 45);
             this.trackBar.TabIndex = 10;
+            this.trackBar.TickFrequency = 20;
             this.trackBar.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
             this.trackBar.Value = 90;
             this.trackBar.ValueChanged += new System.EventHandler(this.trackBar_ValueChanged);
