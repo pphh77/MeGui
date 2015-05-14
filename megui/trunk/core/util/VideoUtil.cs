@@ -649,8 +649,9 @@ namespace MeGUI
                 {
                     if (audioTypes.Contains(type))
                     {
-                        audioStreams[i].Output = Path.ChangeExtension(audioStreams[i].Output,
-                            type.Extension);
+                        string newFileName = Path.ChangeExtension(audioStreams[i].Output, type.Extension);
+                        if (!audioStreams[i].Input.Equals(newFileName))
+                            audioStreams[i].Output = newFileName;
                         break;
                     }
                 }

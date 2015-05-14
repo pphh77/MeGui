@@ -1,3 +1,4 @@
+2541 [AutoEncode]           fixed unintentional deletion of audio input file
 2540 [Audio Encoder]        improved custom command line handling. part II
 2539 [FFMS Indexer]         disabled AVI file handling as FFMS may cause jittery motion
 2538                        improved handling of file access exceptions
