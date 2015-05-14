@@ -568,7 +568,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 info.Arguments = string.Format(_encoderCommandLine,
                     audioJob.Output, a.AudioSampleRate, a.BitsPerSample, a.ChannelsCount, a.SamplesCount, a.AudioSizeInBytes);
                 info.FileName = _encoderExecutablePath;
-                _log.LogValue("Job commandline", _encoderExecutablePath + " " + info.Arguments);
+                _log.LogValue("Job command line", _encoderExecutablePath + " " + info.Arguments);
                 info.UseShellExecute = false;
                 info.RedirectStandardInput = true;
                 info.RedirectStandardOutput = true;
@@ -1291,218 +1291,290 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             }
 
             // let's obtain command line & other stuff
+            StringBuilder sb = new StringBuilder();
             if (audioJob.Settings is AftenSettings)
             {
                 UpdateCacher.CheckPackage("aften");
+                AftenSettings oSettings = audioJob.Settings as AftenSettings;
+                _encoderExecutablePath = this._settings.Aften.Path;
+                _mustSendWavHeaderToEncoderStdIn = true;
+                
                 if (iAVSChannelCount > 6 && (audioJob.Settings.DownmixMode == ChannelMode.KeepOriginal || audioJob.Settings.DownmixMode == ChannelMode.Upmix 
                     || audioJob.Settings.DownmixMode == ChannelMode.UpmixUsingSoxEq ||audioJob.Settings.DownmixMode == ChannelMode.UpmixWithCenterChannelDialog))
                 {
                     script.Append(@"8<=Audiochannels(last)?c71_c51(ConvertAudioToFloat(last)):last" + Environment.NewLine);
                     script.Append(@"7==Audiochannels(last)?c61_c51(ConvertAudioToFloat(last)):last" + Environment.NewLine);
                 }
-                _mustSendWavHeaderToEncoderStdIn = true;
-                AftenSettings n = audioJob.Settings as AftenSettings;
-                _encoderExecutablePath = this._settings.Aften.Path;
-                _encoderCommandLine = "-readtoeof 1 -b " + n.Bitrate + (!String.IsNullOrEmpty(n.CustomEncoderOptions)?(" " + n.CustomEncoderOptions.ToString()):"") + " - \"{0}\"";
+
+                if (!oSettings.CustomEncoderOptions.Contains("-readtoeof "))
+                    sb.Append(" -readtoeof 1");
+                if (!oSettings.CustomEncoderOptions.Contains("-b "))
+                    sb.Append(" -b " + oSettings.Bitrate);
+                if (!String.IsNullOrEmpty(oSettings.CustomEncoderOptions))
+                    sb.Append(" " + oSettings.CustomEncoderOptions.Trim());
+                sb.Append(" - \"{0}\"");
             }
             else if (audioJob.Settings is FlacSettings)
             {
                 UpdateCacher.CheckPackage("flac");
-                script.Append("AudioBits(last)>24?ConvertAudioTo24bit(last):last " + Environment.NewLine); // flac encoder doesn't support 32bits streams
-                _mustSendWavHeaderToEncoderStdIn = false;
-                FlacSettings n = audioJob.Settings as FlacSettings;
+                FlacSettings oSettings = audioJob.Settings as FlacSettings;
                 _encoderExecutablePath = this._settings.Flac.Path;
-                _encoderCommandLine = "--force --force-raw-format --endian=little --sign=signed -" + n.CompressionLevel + (!String.IsNullOrEmpty(n.CustomEncoderOptions)?(" " + n.CustomEncoderOptions.ToString()):"") + " - -o \"{0}\""; 
+                _mustSendWavHeaderToEncoderStdIn = false;
+
+                script.Append("AudioBits(last)>24?ConvertAudioTo24bit(last):last " + Environment.NewLine); // flac encoder doesn't support 32bits streams
+
+                if (!oSettings.CustomEncoderOptions.Contains("--force "))
+                    sb.Append(" --force");
+                if (!oSettings.CustomEncoderOptions.Contains("--force-raw-format"))
+                    sb.Append(" --force-raw-format");
+                if (!oSettings.CustomEncoderOptions.Contains("--endian="))
+                    sb.Append(" --endian=little");
+                if (!oSettings.CustomEncoderOptions.Contains("--sign="))
+                    sb.Append(" --sign=signed");
+                sb.Append(" -" + oSettings.Bitrate);
+                if (!String.IsNullOrEmpty(oSettings.CustomEncoderOptions))
+                    sb.Append(" " + oSettings.CustomEncoderOptions.Trim());
+                sb.Append(" - -o \"{0}\"");
             }
             else if (audioJob.Settings is AC3Settings)
             {
                 UpdateCacher.CheckPackage("ffmpeg");
-                script.Append("32==Audiobits(last)?ConvertAudioTo16bit(last):last" + Environment.NewLine); // ffac3 encoder doesn't support 32bits streams
-                _mustSendWavHeaderToEncoderStdIn = true;
-                AC3Settings n = audioJob.Settings as AC3Settings;
+                AC3Settings oSettings = audioJob.Settings as AC3Settings;
                 _encoderExecutablePath = this._settings.FFmpeg.Path;
-                _encoderCommandLine = "-i - -y -acodec ac3 -ab " + n.Bitrate + "k" + (!String.IsNullOrEmpty(n.CustomEncoderOptions) ? (" " + n.CustomEncoderOptions.ToString()) : "") + " \"{0}\"";
+                _mustSendWavHeaderToEncoderStdIn = true;
+
+                script.Append("32==Audiobits(last)?ConvertAudioTo16bit(last):last" + Environment.NewLine); // ffac3 encoder doesn't support 32bits streams
+
+                sb.Append(" -i - -y");
+                if (!oSettings.CustomEncoderOptions.Contains("-acodec "))
+                    sb.Append(" -acodec ac3");
+                if (!oSettings.CustomEncoderOptions.Contains("-ab "))
+                    sb.Append(" -ab " + oSettings.Bitrate + "k");
+                if (!String.IsNullOrEmpty(oSettings.CustomEncoderOptions))
+                    sb.Append(" " + oSettings.CustomEncoderOptions.Trim());
+                sb.Append(" \"{0}\"");
             }
             else if (audioJob.Settings is MP2Settings)
             {
                 UpdateCacher.CheckPackage("ffmpeg");
-                script.Append("32==Audiobits(last)?ConvertAudioTo16bit(last):last" + Environment.NewLine); // ffmp2 encoder doesn't support 32 bits streams
-                _mustSendWavHeaderToEncoderStdIn = true;
-                MP2Settings n = audioJob.Settings as MP2Settings;
+                MP2Settings oSettings = audioJob.Settings as MP2Settings;
                 _encoderExecutablePath = this._settings.FFmpeg.Path;
-                _encoderCommandLine = "-i - -y -acodec mp2 -ab " + n.Bitrate + "k" + (!String.IsNullOrEmpty(n.CustomEncoderOptions) ? (" " + n.CustomEncoderOptions.ToString()) : "") + " \"{0}\"";
+                _mustSendWavHeaderToEncoderStdIn = true;
+
+                script.Append("32==Audiobits(last)?ConvertAudioTo16bit(last):last" + Environment.NewLine); // ffmp2 encoder doesn't support 32 bits streams
+
+                sb.Append(" -i - -y");
+                if (!oSettings.CustomEncoderOptions.Contains("-acodec "))
+                    sb.Append(" -acodec mp2");
+                if (!oSettings.CustomEncoderOptions.Contains("-ab "))
+                    sb.Append(" -ab " + oSettings.Bitrate + "k");
+                if (!String.IsNullOrEmpty(oSettings.CustomEncoderOptions))
+                    sb.Append(" " + oSettings.CustomEncoderOptions.Trim());
+                sb.Append(" \"{0}\"");
             } 
             else if (audioJob.Settings is OggVorbisSettings)
             {
                 UpdateCacher.CheckPackage("oggenc2");
-                _mustSendWavHeaderToEncoderStdIn = true;
-                OggVorbisSettings n = audioJob.Settings as OggVorbisSettings;
+                OggVorbisSettings oSettings = audioJob.Settings as OggVorbisSettings;
                 _encoderExecutablePath = this._settings.OggEnc.Path;
-                _encoderCommandLine = "--ignorelength --quality " + n.Quality.ToString(System.Globalization.CultureInfo.InvariantCulture) + (!String.IsNullOrEmpty(n.CustomEncoderOptions) ? (" " + n.CustomEncoderOptions.ToString()) : "") + " -o \"{0}\" -";
+                _mustSendWavHeaderToEncoderStdIn = true;
+
+                if (!oSettings.CustomEncoderOptions.Contains("--ignorelength"))
+                    sb.Append(" --ignorelength");
+                if (!oSettings.CustomEncoderOptions.Contains("--quality "))
+                    sb.Append(" --quality " + oSettings.Quality.ToString(System.Globalization.CultureInfo.InvariantCulture) + "k");
+                if (!String.IsNullOrEmpty(oSettings.CustomEncoderOptions))
+                    sb.Append(" " + oSettings.CustomEncoderOptions.Trim());
+                sb.Append(" -o \"{0}\" -");
             }
             else if (audioJob.Settings is NeroAACSettings)
             {
                 UpdateCacher.CheckPackage("neroaacenc");
-                _mustSendWavHeaderToEncoderStdIn = true;
-                NeroAACSettings n = audioJob.Settings as NeroAACSettings;
-                NeroAACSettings nas = n;
+                NeroAACSettings oSettings = audioJob.Settings as NeroAACSettings;
                 _encoderExecutablePath = this._settings.NeroAacEnc.Path;
-                StringBuilder sb = new StringBuilder("-ignorelength ");
-                switch (n.Profile)
+                _mustSendWavHeaderToEncoderStdIn = true;
+                
+                sb.Append(" -ignorelength");
+                if (!oSettings.CustomEncoderOptions.Contains("-he") && !oSettings.CustomEncoderOptions.Contains("-hev2") && !oSettings.CustomEncoderOptions.Contains("-lc"))
                 {
-                    case AacProfile.HE:
-                        sb.Append("-he ");
-                        break;
-                    case AacProfile.PS:
-                        sb.Append("-hev2 ");
-                        break;
-                    case AacProfile.LC:
-                        sb.Append("-lc ");
-                        break;
+                    switch (oSettings.Profile)
+                    {
+                        case AacProfile.HE:
+                            sb.Append(" -he");
+                            break;
+                        case AacProfile.PS:
+                            sb.Append(" -hev2");
+                            break;
+                        case AacProfile.LC:
+                            sb.Append(" -lc");
+                            break;
+                    }
                 }
 
-                switch (n.BitrateMode)
+                if (!oSettings.CustomEncoderOptions.Contains("-br ") && !oSettings.CustomEncoderOptions.Contains("-cbr ") && !oSettings.CustomEncoderOptions.Contains("-q "))
                 {
-                    case BitrateManagementMode.ABR:
-                        sb.AppendFormat(System.Globalization.CultureInfo.InvariantCulture, "-br {0} ", n.Bitrate*1000);
-                        break;
-                    case BitrateManagementMode.CBR:
-                        sb.AppendFormat(System.Globalization.CultureInfo.InvariantCulture, "-cbr {0} ", n.Bitrate*1000);
-                        break;
-                    case BitrateManagementMode.VBR:
-                        sb.AppendFormat(System.Globalization.CultureInfo.InvariantCulture, "-q {0} ", n.Quality);
-                        break;
+                    switch (oSettings.BitrateMode)
+                    {
+                        case BitrateManagementMode.ABR:
+                            sb.AppendFormat(System.Globalization.CultureInfo.InvariantCulture, " -br {0}", oSettings.Bitrate * 1000);
+                            break;
+                        case BitrateManagementMode.CBR:
+                            sb.AppendFormat(System.Globalization.CultureInfo.InvariantCulture, " -cbr {0}", oSettings.Bitrate * 1000);
+                            break;
+                        case BitrateManagementMode.VBR:
+                            sb.AppendFormat(System.Globalization.CultureInfo.InvariantCulture, " -q {0}", oSettings.Quality);
+                            break;
+                    }
                 }
 
                 // Custom Command Line
-                if (!string.IsNullOrEmpty(audioJob.Settings.CustomEncoderOptions))
-                {
-                    sb.Append(audioJob.Settings.CustomEncoderOptions.ToString() + " ");
-                }
+                if (!String.IsNullOrEmpty(oSettings.CustomEncoderOptions))
+                    sb.Append(" " + oSettings.CustomEncoderOptions.Trim());
 
                 sb.Append("-if - -of \"{0}\"");
-
-                _encoderCommandLine = sb.ToString();
             }
             else if (audioJob.Settings is MP3Settings)
             {
                 UpdateCacher.CheckPackage("lame");
-                MP3Settings m = audioJob.Settings as MP3Settings;
-                _mustSendWavHeaderToEncoderStdIn = true;
+                MP3Settings oSettings = audioJob.Settings as MP3Settings;
                 _encoderExecutablePath = this._settings.Lame.Path;
+                _mustSendWavHeaderToEncoderStdIn = true;
+                
                 script.Append("32==Audiobits(last)?ConvertAudioTo16bit(last):last" + Environment.NewLine); // lame encoder doesn't support 32bits streams
 
-                switch (m.BitrateMode)
+                if (!oSettings.CustomEncoderOptions.Contains("-V") && !oSettings.CustomEncoderOptions.Contains("-b ") && !oSettings.CustomEncoderOptions.Contains("--abr "))
                 {
-                    case BitrateManagementMode.VBR:
-                        _encoderCommandLine = "-V" + m.Quality + (!String.IsNullOrEmpty(m.CustomEncoderOptions) ? (" " + m.CustomEncoderOptions.ToString()) : "") + " - \"{0}\"";
-                        break;
-                    case BitrateManagementMode.CBR:
-                        _encoderCommandLine = "-b " + m.Bitrate + " --cbr -h" + (!String.IsNullOrEmpty(m.CustomEncoderOptions) ? (" " + m.CustomEncoderOptions.ToString()) : "") + " - \"{0}\"";
-                        break;
-                    case BitrateManagementMode.ABR:
-                        _encoderCommandLine = "--abr " + m.AbrBitrate + " -h" + (!String.IsNullOrEmpty(m.CustomEncoderOptions) ? (" " + m.CustomEncoderOptions.ToString()) : "") + " - \"{0}\"";
-                        break;
+                    switch (oSettings.BitrateMode)
+                    {
+                        case BitrateManagementMode.VBR:
+                            sb.Append(" -V" + oSettings.Quality);
+                            break;
+                        case BitrateManagementMode.CBR:
+                            sb.Append(" -b " + oSettings.Bitrate + " --cbr -h");
+                            break;
+                        case BitrateManagementMode.ABR:
+                            sb.Append(" --abr " + oSettings.AbrBitrate + " -h");
+                            break;
+                    }
                 }
+
+                if (!String.IsNullOrEmpty(oSettings.CustomEncoderOptions))
+                    sb.Append(" " + oSettings.CustomEncoderOptions.Trim());
+                sb.Append(" - \"{0}\"");
             }
             else if (audioJob.Settings is QaacSettings)
             {
                 UpdateCacher.CheckPackage("qaac");
-                QaacSettings q = audioJob.Settings as QaacSettings;
+                QaacSettings oSettings = audioJob.Settings as QaacSettings;
                 _encoderExecutablePath = this._settings.QAAC.Path;
                 _mustSendWavHeaderToEncoderStdIn = true;
-                StringBuilder sb = new StringBuilder("--ignorelength --threading ");
 
-                if (q.Profile == QaacProfile.ALAC)
-                    sb.Append("-A ");
-                else
+                if (!oSettings.CustomEncoderOptions.Contains("--ignorelength"))
+                    sb.Append(" --ignorelength");
+                if (!oSettings.CustomEncoderOptions.Contains("--threading"))
+                    sb.Append(" --threading");
+
+                if (!oSettings.CustomEncoderOptions.Contains("-A") &&
+                    !oSettings.CustomEncoderOptions.Contains("-V ") &&
+                    !oSettings.CustomEncoderOptions.Contains("-v ") &&
+                    !oSettings.CustomEncoderOptions.Contains("-a ") && 
+                    !oSettings.CustomEncoderOptions.Contains("-c "))
                 {
-                    if (q.Profile == QaacProfile.HE)
-                        sb.Append("--he ");
-
-                    switch (q.Mode)
+                    if (oSettings.Profile == QaacProfile.ALAC)
+                        sb.Append(" -A");
+                    else
                     {
-                        case QaacMode.TVBR: sb.Append("-V " + q.Quality); break;
-                        case QaacMode.CVBR: sb.Append("-v " + q.Bitrate); break;
-                        case QaacMode.ABR: sb.Append("-a " + q.Bitrate); break;
-                        case QaacMode.CBR: sb.Append("-c " + q.Bitrate); break;
+                        if (!oSettings.CustomEncoderOptions.Contains("--he"))
+                            if (oSettings.Profile == QaacProfile.HE)
+                                sb.Append(" --he");
+
+                        switch (oSettings.Mode)
+                        {
+                            case QaacMode.TVBR: sb.Append(" -V " + oSettings.Quality); break;
+                            case QaacMode.CVBR: sb.Append(" -v " + oSettings.Bitrate); break;
+                            case QaacMode.ABR: sb.Append(" -a " + oSettings.Bitrate); break;
+                            case QaacMode.CBR: sb.Append(" -c " + oSettings.Bitrate); break;
+                        }
                     }
                 }
 
-                if (q.NoDelay) // To resolve some A/V sync issues 
-                    sb.Append(" --no-delay");
+                if (!oSettings.CustomEncoderOptions.Contains("--no-delay"))
+                    if (oSettings.NoDelay) // To resolve some A/V sync issues 
+                        sb.Append(" --no-delay");
 
-                // Custom Command Line
-                if (!string.IsNullOrEmpty(audioJob.Settings.CustomEncoderOptions))
-                {
-                    sb.Append(" " + audioJob.Settings.CustomEncoderOptions.ToString());
-                }
-
+                if (!String.IsNullOrEmpty(oSettings.CustomEncoderOptions))
+                    sb.Append(" " + oSettings.CustomEncoderOptions.Trim());
                 sb.Append(" - -o \"{0}\"");
 
-                _encoderCommandLine = sb.ToString();
             }
             else if (audioJob.Settings is OpusSettings)
             {
                 UpdateCacher.CheckPackage("opus");
-                OpusSettings o = audioJob.Settings as OpusSettings;
+                OpusSettings oSettings = audioJob.Settings as OpusSettings;
                 _encoderExecutablePath = this._settings.Opus.Path;
                 _mustSendWavHeaderToEncoderStdIn = true;
-                StringBuilder sb = new StringBuilder("--ignorelength ");
 
-                switch (o.Mode)
-                {
-                    case OpusMode.CVBR: sb.Append("--cvbr --bitrate " + o.Bitrate); break;
-                    case OpusMode.HCBR: sb.Append("--hard-cbr --bitrate " + o.Bitrate); break;
-                    case OpusMode.VBR:  sb.Append("--vbr --bitrate " + o.Bitrate); break;
-                }
+                if (!oSettings.CustomEncoderOptions.Contains("--ignorelength"))
+                    sb.Append(" --ignorelength");
 
-                // Custom Command Line
-                if (!string.IsNullOrEmpty(audioJob.Settings.CustomEncoderOptions))
+                if (!oSettings.CustomEncoderOptions.Contains("--cvbr") && !oSettings.CustomEncoderOptions.Contains("--hard-cbr") && !oSettings.CustomEncoderOptions.Contains("--vbr"))
                 {
-                    sb.Append(" " + audioJob.Settings.CustomEncoderOptions.ToString());
+                    switch (oSettings.Mode)
+                    {
+                        case OpusMode.CVBR: sb.Append(" --cvbr"); break;
+                        case OpusMode.HCBR: sb.Append(" --hard-cbr"); break;
+                        case OpusMode.VBR: sb.Append(" --vbr"); break;
+                    }
                 }
+                if (!oSettings.CustomEncoderOptions.Contains("--bitrate "))
+                    sb.Append(" --bitrate " + oSettings.Bitrate);
+
+                if (!String.IsNullOrEmpty(oSettings.CustomEncoderOptions))
+                    sb.Append(" " + oSettings.CustomEncoderOptions.Trim());
 
                 sb.Append(" - \"{0}\"");
-
-                _encoderCommandLine = sb.ToString();
             }
             else if (audioJob.Settings is FDKAACSettings)
             {
                 UpdateCacher.CheckPackage("fdkaac");
-                FDKAACSettings f = audioJob.Settings as FDKAACSettings;
+                FDKAACSettings oSettings = audioJob.Settings as FDKAACSettings;
                 _encoderExecutablePath = this._settings.Fdkaac.Path;
                 _mustSendWavHeaderToEncoderStdIn = true;
-                StringBuilder sb = new StringBuilder("--ignorelength ");
 
-                switch (f.Mode)
+                if (!oSettings.CustomEncoderOptions.Contains("--ignorelength"))
+                    sb.Append(" --ignorelength");
+                if (!oSettings.CustomEncoderOptions.Contains("-m "))
                 {
-                    case FdkAACMode.CBR: sb.Append("-m 0 -b " + f.Bitrate); break;
-                    case FdkAACMode.VBR: sb.Append("-m 1 -b " + f.Bitrate); break;
+                    switch (oSettings.Mode)
+                    {
+                        case FdkAACMode.CBR: sb.Append(" -m 0"); break;
+                        case FdkAACMode.VBR: sb.Append(" -m 1"); break;
+                    }
                 }
-                
-                switch (f.Profile)
+                if (!oSettings.CustomEncoderOptions.Contains("-b "))
+                    sb.Append(" -b " + oSettings.Bitrate);
+                if (!oSettings.CustomEncoderOptions.Contains("-p "))
                 {
-                    case FdkAACProfile.M4LC:  sb.Append(" -p 2"); break;
-                    case FdkAACProfile.M4HE:  sb.Append(" -p 5"); break;
-                    case FdkAACProfile.M4HE2: sb.Append(" -p 29"); break;
-                    case FdkAACProfile.M4LD:  sb.Append(" -p 23"); break;
-                    case FdkAACProfile.M4ELD: sb.Append(" -p 39"); break;
-                    case FdkAACProfile.M2LC:  sb.Append(" -p 129"); break;
-                    case FdkAACProfile.M2HE:  sb.Append(" -p 132"); break;
-                    case FdkAACProfile.M2HE2: sb.Append(" -p 156"); break;
+                    switch (oSettings.Profile)
+                    {
+                        case FdkAACProfile.M4LC:  sb.Append(" -p 2"); break;
+                        case FdkAACProfile.M4HE:  sb.Append(" -p 5"); break;
+                        case FdkAACProfile.M4HE2: sb.Append(" -p 29"); break;
+                        case FdkAACProfile.M4LD:  sb.Append(" -p 23"); break;
+                        case FdkAACProfile.M4ELD: sb.Append(" -p 39"); break;
+                        case FdkAACProfile.M2LC:  sb.Append(" -p 129"); break;
+                        case FdkAACProfile.M2HE:  sb.Append(" -p 132"); break;
+                        case FdkAACProfile.M2HE2: sb.Append(" -p 156"); break;
+                    }
                 }
 
-                // Custom Command Line
-                if (!string.IsNullOrEmpty(audioJob.Settings.CustomEncoderOptions))
-                {
-                    sb.Append(" " + audioJob.Settings.CustomEncoderOptions.ToString());
-                }
+                if (!String.IsNullOrEmpty(oSettings.CustomEncoderOptions))
+                    sb.Append(" " + oSettings.CustomEncoderOptions.Trim());
 
                 sb.Append(" - -o \"{0}\"");
-
-                _encoderCommandLine = sb.ToString();
             }
+
+            _encoderCommandLine = sb.ToString().Trim();
 
             //Just check encoder existance
             _encoderExecutablePath = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, _encoderExecutablePath);
@@ -1847,7 +1919,7 @@ function x_upmixC" + id + @"(clip stereo)
             _avisynthAudioScript = script.ToString();
 
             _log.LogValue("Avisynth script", _avisynthAudioScript);
-            _log.LogValue("Commandline used", _encoderCommandLine);
+            _log.LogValue("Command line used", _encoderCommandLine);
         }
 
         public void start()

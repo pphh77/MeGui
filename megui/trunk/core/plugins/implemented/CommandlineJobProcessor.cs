@@ -197,7 +197,7 @@ namespace MeGUI
             proc.EnableRaisingEvents = true;
             proc.Exited += new EventHandler(proc_Exited);
             bWaitForExit = false;
-            log.LogValue("Job commandline", '"' + pstart.FileName + "\" " + pstart.Arguments);
+            log.LogValue("Job command line", '"' + pstart.FileName + "\" " + pstart.Arguments);
 
             try
             {
