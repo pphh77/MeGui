@@ -1431,7 +1431,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 if (!String.IsNullOrEmpty(oSettings.CustomEncoderOptions))
                     sb.Append(" " + oSettings.CustomEncoderOptions.Trim());
 
-                sb.Append("-if - -of \"{0}\"");
+                sb.Append(" -if - -of \"{0}\"");
             }
             else if (audioJob.Settings is MP3Settings)
             {
