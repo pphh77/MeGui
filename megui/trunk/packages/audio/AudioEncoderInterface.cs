@@ -40,6 +40,13 @@ namespace MeGUI
         public static readonly JobProcessorFactory Factory =
 new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
 
+        public enum HeaderType : int
+        {
+            NONE = 0,
+            WAV = 1,
+            W64 = 2
+        }
+
         private static IJobProcessor init(MainForm mf, Job j)
         {
             if (j is AudioJob &&
@@ -62,7 +69,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
         private string _avisynthAudioScript;
         private string _encoderExecutablePath;
         private string _encoderCommandLine;
-        private bool _mustSendWavHeaderToEncoderStdIn;
+        private HeaderType _sendWavHeaderToEncoderStdIn;
 
         private int _sampleRate;
 
@@ -415,8 +422,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                             using (Stream target = _encoderProcess.StandardInput.BaseStream)
                             {
                                 // let's write WAV Header
-                                if (_mustSendWavHeaderToEncoderStdIn)
-                                    writeHeader(target, a);
+                                writeHeader(target, a, _sendWavHeaderToEncoderStdIn, -1);
 
                                 _sampleRate = a.AudioSampleRate;
 
@@ -468,7 +474,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                                 }
                                 setProgress(1M);
 
-                                if (_mustSendWavHeaderToEncoderStdIn && a.BytesPerSample % 2 == 1)
+                                if (_sendWavHeaderToEncoderStdIn != HeaderType.NONE && a.BytesPerSample % 2 == 1)
                                     target.WriteByte(0);
                             }
                             raiseEvent("Finalizing encoder");
@@ -604,23 +610,88 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             }
         }
 
-        private void writeHeader(Stream target, AviSynthClip a)
+        private void writeHeader(Stream target, AviSynthClip a, HeaderType headerType, int iChannelMask)
         {
+            // http://behappy.codeplex.com/
+
+            if (headerType == HeaderType.NONE)
+                return;
+
             const uint FAAD_MAGIC_VALUE = 0xFFFFFF00;
-            const uint WAV_HEADER_SIZE = 36;
-            bool useFaadTrick = a.AudioSizeInBytes >= ((long)uint.MaxValue - WAV_HEADER_SIZE);
-            target.Write(System.Text.Encoding.ASCII.GetBytes("RIFF"), 0, 4);
-            target.Write(BitConverter.GetBytes(useFaadTrick ? FAAD_MAGIC_VALUE : (uint)(a.AudioSizeInBytes + WAV_HEADER_SIZE)), 0, 4);
-            target.Write(System.Text.Encoding.ASCII.GetBytes("WAVEfmt "), 0, 8);
-            target.Write(BitConverter.GetBytes((uint)0x10), 0, 4);
-            target.Write(BitConverter.GetBytes((a.SampleType==AudioSampleType.FLOAT) ? (short)0x03 : (short)0x01), 0, 2);
+            bool Greater4GB = a.AudioSizeInBytes >= (uint.MaxValue - 68);
+            bool WExtHeader = iChannelMask >= 0;
+            uint HeaderSize = (uint)(WExtHeader ? 60 : 36);
+            int[] defmask = { 0, 4, 3, 7, 51, 55, 63, 319, 1599, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+            if (Greater4GB && headerType == HeaderType.W64)
+            {
+                // W64
+                HeaderSize = (uint)(WExtHeader ? 128 : 112);
+                target.Write(System.Text.Encoding.ASCII.GetBytes("riff"), 0, 4);
+                target.Write(BitConverter.GetBytes((uint)0x11CF912E), 0, 4);  // GUID
+                target.Write(BitConverter.GetBytes((uint)0xDB28D6A5), 0, 4);
+                target.Write(BitConverter.GetBytes((uint)0x0000C104), 0, 4);
+                target.Write(BitConverter.GetBytes((a.AudioSizeInBytes + HeaderSize)), 0, 8);
+                target.Write(System.Text.Encoding.ASCII.GetBytes("wave"), 0, 4);
+                target.Write(BitConverter.GetBytes((uint)0x11D3ACF3), 0, 4);  // GUID
+                target.Write(BitConverter.GetBytes((uint)0xC000D18C), 0, 4);
+                target.Write(BitConverter.GetBytes((uint)0x8ADB8E4F), 0, 4);
+                target.Write(System.Text.Encoding.ASCII.GetBytes("fmt "), 0, 4);
+                target.Write(BitConverter.GetBytes((uint)0x11D3ACF3), 0, 4);  // GUID
+                target.Write(BitConverter.GetBytes((uint)0xC000D18C), 0, 4);
+                target.Write(BitConverter.GetBytes((uint)0x8ADB8E4F), 0, 4);
+                target.Write(BitConverter.GetBytes(WExtHeader ? (ulong)64 : (ulong)48), 0, 8);
+            }
+            else
+            {
+                //WAV
+                target.Write(System.Text.Encoding.ASCII.GetBytes("RIFF"), 0, 4);
+                target.Write(BitConverter.GetBytes(Greater4GB ? (FAAD_MAGIC_VALUE + HeaderSize) : (uint)(a.AudioSizeInBytes + HeaderSize)), 0, 4);
+                target.Write(System.Text.Encoding.ASCII.GetBytes("WAVE"), 0, 4);
+                target.Write(System.Text.Encoding.ASCII.GetBytes("fmt "), 0, 4);
+                target.Write(BitConverter.GetBytes(WExtHeader ? (uint)40 : (uint)16), 0, 4);
+            }
+            // fmt chunk common
+            target.Write(BitConverter.GetBytes(WExtHeader ? (uint)0xFFFE : (uint)((a.SampleType==AudioSampleType.FLOAT) ? 3 : 1)), 0, 2);
             target.Write(BitConverter.GetBytes(a.ChannelsCount), 0, 2);
             target.Write(BitConverter.GetBytes(a.AudioSampleRate), 0, 4);
-            target.Write(BitConverter.GetBytes(a.AvgBytesPerSec), 0, 4);
-            target.Write(BitConverter.GetBytes(a.BytesPerSample*a.ChannelsCount), 0, 2);
+            target.Write(BitConverter.GetBytes(a.BitsPerSample * a.AudioSampleRate * a.ChannelsCount / 8), 0, 4);
+            target.Write(BitConverter.GetBytes(a.ChannelsCount * a.BitsPerSample / 8), 0, 2);
             target.Write(BitConverter.GetBytes(a.BitsPerSample), 0, 2);
-            target.Write(System.Text.Encoding.ASCII.GetBytes("data"), 0, 4);
-            target.Write(BitConverter.GetBytes(useFaadTrick ? (FAAD_MAGIC_VALUE - WAV_HEADER_SIZE) : (uint)a.AudioSizeInBytes), 0, 4);
+            // if WAVE_FORMAT_EXTENSIBLE continue fmt chunk
+            if (WExtHeader)
+            {
+                if (iChannelMask == 0)
+                    iChannelMask = defmask[a.ChannelsCount];
+                target.Write(BitConverter.GetBytes((uint)0x16), 0, 2);
+                target.Write(BitConverter.GetBytes(a.BitsPerSample), 0, 2);
+                target.Write(BitConverter.GetBytes(iChannelMask), 0, 4);
+                target.Write(BitConverter.GetBytes(((a.SampleType == AudioSampleType.FLOAT) ? 3 : 1)), 0, 4);
+                target.Write(BitConverter.GetBytes((uint)0x00100000), 0, 4); // GUID
+                target.Write(BitConverter.GetBytes((uint)0xAA000080), 0, 4);
+                target.Write(BitConverter.GetBytes((uint)0x719B3800), 0, 4);
+            }
+            // data chunk
+            if (Greater4GB && headerType == HeaderType.W64)
+            {
+                // W64
+                if (!WExtHeader)
+                {
+                    target.Write(BitConverter.GetBytes((uint)0x0000D000), 0, 4); // pad
+                    target.Write(BitConverter.GetBytes((uint)0x0000D000), 0, 4);
+                }
+                target.Write(System.Text.Encoding.ASCII.GetBytes("data"), 0, 4);
+                target.Write(BitConverter.GetBytes((uint)0x11D3ACF3), 0, 4);  // GUID
+                target.Write(BitConverter.GetBytes((uint)0xC000D18C), 0, 4);
+                target.Write(BitConverter.GetBytes((uint)0x8ADB8E4F), 0, 4);
+                target.Write(BitConverter.GetBytes(a.AudioSizeInBytes + 24), 0, 8);
+            }
+            else
+            {
+                // WAV
+                target.Write(System.Text.Encoding.ASCII.GetBytes("data"), 0, 4);
+                target.Write(BitConverter.GetBytes(Greater4GB ? FAAD_MAGIC_VALUE : (uint)a.AudioSizeInBytes), 0, 4);
+            }
         }
 
         internal void Start()
@@ -1297,7 +1368,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 UpdateCacher.CheckPackage("aften");
                 AftenSettings oSettings = audioJob.Settings as AftenSettings;
                 _encoderExecutablePath = this._settings.Aften.Path;
-                _mustSendWavHeaderToEncoderStdIn = true;
+                _sendWavHeaderToEncoderStdIn = HeaderType.WAV;
                 
                 if (iAVSChannelCount > 6 && (audioJob.Settings.DownmixMode == ChannelMode.KeepOriginal || audioJob.Settings.DownmixMode == ChannelMode.Upmix 
                     || audioJob.Settings.DownmixMode == ChannelMode.UpmixUsingSoxEq ||audioJob.Settings.DownmixMode == ChannelMode.UpmixWithCenterChannelDialog))
@@ -1319,7 +1390,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 UpdateCacher.CheckPackage("flac");
                 FlacSettings oSettings = audioJob.Settings as FlacSettings;
                 _encoderExecutablePath = this._settings.Flac.Path;
-                _mustSendWavHeaderToEncoderStdIn = false;
+                _sendWavHeaderToEncoderStdIn = HeaderType.NONE;
 
                 script.Append("AudioBits(last)>24?ConvertAudioTo24bit(last):last " + Environment.NewLine); // flac encoder doesn't support 32bits streams
 
@@ -1341,7 +1412,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 UpdateCacher.CheckPackage("ffmpeg");
                 AC3Settings oSettings = audioJob.Settings as AC3Settings;
                 _encoderExecutablePath = this._settings.FFmpeg.Path;
-                _mustSendWavHeaderToEncoderStdIn = true;
+                _sendWavHeaderToEncoderStdIn = HeaderType.W64;
 
                 script.Append("32==Audiobits(last)?ConvertAudioTo16bit(last):last" + Environment.NewLine); // ffac3 encoder doesn't support 32bits streams
 
@@ -1359,7 +1430,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 UpdateCacher.CheckPackage("ffmpeg");
                 MP2Settings oSettings = audioJob.Settings as MP2Settings;
                 _encoderExecutablePath = this._settings.FFmpeg.Path;
-                _mustSendWavHeaderToEncoderStdIn = true;
+                _sendWavHeaderToEncoderStdIn = HeaderType.W64;
 
                 script.Append("32==Audiobits(last)?ConvertAudioTo16bit(last):last" + Environment.NewLine); // ffmp2 encoder doesn't support 32 bits streams
 
@@ -1377,7 +1448,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 UpdateCacher.CheckPackage("oggenc2");
                 OggVorbisSettings oSettings = audioJob.Settings as OggVorbisSettings;
                 _encoderExecutablePath = this._settings.OggEnc.Path;
-                _mustSendWavHeaderToEncoderStdIn = true;
+                _sendWavHeaderToEncoderStdIn = HeaderType.WAV;
 
                 if (!oSettings.CustomEncoderOptions.Contains("--ignorelength"))
                     sb.Append(" --ignorelength");
@@ -1392,7 +1463,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 UpdateCacher.CheckPackage("neroaacenc");
                 NeroAACSettings oSettings = audioJob.Settings as NeroAACSettings;
                 _encoderExecutablePath = this._settings.NeroAacEnc.Path;
-                _mustSendWavHeaderToEncoderStdIn = true;
+                _sendWavHeaderToEncoderStdIn = HeaderType.WAV;
                 
                 sb.Append(" -ignorelength");
                 if (!oSettings.CustomEncoderOptions.Contains("-he") && !oSettings.CustomEncoderOptions.Contains("-hev2") && !oSettings.CustomEncoderOptions.Contains("-lc"))
@@ -1438,7 +1509,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 UpdateCacher.CheckPackage("lame");
                 MP3Settings oSettings = audioJob.Settings as MP3Settings;
                 _encoderExecutablePath = this._settings.Lame.Path;
-                _mustSendWavHeaderToEncoderStdIn = true;
+                _sendWavHeaderToEncoderStdIn = HeaderType.WAV;
                 
                 script.Append("32==Audiobits(last)?ConvertAudioTo16bit(last):last" + Environment.NewLine); // lame encoder doesn't support 32bits streams
 
@@ -1467,7 +1538,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 UpdateCacher.CheckPackage("qaac");
                 QaacSettings oSettings = audioJob.Settings as QaacSettings;
                 _encoderExecutablePath = this._settings.QAAC.Path;
-                _mustSendWavHeaderToEncoderStdIn = true;
+                _sendWavHeaderToEncoderStdIn = HeaderType.WAV;
 
                 if (!oSettings.CustomEncoderOptions.Contains("--ignorelength"))
                     sb.Append(" --ignorelength");
@@ -1512,7 +1583,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 UpdateCacher.CheckPackage("opus");
                 OpusSettings oSettings = audioJob.Settings as OpusSettings;
                 _encoderExecutablePath = this._settings.Opus.Path;
-                _mustSendWavHeaderToEncoderStdIn = true;
+                _sendWavHeaderToEncoderStdIn = HeaderType.WAV;
 
                 if (!oSettings.CustomEncoderOptions.Contains("--ignorelength"))
                     sb.Append(" --ignorelength");
@@ -1539,7 +1610,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 UpdateCacher.CheckPackage("fdkaac");
                 FDKAACSettings oSettings = audioJob.Settings as FDKAACSettings;
                 _encoderExecutablePath = this._settings.Fdkaac.Path;
-                _mustSendWavHeaderToEncoderStdIn = true;
+                _sendWavHeaderToEncoderStdIn = HeaderType.WAV;
 
                 if (!oSettings.CustomEncoderOptions.Contains("--ignorelength"))
                     sb.Append(" --ignorelength");
