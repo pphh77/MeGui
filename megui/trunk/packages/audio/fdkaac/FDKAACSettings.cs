@@ -62,11 +62,12 @@ namespace MeGUI
 
 
         public FDKAACSettings()
-            : base(ID, AudioCodec.AAC, AudioEncoderType.FDKAAC, 128, BitrateManagementMode.VBR)
+            : base(ID, AudioCodec.AAC, AudioEncoderType.FDKAAC, 128, BitrateManagementMode.CBR)
         {
             base.supportedBitrates = Array.ConvertAll<object, int>(SupportedBitrates, delegate(object o) { return (int)o; });
             mode = FdkAACMode.CBR;
             profile = FdkAACProfile.M4LC;
+            quality = 3;
         }
 
         private FdkAACProfile profile;
@@ -81,6 +82,13 @@ namespace MeGUI
         {
             get { return mode; }
             set { mode = value; }
+        }
+
+        private int quality;
+        public int Quality
+        {
+            get { return quality; }
+            set { quality = value; }
         }
 
         public override BitrateManagementMode BitrateMode

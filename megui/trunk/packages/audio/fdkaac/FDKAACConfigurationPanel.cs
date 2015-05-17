@@ -39,6 +39,8 @@ namespace MeGUI.packages.audio.fdkaac
         }
 
         #region properties
+        private int bitrate;
+        private int quality;
         /// <summary>
         /// gets / sets the settings that are being shown in this configuration dialog
         /// </summary>
@@ -55,15 +57,23 @@ namespace MeGUI.packages.audio.fdkaac
                 }
                 nas.Mode = (FdkAACMode)(cbMode.SelectedItem as EnumProxy).RealValue;
                 nas.Profile = (FdkAACProfile)(cbProfile.SelectedItem as EnumProxy).RealValue;
-                nas.Bitrate = (int)trackBar.Value;
+                if (nas.Mode == FdkAACMode.CBR)
+                    nas.Bitrate = (int)trackBar.Value;
+                else
+                    nas.Quality = (int)trackBar.Value;
                 return nas;
             }
             set
             {
                 FDKAACSettings nas = value as FDKAACSettings;
+                bitrate = nas.Bitrate;
+                quality = nas.Quality;
                 cbMode.SelectedItem = EnumProxy.Create(nas.Mode);
                 cbProfile.SelectedItem = EnumProxy.Create(nas.Profile);
-                trackBar.Value = Math.Max(Math.Min(nas.Bitrate, trackBar.Maximum), trackBar.Minimum);
+                if (nas.Mode == FdkAACMode.CBR)
+                    trackBar.Value = Math.Max(Math.Min(nas.Bitrate, trackBar.Maximum), trackBar.Minimum);
+                else
+                    trackBar.Value = Math.Max(Math.Min(nas.Quality, trackBar.Maximum), trackBar.Minimum);
             }
         }
         #endregion
@@ -91,9 +101,10 @@ namespace MeGUI.packages.audio.fdkaac
                 case FdkAACMode.VBR:
                     trackBar.Visible = true;
                     label4.Visible = false;
-                    trackBar.Minimum = 0;
-                    trackBar.Maximum = 320;
-                    trackBar.TickFrequency = 20;
+                    trackBar.Minimum = 1;
+                    trackBar.Maximum = 5;
+                    trackBar.TickFrequency = 1;
+                    trackBar.Value = quality;
                     break;
                 case FdkAACMode.CBR:
                     trackBar.Visible = true;
@@ -101,9 +112,9 @@ namespace MeGUI.packages.audio.fdkaac
                     trackBar.Minimum = 0;
                     trackBar.Maximum = 320;
                     trackBar.TickFrequency = 20;
+                    trackBar.Value = bitrate;
                     break;
             }
-            trackBar_ValueChanged(sender, e);
         }
 
         private void trackBar_ValueChanged(object sender, EventArgs e)
@@ -111,10 +122,12 @@ namespace MeGUI.packages.audio.fdkaac
             switch ((FdkAACMode)(cbMode.SelectedItem as EnumProxy).RealValue)
             {
                 case FdkAACMode.VBR:
-                    encoderGroupBox.Text = String.Format(" FDK-AAC Options - Variable Bitrate @ {0} kbit/s ", trackBar.Value);
+                    encoderGroupBox.Text = String.Format(" FDK-AAC Options - Variable Bitrate @ Quality = {0} ", trackBar.Value);
+                    quality = trackBar.Value;
                     break;
                 case FdkAACMode.CBR:
                     encoderGroupBox.Text = String.Format(" FDK-AAC Options - Constant Bitrate  @ {0} kbit/s ", trackBar.Value);
+                    bitrate = trackBar.Value;
                     break;
             }
         }

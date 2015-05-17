@@ -1547,17 +1547,21 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 {
                     switch (oSettings.Mode)
                     {
-                        case FdkAACMode.CBR: sb.Append(" -m 0"); break;
-                        case FdkAACMode.VBR: sb.Append(" -m 1"); break;
+                        case FdkAACMode.CBR: // default
+                            sb.Append(" -m 0");
+                            if (!oSettings.CustomEncoderOptions.Contains("-b "))
+                                sb.Append(" -b " + oSettings.Bitrate);
+                            break;
+                        case FdkAACMode.VBR:
+                            sb.Append(" -m " + oSettings.Quality);
+                            break;
                     }
                 }
-                if (!oSettings.CustomEncoderOptions.Contains("-b "))
-                    sb.Append(" -b " + oSettings.Bitrate);
                 if (!oSettings.CustomEncoderOptions.Contains("-p "))
                 {
                     switch (oSettings.Profile)
                     {
-                        case FdkAACProfile.M4LC:  sb.Append(" -p 2"); break;
+                        case FdkAACProfile.M4LC:  sb.Append(" -p 2"); break; // default
                         case FdkAACProfile.M4HE:  sb.Append(" -p 5"); break;
                         case FdkAACProfile.M4HE2: sb.Append(" -p 29"); break;
                         case FdkAACProfile.M4LD:  sb.Append(" -p 23"); break;
