@@ -78,7 +78,7 @@ namespace MeGUI
                 MessageBox.Show("The ContextHelp.xml file could not be found. Please check in the 'Data' directory to see if it exists. Help tooltips will not be available.", "File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            toolTipHelp.SetToolTip(chkAlwaysMuxMKV, SelectHelpText("alwaysmuxmkv"));
+            toolTipHelp.SetToolTip(chx264ExternalMuxer, SelectHelpText("alwaysmuxmkv"));
             toolTipHelp.SetToolTip(ffmsThreads, SelectHelpText("ffmsthreads"));
             toolTipHelp.SetToolTip(cbUseITUValues, SelectHelpText("useituvalues"));
         }
@@ -209,7 +209,6 @@ namespace MeGUI
                     settings.OpenAVSInThreadDuringSession = false;
 				settings.AutoStartQueue = this.autostartQueue.Checked;
                 settings.AutoStartQueueStartup = this.cbAutoStartQueueStartup.Checked;
-                settings.AlwaysMuxMKV = this.chkAlwaysMuxMKV.Checked;
                 if (donothing.Checked)
                     settings.AfterEncoding = AfterEncoding.DoNothing;
                 else if (shutdown.Checked)
@@ -304,7 +303,6 @@ namespace MeGUI
                     cbOpenAVSinThread.CheckState = CheckState.Indeterminate;
 				autostartQueue.Checked = settings.AutoStartQueue;
                 cbAutoStartQueueStartup.Checked = settings.AutoStartQueueStartup;
-                chkAlwaysMuxMKV.Checked = settings.AlwaysMuxMKV;
                 donothing.Checked = settings.AfterEncoding == AfterEncoding.DoNothing;
                 shutdown.Checked = settings.AfterEncoding == AfterEncoding.Shutdown;
                 runCommand.Checked = settings.AfterEncoding == AfterEncoding.RunCommand;

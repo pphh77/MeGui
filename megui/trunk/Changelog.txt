@@ -1,3 +1,4 @@
+2545 [Settings]             merged "Always mux mkv encodings" with "use external muxer"
 2544 [FFmpeg Encoder]       fixed missing W64 header for large PCM data
 2543 [FDK-AAC Encoder]      fixed VBR mode
 2542 [Nero AAC Encoder]     fixed not able to start encodes (regression of 2536). Bug #800

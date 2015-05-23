@@ -57,7 +57,7 @@ namespace MeGUI
                      overwriteStats, keep2of3passOutput, autoUpdate, deleteCompletedJobs, deleteIntermediateFiles,
                      deleteAbortedOutput, openProgressWindow, autoSelectHDStreams, bUseFDKAac,
                      alwaysOnTop, addTimePosition, alwaysbackupfiles, bUseITU, bEac3toLastUsedFileMode,
-                     bAutoLoadDG, bAutoStartQueueStartup, bAlwaysMuxMKV, b64bitX264, bAlwayUsePortableAviSynth,
+                     bAutoLoadDG, bAutoStartQueueStartup, b64bitX264, bAlwayUsePortableAviSynth,
                      bEnsureCorrectPlaybackSpeed, bOpenAVSInThread, bExternalMuxerX264, bUseNeroAacEnc;
         private decimal forceFilmThreshold, acceptableFPSError;
         private int nbPasses, autoUpdateServerSubList, minComplexity, updateFormSplitter,
@@ -110,7 +110,6 @@ namespace MeGUI
 			autoForceFilm = true;
             bAutoLoadDG = true;
 			autoStartQueue = true;
-            bAlwaysMuxMKV = true;
             bAutoStartQueueStartup = false;
 			forceFilmThreshold = new decimal(95);
 			defaultLanguage1 = "English";
@@ -633,15 +632,6 @@ namespace MeGUI
             get { return bAutoStartQueueStartup; }
             set { bAutoStartQueueStartup = value; }
 		}
-
-        /// <summary>
-        /// gets / sets whether MKV files should always be muxed with mkvmerge even if x264 can output it directly
-        /// </summary>
-        public bool AlwaysMuxMKV
-        {
-            get { return bAlwaysMuxMKV; }
-            set { bAlwaysMuxMKV = value; }
-        }
 
 		/// <summary>
 		/// gets / sets whether pressing Queue should automatically start encoding

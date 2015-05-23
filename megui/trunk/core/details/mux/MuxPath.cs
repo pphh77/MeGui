@@ -97,7 +97,7 @@ namespace MeGUI
         {
             if (path.Count == 0)
             {
-                if (initialInputTypes.Count == 1 && MainForm.Instance.Settings.AlwaysMuxMKV && this.targetType == ContainerType.MKV)
+                if (initialInputTypes.Count == 1 && MainForm.Instance.Settings.UseExternalMuxerX264 && this.targetType == ContainerType.MKV)
                     return false;
 
                 return (initialInputTypes.Count == 0 || 
