@@ -25,7 +25,7 @@ using System.Text;
 
 namespace MeGUI
 {
-    public enum MuxerType { MP4BOX, MKVMERGE, AVIMUXGUI, TSMUXER };
+    public enum MuxerType { MP4BOX, MKVMERGE, AVIMUXGUI, TSMUXER, FFMPEG };
     public class MuxableType
     {
         public OutputType outputType;
@@ -546,6 +546,7 @@ namespace MeGUI
             return new MP4BoxMuxer(settings.Mp4Box.Path);
         }
     }
+
     public class MKVMergeMuxerProvider : MuxerProvider
     {
         public MKVMergeMuxerProvider() : base("mkvmerge")
@@ -630,6 +631,7 @@ namespace MeGUI
             return new MkvMergeMuxer(settings.MkvMerge.Path);
         }
     }
+
     public class AVIMuxGUIMuxerProvider : MuxerProvider
     {
         public AVIMuxGUIMuxerProvider(): base("AVIMuxGUI")
@@ -676,7 +678,6 @@ namespace MeGUI
             return new AMGMuxer(settings.AviMuxGui.Path);
         }
     }
-
     public class TSMuxerProvider : MuxerProvider
     {
         public TSMuxerProvider() : base("tsMuxeR")
@@ -730,18 +731,43 @@ namespace MeGUI
             supportedDeviceTypes.Add(DeviceType.BD);
 
             base.type = MuxerType.TSMUXER;
-            maxFilesOfType = new int[] { 1, -1, -1, 1, 1};
+            maxFilesOfType = new int[] { 1, -1, -1, 1, 1 };
             name = "M2TS Muxer";
             shortcut = System.Windows.Forms.Shortcut.Ctrl3;
         }
- 
+
         public override IJobProcessor GetMuxer(MeGUISettings settings)
         {
             return new tsMuxeR(settings.TSMuxer.Path);
         }
     }
 
+    public class FFmpegMuxerProvider : MuxerProvider
+    {
+        public FFmpegMuxerProvider() : base("FFmpeg")
+        {
+            supportedVideoTypes.Add(VideoType.RAWASP);
+            supportedVideoCodecs.Add(VideoCodec.ASP);
+            supportsAnyInputtableVideoCodec = false;
+            supportsAnyInputtableAudioCodec = false;
+
+            supportedContainerOutputTypes.Add(ContainerType.AVI);
+            supportedContainerOutputTypes.Add(ContainerType.MKV);
+
+            supportedContainerInputTypes.Add(ContainerType.AVI);
+
+            maxFilesOfType = new int[] { 1, 0, 0, 0, 0 };
+            base.type = MuxerType.FFMPEG;
+            name = "FFmpeg Muxer";
+        }
+ 
+        public override IJobProcessor GetMuxer(MeGUISettings settings)
+        {
+            return new tsMuxeR(settings.FFmpeg.Path);
+        }
+    }
     #endregion
+
     #region top level providers
     public abstract class MuxerProvider : IMuxing
     {
@@ -1229,8 +1255,8 @@ namespace MeGUI
         public XviDEncoderProvider()
         {
             supportedCodecs.Add(VideoCodec.ASP);
-            supportedTypes.Add(VideoType.AVI);
-            supportedTypes.Add(VideoType.MKV);
+            //supportedTypes.Add(VideoType.AVI);
+            //supportedTypes.Add(VideoType.MKV);
             supportedTypes.Add(VideoType.RAWASP);
             supportedEncoderTypes.Add(VideoEncoderType.XVID);
         }
@@ -1263,8 +1289,8 @@ namespace MeGUI
         public X265EncoderProvider()
         {
             supportedCodecs.Add(VideoCodec.HEVC);
-            supportedTypes.Add(VideoType.MP4);
-            supportedTypes.Add(VideoType.MKV); 
+            //supportedTypes.Add(VideoType.MP4);
+            //supportedTypes.Add(VideoType.MKV); 
             supportedTypes.Add(VideoType.RAWHEVC);
             supportedEncoderTypes.Add(VideoEncoderType.X265);
         }

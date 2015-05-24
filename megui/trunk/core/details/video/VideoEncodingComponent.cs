@@ -77,7 +77,6 @@ namespace MeGUI
         #endregion
         #region generic handlers: filetype, profiles and codec. Also, encoder provider
 
-
         public VideoCodecSettings CurrentSettings
         {
             get
@@ -116,6 +115,7 @@ namespace MeGUI
             set { addPrerenderJob.Checked = value; }
         }
         #endregion
+
         #region event handlers
         private void videoInput_FileSelected(FileBar sender, FileBarEventArgs args)
         {
@@ -130,6 +130,7 @@ namespace MeGUI
         {
             info.VideoOutput = videoOutput.Filename;
         }
+
         /// <summary>
         /// opens the AviSynth preview for a given AviSynth script
         /// gets the properties of the video, registers the callbacks, updates the video bitrate (we know the lenght of the video now) and updates the commandline
@@ -157,7 +158,6 @@ namespace MeGUI
             }
         }
 
-
         private void VideoInput_DoubleClick(object sender, System.EventArgs e)
         {
             if (!VideoInput.Equals(""))
@@ -170,6 +170,7 @@ namespace MeGUI
             }
             else MessageBox.Show("Load an avisynth script first...", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+
         private void queueVideoButton_Click(object sender, System.EventArgs e)
         {
             fileType_SelectedIndexChanged(sender, e); // to select always correct output file extension
@@ -182,27 +183,37 @@ namespace MeGUI
             VideoCodecSettings vSettings = this.CurrentSettings.Clone();
 
             string videoOutput = info.VideoOutput;
-            if ((MainForm.Instance.Settings.UseExternalMuxerX264 || fileType.Text.Equals("MP4"))
-                && (!fileType.Text.StartsWith("RAW") && vSettings.SettingsID.StartsWith("x26")))
+
+            // special handling as the encoders cannot output all desired container types
+            if (!fileType.Text.StartsWith("RAW") 
+                && (!vSettings.SettingsID.Equals("x264") || !fileType.Text.Equals("MKV") || MainForm.Instance.Settings.UseExternalMuxerX264))
             {
                 if (vSettings.SettingsID.Equals("x264"))
                     videoOutput = Path.ChangeExtension(videoOutput, "264");
                 else if (vSettings.SettingsID.Equals("x265"))
                     videoOutput = Path.ChangeExtension(videoOutput, "hevc");
-                    
+                else if (vSettings.SettingsID.Equals("XviD"))
+                    videoOutput = Path.ChangeExtension(videoOutput, "m4v");
             }
 
             JobChain prepareJobs = mainForm.JobUtil.AddVideoJobs(info.VideoInput, videoOutput, this.CurrentSettings.Clone(),
                 info.IntroEndFrame, info.CreditsStartFrame, info.DAR, PrerenderJob, true, info.Zones);
 
-            if ((MainForm.Instance.Settings.UseExternalMuxerX264 || fileType.Text.Equals("MP4"))
-                && (!fileType.Text.StartsWith("RAW") && vSettings.SettingsID.StartsWith("x26")))
+            if (!fileType.Text.StartsWith("RAW") 
+                && (!vSettings.SettingsID.Equals("x264") || !fileType.Text.Equals("MKV") || MainForm.Instance.Settings.UseExternalMuxerX264))
             {
-                // create job
+                // create mux job
                 MuxJob mJob = new MuxJob();
                 mJob.Input = videoOutput;
 
-                if (fileType.Text.Equals("MKV"))
+                if (vSettings.SettingsID.Equals("XviD"))
+                {
+                    mJob.MuxType = MuxerType.FFMPEG;
+                    mJob.Output = Path.ChangeExtension(videoOutput, "avi");
+                    if (fileType.Text.Equals("MKV"))
+                        mJob.Output = Path.ChangeExtension(videoOutput, "mkv");
+                }
+                else if (fileType.Text.Equals("MKV"))
                 {
                     mJob.MuxType = MuxerType.MKVMERGE;
                     mJob.Output = Path.ChangeExtension(videoOutput, "mkv");
@@ -469,9 +480,21 @@ namespace MeGUI
             lastCodec = CurrentSettings.EncoderType;
 
             VideoType[] vArray = videoEncoderProvider.GetSupportedOutput(lastCodec);
-            if (lastCodec == VideoEncoderType.X264)
+            if (lastCodec == VideoEncoderType.XVID)
+            {
+                Array.Resize(ref vArray, vArray.Length + 2);
+                vArray[vArray.Length - 2] = VideoType.AVI;
+                vArray[vArray.Length - 1] = VideoType.MKV;
+            }
+            else if (lastCodec == VideoEncoderType.X264)
             {
                 Array.Resize(ref vArray, vArray.Length + 1);
+                vArray[vArray.Length - 1] = VideoType.MP4;
+            }
+            else if (lastCodec == VideoEncoderType.X265)
+            {
+                Array.Resize(ref vArray, vArray.Length + 2);
+                vArray[vArray.Length - 2] = VideoType.MKV;
                 vArray[vArray.Length - 1] = VideoType.MP4;
             }
 

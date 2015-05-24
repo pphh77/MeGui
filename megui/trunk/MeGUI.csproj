@@ -294,6 +294,7 @@
     <Compile Include="packages\audio\fdkaac\FDKAACConfigurationPanel.Designer.cs">
       <DependentUpon>FDKAACConfigurationPanel.cs</DependentUpon>
     </Compile>
+    <Compile Include="packages\muxer\ffmpeg\FFmpegMuxer.cs" />
     <Compile Include="packages\reader\lmash\lsmashReader.cs" />
     <Compile Include="packages\reader\ttxt\ttxtReader.cs" />
     <Compile Include="packages\tools\avscreator\AviSynthProfileConfigPanel.cs">

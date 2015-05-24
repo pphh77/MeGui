@@ -630,8 +630,12 @@ namespace MeGUI
             {
                 if (type.outputType is VideoType)
                 {
-                    if (video.Settings.EncoderType == VideoEncoderType.X264 && type.outputType.ContainerType == ContainerType.MP4)
+                    if (video.Settings.EncoderType == VideoEncoderType.XVID && (type.outputType.ContainerType == ContainerType.AVI || type.outputType.ContainerType == ContainerType.MKV))
+                        video.Output = Path.ChangeExtension(video.Output, ".m4v");
+                    else if (video.Settings.EncoderType == VideoEncoderType.X264 && type.outputType.ContainerType == ContainerType.MP4)
                         video.Output = Path.ChangeExtension(video.Output, ".264");
+                    else if (video.Settings.EncoderType == VideoEncoderType.X265 && (type.outputType.ContainerType == ContainerType.MKV || type.outputType.ContainerType == ContainerType.MP4))
+                        video.Output = Path.ChangeExtension(video.Output, ".hevc");
                     else 
                         video.Output = Path.ChangeExtension(video.Output, type.outputType.Extension);
                     video.VideoType = type;

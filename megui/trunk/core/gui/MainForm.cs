@@ -951,6 +951,7 @@ namespace MeGUI
             PackageSystem.JobProcessors.Register(MP4BoxMuxer.Factory);
             PackageSystem.JobProcessors.Register(AMGMuxer.Factory);
             PackageSystem.JobProcessors.Register(tsMuxeR.Factory);
+            PackageSystem.JobProcessors.Register(FFmpegMuxer.Factory);
 
             PackageSystem.JobProcessors.Register(MkvExtract.Factory);
             PackageSystem.JobProcessors.Register(PgcDemux.Factory);
@@ -969,6 +970,7 @@ namespace MeGUI
             PackageSystem.JobProcessors.Register(HDStreamExtractorIndexer.Factory);
             PackageSystem.MuxerProviders.Register(new AVIMuxGUIMuxerProvider());
             PackageSystem.MuxerProviders.Register(new TSMuxerProvider());
+            PackageSystem.MuxerProviders.Register(new FFmpegMuxerProvider());
             PackageSystem.MuxerProviders.Register(new MKVMergeMuxerProvider());
             PackageSystem.MuxerProviders.Register(new MP4BoxMuxerProvider());
             PackageSystem.Tools.Register(new MeGUI.packages.tools.cutter.CutterTool());
