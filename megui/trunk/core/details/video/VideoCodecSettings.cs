@@ -185,15 +185,6 @@ namespace MeGUI
 			set { creditsQuantizer = value; }
 		}
 		/// <summary>
-		/// returns the available FourCCs for the codec
-		/// </summary>
-        [PropertyEqualityIgnore]
-        public string[] FourCCs
-        {
-            get { return fourCCs; }
-            set { fourCCs = value; }
-        }
-		/// <summary>
 		/// gets / sets the logfile
 		/// </summary>
 		public string Logfile
@@ -241,14 +232,6 @@ namespace MeGUI
                     return customEncoderOptions;
             }
 			set { customEncoderOptions = value; }
-		}
-		/// <summary>
-		/// gets / sets which fourcc from the FourCCs array is to be used
-		/// </summary>
-		public int FourCC
-		{
-			get { return fourCC; }
-			set { fourCC = value; }
 		}
 		/// <summary>
         ///  gets / sets the maximum number of passes that can be performed with the current codec

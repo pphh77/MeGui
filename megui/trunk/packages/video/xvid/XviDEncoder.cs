@@ -80,24 +80,54 @@ new JobProcessorFactory(new ProcessorFactory(init), "XviDEncoder");
         {
             StringBuilder sb = new StringBuilder();
             CultureInfo ci = new CultureInfo("en-us");
+
+            #region input options
             sb.Append("-i \"" + input + "\" ");
+            #endregion
+
+            #region output options
+            if (xs.VideoEncodingType != VideoCodecSettings.VideoEncodingMode.twopass1) // not 2 pass vbr first pass, add output filename and output type
+                sb.Append("-o \"" + output + "\" ");
+            #endregion
+
+            #region rate control options
             switch (xs.VideoEncodingType)
             {
-                case VideoCodecSettings.VideoEncodingMode.CBR:
-                    sb.Append("-single -bitrate " + xs.BitrateQuantizer + " "); // add bitrate
-                    break;
-                case VideoCodecSettings.VideoEncodingMode.CQ:
-                    sb.Append("-single -cq " + xs.Quantizer.ToString(ci) + " "); // add quantizer
-                    break;
                 case VideoCodecSettings.VideoEncodingMode.twopass1: // 2 pass first pass
-                    sb.Append("-pass1 " + "\"" + xs.Logfile + "\" -bitrate " + xs.BitrateQuantizer + " "); // add logfile
+                    sb.Append("-pass1 " + "\"" + xs.Logfile + "\" "); // add logfile
                     break;
                 case VideoCodecSettings.VideoEncodingMode.twopass2: // 2 pass second pass
                 case VideoCodecSettings.VideoEncodingMode.twopassAutomated: // automated twopass
-                    sb.Append("-pass2 " + "\"" + xs.Logfile + "\" -bitrate " + xs.BitrateQuantizer + " "); // add logfile
+                    sb.Append("-pass2 " + "\"" + xs.Logfile + "\" "); // add logfile
                     break;
             }
-            if (xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.CQ || xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.CBR) // 1 pass modes
+            if (!xs.CustomEncoderOptions.Contains("-bitrate ") && !xs.CustomEncoderOptions.Contains("-cq "))
+            {
+                if (xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.CQ)
+                    sb.Append("-cq " + xs.Quantizer.ToString(ci) + " "); // add quantizer
+                else if (xs.BitrateQuantizer != 700)
+                    sb.Append("-bitrate " + xs.BitrateQuantizer + " "); // add bitrate
+            }
+            if (!xs.CustomEncoderOptions.Contains("-max_key_interval ") && xs.KeyframeInterval != 300)
+                sb.Append("-max_key_interval " + xs.KeyframeInterval + " ");
+            if (zones != null && zones.Length > 0 && xs.CreditsQuantizer >= new decimal(1))
+            {
+                foreach (Zone zone in zones)
+                {
+                    if (zone.mode == ZONEMODE.Quantizer)
+                        sb.Append("-zq " + zone.startFrame + " " + zone.modifier + " ");
+                    if (zone.mode == ZONEMODE.Weight)
+                    {
+                        sb.Append("-zw " + zone.startFrame + " ");
+                        double mod = (double)zone.modifier / 100.0;
+                        sb.Append(mod.ToString(ci) + " ");
+                    }
+                }
+            }
+            #endregion
+
+            #region single pass options
+            if (xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.CQ || xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.CBR)
             {
                 if (!xs.CustomEncoderOptions.Contains("-reaction ") && xs.ReactionDelayFactor != 16)
                     sb.Append("-reaction " + xs.ReactionDelayFactor + " ");
@@ -106,7 +136,10 @@ new JobProcessorFactory(new ProcessorFactory(init), "XviDEncoder");
                 if (!xs.CustomEncoderOptions.Contains("-smoother ") && xs.RateControlBuffer != 100)
                     sb.Append("-smoother " + xs.RateControlBuffer + " ");
             }
-            else // two pass modes
+            #endregion
+
+            #region second pass options
+            if (xs.VideoEncodingType != VideoCodecSettings.VideoEncodingMode.CQ && xs.VideoEncodingType != VideoCodecSettings.VideoEncodingMode.CBR)
             {
                 if (!xs.CustomEncoderOptions.Contains("-kboost ") && xs.KeyFrameBoost != 10)
                     sb.Append("-kboost " + xs.KeyFrameBoost + " ");
@@ -124,6 +157,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "XviDEncoder");
                     sb.Append("-chigh " + xs.HighBitrateDegradation + " ");
                 if (!xs.CustomEncoderOptions.Contains("-clow ") && xs.LowBitrateImprovement != 0)
                     sb.Append("-clow " + xs.LowBitrateImprovement + " ");
+                // -overhead missing
                 if (xs.XvidProfile != 0)
                 {
                     int ivbvmax = 0, ivbvsize = 0, ivbvpeak = 0;
@@ -168,16 +202,31 @@ new JobProcessorFactory(new ProcessorFactory(init), "XviDEncoder");
                         sb.Append("-vbvpeak " + ivbvpeak + " ");
                 }
             }
+            #endregion
+
+            #region bframes options
+            if (!xs.CustomEncoderOptions.Contains("-max_bframes ") && xs.NbBframes != 2)
+                sb.Append("-max_bframes " + xs.NbBframes + " ");
+            if (xs.NbBframes > 0)
+            {
+                if (!xs.CustomEncoderOptions.Contains("-bquant_ratio ") && xs.BQuantRatio != 150)
+                    sb.Append("-bquant_ratio " + xs.BQuantRatio + " ");
+                if (!xs.CustomEncoderOptions.Contains("-bquant_offset ") && xs.BQuantOffset != 100)
+                    sb.Append("-bquant_offset " + xs.BQuantOffset + " ");
+            }
+            #endregion
+
+            #region other options
+            // -noasm missing
             if (!xs.CustomEncoderOptions.Contains("-turbo") && xs.Turbo)
                 sb.Append("-turbo ");
-            if (!xs.CustomEncoderOptions.Contains("-max_key_interval ") && xs.KeyframeInterval != 300)
-                sb.Append("-max_key_interval " + xs.KeyframeInterval + " ");
-            if (!xs.CustomEncoderOptions.Contains("-nopacked") && !xs.PackedBitstream) // default is on in encraw
-                sb.Append("-nopacked ");
             if (!xs.CustomEncoderOptions.Contains("-quality ") && xs.MotionSearchPrecision != 6)
                 sb.Append("-quality " + xs.MotionSearchPrecision + " ");
             if (!xs.CustomEncoderOptions.Contains("-vhqmode ") && xs.VHQMode != 1)
                 sb.Append("-vhqmode " + xs.VHQMode + " ");
+            if (xs.NbBframes > 0 && !xs.CustomEncoderOptions.Contains("-bvhq ") && xs.VHQForBframes)
+                sb.Append("-bvhq ");
+            // -metric missing
             if (!xs.CustomEncoderOptions.Contains("-qpel ") && xs.QPel)
                 sb.Append("-qpel ");
             if (!xs.CustomEncoderOptions.Contains("-gmc ") && xs.GMC)
@@ -194,39 +243,43 @@ new JobProcessorFactory(new ProcessorFactory(init), "XviDEncoder");
                 else
                     sb.Append("2 ");
             }
-            if (!xs.CustomEncoderOptions.Contains("-lumimasking") && xs.HVSMasking != 0)
-                sb.Append("-lumimasking ");
-            if (!xs.CustomEncoderOptions.Contains("-notrellis") && !xs.Trellis)
-                sb.Append("-notrellis ");
+            if (!xs.CustomEncoderOptions.Contains("-nopacked") && !xs.PackedBitstream)
+                sb.Append("-nopacked ");
+            if (!xs.CustomEncoderOptions.Contains("-noclosed_gop") && !xs.ClosedGOP)
+                sb.Append("-noclosed_gop ");
+            if (!xs.CustomEncoderOptions.Contains("-masking ") && xs.HVSMasking != 0)
+                sb.Append("-masking " + xs.HVSMasking + " ");
+            // -stats missing
+            // -ssim missing
+            // -ssim_file missing
+            // -debug missing
+            // -vop_debug missing
             if (!xs.CustomEncoderOptions.Contains("-nochromame") && !xs.ChromaMotion)
                 sb.Append("-nochromame ");
+            if (!xs.CustomEncoderOptions.Contains("-notrellis") && !xs.Trellis)
+                sb.Append("-notrellis ");
             if (!xs.CustomEncoderOptions.Contains("-imin ") && xs.MinQuantizer != 2)
                 sb.Append("-imin " + xs.MinQuantizer + " ");
             if (!xs.CustomEncoderOptions.Contains("-imax ") && xs.MaxQuantizer != 31)
                 sb.Append("-imax " + xs.MaxQuantizer + " ");
-            if (!xs.CustomEncoderOptions.Contains("-pmin ") && xs.MinPQuant != 2)
-                sb.Append("-pmin " + xs.MinPQuant + " ");
-            if (!xs.CustomEncoderOptions.Contains("-pmax ") && xs.MaxPQuant != 31)
-                sb.Append("-pmax " + xs.MaxPQuant + " ");
-            if (!xs.CustomEncoderOptions.Contains("-noclosed_gop") && !xs.ClosedGOP)
-                sb.Append("-noclosed_gop ");
-            if (!xs.CustomEncoderOptions.Contains("-drop ") && xs.FrameDropRatio != 0)
-                sb.Append("-drop " + xs.FrameDropRatio + " ");
-            if (!xs.CustomEncoderOptions.Contains("-max_bframes ") && xs.NbBframes != 2) 
-                sb.Append("-max_bframes " + xs.NbBframes + " ");
             if (xs.NbBframes > 0)
             {
-                if (!xs.CustomEncoderOptions.Contains("-bvhq ") && xs.VHQForBframes)
-                    sb.Append("-bvhq ");
-                if (!xs.CustomEncoderOptions.Contains("-bquant_ratio ") && xs.BQuantRatio != 150)
-                    sb.Append("-bquant_ratio " + xs.BQuantRatio + " ");
-                if (!xs.CustomEncoderOptions.Contains("-bquant_offset ") && xs.BQuantOffset != 100)
-                    sb.Append("-bquant_offset " + xs.BQuantOffset + " ");
                 if (!xs.CustomEncoderOptions.Contains("-bmin ") && xs.MinBQuant != 2)
                     sb.Append("-bmin " + xs.MinBQuant + " ");
                 if (!xs.CustomEncoderOptions.Contains("-bmax ") && xs.MaxBQuant != 31)
                     sb.Append("-bmax " + xs.MaxBQuant + " ");
             }
+            if (!xs.CustomEncoderOptions.Contains("-pmin ") && xs.MinPQuant != 2)
+                sb.Append("-pmin " + xs.MinPQuant + " ");
+            if (!xs.CustomEncoderOptions.Contains("-pmax ") && xs.MaxPQuant != 31)
+                sb.Append("-pmax " + xs.MaxPQuant + " ");
+            if (!xs.CustomEncoderOptions.Contains("-drop ") && xs.FrameDropRatio != 0)
+                sb.Append("-drop " + xs.FrameDropRatio + " ");
+            // -start missing
+            if (!xs.CustomEncoderOptions.Contains("-threads ") && xs.NbThreads > 0)
+                sb.Append("-threads " + xs.NbThreads + " ");
+            // -slices missing
+            // -progress missing
             if (!xs.CustomEncoderOptions.Contains("-par ") && d.HasValue) // custom PAR mode
             {
                 Sar s = d.Value.ToSar(hres, vres);
@@ -243,35 +296,10 @@ new JobProcessorFactory(new ProcessorFactory(init), "XviDEncoder");
                 else
                     sb.Append("-par " + s.X + ":" + s.Y + " ");
             }
-            if (!xs.CustomEncoderOptions.Contains("-threads ") && xs.NbThreads > 0)
-                sb.Append("-threads " + xs.NbThreads + " ");
-            if (zones != null && zones.Length > 0 && xs.CreditsQuantizer >= new decimal(1)
-                && xs.VideoEncodingType != VideoCodecSettings.VideoEncodingMode.CQ) // only for non CQ mode at the moment
-            {
-                foreach (Zone zone in zones)
-                {
-                    if (zone.mode == ZONEMODE.Quantizer)
-                        sb.Append("-zq " + zone.startFrame + " " + zone.modifier + " ");
-                    if (zone.mode == ZONEMODE.Weight)
-                    {
-                        sb.Append("-zw " + zone.startFrame + " ");
-                        double mod = (double)zone.modifier / 100.0;
-                        sb.Append(mod.ToString(ci) + " ");
-                    }
-                }
-            }
-            if (xs.VideoEncodingType != VideoCodecSettings.VideoEncodingMode.twopass1) // not 2 pass vbr first pass, add output filename and output type
-            {
-                string extension = Path.GetExtension(output).ToLowerInvariant();
-                if (extension.Equals(".mkv"))
-                    sb.Append("-mkv \"" + output + "\"");
-                else if (extension.Equals(".avi"))
-                    sb.Append("-avi \"" + output + "\"");
-                else
-                    sb.Append("-o \"" + output + "\"");
-            }
+            #endregion
+
             if (!String.IsNullOrEmpty(xs.CustomEncoderOptions.Trim())) // add custom encoder options
-                sb.Append(" " + xs.CustomEncoderOptions);
+                sb.Append(xs.CustomEncoderOptions.Trim());
             return sb.ToString();
         }
     }

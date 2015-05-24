@@ -109,9 +109,9 @@ namespace MeGUI
             lowBitrateImprovement = 0;
             reactionDelayFactor = 16;
             averagingPeriod = 100;
-            rateControlBuffer = 0;
+            rateControlBuffer = 100;
             Turbo = true;
-            packedBitstream = false;
+            packedBitstream = true;
             QPel = false;
             gmc = false;
             chromaMotion = true;
@@ -127,19 +127,10 @@ namespace MeGUI
             vbvMaxRate = 0;
             vbvPeakRate = 0;
             base.MaxNumberOfPasses = 2;
-            FourCCs = FourCCsForMPEG4ASP;
-            hvsMasking = 1;
+            hvsMasking = 0;
             NbThreads = 0;
         }
         #region properties
-        /// I believe we really does'nt need to create this array @ per-instance basis
-        private static readonly string[] m_fourCCs = { "XVID", "DIVX", "DX50", "MP4V" };
-
-        public static string[] FourCCsForMPEG4ASP
-        {
-            get { return m_fourCCs; }
-        }
-
         public decimal Quantizer
         {
             get { return quantizer; }

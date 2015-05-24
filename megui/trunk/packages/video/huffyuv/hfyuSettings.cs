@@ -28,15 +28,10 @@ namespace MeGUI
     {
         public static string ID = "Huffyuv";
 
-        private static readonly string[] m_fourCCs = { "FFVH" };
-
-        public hfyuSettings()
-            : base(ID, VideoEncoderType.HFYU)
+        public hfyuSettings() : base(ID, VideoEncoderType.HFYU)
         {
             base.BitrateQuantizer = 0;
             base.VideoEncodingType = VideoEncodingMode.CQ;
-            base.FourCC = 0;
-            FourCCs = m_fourCCs;
         }
 
         public override bool UsesSAR

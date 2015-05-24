@@ -49,8 +49,6 @@ namespace MeGUI.packages.video.xvid
             this.nbThreads = new System.Windows.Forms.NumericUpDown();
             this.xvidInterlaced = new System.Windows.Forms.CheckBox();
             this.xvidTrellisQuant = new System.Windows.Forms.CheckBox();
-            this.fourCCLabel = new System.Windows.Forms.Label();
-            this.fourCC = new System.Windows.Forms.ComboBox();
             this.xvidCodecToolsGroupBox = new System.Windows.Forms.GroupBox();
             this.HVSMasking = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -216,8 +214,6 @@ namespace MeGUI.packages.video.xvid
             this.xvidOtherGroupBox.Controls.Add(this.nbThreads);
             this.xvidOtherGroupBox.Controls.Add(this.xvidInterlaced);
             this.xvidOtherGroupBox.Controls.Add(this.xvidTrellisQuant);
-            this.xvidOtherGroupBox.Controls.Add(this.fourCCLabel);
-            this.xvidOtherGroupBox.Controls.Add(this.fourCC);
             this.xvidOtherGroupBox.Location = new System.Drawing.Point(326, 3);
             this.xvidOtherGroupBox.Name = "xvidOtherGroupBox";
             this.xvidOtherGroupBox.Size = new System.Drawing.Size(162, 423);
@@ -333,6 +329,8 @@ namespace MeGUI.packages.video.xvid
             // 
             // xvidPackedBitstream
             // 
+            this.xvidPackedBitstream.Checked = true;
+            this.xvidPackedBitstream.CheckState = System.Windows.Forms.CheckState.Checked;
             this.xvidPackedBitstream.Location = new System.Drawing.Point(11, 87);
             this.xvidPackedBitstream.Name = "xvidPackedBitstream";
             this.xvidPackedBitstream.Size = new System.Drawing.Size(16, 24);
@@ -420,30 +418,6 @@ namespace MeGUI.packages.video.xvid
             this.xvidTrellisQuant.Text = "Trellis Quant";
             this.xvidTrellisQuant.CheckedChanged += new System.EventHandler(this.updateEvent);
             // 
-            // fourCCLabel
-            // 
-            this.fourCCLabel.Location = new System.Drawing.Point(8, 199);
-            this.fourCCLabel.Name = "fourCCLabel";
-            this.fourCCLabel.Size = new System.Drawing.Size(46, 18);
-            this.fourCCLabel.TabIndex = 6;
-            this.fourCCLabel.Text = "FourCC";
-            this.fourCCLabel.Visible = false;
-            // 
-            // fourCC
-            // 
-            this.fourCC.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.fourCC.Items.AddRange(new object[] {
-            "XVID",
-            "DIVX",
-            "DX50",
-            "MP4V"});
-            this.fourCC.Location = new System.Drawing.Point(84, 196);
-            this.fourCC.Name = "fourCC";
-            this.fourCC.Size = new System.Drawing.Size(72, 21);
-            this.fourCC.TabIndex = 7;
-            this.fourCC.Visible = false;
-            this.fourCC.SelectedIndexChanged += new System.EventHandler(this.updateEvent);
-            // 
             // xvidCodecToolsGroupBox
             // 
             this.xvidCodecToolsGroupBox.Controls.Add(this.HVSMasking);
@@ -477,7 +451,8 @@ namespace MeGUI.packages.video.xvid
             this.HVSMasking.FormattingEnabled = true;
             this.HVSMasking.Items.AddRange(new object[] {
             "None",
-            "Lumi"});
+            "Lumi",
+            "Variance"});
             this.HVSMasking.Location = new System.Drawing.Point(192, 184);
             this.HVSMasking.Name = "HVSMasking";
             this.HVSMasking.Size = new System.Drawing.Size(121, 21);
@@ -1316,6 +1291,7 @@ namespace MeGUI.packages.video.xvid
             this.xvidRCBufferSize.Name = "xvidRCBufferSize";
             this.xvidRCBufferSize.Size = new System.Drawing.Size(48, 20);
             this.xvidRCBufferSize.TabIndex = 5;
+            this.xvidRCBufferSize.Text = "100";
             this.xvidRCBufferSize.TextChanged += new System.EventHandler(this.updateEvent);
             this.xvidRCBufferSize.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textField_KeyPress);
             // 
@@ -1484,8 +1460,6 @@ namespace MeGUI.packages.video.xvid
         private System.Windows.Forms.GroupBox xvidOtherGroupBox;
         private System.Windows.Forms.CheckBox xvidInterlaced;
         private System.Windows.Forms.CheckBox xvidTrellisQuant;
-        private System.Windows.Forms.Label fourCCLabel;
-        private System.Windows.Forms.ComboBox fourCC;
         private System.Windows.Forms.GroupBox xvidCodecToolsGroupBox;
         private System.Windows.Forms.CheckBox xvidUseVHQForBframes;
         private System.Windows.Forms.Label xvidUseVHQForBframesLabel;

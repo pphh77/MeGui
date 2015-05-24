@@ -412,14 +412,13 @@ namespace MeGUI
                     }
 
                     VideoCodecSettings settings = GetCurrentVideoSettings();
-                    if (settings != null && !settings.SettingsID.Equals("x264") && !settings.SettingsID.Equals("x265")) // mod16 restriction
+                    if (settings != null && !settings.SettingsID.Equals("x264") && !settings.SettingsID.Equals("x265")) // mod4 restriction
                     {
-                        if (avi.Clip.VideoHeight % 16 != 0 ||
-                            avi.Clip.VideoWidth % 16 != 0)
-                            return string.Format("AviSynth clip doesn't have mod16 dimensions:\r\nWidth: {0}\r\nHeight:{1}\r\n" +
+                        if (avi.Clip.VideoHeight % 4 != 0 ||
+                            avi.Clip.VideoWidth % 4 != 0)
+                            return string.Format("AviSynth clip doesn't have mod4 dimensions:\r\nWidth: {0}\r\nHeight:{1}\r\n" +
                                 "This could cause problems with some encoders,\r\n" +
-                                "and will also result in a loss of compressibility.\r\n" +
-                                "I suggest you resize to a mod16 resolution.", avi.Clip.VideoWidth, avi.Clip.VideoHeight);
+                                "and will also result in a loss of compressibility.", avi.Clip.VideoWidth, avi.Clip.VideoHeight);
                     }
                 }
             }

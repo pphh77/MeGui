@@ -157,7 +157,6 @@ namespace MeGUI.packages.video.xvid
                 case 1: // Home Theater
                     this.xvidNbBFrames.Maximum = 1;
                     this.xvidPackedBitstream.Checked = true;
-                    this.fourCC.SelectedIndex = 2;
                     this.cqmComboBox1.SelectedIndex = 0;
                     this.cqmComboBox1.Enabled = false;
                     this.xvidQpel.Enabled = false;
@@ -178,7 +177,6 @@ namespace MeGUI.packages.video.xvid
                 case 2: // Hi-Def 720p
                     this.xvidNbBFrames.Maximum = 2;
                     this.xvidPackedBitstream.Checked = false;
-                    this.fourCC.SelectedIndex = 2;
                     this.cqmComboBox1.SelectedIndex = 0;
                     this.cqmComboBox1.Enabled = false;
                     this.xvidQpel.Enabled = false;
@@ -199,7 +197,6 @@ namespace MeGUI.packages.video.xvid
                 case 3: // Hi-Def 1080p
                     this.xvidNbBFrames.Maximum = 2;
                     this.xvidPackedBitstream.Checked = false;
-                    this.fourCC.SelectedIndex = 2;
                     this.cqmComboBox1.SelectedIndex = 0;
                     this.cqmComboBox1.Enabled = false;
                     this.xvidQpel.Enabled = false;
@@ -219,7 +216,6 @@ namespace MeGUI.packages.video.xvid
                     break;
                 case 4: // Handheld
                     this.xvidNbBFrames.Maximum = 0;
-                    this.fourCC.SelectedIndex = 2;
                     this.cqmComboBox1.SelectedIndex = 0;
                     this.cqmComboBox1.Enabled = false;
                     this.xvidQpel.Enabled = false;
@@ -240,7 +236,6 @@ namespace MeGUI.packages.video.xvid
                     break;
                 case 5: // Portable
                     this.xvidNbBFrames.Maximum = 0;
-                    this.fourCC.SelectedIndex = 2;
                     this.cqmComboBox1.SelectedIndex = 0;
                     this.cqmComboBox1.Enabled = false;
                     this.xvidQpel.Enabled = false;
@@ -312,8 +307,6 @@ namespace MeGUI.packages.video.xvid
         /// </summary>
         protected override void doCodecSpecificLoadAdjustments()
         {
-            if (fourCC.SelectedIndex == -1)
-                this.fourCC.SelectedIndex = 0;
             if (xvidEncodingMode.SelectedIndex == -1)
                 this.xvidEncodingMode.SelectedIndex = (int)VideoCodecSettings.VideoEncodingMode.CBR;
             if (xvidMotionSearchPrecision.SelectedIndex == -1)
@@ -353,7 +346,6 @@ namespace MeGUI.packages.video.xvid
             get
             {
                 xvidSettings xs = new xvidSettings();
-                xs.FourCC = fourCC.SelectedIndex;
                 xs.Turbo = this.xvidTurbo.Checked;
                 xs.VideoEncodingType = (VideoCodecSettings.VideoEncodingMode)this.xvidEncodingMode.SelectedIndex;
                 xs.Quantizer = xvidBitrateQuantizer.Value;
@@ -412,7 +404,6 @@ namespace MeGUI.packages.video.xvid
             set
             {
                 xvidSettings xs = value;
-                fourCC.SelectedIndex = xs.FourCC;
                 this.xvidTurbo.Checked = xs.Turbo;
                 this.xvidEncodingMode.SelectedIndex = (int)xs.VideoEncodingType;
                 lastEncodingMode = xs.VideoEncodingType;
