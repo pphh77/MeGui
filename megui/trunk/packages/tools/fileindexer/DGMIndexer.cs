@@ -28,7 +28,7 @@ using MeGUI.core.util;
 
 namespace MeGUI
 {
-    public class DGMIndexer : CommandlineJobProcessor<DGIIndexJob>
+    public class DGMIndexer : CommandlineJobProcessor<DGMIndexJob>
     {
         public static readonly JobProcessorFactory Factory = new JobProcessorFactory(new ProcessorFactory(init), "DGMIndexer");
 

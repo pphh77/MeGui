@@ -1,3 +1,4 @@
+2552 [DGIndexIM Indexer]    fixed not able to start job (regression of 2551)
 2551 [DGAVCIndex Indexer]   removed DGAVCIndex
      [DGIndexIM Indexer]    added DGIndexIM. it has to be enabled in the settings and
                             the license.txt file has to be placed manually in the directory /tools/dgindexim

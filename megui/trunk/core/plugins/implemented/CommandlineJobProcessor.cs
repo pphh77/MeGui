@@ -72,7 +72,6 @@ namespace MeGUI
         {
             foreach (string filePath in tempFiles)
                 safeDelete(filePath);
-
         }
 
         private static void safeDelete(string filePath)
