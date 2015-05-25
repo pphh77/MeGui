@@ -291,7 +291,7 @@ namespace MeGUI.packages.video.xvid
         #region codec-specific overload functions
         protected override string getCommandline()
         {
-            return XviDEncoder.genCommandline("input", "output", null, Settings as xvidSettings, 1, 1, null);
+            return XviDEncoder.genCommandline("input", "output", null, Settings as xvidSettings, -1, -1, 0, 1, null, null);
         }
         /// <summary>
         /// Does all the necessary adjustments after a GUI change has been made.

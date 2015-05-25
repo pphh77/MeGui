@@ -72,12 +72,10 @@ namespace MeGUI
             quality
         };
 
-        private int bitrateQuantizer, keyframeInterval, nbBframes, minQuantizer, maxQuantizer, fourCC,
-            maxNumberOfPasses, nbThreads;
+        private int bitrateQuantizer, keyframeInterval, nbBframes, minQuantizer, maxQuantizer, maxNumberOfPasses, nbThreads;
 		private bool v4mv, qpel, trellis;
 		private decimal creditsQuantizer;
 		private string logfile, customEncoderOptions, videoName;
-        private string[] fourCCs;
         private VideoEncoderType vet;
         private VideoEncodingMode videoEncodyingType;
 
@@ -93,7 +91,6 @@ namespace MeGUI
             logfile = ".stats";
             customEncoderOptions = "";
             videoName = "";
-            fourCC = 0;
             nbThreads = 1;
 		}
         public VideoCodec Codec

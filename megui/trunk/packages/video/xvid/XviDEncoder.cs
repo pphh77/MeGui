@@ -72,14 +72,25 @@ new JobProcessorFactory(new ProcessorFactory(init), "XviDEncoder");
         {
             get
             {
-                return genCommandline(job.Input, job.Output, job.DAR, job.Settings as xvidSettings, hres, vres, job.Zones);
+                return genCommandline(job.Input, job.Output, job.DAR, job.Settings as xvidSettings, hres, vres, fps_n, fps_d, job.Zones, base.log);
             }
         }
 
-        public static string genCommandline(string input, string output, Dar? d, xvidSettings xs, int hres, int vres, Zone[] zones)
+        public static string genCommandline(string input, string output, Dar? d, xvidSettings xs, int hres, int vres, int fps_n, int fps_d, Zone[] zones, LogItem log)
         {
             StringBuilder sb = new StringBuilder();
             CultureInfo ci = new CultureInfo("en-us");
+
+            // log
+            if (log != null)
+            {
+                log.LogEvent("resolution: " + hres + "x" + vres);
+                log.LogEvent("frame rate: " + fps_n + "/" + fps_d);
+                if (d.HasValue)
+                    log.LogValue("aspect ratio", d.Value);
+                if (!String.IsNullOrEmpty(xs.CustomEncoderOptions))
+                    log.LogEvent("custom command line: " + xs.CustomEncoderOptions);
+            }
 
             #region input options
             sb.Append("-i \"" + input + "\" ");

@@ -1,3 +1,5 @@
+2549 [XviD Encoder]         added additional log information
+2548 [Muxer]                fixed wrong fps value if fps is changed in AVS. Bug #799
 2547 [XviD Encoder]         adjusted settings for recent Xvid (requires Xvid 1.3.x)
 2546 [FFmpeg Muxer]         added FFmpeg muxer to support ASP elementary streams > 2GB
      [XviD Encoder]         MKV and AVI output will always be muxed with FFmpeg
