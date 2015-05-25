@@ -553,7 +553,7 @@ namespace MeGUI
                     case PossibleSources.dgi:
                         if (line.Contains("DGMPGIndexFileNV")) flag = true;
                         if (line.Contains("DGAVCIndexFileNV")) flag = true;
-                        if (line.Contains("DGVC1IndexFileNV")) flag = true; 
+                        if (line.Contains("DGVC1IndexFileNV")) flag = true;
                         break; 
                 }
             }

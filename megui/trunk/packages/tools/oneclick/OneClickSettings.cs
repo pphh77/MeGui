@@ -303,7 +303,7 @@ namespace MeGUI
                     Array.Resize<string>(ref value, 5);
                     value[4] = FileIndexerWindow.IndexType.AVISOURCE.ToString();
                 }
-                if (value.Length == 5)
+                else if (value.Length == 5)
                 {
                     bool bFound = false;
                     Array.Resize<string>(ref value, 6);
@@ -318,7 +318,20 @@ namespace MeGUI
                             value[i + 1] = value[i];
                     }
                 }
-                indexerPriority = new List<string>(value); 
+                for (int i = 0; i < value.Length; i++)
+                {
+                    if (value[i].ToUpper().Equals("DGA"))
+                    {
+                        value[0] = FileIndexerWindow.IndexType.DGI.ToString();
+                        value[1] = FileIndexerWindow.IndexType.DGM.ToString();
+                        value[2] = FileIndexerWindow.IndexType.D2V.ToString();
+                        value[3] = FileIndexerWindow.IndexType.LSMASH.ToString();
+                        value[4] = FileIndexerWindow.IndexType.FFMS.ToString();
+                        value[5] = FileIndexerWindow.IndexType.AVISOURCE.ToString();
+                        break;
+                    }
+                }
+                indexerPriority = new List<string>(value);
             }
         }
 
