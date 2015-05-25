@@ -327,8 +327,8 @@ namespace MeGUI
         {
             get 
             {
-                if (hvsMasking > 1)
-                    hvsMasking = 1;
+                if (hvsMasking > 2)
+                    hvsMasking = 2;
                 return hvsMasking; 
             }
             set { hvsMasking = value; }
