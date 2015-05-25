@@ -225,7 +225,6 @@ namespace MeGUI
                 }
 
                 mJob.Settings.MuxAll = true;
-                mJob.Settings.Framerate = decimal.Round((decimal)FrameRate, 3, MidpointRounding.AwayFromZero);
                 mJob.Settings.MuxedInput = mJob.Input;
                 mJob.Settings.MuxedOutput = mJob.Output;
                 mJob.FilesToDelete.Add(videoOutput);

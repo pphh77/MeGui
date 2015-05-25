@@ -80,6 +80,8 @@ new JobProcessorFactory(new ProcessorFactory(init), "AMGMuxer");
             // add the audio streams
             foreach (MuxStream s in settings.AudioStreams)
             {
+                MediaInfoFile oAudioInfo = new MediaInfoFile(s.path, ref log);
+
                 script.AppendFormat("LOAD {1}{0}", Environment.NewLine, s.path);
                 script.AppendLine("SET OUTPUT OPTIONS");
                 if (!string.IsNullOrEmpty(s.name))
@@ -109,6 +111,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AMGMuxer");
             // add the video stream if it exists
             if (!string.IsNullOrEmpty(settings.VideoInput))
             {
+                MediaInfoFile oVideoInfo = new MediaInfoFile(settings.VideoInput, ref log);
                 script.AppendFormat("LOAD {1}{0}SELECT FILE {2}{0}ADD VIDEOSOURCE{0}DESELECT FILE {2}{0}", 
                     Environment.NewLine, settings.VideoInput, fileNum);
                 fileNum++;
@@ -117,6 +120,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AMGMuxer");
             // mux in the rest if it exists
             if (!string.IsNullOrEmpty(settings.MuxedInput))
             {
+                MediaInfoFile oVideoInfo = new MediaInfoFile(settings.VideoInput, ref log);
                 script.AppendFormat("LOAD {1}{0}SELECT FILE {2}{0}ADD VIDEOSOURCE{0}DESELECT FILE {2}{0}",
                     Environment.NewLine, settings.MuxedInput, fileNum);
                 fileNum++;

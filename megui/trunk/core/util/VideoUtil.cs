@@ -582,7 +582,7 @@ namespace MeGUI
                 inputsToDelete.Add(video.Output);
             inputsToDelete.AddRange(Array.ConvertAll<AudioJob, string>(audioStreams, delegate(AudioJob a) { return a.Output; }));
 
-            JobChain muxJobs = jobUtil.GenerateMuxJobs(video, video.Framerate, allAudioToMux.ToArray(), allInputAudioTypes.ToArray(),
+            JobChain muxJobs = jobUtil.GenerateMuxJobs(video, null, allAudioToMux.ToArray(), allInputAudioTypes.ToArray(),
                 subtitles, allInputSubtitleTypes.ToArray(), chapters, chapterInputType, container, muxedOutput, splitSize, inputsToDelete, 
                 deviceType, deviceOutputType, alwaysMuxOutput);
 

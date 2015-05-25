@@ -197,11 +197,10 @@ new JobProcessorFactory(new ProcessorFactory(init), "TSMuxer");
                         sw.Write("\n" + vcodecID + ", ");
                         sw.Write("\"" + videoFile + "\"");
 
+                        string fpsString = oVideoInfo.VideoInfo.FPS.ToString(ci);
                         if (settings.Framerate.HasValue)
-                        {
-                            string fpsString = settings.Framerate.Value.ToString(ci);
-                            sw.Write(", fps=" + fpsString);
-                        }
+                            fpsString = settings.Framerate.Value.ToString(ci);
+                        sw.Write(", fps=" + fpsString);
 
                         if (!String.IsNullOrEmpty(extra))
                             sw.Write(" ," + extra);

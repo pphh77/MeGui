@@ -143,9 +143,11 @@ new JobProcessorFactory(new ProcessorFactory(init), "MkvMergeMuxer");
                         sb.Append(" --engage keep_bitstream_ar_info"); // assuming that SAR info is already in the stream...
                     if (!string.IsNullOrEmpty(settings.VideoName))
                         sb.Append(" --track-name \"" + trackID + ":" + settings.VideoName.Replace("\"", "\\\"") + "\"");
-                    if (settings.Framerate.HasValue && (oVideoInfo.VideoInfo.Codec == null ||
-                        oVideoInfo.VideoInfo.Codec != VideoCodec.AVC || oVideoInfo.VideoInfo.ScanType.ToLowerInvariant().Equals("progressive")))
-                        sb.Append(" --default-duration " + trackID + ":" + PrettyFormatting.ReplaceFPSValue(settings.Framerate.Value.ToString()) + "fps");
+                    string fpsString = String.Format("{0:##.###}", oVideoInfo.VideoInfo.FPS);
+                    if (settings.Framerate.HasValue)
+                        fpsString = String.Format("{0:##.###}", settings.Framerate.Value);
+                    if (oVideoInfo.VideoInfo.Codec == null || oVideoInfo.VideoInfo.Codec != VideoCodec.AVC || oVideoInfo.VideoInfo.ScanType.ToLowerInvariant().Equals("progressive"))
+                        sb.Append(" --default-duration " + trackID + ":" + PrettyFormatting.ReplaceFPSValue(fpsString) + "fps");
                     sb.Append(" \"--compression\" \"" + trackID + ":none\"");
                     sb.Append(" -d \"" + trackID + "\" --no-chapters -A -S \"" + inputFile + "\"");
                 }

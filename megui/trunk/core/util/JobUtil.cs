@@ -196,8 +196,11 @@ namespace MeGUI
                     mjob.Settings.VideoName = video.Settings.VideoName;
                 }
                 mjob.NbOfFrames = video.NumberOfFrames;
-                string fpsFormated = String.Format("{0:##.###}", framerate); // this formating is required for mkvmerge at least to avoid fps rounding error
-                mjob.Settings.Framerate = Convert.ToDecimal(fpsFormated); 
+                if (framerate != null)
+                {
+                    string fpsFormated = String.Format("{0:##.###}", framerate); // this formating is required for mkvmerge at least to avoid fps rounding error
+                    mjob.Settings.Framerate = Convert.ToDecimal(fpsFormated);
+                }
 
                 string tempOutputName = Path.Combine(Path.GetDirectoryName(output),
                     Path.GetFileNameWithoutExtension(output) + tempNumber + ".");
