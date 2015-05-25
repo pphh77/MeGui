@@ -58,7 +58,6 @@ namespace MeGUI
             SafeRegister<x265Settings, x265ConfigurationPanel>("Video");
             SafeRegister<xvidSettings, xvidConfigurationPanel>("Video");
             profileGroups.Add(new ProfileGroup(typeof(AudioCodecSettings), "Audio"));
-            SafeRegister<AftenSettings, MeGUI.packages.audio.aften.AftenConfigurationPanel>("Audio");
             SafeRegister<AC3Settings, MeGUI.packages.audio.ffac3.AC3ConfigurationPanel>("Audio");
             SafeRegister<MP2Settings, MeGUI.packages.audio.ffmp2.MP2ConfigurationPanel>("Audio");
             SafeRegister<MP3Settings, MeGUI.packages.audio.lame.lameConfigurationPanel>("Audio");
@@ -266,14 +265,14 @@ namespace MeGUI
                     counter = 0;
                 }
                 counter++;
-                if (iBlock == 1 && (line.Equals("    <string>Snow</string>") || line.Equals("    <string>Aud-X MP3</string>") || line.Equals("    <string>Winamp AAC</string>") || line.Equals("    <string>FAAC</string>")))
+                if (iBlock == 1 && (line.Equals("    <string>Aften AC-3</string>") || line.Equals("    <string>Snow</string>") || line.Equals("    <string>Aud-X MP3</string>") || line.Equals("    <string>Winamp AAC</string>") || line.Equals("    <string>FAAC</string>")))
                     arrDeprecated.Add(counter);
-                else if (iBlock == 4 && (line.Equals("    <string>Snow</string>") || line.Equals("    <string>Aud-X MP3</string>") || line.Equals("    <string>Winamp AAC</string>") || line.Equals("    <string>FAAC</string>")))
+                else if (iBlock == 4 && (line.Equals("    <string>Aften AC-3</string>") || line.Equals("    <string>Snow</string>") || line.Equals("    <string>Aud-X MP3</string>") || line.Equals("    <string>Winamp AAC</string>") || line.Equals("    <string>FAAC</string>")))
                 {
                     if (line.Contains("Snow"))
                         sbNewFile.AppendLine("    <string>x264</string>");
                     else
-                        sbNewFile.AppendLine("    <string>Aften AC-3</string>");
+                        sbNewFile.AppendLine("    <string>FFmpeg AC-3</string>");
                 }
                 else if (iBlock == 2)
                 {

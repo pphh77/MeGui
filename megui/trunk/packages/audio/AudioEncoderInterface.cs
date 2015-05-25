@@ -56,7 +56,6 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 ((j as AudioJob).Settings is OggVorbisSettings) ||
                 ((j as AudioJob).Settings is NeroAACSettings) ||
                 ((j as AudioJob).Settings is FlacSettings) ||
-                ((j as AudioJob).Settings is AftenSettings) ||
                 ((j as AudioJob).Settings is QaacSettings) ||
                 ((j as AudioJob).Settings is OpusSettings) ||
                 ((j as AudioJob).Settings is FDKAACSettings)))
@@ -336,11 +335,6 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             else if (audioJob.Settings is NeroAACSettings)
             {
                 if (System.Text.RegularExpressions.Regex.IsMatch(line.ToLowerInvariant(), @"^processed\s?[0-9]{0,5}\s?seconds..."))
-                    return;
-            }
-            else if (audioJob.Settings is AftenSettings)
-            {
-                if (System.Text.RegularExpressions.Regex.IsMatch(line.ToLowerInvariant(), @"^progress: "))
                     return;
             }
             else if (audioJob.Settings is AC3Settings || audioJob.Settings is MP2Settings)
@@ -1363,29 +1357,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
 
             // let's obtain command line & other stuff
             StringBuilder sb = new StringBuilder();
-            if (audioJob.Settings is AftenSettings)
-            {
-                UpdateCacher.CheckPackage("aften");
-                AftenSettings oSettings = audioJob.Settings as AftenSettings;
-                _encoderExecutablePath = this._settings.Aften.Path;
-                _sendWavHeaderToEncoderStdIn = HeaderType.WAV;
-                
-                if (iAVSChannelCount > 6 && (audioJob.Settings.DownmixMode == ChannelMode.KeepOriginal || audioJob.Settings.DownmixMode == ChannelMode.Upmix 
-                    || audioJob.Settings.DownmixMode == ChannelMode.UpmixUsingSoxEq ||audioJob.Settings.DownmixMode == ChannelMode.UpmixWithCenterChannelDialog))
-                {
-                    script.Append(@"8<=Audiochannels(last)?c71_c51(ConvertAudioToFloat(last)):last" + Environment.NewLine);
-                    script.Append(@"7==Audiochannels(last)?c61_c51(ConvertAudioToFloat(last)):last" + Environment.NewLine);
-                }
-
-                if (!oSettings.CustomEncoderOptions.Contains("-readtoeof "))
-                    sb.Append(" -readtoeof 1");
-                if (!oSettings.CustomEncoderOptions.Contains("-b "))
-                    sb.Append(" -b " + oSettings.Bitrate);
-                if (!String.IsNullOrEmpty(oSettings.CustomEncoderOptions))
-                    sb.Append(" " + oSettings.CustomEncoderOptions.Trim());
-                sb.Append(" - \"{0}\"");
-            }
-            else if (audioJob.Settings is FlacSettings)
+            if (audioJob.Settings is FlacSettings)
             {
                 UpdateCacher.CheckPackage("flac");
                 FlacSettings oSettings = audioJob.Settings as FlacSettings;

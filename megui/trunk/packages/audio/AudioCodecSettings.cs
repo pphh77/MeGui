@@ -109,7 +109,6 @@ namespace MeGUI
         XmlInclude(typeof(NeroAACSettings)), 
         XmlInclude(typeof(MP3Settings)), 
         XmlInclude(typeof(OggVorbisSettings)),
-        XmlInclude(typeof(AftenSettings)),
         XmlInclude(typeof(FlacSettings)),
         XmlInclude(typeof(QaacSettings)),
         XmlInclude(typeof(OpusSettings)),

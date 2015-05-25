@@ -79,7 +79,7 @@ namespace MeGUI
         private OCGUIMode ocGUIMode;
         private AfterEncoding afterEncoding;
         private ProxyMode httpProxyMode;
-        private ProgramSettings aften, avimuxgui, avisynth, avisynthplugins, besplit, dgavcindex, dgindex, dgindexnv,
+        private ProgramSettings avimuxgui, avisynth, avisynthplugins, besplit, dgavcindex, dgindex, dgindexnv,
                                 eac3to, ffmpeg, ffms, flac, lame, lsmash, mkvmerge, mp4box, neroaacenc, oggenc,
                                 opus, pgcdemux, qaac, fdkaac, tsmuxer, vobsub, x264, x264_10b, x265, xvid;
         #endregion
@@ -1035,12 +1035,6 @@ namespace MeGUI
             set { bUseX265 = value; }
         }
 
-        public ProgramSettings Aften
-        {
-            get { return aften; }
-            set { aften = value; }
-        }
-
         public ProgramSettings AviMuxGui
         {
             get { return avimuxgui; }
@@ -1259,8 +1253,6 @@ namespace MeGUI
         public void InitializeProgramSettings()
         {
             // initialize program settings if required
-            if (aften == null)
-                aften = new ProgramSettings("aften");
             if (avimuxgui == null)
                 avimuxgui = new ProgramSettings("avimux_gui");
             if (avisynth == null)
@@ -1317,7 +1309,6 @@ namespace MeGUI
                 xvid = new ProgramSettings("xvid_encraw");
 
             // set default name, program paths & files
-            aften.UpdateInformation("aften", "Aften", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\aften\aften.exe"));
             avimuxgui.UpdateInformation("avimux_gui", "AVI-Mux GUI", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avimux_gui\avimux_gui.exe"));
             avisynth.UpdateInformation("avs", "AviSynth portable", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avs\AviSynth.dll"));
             avisynth.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avs\DevIL.dll"));
