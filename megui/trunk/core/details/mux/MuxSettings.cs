@@ -44,7 +44,7 @@ namespace MeGUI
 		{
 			audioStreams = new List<MuxStream>();
 			subtitleStreams = new List<MuxStream>();
-            framerate = 0.0M;
+            framerate = null;
             muxedInput = "";
 			chapterFile = "";
             videoName = "";
