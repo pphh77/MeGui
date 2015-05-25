@@ -232,14 +232,7 @@ namespace MeGUI
                 {
                     bool bFound = false;
                     string trackFile = strTrackName + audioTracks[counter].TrackIDx + "*";
-                    if (Path.GetExtension(projectName).ToLowerInvariant().Equals(".dgi"))
-                    {
-                        if (FileIndexerWindow.isDGMFile(projectName))
-                            trackFile = Path.GetFileNameWithoutExtension(projectName) + trackFile;
-                        else
-                            trackFile = Path.GetFileName(projectName) + trackFile;
-                    }
-                    else if (Path.GetExtension(projectName).ToLowerInvariant().Equals(".ffindex") || Path.GetExtension(projectName).ToLowerInvariant().Equals(".lwi"))
+                    if (Path.GetExtension(projectName).ToLowerInvariant().Equals(".ffindex") || Path.GetExtension(projectName).ToLowerInvariant().Equals(".lwi"))
                         trackFile = Path.GetFileNameWithoutExtension(projectName) + "_track_" + (audioTracks[counter].TrackIndex + 1) + "_*.avs";
                     else
                         trackFile = Path.GetFileNameWithoutExtension(projectName) + trackFile;
@@ -271,10 +264,7 @@ namespace MeGUI
                 }
 
                 // Find files which can be deleted
-                if (Path.GetExtension(projectName).ToLowerInvariant().Equals(".dgi"))
-                    strTrackName = Path.GetFileName(projectName) + strTrackName;
-                else
-                    strTrackName = Path.GetFileNameWithoutExtension(projectName) + strTrackName;
+                strTrackName = Path.GetFileNameWithoutExtension(projectName) + strTrackName;
 
                 files = Directory.GetFiles(Path.GetDirectoryName(projectName), strTrackName + "*");
                 foreach (string file in files)
