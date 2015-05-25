@@ -23,13 +23,13 @@ using System.Collections.Generic;
 
 namespace MeGUI
 {
-    public class DGAIndexJob : IndexJob
+    public class DGMIndexJob : IndexJob
     {
-		public DGAIndexJob():base()
-		{
-		}
+        public DGMIndexJob() : base()
+        {
+        }
 
-        public DGAIndexJob(string input, string output, int demuxType, List<AudioTrackInfo> audioTracks, bool loadSources, bool demuxVideo)
+        public DGMIndexJob(string input, string output, int demuxType, List<AudioTrackInfo> audioTracks, bool loadSources, bool demuxVideo)
         {
             Input = input;
             Output = output;

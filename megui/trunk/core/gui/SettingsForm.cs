@@ -256,6 +256,10 @@ namespace MeGUI
                     UpdateCacher.CheckPackage("dgindexnv", useDGIndexNV.Checked, false);
                 settings.UseDGIndexNV = useDGIndexNV.Checked;
 
+                if (useDGIndexIM.Checked != internalSettings.UseDGIndexIM)
+                    UpdateCacher.CheckPackage("dgindexim", useDGIndexIM.Checked, false);
+                settings.UseDGIndexIM = useDGIndexIM.Checked;
+
                 if (useNeroAacEnc.Checked != internalSettings.UseNeroAacEnc)
                     UpdateCacher.CheckPackage("neroaacenc", useNeroAacEnc.Checked, false);
                 settings.UseNeroAacEnc = useNeroAacEnc.Checked;
@@ -337,6 +341,7 @@ namespace MeGUI
                     ffmsThreads.Value = settings.FFMSThreads;
                 cbUseITUValues.Checked = settings.UseITUValues;
                 useDGIndexNV.Checked = settings.UseDGIndexNV;
+                useDGIndexIM.Checked = settings.UseDGIndexIM;
                 useNeroAacEnc.Checked = settings.UseNeroAacEnc;
                 useFDKAac.Checked = settings.UseFDKAac;
                 useQAAC.Checked = settings.UseQAAC;

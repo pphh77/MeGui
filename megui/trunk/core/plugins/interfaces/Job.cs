@@ -88,7 +88,7 @@ namespace MeGUI
 	[XmlInclude(typeof(VideoJob)), XmlInclude(typeof(AudioJob)), XmlInclude(typeof(MuxJob)), 
 	XmlInclude (typeof(MuxStream)), XmlInclude(typeof(D2VIndexJob)), XmlInclude(typeof(AviSynthJob)), 
     XmlInclude(typeof(SubtitleIndexJob)), XmlInclude(typeof(AudioSplitJob)), XmlInclude(typeof(AudioJoinJob)),
-    XmlInclude(typeof(CleanupJob)), XmlInclude(typeof(DGAIndexJob)), XmlInclude(typeof(FFMSIndexJob)),
+    XmlInclude(typeof(CleanupJob)), XmlInclude(typeof(DGMIndexJob)), XmlInclude(typeof(FFMSIndexJob)),
     XmlInclude(typeof(DGIIndexJob)), XmlInclude(typeof(HDStreamsExJob)), XmlInclude(typeof(PgcDemuxJob)),
     XmlInclude(typeof(MkvExtractJob)), XmlInclude(typeof(OneClickPostProcessingJob)), XmlInclude(typeof(LSMASHIndexJob))]
 	public abstract class Job

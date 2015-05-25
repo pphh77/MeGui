@@ -25,8 +25,7 @@ namespace MeGUI
 {
     public class DGIIndexJob : IndexJob
     {
-        public DGIIndexJob()
-            : base()
+        public DGIIndexJob() : base()
         {
         }
 

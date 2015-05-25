@@ -344,12 +344,19 @@ namespace MeGUI
                     sourceType = PossibleSources.d2v;
                     openVideo(videoInput);
                     break;
-                case ".dga":
-                    sourceType = PossibleSources.dga;                    
-                    openVideo(videoInput);
-                    break;
                 case ".dgi":
-                    sourceType = PossibleSources.dgi;
+                    using (StreamReader sr = new StreamReader(videoInput, Encoding.Default))
+                    {
+                        string line = null;
+                        while ((line = sr.ReadLine()) != null)
+                        {
+                            if (line.ToLower().Contains("dgindexim"))
+                                sourceType = PossibleSources.dgm;
+                            else
+                                sourceType = PossibleSources.dgi;
+                            break;
+                        }
+                    }
                     openVideo(videoInput); 
                     break;
                 case ".ffindex":
@@ -434,7 +441,6 @@ namespace MeGUI
             switch (this.sourceType)
             {            
                 case PossibleSources.d2v:
-                case PossibleSources.dga:
                     this.mpeg2Deblocking.Enabled = true;
                     this.colourCorrect.Enabled = true;
                     this.fpsBox.Enabled = false;
@@ -509,6 +515,23 @@ namespace MeGUI
                     this.nvDeInt.Enabled = true;
                     this.nvDeInt.Checked = false;
                     this.nvResize.Enabled = true;
+                    this.nvResize.Checked = false;
+                    this.cbNvDeInt.SelectedIndex = 0;
+                    this.tabSources.SelectedTab = tabPage3;
+                    break;
+                case PossibleSources.dgm:
+                    this.mpeg2Deblocking.Checked = false;
+                    this.mpeg2Deblocking.Enabled = false;
+                    this.colourCorrect.Enabled = false;
+                    this.colourCorrect.Checked = false;
+                    this.flipVertical.Enabled = false;
+                    this.flipVertical.Checked = false;
+                    this.dss2.Enabled = false;
+                    this.fpsBox.Enabled = false;
+                    this.cbNvDeInt.Enabled = false;
+                    this.nvDeInt.Enabled = false;
+                    this.nvDeInt.Checked = false;
+                    this.nvResize.Enabled = false;
                     this.nvResize.Checked = false;
                     this.cbNvDeInt.SelectedIndex = 0;
                     this.tabSources.SelectedTab = tabPage3;
@@ -1412,7 +1435,7 @@ namespace MeGUI
         }
     }
     public delegate void OpenScriptCallback(string avisynthScript);
-    public enum PossibleSources { d2v, dga, dgi, vdr, directShow, avs, ffindex, lsmash };
+    public enum PossibleSources { d2v, dgm, dgi, vdr, directShow, avs, ffindex, lsmash };
     public enum mod16Method : int { none = -1, resize = 0, overcrop, nonMod16, mod4Horizontal, undercrop };
     public enum modValue : int { mod16 = 0, mod8, mod4, mod2 };
 

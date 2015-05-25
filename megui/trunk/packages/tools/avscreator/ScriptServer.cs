@@ -160,12 +160,12 @@ namespace MeGUI
                     if (colormatrix)
                         inputLine += string.Format("\r\nLoadPlugin(\"" + Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "ColorMatrix.dll") + "\")\r\nColorMatrix(hints=true{0}, threads=0)", interlaced ? ", interlaced=true" : "");
                     break;
-                case PossibleSources.dga:
-                    UpdateCacher.CheckPackage("dgavcindex");
+                case PossibleSources.dgm:
+                    UpdateCacher.CheckPackage("dgindexim");
                     if (String.IsNullOrEmpty(indexFile))
                         indexFile = input;
-                    strDLLPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.DGAVCIndex.Path), "DGAVCDecode.dll");
-                    inputLine = "LoadPlugin(\"" + strDLLPath + "\")\r\nAVCSource(\"" + indexFile + "\")"; 
+                    strDLLPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexIM.Path), "dgdecodeim.dll");
+                    inputLine = "LoadPlugin(\"" + strDLLPath + "\")\r\nDGSourceIM(\"" + indexFile + "\", silent=true)"; 
                     break;
                 case PossibleSources.dgi:
                     UpdateCacher.CheckPackage("dgindexnv");

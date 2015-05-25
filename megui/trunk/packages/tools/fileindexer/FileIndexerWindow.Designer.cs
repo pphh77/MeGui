@@ -67,7 +67,7 @@ namespace MeGUI
             this.closeOnQueue = new System.Windows.Forms.CheckBox();
             this.gbIndexer = new System.Windows.Forms.GroupBox();
             this.btnLSMASH = new System.Windows.Forms.RadioButton();
-            this.btnDGA = new System.Windows.Forms.RadioButton();
+            this.btnDGM = new System.Windows.Forms.RadioButton();
             this.btnFFMS = new System.Windows.Forms.RadioButton();
             this.btnD2V = new System.Windows.Forms.RadioButton();
             this.btnDGI = new System.Windows.Forms.RadioButton();
@@ -267,7 +267,7 @@ namespace MeGUI
             // gbIndexer
             // 
             this.gbIndexer.Controls.Add(this.btnLSMASH);
-            this.gbIndexer.Controls.Add(this.btnDGA);
+            this.gbIndexer.Controls.Add(this.btnDGM);
             this.gbIndexer.Controls.Add(this.btnFFMS);
             this.gbIndexer.Controls.Add(this.btnD2V);
             this.gbIndexer.Controls.Add(this.btnDGI);
@@ -284,24 +284,24 @@ namespace MeGUI
             this.btnLSMASH.AutoSize = true;
             this.btnLSMASH.Location = new System.Drawing.Point(345, 20);
             this.btnLSMASH.Name = "btnLSMASH";
-            this.btnLSMASH.Size = new System.Drawing.Size(104, 17);
+            this.btnLSMASH.Size = new System.Drawing.Size(101, 17);
             this.btnLSMASH.TabIndex = 4;
             this.btnLSMASH.TabStop = true;
             this.btnLSMASH.Text = "L-SMASH Works";
             this.btnLSMASH.UseVisualStyleBackColor = true;
             this.btnLSMASH.Click += new System.EventHandler(this.btnLSMASH_Click);
             // 
-            // btnDGA
+            // btnDGM
             // 
-            this.btnDGA.AutoSize = true;
-            this.btnDGA.Location = new System.Drawing.Point(85, 20);
-            this.btnDGA.Name = "btnDGA";
-            this.btnDGA.Size = new System.Drawing.Size(87, 17);
-            this.btnDGA.TabIndex = 3;
-            this.btnDGA.TabStop = true;
-            this.btnDGA.Text = "DGAVCIndex";
-            this.btnDGA.UseVisualStyleBackColor = true;
-            this.btnDGA.Click += new System.EventHandler(this.btnDGA_Click);
+            this.btnDGM.AutoSize = true;
+            this.btnDGM.Location = new System.Drawing.Point(85, 20);
+            this.btnDGM.Name = "btnDGM";
+            this.btnDGM.Size = new System.Drawing.Size(79, 17);
+            this.btnDGM.TabIndex = 3;
+            this.btnDGM.TabStop = true;
+            this.btnDGM.Text = "DGIndexIM";
+            this.btnDGM.UseVisualStyleBackColor = true;
+            this.btnDGM.Click += new System.EventHandler(this.btnDGM_Click);
             // 
             // btnFFMS
             // 
@@ -330,7 +330,7 @@ namespace MeGUI
             // btnDGI
             // 
             this.btnDGI.AutoSize = true;
-            this.btnDGI.Location = new System.Drawing.Point(178, 20);
+            this.btnDGI.Location = new System.Drawing.Point(171, 20);
             this.btnDGI.Name = "btnDGI";
             this.btnDGI.Size = new System.Drawing.Size(80, 17);
             this.btnDGI.TabIndex = 0;
@@ -494,7 +494,7 @@ namespace MeGUI
         private System.Windows.Forms.RadioButton btnDGI;
         private System.Windows.Forms.RadioButton btnD2V;
         private System.Windows.Forms.RadioButton btnFFMS;
-        private System.Windows.Forms.RadioButton btnDGA;
+        private System.Windows.Forms.RadioButton btnDGM;
         private System.Windows.Forms.GroupBox gbFileInformation;
         private System.Windows.Forms.Label lblContainer;
         private System.Windows.Forms.Label lblScanType;

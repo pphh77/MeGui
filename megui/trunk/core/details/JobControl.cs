@@ -564,7 +564,11 @@ namespace MeGUI.core.details
                     DialogResult r = MessageBox.Show("Job " + name + " could not be loaded. Delete?", "Error loading Job", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
                     if (r == DialogResult.Yes)
                     {
-                        try { s.Close(); File.Delete(name); }
+                        try 
+                        { 
+                            s.Close(); 
+                            File.Delete(name); 
+                        }
                         catch (Exception) { }
                     }
                     LogItem _oLog = MainForm.Instance.Log.Info("Error");
@@ -573,7 +577,7 @@ namespace MeGUI.core.details
                 }
             }
         }
-                #endregion
+        #endregion
         #endregion
         #endregion
         #region free job name

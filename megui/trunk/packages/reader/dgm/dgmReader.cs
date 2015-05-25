@@ -23,25 +23,41 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Xml.Serialization;
+using System.Text.RegularExpressions;
 
 using MeGUI.core.util;
 
 namespace MeGUI
 {
-    public class dgaFileFactory : IMediaFileFactory
+    public class dgmFileFactory : IMediaFileFactory
     {
 
         #region IMediaFileFactory Members
 
         public IMediaFile Open(string file)
         {
-            return new dgaFile(file);
+            return new dgmFile(file);
         }
 
         public int HandleLevel(string file)
         {
-            if (file.ToLower(System.Globalization.CultureInfo.InvariantCulture).EndsWith(".dga"))
-                return 11;
+            if (!file.ToLowerInvariant().EndsWith(".dgi"))
+                return -1;
+            using (StreamReader sr = new StreamReader(file, System.Text.Encoding.Default))
+            {
+                string line = null;
+                int iLineCount = 0;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    iLineCount++;
+                    if (iLineCount == 1)
+                    {
+                        if (line.ToLower().Contains("dgindexim"))
+                            return 11;
+                        break;
+                    }
+                }
+            }
             return -1;
         }
 
@@ -51,51 +67,74 @@ namespace MeGUI
 
         public string ID
         {
-            get { return "dga"; }
+            get { return "dgm"; }
         }
 
         #endregion
     }
 
-/// <summary>
-	/// Summary description for dgaReader.
-	/// </summary>
-    public class dgaFile : IMediaFile
+    /// <summary>
+    /// Summary description for dgiReader.
+    /// </summary>
+    public class dgmFile : IMediaFile
     {
         private AvsFile reader;
         private string fileName;
         private VideoInformation info;
 
         /// <summary>
-        /// initializes the dga reader
+        /// initializes the dgi reader
         /// </summary>
-        /// <param name="fileName">the DGAVCIndex project file that this reader will process</param>
-        public dgaFile(string fileName)
+        /// <param name="fileName">the DGNVIndex project file that this reader will process</param>
+        public dgmFile(string fileName)
         {
-            UpdateCacher.CheckPackage("dgavcindex");
             this.fileName = fileName;
-            string strPath = Path.GetDirectoryName(MainForm.Instance.Settings.DGAVCIndex.Path);
-            string strDLL = Path.Combine(strPath, "DGAVCDecode.dll");
-            reader = AvsFile.ParseScript("LoadPlugin(\"" + strDLL + "\")\r\nAVCSource(\"" + this.fileName + "\")");
+            UpdateCacher.CheckPackage("dgindexim");
+
+            string strScript = "";
+            string strPath = Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexIM.Path);
+            strScript = "LoadPlugin(\"" + Path.Combine(strPath, "DGDecodeIM.dll") + "\")\r\nDGSourceIM(\"" + this.fileName + "\", silent=true)";
+            reader = AvsFile.ParseScript(strScript);
+
             this.readFileProperties();
         }
 
+        private static readonly Regex r = new Regex("[0-9.]+(?=% FILM)");
+
+        public static double GetFilmPercent(string file)
+        {
+            double filmPercentage = -1.0;
+
+            if (String.IsNullOrEmpty(file))
+                return filmPercentage;
+
+            using (StreamReader sr = new StreamReader(file))
+            {
+                string line = sr.ReadLine();
+                while ((line = sr.ReadLine()) != null)
+                    if (r.IsMatch(line))
+                        filmPercentage = double.Parse(r.Match(line).Value,
+                            System.Globalization.CultureInfo.InvariantCulture);
+            }
+            return filmPercentage;
+        }
+
         /// <summary>
-        /// reads the dga file, which is essentially a text file
+        /// reads the dgi file, which is essentially a text file
         /// </summary>
         private void readFileProperties()
         {
             info = reader.VideoInfo.Clone();
             using (StreamReader sr = new StreamReader(fileName))
             {
-                int iLineCount = 0;
                 string line = null;
+                int iLineCount = 0;
                 while ((line = sr.ReadLine()) != null)
                 {
-                    iLineCount++;
                     if (iLineCount == 3)
                     {
-                        string strSourceFile = line;
+                        string strSourceFile = line.Substring(0, line.LastIndexOf(" "));
+                        strSourceFile = Path.Combine(Path.GetDirectoryName(fileName), strSourceFile);
                         if (File.Exists(strSourceFile))
                         {
                             MediaInfoFile oInfo = new MediaInfoFile(strSourceFile);
@@ -103,6 +142,7 @@ namespace MeGUI
                         }
                         break;
                     }
+                    iLineCount++;
                 }
             }
         }

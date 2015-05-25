@@ -36,7 +36,7 @@ namespace MeGUI
     {
         public enum IndexType
         {
-            AVISOURCE, D2V, DGA, DGI, FFMS, LSMASH, NONE
+            AVISOURCE, D2V, DGM, DGI, FFMS, LSMASH, NONE
         };
 
         #region variables
@@ -109,16 +109,21 @@ namespace MeGUI
 
         private void CheckDGIIndexer()
         {
-            string filter = "All DGAVCIndex supported files|*.264;*.h264;*.avc;*.m2t*;*.m2ts;*.mts;*.tp;*.ts;*.trp";
-            filter += "|All DGIndex supported files|*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.tp;*.ts;*.trp;*.m2t;*.m2ts;*.pva;*.vro";
+            string filter = "All DGIndex supported files|*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.tp;*.ts;*.trp;*.m2t;*.m2ts;*.pva;*.vro";
             filter += "|All FFMS Indexer supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.vob;*.mpg;*.m2ts;*.ts";
             filter += "|All LSMASH Indexer supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.vob;*.mpg;*.m2ts;*.ts";
-            if (MainForm.Instance.Settings.IsDGIIndexerAvailable())
+            if (MainForm.Instance.Settings.IsDGIIndexerAvailable() || MainForm.Instance.Settings.IsDGMIndexerAvailable())
             {
-                filter += "|All DGIndexNV supported files|*.264;*.h264;*.avc;*.m2v;*.mpv;*.vc1;*.mkv;*.vob;*.mp4;*.mpg;*.mpeg;*.m2t;*.m2ts;*.mts;*.tp;*.ts;*.trp";
+                if (MainForm.Instance.Settings.IsDGIIndexerAvailable())
+                    filter += "|All DGIndexNV supported files|*.264;*.h264;*.avc;*.m2v;*.mpv;*.vc1;*.mkv;*.vob;*.mp4;*.mpg;*.mpeg;*.m2t;*.m2ts;*.mts;*.tp;*.ts;*.trp";
+                if (MainForm.Instance.Settings.IsDGMIndexerAvailable())
+                    filter += "|All DGIndexIM supported files|*.264;*.h264;*.avc;*.m2v;*.mpv;*.vc1;*.mkv;*.vob;*.mp4;*.mpg;*.mpeg;*.m2t;*.m2ts;*.mts;*.tp;*.ts;*.trp";
                 filter += "|All supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.264;*.h264;*.avc;*.m2t*;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.pva;*.vro;*.vc1|All files|*.*";
                 input.Filter = filter;
-                input.FilterIndex = 6;
+                if (MainForm.Instance.Settings.IsDGIIndexerAvailable() && MainForm.Instance.Settings.IsDGMIndexerAvailable())
+                    input.FilterIndex = 7;
+                else
+                    input.FilterIndex = 6;
             }
             else
             {
@@ -148,18 +153,20 @@ namespace MeGUI
                             generateAudioList();
                         break;
                     }
-                case IndexType.DGA:
+                case IndexType.DGM:
                     {
-                        this.saveProjectDialog.Filter = "DGAVCIndex project files|*.dga";
-                        //this.gbOutput.Enabled = true;
-                        this.gbAudio.Enabled = true;
-                        this.gbAudio.Text = " Audio Demux ";
+                        this.saveProjectDialog.Filter = "DGIndexIM project files|*.dgi";
                         if (this.demuxTracks.Checked)
                             this.demuxAll.Checked = true;
                         this.demuxTracks.Enabled = false;
+                        //this.gbAudio.Enabled = true;
+                        this.gbAudio.Text = " Audio Demux ";
+                        this.gbOutput.Enabled = true;
                         this.demuxVideo.Enabled = true;
-                        IndexerUsed = IndexType.DGA;
-                        btnDGA.Checked = true;
+                        IndexerUsed = IndexType.DGM;
+                        btnDGM.Checked = true;
+                        if (txtContainerInformation.Text.Trim().ToUpperInvariant().Equals("MATROSKA"))
+                            generateAudioList();
                         break;
                     }
                 case IndexType.D2V:
@@ -291,14 +298,14 @@ namespace MeGUI
             generateAudioList();
 
             btnD2V.Enabled = iFile.isD2VIndexable();
-            btnDGA.Enabled = iFile.isDGAIndexable();
+            btnDGM.Enabled = iFile.isDGMIndexable();
             btnDGI.Enabled = iFile.isDGIIndexable();
             btnFFMS.Enabled = iFile.isFFMSIndexable();
             btnLSMASH.Enabled = iFile.isLSMASHIndexable(true);
 
             IndexType newType = IndexType.NONE;
             iFile.recommendIndexer(out newType, true);
-            if (newType == IndexType.D2V || newType == IndexType.DGA ||
+            if (newType == IndexType.D2V || newType == IndexType.DGM ||
                 newType == IndexType.DGI || newType == IndexType.FFMS ||
                 newType == IndexType.LSMASH)
             {
@@ -308,7 +315,7 @@ namespace MeGUI
             else
             {
                 gbIndexer.Enabled = gbAudio.Enabled = gbOutput.Enabled = false;
-                btnFFMS.Checked = btnD2V.Checked = btnDGA.Checked = btnDGI.Checked = btnLSMASH.Checked = false;
+                btnFFMS.Checked = btnD2V.Checked = btnDGM.Checked = btnDGI.Checked = btnLSMASH.Checked = false;
                 output.Text = "";
                 demuxNoAudiotracks.Checked = true;
                 MessageBox.Show("No indexer for this file found. Please try open it directly in the AVS Script Creator", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -376,9 +383,9 @@ namespace MeGUI
                     projectPath = Path.GetDirectoryName(this.input.Filename);
                 switch (IndexerUsed)
                 {
-                    case IndexType.D2V: output.Text = Path.Combine(projectPath, Path.ChangeExtension(fileNameNoPath, ".d2v")); ; break;
-                    case IndexType.DGA: output.Text = Path.Combine(projectPath, Path.ChangeExtension(fileNameNoPath, ".dga")); ; break;
-                    case IndexType.DGI: output.Text = Path.Combine(projectPath, Path.ChangeExtension(fileNameNoPath, ".dgi")); ; break;
+                    case IndexType.D2V: output.Text = Path.Combine(projectPath, Path.ChangeExtension(fileNameNoPath, ".d2v")); break;
+                    case IndexType.DGM:
+                    case IndexType.DGI: output.Text = Path.Combine(projectPath, Path.ChangeExtension(fileNameNoPath, ".dgi")); break;
                     case IndexType.FFMS: output.Text = Path.Combine(projectPath, fileNameNoPath + ".ffindex"); break;
                     case IndexType.LSMASH: output.Text = Path.Combine(projectPath, fileNameNoPath + ".lwi"); break;
                 }
@@ -458,9 +465,9 @@ namespace MeGUI
                             this.Close();
                         break;
                     }
-                case IndexType.DGA:
+                case IndexType.DGM:
                     {
-                        prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(generateDGAIndexJob(videoInput)));
+                        prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(generateDGMIndexJob(videoInput)));
                         mainForm.Jobs.addJobsWithDependencies(prepareJobs, true);
                         if (this.closeOnQueue.Checked)
                             this.Close();
@@ -549,7 +556,7 @@ namespace MeGUI
             return new DGIIndexJob(videoInput, this.output.Text, demuxType, audioTracks, loadOnComplete.Checked, demuxVideo.Checked);
         }
 
-        private DGAIndexJob generateDGAIndexJob(string videoInput)
+        private DGMIndexJob generateDGMIndexJob(string videoInput)
         {
             int demuxType = 0;
             if (demuxTracks.Checked)
@@ -563,7 +570,7 @@ namespace MeGUI
             foreach (AudioTrackInfo ati in AudioTracks.CheckedItems)
                 audioTracks.Add(ati);
 
-            return new DGAIndexJob(videoInput, this.output.Text, demuxType, audioTracks, loadOnComplete.Checked, demuxVideo.Checked);
+            return new DGMIndexJob(videoInput, this.output.Text, demuxType, audioTracks, loadOnComplete.Checked, demuxVideo.Checked);
         }
 
         private FFMSIndexJob generateFFMSIndexJob(string videoInput)
@@ -619,9 +626,9 @@ namespace MeGUI
             changeIndexer(IndexType.DGI);
         }
 
-        private void btnDGA_Click(object sender, EventArgs e)
+        private void btnDGM_Click(object sender, EventArgs e)
         {
-            changeIndexer(IndexType.DGA);
+            changeIndexer(IndexType.DGM);
         }
 
         private void btnD2V_Click(object sender, EventArgs e)
@@ -746,13 +753,14 @@ namespace MeGUI
         }
     }
 
-    public class dgaIndexJobPostProcessor
+    public class dgmIndexJobPostProcessor
     {
-        public static JobPostProcessor PostProcessor = new JobPostProcessor(postprocess, "Dga_postprocessor");
+        public static JobPostProcessor PostProcessor = new JobPostProcessor(postprocess, "Dgm_postprocessor");
         private static LogItem postprocess(MainForm mainForm, Job ajob)
         {
-            if (!(ajob is DGAIndexJob)) return null;
-            DGAIndexJob job = (DGAIndexJob)ajob;
+            if (!(ajob is DGMIndexJob))
+                return null;
+            DGMIndexJob job = (DGMIndexJob)ajob;
 
             StringBuilder logBuilder = new StringBuilder();
             VideoUtil vUtil = new VideoUtil(mainForm);

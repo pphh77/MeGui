@@ -28,29 +28,37 @@ using MeGUI.core.util;
 
 namespace MeGUI
 {
-    public class DGAIndexer : CommandlineJobProcessor<DGAIndexJob>
+    public class DGMIndexer : CommandlineJobProcessor<DGIIndexJob>
     {
-public static readonly JobProcessorFactory Factory =
-            new JobProcessorFactory(new ProcessorFactory(init), "DGAIndexer");
+        public static readonly JobProcessorFactory Factory = new JobProcessorFactory(new ProcessorFactory(init), "DGMIndexer");
 
         private static IJobProcessor init(MainForm mf, Job j)
         {
-            if (j is DGAIndexJob) return new DGAIndexer(mf.Settings.DGAVCIndex.Path);
+            if (j is DGMIndexJob)
+                return new DGMIndexer(mf.Settings.DGIndexIM.Path);
             return null;
         }
 
-        public DGAIndexer(string executableName)
+        public DGMIndexer(string executableName)
         {
-            UpdateCacher.CheckPackage("dgavcindex");
+            UpdateCacher.CheckPackage("dgindexim");
             executable = executableName;
         }
 
         public override void ProcessLine(string line, StreamType stream, ImageType oType)
         {
             if (Regex.IsMatch(line, "^[0-9]{1,3}$", RegexOptions.Compiled))
+            {
                 su.PercentageDoneExact = Int32.Parse(line);
+                return;
+            }
+
+            if (line.Contains("Project"))
+                su.Status = "Creating DGI...";
             else
-                base.ProcessLine(line, stream, oType);
+                su.Status = "Creating " + line;
+            base.startTime = DateTime.Now;
+            base.ProcessLine(line, stream, oType);
         }
 
         protected override void checkJobIO()
@@ -64,7 +72,7 @@ public static readonly JobProcessorFactory Factory =
             {
                 base.checkJobIO();
             }
-            su.Status = "Creating DGA...";
+            su.Status = "Creating DGI...";
         }
 
         protected override string Commandline
@@ -72,9 +80,28 @@ public static readonly JobProcessorFactory Factory =
             get
             {
                 StringBuilder sb = new StringBuilder();
+                sb.Append("-i \"" + job.Input + "\"");
+                if (MainForm.Instance.Settings.AutoLoadDG && Path.GetExtension(job.Input).ToLowerInvariant().Equals(".vob"))
+                {
+                    string strFile = Path.GetFileNameWithoutExtension(job.Input);
+                    int iNumber = 0;
+                    if (int.TryParse(strFile.Substring(strFile.Length - 1), out iNumber))
+                    {
+                        while (++iNumber < 10)
+                        {
+                            string strNewFile = "";
+                            strNewFile = Path.Combine(Path.GetDirectoryName(job.Input), strFile.Substring(0, strFile.Length - 1) + iNumber.ToString() + ".vob");
+                            if (File.Exists(strNewFile))
+                                sb.Append(",\"" + strNewFile + "\"");
+                            else
+                                break;
+                        }
+                    }
+                }
                 if (job.DemuxVideo)
-                     sb.Append("-i \"" + job.Input + "\" -od \"" + job.Output + "\" -e -h");
-                else sb.Append("-i \"" + job.Input + "\" -o \"" + job.Output + "\" -e -h");
+                    sb.Append(" -od \"" + job.Output + "\" -e -h");
+                else
+                    sb.Append(" -o \"" + job.Output + "\" -e -h");
                 if (job.DemuxMode == 2)
                     sb.Append(" -a"); // demux everything
                 return sb.ToString();

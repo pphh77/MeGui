@@ -53,7 +53,7 @@ namespace MeGUI
                        strLastDestinationPath, strLastSourcePath, tempDirMP4, neroAacEncPath, fdkAacPath,
                        httpproxyaddress, httpproxyport, httpproxyuid, httpproxypwd, defaultOutputDir,
                        appendToForcedStreams, lastUsedOneClickFolder, lastUpdateServer;
-        private bool autoForceFilm, autoStartQueue, autoOpenScript, bUseQAAC, bUseX265, bUseDGIndexNV,
+        private bool autoForceFilm, autoStartQueue, autoOpenScript, bUseQAAC, bUseX265, bUseDGIndexNV, bUseDGIndexIM,
                      overwriteStats, keep2of3passOutput, autoUpdate, deleteCompletedJobs, deleteIntermediateFiles,
                      deleteAbortedOutput, openProgressWindow, autoSelectHDStreams, bUseFDKAac,
                      alwaysOnTop, addTimePosition, alwaysbackupfiles, bUseITU, bEac3toLastUsedFileMode,
@@ -79,7 +79,7 @@ namespace MeGUI
         private OCGUIMode ocGUIMode;
         private AfterEncoding afterEncoding;
         private ProxyMode httpProxyMode;
-        private ProgramSettings avimuxgui, avisynth, avisynthplugins, besplit, dgavcindex, dgindex, dgindexnv,
+        private ProgramSettings avimuxgui, avisynth, avisynthplugins, besplit, dgindexim, dgindex, dgindexnv,
                                 eac3to, ffmpeg, ffms, flac, lame, lsmash, mkvmerge, mp4box, neroaacenc, oggenc,
                                 opus, pgcdemux, qaac, fdkaac, tsmuxer, vobsub, x264, x264_10b, x265, xvid;
         #endregion
@@ -173,7 +173,7 @@ namespace MeGUI
             bUseITU = true;
             bOpenAVSInThread = true;
             lastUsedOneClickFolder = "";
-            bUseNeroAacEnc = bUseFDKAac = bUseQAAC = bUseX265 = bUseDGIndexNV = false;
+            bUseNeroAacEnc = bUseFDKAac = bUseQAAC = bUseX265 = bUseDGIndexNV = bUseDGIndexIM = false;
             chapterCreatorMinimumLength = 900;
             bEac3toLastUsedFileMode = false;
             bExternalMuxerX264 = true;
@@ -1011,6 +1011,12 @@ namespace MeGUI
             set { bUseDGIndexNV = value; }
         }
 
+        public bool UseDGIndexIM
+        {
+            get { return bUseDGIndexIM; }
+            set { bUseDGIndexIM = value; }
+        }
+
         public bool UseNeroAacEnc
         {
             get { return bUseNeroAacEnc; }
@@ -1059,10 +1065,10 @@ namespace MeGUI
             set { besplit = value; }
         }
 
-        public ProgramSettings DGAVCIndex
+        public ProgramSettings DGIndexIM
         {
-            get { return dgavcindex; }
-            set { dgavcindex = value; }
+            get { return dgindexim; }
+            set { dgindexim = value; }
         }
 
         public ProgramSettings DGIndex
@@ -1241,11 +1247,39 @@ namespace MeGUI
 
             // check if the license file is available
             if (!File.Exists(Path.Combine(Path.GetDirectoryName(dgindexnv.Path), "license.txt")))
-                return false;
+            {
+                if (File.Exists(Path.Combine(Path.GetDirectoryName(dgindexim.Path), "license.txt")))
+                {
+                    // license.txt available in the other indexer directory. copy it
+                    File.Copy(Path.Combine(Path.GetDirectoryName(dgindexim.Path), "license.txt"), Path.Combine(Path.GetDirectoryName(dgindexnv.Path), "license.txt"));
+                }
+                else
+                    return false;
+            }
 
             // DGI is not available in a RDP connection
             if (SystemInformation.TerminalServerSession == true)
                 return false;
+
+            return true;
+        }
+
+        public bool IsDGMIndexerAvailable()
+        {
+            if (!bUseDGIndexIM)
+                return false;
+
+            // check if the license file is available
+            if (!File.Exists(Path.Combine(Path.GetDirectoryName(dgindexim.Path), "license.txt")))
+            {
+                if (File.Exists(Path.Combine(Path.GetDirectoryName(dgindexnv.Path), "license.txt")))
+                {
+                    // license.txt available in the other indexer directory. copy it
+                    File.Copy(Path.Combine(Path.GetDirectoryName(dgindexnv.Path), "license.txt"), Path.Combine(Path.GetDirectoryName(dgindexim.Path), "license.txt"));
+                }
+                else
+                    return false;
+            }
 
             return true;
         }
@@ -1261,8 +1295,8 @@ namespace MeGUI
                 avisynthplugins = new ProgramSettings("avisynth_plugin");
             if (besplit == null)
                 besplit = new ProgramSettings("besplit");
-            if (dgavcindex == null)
-                dgavcindex = new ProgramSettings("dgavcindex");
+            if (dgindexim == null)
+                dgindexim = new ProgramSettings("dgindexim");
             if (dgindex == null)
                 dgindex = new ProgramSettings("dgindex");
             if (dgindexnv == null)
@@ -1341,8 +1375,9 @@ namespace MeGUI
             avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\yadif.dll"));
             avisynthplugins.Required = true;
             besplit.UpdateInformation("besplit", "Besplit", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\besplit\besplit.exe"));
-            dgavcindex.UpdateInformation("dgavcindex", "DGAVCIndex", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\dgavcindex\dgavcindex.exe"));
-            dgavcindex.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\dgavcindex\dgavcdecode.dll"));
+            dgindexim.UpdateInformation("dgindexim", "DGIndexIM", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\dgindexim\dgindexim.exe"));
+            dgindexim.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\dgindexim\DGDecodeIM.dll"));
+            dgindexim.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\dgindexim\libmfxsw32.dll"));
             dgindex.UpdateInformation("dgindex", "DGIndex", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\dgindex\dgindex.exe"));
             dgindex.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\dgindex\dgdecode.dll"));
             dgindexnv.UpdateInformation("dgindexnv", "DGIndexNV", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\dgindexnv\dgindexnv.exe"));

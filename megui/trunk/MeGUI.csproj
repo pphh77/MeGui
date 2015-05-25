@@ -616,7 +616,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="packages\reader\d2v\d2vReader.cs" />
-    <Compile Include="packages\reader\dga\dgaReader.cs" />
+    <Compile Include="packages\reader\dgm\dgmReader.cs" />
     <Compile Include="packages\reader\dgi\dgiReader.cs" />
     <Compile Include="packages\reader\ffms\ffmsReader.cs" />
     <Compile Include="packages\reader\mediainfo\MediaInfoFile.cs" />
@@ -722,8 +722,8 @@
     <Compile Include="packages\tools\fileindexer\DGIIndexer.cs" />
     <Compile Include="packages\tools\fileindexer\DGIIndexJob.cs" />
     <Compile Include="packages\tools\fileindexer\D2VIndexJob.cs" />
-    <Compile Include="packages\tools\fileindexer\DGAIndexJob.cs" />
-    <Compile Include="packages\tools\fileindexer\DGAIndexer.cs" />
+    <Compile Include="packages\tools\fileindexer\DGMIndexJob.cs" />
+    <Compile Include="packages\tools\fileindexer\DGMIndexer.cs" />
     <Compile Include="packages\tools\hdbdextractor\CustomDataGridView.cs">
       <SubType>Component</SubType>
     </Compile>

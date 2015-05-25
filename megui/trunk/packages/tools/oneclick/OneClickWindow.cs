@@ -170,11 +170,25 @@ namespace MeGUI
             cbGUIMode.DataSource = EnumProxy.CreateArray(new object[] { MeGUISettings.OCGUIMode.Basic, MeGUISettings.OCGUIMode.Default, MeGUISettings.OCGUIMode.Advanced });
             bLock = false;
 
-            if (MainForm.Instance.Settings.IsDGIIndexerAvailable())
-                input.Filter = "All supported files|*.avs;*.ifo;*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.264;*.h264;*.avc;*.m2t*;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.vob;*.ifo;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.pva;*.vro;*.vc1;*.mpls|All DGAVCIndex supported files|*.264;*.h264;*.avc;*.m2t*;*.m2ts;*.mts;*.tp;*.ts;*.trp|All DGIndex supported files|*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.tp;*.ts;*.trp;*.m2t;*.m2ts;*.pva;*.vro|All DGIndexNV supported files|*.264;*.h264;*.avc;*.m2v;*.mpv;*.vc1;*.mkv;*.vob;*.mpg;*.mpeg;*.m2t;*.m2ts;*.mts;*.tp;*.ts;*.trp|All FFMS Indexer supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.vob;*.mpg;*.m2ts;*.ts|All LSMASH Indexer supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.vob;*.mpg;*.m2ts;*.ts|AviSynth Scripts|*.avs|IFO DVD files|*.ifo|Blu-Ray Playlist|*.mpls|All files|*.*";
+            string filter = "All DGIndex supported files|*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.tp;*.ts;*.trp;*.m2t;*.m2ts;*.pva;*.vro";
+            filter += "|All FFMS Indexer supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.vob;*.mpg;*.m2ts;*.ts";
+            filter += "|All LSMASH Indexer supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.vob;*.mpg;*.m2ts;*.ts";
+            if (MainForm.Instance.Settings.IsDGIIndexerAvailable() || MainForm.Instance.Settings.IsDGMIndexerAvailable())
+            {
+                if (MainForm.Instance.Settings.IsDGIIndexerAvailable())
+                    filter += "|All DGIndexNV supported files|*.264;*.h264;*.avc;*.m2v;*.mpv;*.vc1;*.mkv;*.vob;*.mp4;*.mpg;*.mpeg;*.m2t;*.m2ts;*.mts;*.tp;*.ts;*.trp";
+                if (MainForm.Instance.Settings.IsDGMIndexerAvailable())
+                    filter += "|All DGIndexIM supported files|*.264;*.h264;*.avc;*.m2v;*.mpv;*.vc1;*.mkv;*.vob;*.mp4;*.mpg;*.mpeg;*.m2t;*.m2ts;*.mts;*.tp;*.ts;*.trp";
+                filter = "All supported files|*.avs;*.ifo;*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.264;*.h264;*.avc;*.m2t*;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.pva;*.vro;*.vc1|" + filter + "|All files|*.*";
+                input.Filter = filter;
+            }
             else
-                input.Filter = "All supported files|*.avs;*.ifo;*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.264;*.h264;*.avc;*.m2t*;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.vob;*.ifo;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.pva;*.vro;*.mpls|All DGAVCIndex supported files|*.264;*.h264;*.avc;*.m2t*;*.m2ts;*.mts;*.tp;*.ts;*.trp|All DGIndex supported files|*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.tp;*.ts;*.trp;*.m2t;*.m2ts;*.pva;*.vro|All FFMS Indexer supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.vob;*.mpg;*.m2ts;*.ts|All LSMASH Indexer supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.vob;*.mpg;*.m2ts;*.ts|AviSynth Scripts|*.avs|IFO DVD files|*.ifo|Blu-Ray Playlist|*.mpls|All files|*.*";
-            
+            {
+                filter += "All supported files|*.avs;*.ifo;*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.264;*.h264;*.avc;*.m2t*;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.pva;*.vro|" + filter + "|All files|*.*";
+                input.Filter = filter;
+            }
+
+
             DragDropUtil.RegisterMultiFileDragDrop(input, setInput, delegate() { return input.Filter + "|All folders|*."; });
             DragDropUtil.RegisterSingleFileDragDrop(output, setOutput);
             DragDropUtil.RegisterSingleFileDragDrop(chapterFile, null, delegate() { return chapterFile.Filter; });
@@ -1194,20 +1208,12 @@ namespace MeGUI
             prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(audioJobs));
 
             JobChain finalJobChain = null;
-            if (dpp.IndexType == FileIndexerWindow.IndexType.D2V || dpp.IndexType == FileIndexerWindow.IndexType.DGA)
+            if (dpp.IndexType == FileIndexerWindow.IndexType.D2V)
             {   
                 string indexFile = string.Empty;
                 IndexJob job = null;
-                if (dpp.IndexType == FileIndexerWindow.IndexType.D2V)
-                {
-                    indexFile = Path.Combine(dpp.WorkingDirectory, workingName.Text + ".d2v");
-                    job = new D2VIndexJob(dpp.VideoInput, indexFile, 2, arrAudioTrackInfo, false, false);
-                }
-                else
-                {
-                    indexFile = Path.Combine(dpp.WorkingDirectory, workingName.Text + ".dga");
-                    job = new DGAIndexJob(dpp.VideoInput, indexFile, 2, arrAudioTrackInfo, false, false);
-                }
+                indexFile = Path.Combine(dpp.WorkingDirectory, workingName.Text + ".d2v");
+                job = new D2VIndexJob(dpp.VideoInput, indexFile, 2, arrAudioTrackInfo, false, false);
                 OneClickPostProcessingJob ocJob = new OneClickPostProcessingJob(dpp.VideoInput, indexFile, dpp);
                 finalJobChain = new SequentialChain(prepareJobs, new SequentialChain(job), new SequentialChain(ocJob));
             }
@@ -1216,7 +1222,7 @@ namespace MeGUI
                 dpp.IndexType == FileIndexerWindow.IndexType.LSMASH)
             {
                 string indexFile = string.Empty;
-                if (dpp.IndexType == FileIndexerWindow.IndexType.DGI)
+                if (dpp.IndexType == FileIndexerWindow.IndexType.DGI || dpp.IndexType == FileIndexerWindow.IndexType.DGM)
                     indexFile = Path.Combine(dpp.WorkingDirectory, workingName.Text + ".dgi");
                 else if (dpp.IndexType == FileIndexerWindow.IndexType.LSMASH)
                     indexFile = Path.Combine(dpp.WorkingDirectory, Path.GetFileName(dpp.VideoInput) + ".lwi");
@@ -1229,6 +1235,8 @@ namespace MeGUI
                 {
                     if (dpp.IndexType == FileIndexerWindow.IndexType.DGI)
                         job = new DGIIndexJob(dpp.VideoInput, indexFile, 0, null, false, false);
+                    else if (dpp.IndexType == FileIndexerWindow.IndexType.DGM)
+                        job = new DGMIndexJob(dpp.VideoInput, indexFile, 0, null, false, false);
                     else if (dpp.IndexType == FileIndexerWindow.IndexType.LSMASH)
                         job = new LSMASHIndexJob(dpp.VideoInput, indexFile, 0, null, false);
                     else
@@ -1245,6 +1253,8 @@ namespace MeGUI
                 {
                     if (dpp.IndexType == FileIndexerWindow.IndexType.DGI)
                         job = new DGIIndexJob(dpp.VideoInput, indexFile, 2, arrAudioTrackInfo, false, false);
+                    else if (dpp.IndexType == FileIndexerWindow.IndexType.DGM)
+                        job = new DGMIndexJob(dpp.VideoInput, indexFile, 2, arrAudioTrackInfo, false, false);
                     else if (dpp.IndexType == FileIndexerWindow.IndexType.LSMASH)
                         job = new LSMASHIndexJob(dpp.VideoInput, indexFile, 2, arrAudioTrackInfo, false);
                     else
@@ -1956,7 +1966,7 @@ namespace MeGUI
 
             if (inputContainer == ContainerType.MKV ||
                 iFile.IndexerToUse == FileIndexerWindow.IndexType.D2V ||
-                iFile.IndexerToUse == FileIndexerWindow.IndexType.DGA ||
+                iFile.IndexerToUse == FileIndexerWindow.IndexType.DGM ||
                 iFile.IndexerToUse == FileIndexerWindow.IndexType.DGI)
                 return true;
 

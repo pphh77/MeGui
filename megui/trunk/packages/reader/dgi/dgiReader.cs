@@ -41,8 +41,23 @@ namespace MeGUI
 
         public int HandleLevel(string file)
         {
-            if (file.ToLower(System.Globalization.CultureInfo.InvariantCulture).EndsWith(".dgi"))
-                return 12;
+            if (!file.ToLowerInvariant().EndsWith(".dgi"))
+                return -1;
+            using (StreamReader sr = new StreamReader(file, System.Text.Encoding.Default))
+            {
+                string line = null;
+                int iLineCount = 0;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    iLineCount++;
+                    if (iLineCount == 1)
+                    {
+                        if (line.ToLower().Contains("dgindexnv"))
+                            return 12;
+                        break;
+                    }
+                }
+            }
             return -1;
         }
 
@@ -178,4 +193,3 @@ namespace MeGUI
         #endregion
     }
 }
-

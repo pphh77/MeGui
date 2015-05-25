@@ -1,3 +1,7 @@
+2551 [DGAVCIndex Indexer]   removed DGAVCIndex
+     [DGIndexIM Indexer]    added DGIndexIM. it has to be enabled in the settings and
+                            the license.txt file has to be placed manually in the directory /tools/dgindexim
+     [Indexer]              new default order: DGIndexNV, DGIndexIM, DGIndex, L-SMASH, FFMS
 2550 [Aften Encoder]        removed aften encoder. please switch to FFmpeg AC-3.
 2549 [XviD Encoder]         added additional log information
 2548 [Muxer]                fixed wrong fps value if fps is changed in AVS. Bug #799

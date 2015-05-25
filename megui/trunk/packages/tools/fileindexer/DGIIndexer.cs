@@ -30,8 +30,7 @@ namespace MeGUI
 {
     public class DGIIndexer : CommandlineJobProcessor<DGIIndexJob>
     {
-        public static readonly JobProcessorFactory Factory =
-                    new JobProcessorFactory(new ProcessorFactory(init), "DGIIndexer");
+        public static readonly JobProcessorFactory Factory = new JobProcessorFactory(new ProcessorFactory(init), "DGIIndexer");
 
         private static IJobProcessor init(MainForm mf, Job j)
         {
@@ -82,7 +81,7 @@ namespace MeGUI
             {
                 StringBuilder sb = new StringBuilder();
                 sb.Append("-i \"" + job.Input + "\"");
-                if (MainForm.Instance.Settings.AutoLoadDG && Path.GetExtension(job.Input).ToLower(System.Globalization.CultureInfo.InvariantCulture).Equals(".vob"))
+                if (MainForm.Instance.Settings.AutoLoadDG && Path.GetExtension(job.Input).ToLowerInvariant().Equals(".vob"))
                 {
                     string strFile = Path.GetFileNameWithoutExtension(job.Input);
                     int iNumber = 0;

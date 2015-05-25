@@ -35,10 +35,6 @@ using MeGUI.core.util;
 namespace MeGUI
 {
     public delegate void UpdateGUIStatusCallback(StatusUpdate su); // catches the UpdateGUI events fired from the encoder
-    public enum ProcessingStatus
-    {
-        DOINGNOTHING, RUNNING, PAUSED, STOPPING
-    }
 
     /// <summary>
     /// MainForm is the main GUI of the program
@@ -960,7 +956,7 @@ namespace MeGUI
 
             PackageSystem.JobProcessors.Register(AviSynthProcessor.Factory);
             PackageSystem.JobProcessors.Register(D2VIndexer.Factory);
-            PackageSystem.JobProcessors.Register(DGAIndexer.Factory);
+            PackageSystem.JobProcessors.Register(DGMIndexer.Factory);
             PackageSystem.JobProcessors.Register(DGIIndexer.Factory);
             PackageSystem.JobProcessors.Register(FFMSIndexer.Factory);
             PackageSystem.JobProcessors.Register(LSMASHIndexer.Factory);
@@ -988,14 +984,14 @@ namespace MeGUI
             PackageSystem.Tools.Register(new MeGUI.packages.tools.hdbdextractor.HdBdExtractorTool());
             PackageSystem.MediaFileTypes.Register(new AvsFileFactory());
             PackageSystem.MediaFileTypes.Register(new d2vFileFactory());
-            PackageSystem.MediaFileTypes.Register(new dgaFileFactory());
+            PackageSystem.MediaFileTypes.Register(new dgmFileFactory());
             PackageSystem.MediaFileTypes.Register(new dgiFileFactory());
             PackageSystem.MediaFileTypes.Register(new ffmsFileFactory());
             PackageSystem.MediaFileTypes.Register(new lsmashFileFactory());
             PackageSystem.MediaFileTypes.Register(new MediaInfoFileFactory());
             PackageSystem.JobPreProcessors.Register(BitrateCalculatorPreProcessor.CalculationProcessor);
             PackageSystem.JobPostProcessors.Register(d2vIndexJobPostProcessor.PostProcessor);
-            PackageSystem.JobPostProcessors.Register(dgaIndexJobPostProcessor.PostProcessor);
+            PackageSystem.JobPostProcessors.Register(dgmIndexJobPostProcessor.PostProcessor);
             PackageSystem.JobPostProcessors.Register(dgiIndexJobPostProcessor.PostProcessor);
             PackageSystem.JobPostProcessors.Register(ffmsIndexJobPostProcessor.PostProcessor);
             PackageSystem.JobPostProcessors.Register(lsmashIndexJobPostProcessor.PostProcessor);

@@ -83,8 +83,10 @@ namespace MeGUI
             this.defaultLanguage2 = new System.Windows.Forms.ComboBox();
             this.defaultLanguage1 = new System.Windows.Forms.ComboBox();
             this.gbDefaultOutput = new System.Windows.Forms.GroupBox();
+            this.targetSizeSCBox1 = new MeGUI.core.gui.TargetSizeSCBox();
             this.btnClearOutputDirecoty = new System.Windows.Forms.Button();
             this.clearDefaultOutputDir = new System.Windows.Forms.Button();
+            this.defaultOutputDir = new MeGUI.FileBar();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -121,6 +123,7 @@ namespace MeGUI
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.useFDKAac = new System.Windows.Forms.CheckBox();
             this.lblFDK = new System.Windows.Forms.Label();
+            this.fdkaacLocation = new MeGUI.FileBar();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
             this.useX265 = new System.Windows.Forms.CheckBox();
             this.chx264ExternalMuxer = new System.Windows.Forms.CheckBox();
@@ -134,8 +137,10 @@ namespace MeGUI
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.useNeroAacEnc = new System.Windows.Forms.CheckBox();
             this.lblNero = new System.Windows.Forms.Label();
+            this.neroaacencLocation = new MeGUI.FileBar();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.btnClearMP4TempDirectory = new System.Windows.Forms.Button();
+            this.tempDirMP4 = new MeGUI.FileBar();
             this.vobGroupBox = new System.Windows.Forms.GroupBox();
             this.useDGIndexNV = new System.Windows.Forms.CheckBox();
             this.cbAutoLoadDG = new System.Windows.Forms.CheckBox();
@@ -147,11 +152,7 @@ namespace MeGUI
             this.autoEncodeDefaultsButton = new System.Windows.Forms.Button();
             this.toolTipHelp = new System.Windows.Forms.ToolTip(this.components);
             this.helpButton1 = new MeGUI.core.gui.HelpButton();
-            this.targetSizeSCBox1 = new MeGUI.core.gui.TargetSizeSCBox();
-            this.defaultOutputDir = new MeGUI.FileBar();
-            this.fdkaacLocation = new MeGUI.FileBar();
-            this.neroaacencLocation = new MeGUI.FileBar();
-            this.tempDirMP4 = new MeGUI.FileBar();
+            this.useDGIndexIM = new System.Windows.Forms.CheckBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
             groupBox1.SuspendLayout();
             this.otherGroupBox.SuspendLayout();
@@ -532,6 +533,19 @@ namespace MeGUI
             this.gbDefaultOutput.TabStop = false;
             this.gbDefaultOutput.Text = " Default Output Directory + Custom File Size Values ";
             // 
+            // targetSizeSCBox1
+            // 
+            this.targetSizeSCBox1.CustomSizes = new MeGUI.core.util.FileSize[0];
+            this.targetSizeSCBox1.Location = new System.Drawing.Point(8, 56);
+            this.targetSizeSCBox1.MaximumSize = new System.Drawing.Size(1000, 28);
+            this.targetSizeSCBox1.MinimumSize = new System.Drawing.Size(64, 28);
+            this.targetSizeSCBox1.Name = "targetSizeSCBox1";
+            this.targetSizeSCBox1.NullString = "Modify custom file size values";
+            this.targetSizeSCBox1.SaveCustomValues = true;
+            this.targetSizeSCBox1.SelectedIndex = 0;
+            this.targetSizeSCBox1.Size = new System.Drawing.Size(273, 28);
+            this.targetSizeSCBox1.TabIndex = 44;
+            // 
             // btnClearOutputDirecoty
             // 
             this.btnClearOutputDirecoty.Anchor = System.Windows.Forms.AnchorStyles.Left;
@@ -550,6 +564,22 @@ namespace MeGUI
             this.clearDefaultOutputDir.TabIndex = 41;
             this.clearDefaultOutputDir.Text = "x";
             this.clearDefaultOutputDir.Click += new System.EventHandler(this.clearDefaultOutputDir_Click);
+            // 
+            // defaultOutputDir
+            // 
+            this.defaultOutputDir.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.defaultOutputDir.Filename = "";
+            this.defaultOutputDir.Filter = null;
+            this.defaultOutputDir.FilterIndex = 0;
+            this.defaultOutputDir.FolderMode = true;
+            this.defaultOutputDir.Location = new System.Drawing.Point(8, 24);
+            this.defaultOutputDir.Name = "defaultOutputDir";
+            this.defaultOutputDir.ReadOnly = true;
+            this.defaultOutputDir.SaveMode = false;
+            this.defaultOutputDir.Size = new System.Drawing.Size(243, 26);
+            this.defaultOutputDir.TabIndex = 40;
+            this.defaultOutputDir.Title = null;
             // 
             // tabPage3
             // 
@@ -956,6 +986,23 @@ namespace MeGUI
             this.lblFDK.TabIndex = 45;
             this.lblFDK.Text = "Location";
             // 
+            // fdkaacLocation
+            // 
+            this.fdkaacLocation.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.fdkaacLocation.Enabled = false;
+            this.fdkaacLocation.Filename = "";
+            this.fdkaacLocation.Filter = "FDKAAC|fdkaac.exe";
+            this.fdkaacLocation.FilterIndex = 0;
+            this.fdkaacLocation.FolderMode = false;
+            this.fdkaacLocation.Location = new System.Drawing.Point(64, 18);
+            this.fdkaacLocation.Name = "fdkaacLocation";
+            this.fdkaacLocation.ReadOnly = true;
+            this.fdkaacLocation.SaveMode = false;
+            this.fdkaacLocation.Size = new System.Drawing.Size(399, 26);
+            this.fdkaacLocation.TabIndex = 44;
+            this.fdkaacLocation.Title = null;
+            // 
             // groupBox6
             // 
             this.groupBox6.Controls.Add(this.useX265);
@@ -1112,6 +1159,23 @@ namespace MeGUI
             this.lblNero.TabIndex = 45;
             this.lblNero.Text = "Location";
             // 
+            // neroaacencLocation
+            // 
+            this.neroaacencLocation.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.neroaacencLocation.Enabled = false;
+            this.neroaacencLocation.Filename = "";
+            this.neroaacencLocation.Filter = "NeroAacEnc|neroaacenc.exe";
+            this.neroaacencLocation.FilterIndex = 0;
+            this.neroaacencLocation.FolderMode = false;
+            this.neroaacencLocation.Location = new System.Drawing.Point(64, 18);
+            this.neroaacencLocation.Name = "neroaacencLocation";
+            this.neroaacencLocation.ReadOnly = true;
+            this.neroaacencLocation.SaveMode = false;
+            this.neroaacencLocation.Size = new System.Drawing.Size(399, 26);
+            this.neroaacencLocation.TabIndex = 44;
+            this.neroaacencLocation.Title = null;
+            // 
             // groupBox4
             // 
             this.groupBox4.Controls.Add(this.btnClearMP4TempDirectory);
@@ -1132,8 +1196,26 @@ namespace MeGUI
             this.btnClearMP4TempDirectory.Text = "x";
             this.btnClearMP4TempDirectory.Click += new System.EventHandler(this.btnClearMP4TempDirectory_Click);
             // 
+            // tempDirMP4
+            // 
+            this.tempDirMP4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tempDirMP4.Filename = "";
+            this.tempDirMP4.Filter = null;
+            this.tempDirMP4.FilterIndex = 0;
+            this.tempDirMP4.FolderMode = true;
+            this.tempDirMP4.Location = new System.Drawing.Point(12, 20);
+            this.tempDirMP4.Name = "tempDirMP4";
+            this.tempDirMP4.ReadOnly = true;
+            this.tempDirMP4.SaveMode = false;
+            this.tempDirMP4.Size = new System.Drawing.Size(418, 26);
+            this.tempDirMP4.TabIndex = 41;
+            this.tempDirMP4.Title = null;
+            this.tempDirMP4.FileSelected += new MeGUI.FileBarEventHandler(this.tempDirMP4_FileSelected);
+            // 
             // vobGroupBox
             // 
+            this.vobGroupBox.Controls.Add(this.useDGIndexIM);
             this.vobGroupBox.Controls.Add(this.useDGIndexNV);
             this.vobGroupBox.Controls.Add(this.cbAutoLoadDG);
             this.vobGroupBox.Controls.Add(this.percentLabel);
@@ -1243,85 +1325,15 @@ namespace MeGUI
             this.helpButton1.Size = new System.Drawing.Size(38, 23);
             this.helpButton1.TabIndex = 1;
             // 
-            // targetSizeSCBox1
+            // useDGIndexIM
             // 
-            this.targetSizeSCBox1.CustomSizes = new MeGUI.core.util.FileSize[0];
-            this.targetSizeSCBox1.Location = new System.Drawing.Point(8, 56);
-            this.targetSizeSCBox1.MaximumSize = new System.Drawing.Size(1000, 28);
-            this.targetSizeSCBox1.MinimumSize = new System.Drawing.Size(64, 28);
-            this.targetSizeSCBox1.Name = "targetSizeSCBox1";
-            this.targetSizeSCBox1.NullString = "Modify custom file size values";
-            this.targetSizeSCBox1.SaveCustomValues = true;
-            this.targetSizeSCBox1.SelectedIndex = 0;
-            this.targetSizeSCBox1.Size = new System.Drawing.Size(273, 28);
-            this.targetSizeSCBox1.TabIndex = 44;
-            // 
-            // defaultOutputDir
-            // 
-            this.defaultOutputDir.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.defaultOutputDir.Filename = "";
-            this.defaultOutputDir.Filter = null;
-            this.defaultOutputDir.FilterIndex = 0;
-            this.defaultOutputDir.FolderMode = true;
-            this.defaultOutputDir.Location = new System.Drawing.Point(8, 24);
-            this.defaultOutputDir.Name = "defaultOutputDir";
-            this.defaultOutputDir.ReadOnly = true;
-            this.defaultOutputDir.SaveMode = false;
-            this.defaultOutputDir.Size = new System.Drawing.Size(243, 26);
-            this.defaultOutputDir.TabIndex = 40;
-            this.defaultOutputDir.Title = null;
-            // 
-            // fdkaacLocation
-            // 
-            this.fdkaacLocation.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.fdkaacLocation.Enabled = false;
-            this.fdkaacLocation.Filename = "";
-            this.fdkaacLocation.Filter = "FDKAAC|fdkaac.exe";
-            this.fdkaacLocation.FilterIndex = 0;
-            this.fdkaacLocation.FolderMode = false;
-            this.fdkaacLocation.Location = new System.Drawing.Point(64, 18);
-            this.fdkaacLocation.Name = "fdkaacLocation";
-            this.fdkaacLocation.ReadOnly = true;
-            this.fdkaacLocation.SaveMode = false;
-            this.fdkaacLocation.Size = new System.Drawing.Size(399, 26);
-            this.fdkaacLocation.TabIndex = 44;
-            this.fdkaacLocation.Title = null;
-            // 
-            // neroaacencLocation
-            // 
-            this.neroaacencLocation.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.neroaacencLocation.Enabled = false;
-            this.neroaacencLocation.Filename = "";
-            this.neroaacencLocation.Filter = "NeroAacEnc|neroaacenc.exe";
-            this.neroaacencLocation.FilterIndex = 0;
-            this.neroaacencLocation.FolderMode = false;
-            this.neroaacencLocation.Location = new System.Drawing.Point(64, 18);
-            this.neroaacencLocation.Name = "neroaacencLocation";
-            this.neroaacencLocation.ReadOnly = true;
-            this.neroaacencLocation.SaveMode = false;
-            this.neroaacencLocation.Size = new System.Drawing.Size(399, 26);
-            this.neroaacencLocation.TabIndex = 44;
-            this.neroaacencLocation.Title = null;
-            // 
-            // tempDirMP4
-            // 
-            this.tempDirMP4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tempDirMP4.Filename = "";
-            this.tempDirMP4.Filter = null;
-            this.tempDirMP4.FilterIndex = 0;
-            this.tempDirMP4.FolderMode = true;
-            this.tempDirMP4.Location = new System.Drawing.Point(12, 20);
-            this.tempDirMP4.Name = "tempDirMP4";
-            this.tempDirMP4.ReadOnly = true;
-            this.tempDirMP4.SaveMode = false;
-            this.tempDirMP4.Size = new System.Drawing.Size(418, 26);
-            this.tempDirMP4.TabIndex = 41;
-            this.tempDirMP4.Title = null;
-            this.tempDirMP4.FileSelected += new MeGUI.FileBarEventHandler(this.tempDirMP4_FileSelected);
+            this.useDGIndexIM.AutoSize = true;
+            this.useDGIndexIM.Location = new System.Drawing.Point(12, 47);
+            this.useDGIndexIM.Name = "useDGIndexIM";
+            this.useDGIndexIM.Size = new System.Drawing.Size(115, 17);
+            this.useDGIndexIM.TabIndex = 48;
+            this.useDGIndexIM.Text = "Enable DGIndexIM";
+            this.useDGIndexIM.UseVisualStyleBackColor = true;
             // 
             // SettingsForm
             // 
@@ -1479,5 +1491,6 @@ namespace MeGUI
         private System.Windows.Forms.CheckBox useFDKAac;
         private System.Windows.Forms.Label lblFDK;
         private FileBar fdkaacLocation;
+        private System.Windows.Forms.CheckBox useDGIndexIM;
     }
 }

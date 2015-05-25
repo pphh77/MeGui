@@ -248,7 +248,6 @@ namespace MeGUI
             }
         }
 
-#warning delete block some months after the next stable release
         private void deleteDeprecatedEntries(String strFile)
         {
             String line;
@@ -256,6 +255,7 @@ namespace MeGUI
             int counter = 0, iBlock = 0;
             List<int> arrDeprecated = new List<int>();
             StreamReader file = new StreamReader(strFile);
+            bool bFound = false;
             
             while ((line = file.ReadLine()) != null)
             {
@@ -266,9 +266,13 @@ namespace MeGUI
                 }
                 counter++;
                 if (iBlock == 1 && (line.Equals("    <string>Aften AC-3</string>") || line.Equals("    <string>Snow</string>") || line.Equals("    <string>Aud-X MP3</string>") || line.Equals("    <string>Winamp AAC</string>") || line.Equals("    <string>FAAC</string>")))
+                {
+                    bFound = true;
                     arrDeprecated.Add(counter);
+                }
                 else if (iBlock == 4 && (line.Equals("    <string>Aften AC-3</string>") || line.Equals("    <string>Snow</string>") || line.Equals("    <string>Aud-X MP3</string>") || line.Equals("    <string>Winamp AAC</string>") || line.Equals("    <string>FAAC</string>")))
                 {
+                    bFound = true;
                     if (line.Contains("Snow"))
                         sbNewFile.AppendLine("    <string>x264</string>");
                     else
@@ -290,9 +294,12 @@ namespace MeGUI
             }
             file.Close();
 
-            StreamWriter newfile = new StreamWriter(strFile);
-            newfile.Write(sbNewFile);
-            newfile.Close();
+            if (bFound)
+            {
+                StreamWriter newfile = new StreamWriter(strFile);
+                newfile.Write(sbNewFile);
+                newfile.Close();
+            }
         }
 
         public void LoadProfiles()

@@ -195,7 +195,7 @@ namespace MeGUI
             if (!iFile.recommendIndexer(out oIndexer, true))
                 return iResult;
 
-            if (oIndexer != FileIndexerWindow.IndexType.D2V && oIndexer != FileIndexerWindow.IndexType.DGA &&
+            if (oIndexer != FileIndexerWindow.IndexType.D2V && oIndexer != FileIndexerWindow.IndexType.DGM &&
                 oIndexer != FileIndexerWindow.IndexType.DGI && oIndexer != FileIndexerWindow.IndexType.FFMS &&
                 oIndexer != FileIndexerWindow.IndexType.LSMASH)
                 return iResult;

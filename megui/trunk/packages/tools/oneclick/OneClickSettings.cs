@@ -361,11 +361,11 @@ namespace MeGUI
                     DefaultSubtitleLanguage.Add(MainForm.Instance.Settings.DefaultLanguage2);
             }
             IndexerPriority.Add(FileIndexerWindow.IndexType.DGI.ToString());
+            IndexerPriority.Add(FileIndexerWindow.IndexType.DGM.ToString());
             IndexerPriority.Add(FileIndexerWindow.IndexType.D2V.ToString());
-            IndexerPriority.Add(FileIndexerWindow.IndexType.FFMS.ToString());
             IndexerPriority.Add(FileIndexerWindow.IndexType.LSMASH.ToString());
+            IndexerPriority.Add(FileIndexerWindow.IndexType.FFMS.ToString());
             IndexerPriority.Add(FileIndexerWindow.IndexType.AVISOURCE.ToString());
-            IndexerPriority.Add(FileIndexerWindow.IndexType.DGA.ToString());
 		}
 
         #region GenericSettings Members

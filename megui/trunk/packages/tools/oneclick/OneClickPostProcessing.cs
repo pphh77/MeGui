@@ -512,10 +512,10 @@ namespace MeGUI
                 iMediaFile = new d2vFile(indexFile);
                 oPossibleSource = PossibleSources.d2v;
             }
-            else if (job.PostprocessingProperties.IndexType == FileIndexerWindow.IndexType.DGA)
+            else if (job.PostprocessingProperties.IndexType == FileIndexerWindow.IndexType.DGM)
             {
-                iMediaFile = new dgaFile(indexFile);
-                oPossibleSource = PossibleSources.dga;
+                iMediaFile = new dgmFile(indexFile);
+                oPossibleSource = PossibleSources.dgm;
             }
             else if (job.PostprocessingProperties.IndexType == FileIndexerWindow.IndexType.FFMS)
             {

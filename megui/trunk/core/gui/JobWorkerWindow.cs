@@ -593,7 +593,7 @@ namespace MeGUI.core.gui
                 //Check to see if output file already exists before encoding.
                 if (File.Exists(job.Job.Output) &&
                     (!Path.GetExtension(job.Job.Output).Equals(".lwi") && !Path.GetExtension(job.Job.Output).Equals(".ffindex") &&
-                    !Path.GetExtension(job.Job.Output).Equals(".dga") && !Path.GetExtension(job.Job.Output).Equals(".d2v") &&
+                    !Path.GetExtension(job.Job.Output).Equals(".d2v") &&
                     !Path.GetExtension(job.Job.Output).Equals(".dgi")) && !mainForm.DialogManager.overwriteJobOutput(job.Job.Output))
                     throw new JobStartException("File exists and the user doesn't want to overwrite", ExceptionType.UserSkip);
 

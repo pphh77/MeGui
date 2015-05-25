@@ -300,16 +300,21 @@ namespace MeGUI
 
                 // if an index file is used extract the real file name
                 if (Path.GetExtension(file).ToLowerInvariant().Equals(".d2v") ||
-                    Path.GetExtension(file).ToLowerInvariant().Equals(".dga") ||
                     Path.GetExtension(file).ToLowerInvariant().Equals(".dgi"))
                 {
                     using (StreamReader sr = new StreamReader(file, Encoding.Default))
                     {
                         string line = null;
                         int iLineCount = 0;
+                        bool bDGIndexIM = false;
                         while ((line = sr.ReadLine()) != null)
                         {
                             iLineCount++;
+                            if (iLineCount == 1 && Path.GetExtension(file).ToLowerInvariant().Equals(".dgi"))
+                            {
+                                if (line.ToLower().Contains("dgindexim"))
+                                    bDGIndexIM = true;
+                            }
                             if (iLineCount == 3 && !Path.GetExtension(file).ToLowerInvariant().Equals(".dgi"))
                             {
                                 string strSourceFile = line;
@@ -322,6 +327,8 @@ namespace MeGUI
                             else if (iLineCount == 4)
                             {
                                 string strSourceFile = line.Substring(0, line.LastIndexOf(" "));
+                                if (bDGIndexIM)
+                                    strSourceFile = Path.Combine(Path.GetDirectoryName(file), strSourceFile);
                                 if (File.Exists(strSourceFile))
                                     _file = file = strSourceFile;
                                 break;
@@ -1013,24 +1020,34 @@ namespace MeGUI
             return true;
         }
 
-        /// <summary>checks if the file is indexable by DGIndex</summary>
+        /// <summary>checks if the file is indexable by DGIndexIM</summary>
         /// <returns>true if indexable, false if not</returns>
-        public bool isDGAIndexable()
+        public bool isDGMIndexable()
         {
             // check if the file is a video file
             if (!_VideoInfo.HasVideo)
                 return false;
 
-            // only AVC is supported
-            if (!_VideoInfo.Track.Codec.ToUpperInvariant().Equals("AVC"))
+            // check if the indexer and the license file are available
+            if (!MainForm.Instance.Settings.IsDGMIndexerAvailable())
+                return false;
+
+            // only AVC, VC1 and MPEG2 are supported
+            if (!_VideoInfo.Track.Codec.ToUpperInvariant().Equals("AVC") &&
+                !_VideoInfo.Track.Codec.ToUpperInvariant().Equals("VC-1") &&
+                !_VideoInfo.Track.Codec.ToUpperInvariant().Equals("MPEG-2 VIDEO"))
                 return false;
 
             // only the following container formats are supported
-            if (!_strContainer.ToUpperInvariant().Equals("MPEG-TS") &&
+            if (!_strContainer.ToUpperInvariant().Equals("MATROSKA") &&
+                !_strContainer.ToUpperInvariant().Equals("MPEG-TS") &&
                 !_strContainer.ToUpperInvariant().Equals("MPEG-PS") &&
                 !_strContainer.ToUpperInvariant().Equals("MPEG VIDEO") &&
+                !_strContainer.ToUpperInvariant().Equals("MPEG-4") &&
+                !_strContainer.ToUpperInvariant().Equals("VC-1") &&
                 !_strContainer.ToUpperInvariant().Equals("AVC") &&
-                !_strContainer.ToUpperInvariant().Equals("BDAV"))
+                !_strContainer.ToUpperInvariant().Equals("BDAV") &&
+                !_strContainer.ToUpperInvariant().Equals("BLU-RAY PLAYLIST"))
                 return false;
 
             return true;
@@ -1134,16 +1151,16 @@ namespace MeGUI
         {
             if (isDGIIndexable())
                 oType = FileIndexerWindow.IndexType.DGI;
+            else if (isDGMIndexable())
+                oType = FileIndexerWindow.IndexType.DGM;
             else if (isD2VIndexable())
                 oType = FileIndexerWindow.IndexType.D2V;
             else if (isAVISourceIndexable(true))
                 oType = FileIndexerWindow.IndexType.AVISOURCE;
-            else if (isFFMSIndexable())
-                oType = FileIndexerWindow.IndexType.FFMS;
             else if (isLSMASHIndexable(bWriteableDirOnly))
                 oType = FileIndexerWindow.IndexType.LSMASH;
-            else if (isDGAIndexable())
-                oType = FileIndexerWindow.IndexType.DGA;
+            else if (isFFMSIndexable())
+                oType = FileIndexerWindow.IndexType.FFMS;
             else
             {
                 oType = FileIndexerWindow.IndexType.FFMS;
@@ -1192,11 +1209,11 @@ namespace MeGUI
                     }
                     continue;
                 }
-                else if (strIndexer.Equals(FileIndexerWindow.IndexType.DGA.ToString()))
+                else if (strIndexer.Equals(FileIndexerWindow.IndexType.DGM.ToString()))
                 {
-                    if (isDGAIndexable())
+                    if (isDGMIndexable())
                     {
-                        oType = FileIndexerWindow.IndexType.DGA;
+                        oType = FileIndexerWindow.IndexType.DGM;
                         break;
                     }
                     continue;
