@@ -1,3 +1,5 @@
+2554 [OneClick]             fixed an error when both DGIndex* are disabled (regression of 2551)
+                            fixed some problems when using the DGIndexIM indexer (regression of 2551)
 2553 [OneClick]             reset to indexer defaults to remove DGA
 2552 [DGIndexIM Indexer]    fixed not able to start job (regression of 2551)
 2551 [DGAVCIndex Indexer]   removed DGAVCIndex

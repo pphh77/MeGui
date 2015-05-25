@@ -184,10 +184,9 @@ namespace MeGUI
             }
             else
             {
-                filter += "All supported files|*.avs;*.ifo;*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.264;*.h264;*.avc;*.m2t*;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.pva;*.vro|" + filter + "|All files|*.*";
+                filter = "All supported files|*.avs;*.ifo;*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.264;*.h264;*.avc;*.m2t*;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.pva;*.vro|" + filter + "|All files|*.*";
                 input.Filter = filter;
             }
-
 
             DragDropUtil.RegisterMultiFileDragDrop(input, setInput, delegate() { return input.Filter + "|All folders|*."; });
             DragDropUtil.RegisterSingleFileDragDrop(output, setOutput);
@@ -1218,6 +1217,7 @@ namespace MeGUI
                 finalJobChain = new SequentialChain(prepareJobs, new SequentialChain(job), new SequentialChain(ocJob));
             }
             else if (dpp.IndexType == FileIndexerWindow.IndexType.DGI ||
+                dpp.IndexType == FileIndexerWindow.IndexType.DGM ||
                 dpp.IndexType == FileIndexerWindow.IndexType.FFMS ||
                 dpp.IndexType == FileIndexerWindow.IndexType.LSMASH)
             {

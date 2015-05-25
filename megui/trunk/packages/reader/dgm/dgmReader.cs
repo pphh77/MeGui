@@ -43,21 +43,9 @@ namespace MeGUI
         {
             if (!file.ToLowerInvariant().EndsWith(".dgi"))
                 return -1;
-            using (StreamReader sr = new StreamReader(file, System.Text.Encoding.Default))
-            {
-                string line = null;
-                int iLineCount = 0;
-                while ((line = sr.ReadLine()) != null)
-                {
-                    iLineCount++;
-                    if (iLineCount == 1)
-                    {
-                        if (line.ToLower().Contains("dgindexim"))
-                            return 11;
-                        break;
-                    }
-                }
-            }
+
+            if (FileIndexerWindow.isDGMFile(file))
+                return 11;
             return -1;
         }
 

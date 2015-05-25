@@ -345,18 +345,10 @@ namespace MeGUI
                     openVideo(videoInput);
                     break;
                 case ".dgi":
-                    using (StreamReader sr = new StreamReader(videoInput, Encoding.Default))
-                    {
-                        string line = null;
-                        while ((line = sr.ReadLine()) != null)
-                        {
-                            if (line.ToLower().Contains("dgindexim"))
-                                sourceType = PossibleSources.dgm;
-                            else
-                                sourceType = PossibleSources.dgi;
-                            break;
-                        }
-                    }
+                    if (FileIndexerWindow.isDGMFile(videoInput))
+                        sourceType = PossibleSources.dgm;
+                    else
+                        sourceType = PossibleSources.dgi;
                     openVideo(videoInput); 
                     break;
                 case ".ffindex":

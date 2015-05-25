@@ -522,6 +522,18 @@ namespace MeGUI
                 queueButton.DialogResult = DialogResult.None;
         }
 
+        public static bool isDGMFile(string input)
+        {
+            using (StreamReader sr = new StreamReader(input, System.Text.Encoding.Default))
+            {
+                string line = sr.ReadLine();
+                if (line.ToLower().Contains("dgindexim"))
+                    return true;
+                else
+                    return false;
+            }
+        }
+
         private D2VIndexJob generateD2VIndexJob(string videoInput)
         {
             int demuxType = 0;

@@ -233,7 +233,12 @@ namespace MeGUI
                     bool bFound = false;
                     string trackFile = strTrackName + audioTracks[counter].TrackIDx + "*";
                     if (Path.GetExtension(projectName).ToLowerInvariant().Equals(".dgi"))
-                        trackFile = Path.GetFileName(projectName) + trackFile;
+                    {
+                        if (FileIndexerWindow.isDGMFile(projectName))
+                            trackFile = Path.GetFileNameWithoutExtension(projectName) + trackFile;
+                        else
+                            trackFile = Path.GetFileName(projectName) + trackFile;
+                    }
                     else if (Path.GetExtension(projectName).ToLowerInvariant().Equals(".ffindex") || Path.GetExtension(projectName).ToLowerInvariant().Equals(".lwi"))
                         trackFile = Path.GetFileNameWithoutExtension(projectName) + "_track_" + (audioTracks[counter].TrackIndex + 1) + "_*.avs";
                     else

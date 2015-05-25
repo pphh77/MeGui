@@ -43,22 +43,10 @@ namespace MeGUI
         {
             if (!file.ToLowerInvariant().EndsWith(".dgi"))
                 return -1;
-            using (StreamReader sr = new StreamReader(file, System.Text.Encoding.Default))
-            {
-                string line = null;
-                int iLineCount = 0;
-                while ((line = sr.ReadLine()) != null)
-                {
-                    iLineCount++;
-                    if (iLineCount == 1)
-                    {
-                        if (line.ToLower().Contains("dgindexnv"))
-                            return 12;
-                        break;
-                    }
-                }
-            }
-            return -1;
+
+            if (FileIndexerWindow.isDGMFile(file))
+                return -1;
+            return 12;
         }
 
         #endregion
