@@ -85,7 +85,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "FFmpegMuxer");
                     inputFile = settings.MuxedInput;
 
                 MediaInfoFile oVideoInfo = new MediaInfoFile(inputFile, ref log);
-                sb.Append("-y -i \"" + inputFile + "\" -vcodec copy -vtag xvid \"" + job.Output + "\" ");
+                sb.Append("-y -i \"" + inputFile + "\" -vcodec copy -vtag XVID \"" + job.Output + "\" ");
 
                 return sb.ToString();
             }

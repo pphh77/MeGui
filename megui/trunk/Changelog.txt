@@ -1,3 +1,4 @@
+2558 [XviD Encoder]         changed FourCC to XVID when muxing with FFmpeg (regression of 2546)
 2557 [OneClick]             fixed missing audio files if using DGIndexNV (regression of 2554)
 2556 [XviD]                 fixed not able to set -masking 2 (regression of 2547)
 2555 [Muxer]                fixed using 0 as fps value (regression of 2548)
