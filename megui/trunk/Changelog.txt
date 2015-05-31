@@ -1,3 +1,4 @@
+2559 [MP4 Muxer]            support UTF-8 for track names. Patch by Eli Bildirici #68
 2558 [XviD Encoder]         changed FourCC to XVID when muxing with FFmpeg (regression of 2546)
 2557 [OneClick]             fixed missing audio files if using DGIndexNV (regression of 2554)
 2556 [XviD]                 fixed not able to set -masking 2 (regression of 2547)

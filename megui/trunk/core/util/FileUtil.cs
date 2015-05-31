@@ -672,6 +672,29 @@ namespace MeGUI.core.util
         }
 
         /// <summary>
+        /// Creates UTF-8 formatted text file containing the track name of a file.
+        /// Allows mp4box to use int'l chars in track names, as well as control chars 
+        /// such as colons, equals signs, quotation marks, &c.
+        /// </summary>
+        public static string CreateUTF8TracknameFile(string trackName, string fileName, int trackNumber)
+        {
+            string tracknameFilePath = Path.GetFullPath(fileName) + "_TRACKNAME" + trackNumber.ToString() + ".txt";
+            try 
+            {
+                using (StreamWriter sw = new StreamWriter(tracknameFilePath, true, Encoding.UTF8))
+                {
+                    sw.Write(trackName);
+                    sw.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                e.Message.ToString();
+            }
+            return tracknameFilePath;
+        }
+
+        /// <summary>
         /// Create Chapters XML File from OGG Chapters File
         /// </summary>
         /// <param name="inFile">input</inFile>

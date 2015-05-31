@@ -264,7 +264,11 @@ new JobProcessorFactory(new ProcessorFactory(init), "MP4BoxMuxer");
                     sb.Append(":fps=" + fpsString);
 
                     if (!string.IsNullOrEmpty(settings.VideoName))
-                        sb.Append(":name=" + settings.VideoName);
+                    {
+                        string tracknameFilePath = FileUtil.CreateUTF8TracknameFile(settings.VideoName, strInput, 0);
+                        sb.Append(":name=file://" + tracknameFilePath);
+                        job.FilesToDelete.Add(tracknameFilePath);
+                    }
                     else
                         sb.Append(":name="); // to erase the default GPAC string
                     sb.Append("\"");
@@ -314,7 +318,13 @@ new JobProcessorFactory(new ProcessorFactory(init), "MP4BoxMuxer");
                         }
                     }
                     if (!string.IsNullOrEmpty(stream.name))
-                        sb.Append(":name=" + stream.name);
+                    {
+                        string tracknameFilePath = FileUtil.CreateUTF8TracknameFile(stream.name, stream.path, trackCount);
+                        sb.Append(":name=file://" + tracknameFilePath);
+                        job.FilesToDelete.Add(tracknameFilePath);
+                    }
+                    else
+                        sb.Append(":name="); // to erase the default GPAC string
                     if (stream.delay != 0)
                         sb.AppendFormat(":delay={0}", stream.delay);
                     if (settings.DeviceType == "iPod" || settings.DeviceType == "iPhone" || settings.DeviceType == "iPad" || settings.DeviceType == "Apple TV")
@@ -323,8 +333,6 @@ new JobProcessorFactory(new ProcessorFactory(init), "MP4BoxMuxer");
                         if (trackCount > 0)
                             sb.Append(":disable");
                     }
-                    if (string.IsNullOrEmpty(stream.name))
-                        sb.Append(":name="); // to erase the default GPAC string
                     sb.Append("\"");
                     trackCount++;
                 }
@@ -357,15 +365,19 @@ new JobProcessorFactory(new ProcessorFactory(init), "MP4BoxMuxer");
                         }
                     }
                     if (!string.IsNullOrEmpty(stream.name))
-                        sb.Append(":name=" + stream.name);
+                    {
+                        string tracknameFilePath = FileUtil.CreateUTF8TracknameFile(stream.name, stream.path, trackCount);
+                        sb.Append(":name=file://" + tracknameFilePath);
+                        job.FilesToDelete.Add(tracknameFilePath);
+                    }
+                    else
+                        sb.Append(":name="); // to erase the default GPAC string
                     if (settings.DeviceType == "iPod" || settings.DeviceType == "iPhone" || settings.DeviceType == "iPad" || settings.DeviceType == "Apple TV")
                     {
                         sb.Append(":hdlr=sbtl:layout=-1:group=2");
                         if (trackCount > 0)
                             sb.Append(":disable");
                     }
-                    if (string.IsNullOrEmpty(stream.name))
-                        sb.Append(":name="); // to erase the default GPAC string
                     sb.Append("\"");
                     trackCount++;
                 }
