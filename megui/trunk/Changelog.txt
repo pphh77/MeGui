@@ -1,4 +1,5 @@
-2560 [FFmpeg Muxer]         force source FPS (regression of 2546)
+2561 [AVI Muxer]            improved logging
+2560 [FFmpeg Muxer]         force source frame rate (regression of 2546)
 2559 [MP4 Muxer]            support UTF-8 for track names. Patch by Eli Bildirici #68
 2558 [XviD Encoder]         changed FourCC to XVID when muxing with FFmpeg (regression of 2546)
 2557 [OneClick]             fixed missing audio files if using DGIndexNV (regression of 2554)
