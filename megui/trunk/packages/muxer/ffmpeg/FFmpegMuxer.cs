@@ -30,8 +30,7 @@ namespace MeGUI
 {
     class FFmpegMuxer : CommandlineMuxer
     {
-        public static readonly JobProcessorFactory Factory =
-new JobProcessorFactory(new ProcessorFactory(init), "FFmpegMuxer");
+        public static readonly JobProcessorFactory Factory = new JobProcessorFactory(new ProcessorFactory(init), "FFmpegMuxer");
         
         private static IJobProcessor init(MainForm mf, Job j)
         {
@@ -85,7 +84,14 @@ new JobProcessorFactory(new ProcessorFactory(init), "FFmpegMuxer");
                     inputFile = settings.MuxedInput;
 
                 MediaInfoFile oVideoInfo = new MediaInfoFile(inputFile, ref log);
-                sb.Append("-y -i \"" + inputFile + "\" -vcodec copy -vtag XVID \"" + job.Output + "\" ");
+
+                // get source FPS
+                System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("en-us");
+                string fpsString = oVideoInfo.VideoInfo.FPS.ToString(ci);
+                if (settings.Framerate.HasValue)
+                    fpsString = settings.Framerate.Value.ToString(ci);
+
+                sb.Append("-y -i \"" + inputFile + "\" -vcodec copy -vtag XVID -r " + fpsString + " \"" + job.Output + "\" ");
 
                 return sb.ToString();
             }
