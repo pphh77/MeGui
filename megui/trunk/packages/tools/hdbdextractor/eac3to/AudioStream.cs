@@ -43,7 +43,9 @@ namespace eac3to
                     case AudioStreamType.DTS:                        
                         return new object[] { "DTS", "DTSHD", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
                     case AudioStreamType.TrueHD:
-                        return new object[] { "THD", "THD+AC3", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
+                        return new object[] { "THD", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
+                    case (AudioStreamType.TrueHD | AudioStreamType.AC3):
+                        return new object[] { "THD+AC3", "THD", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
                     case AudioStreamType.MP2:
                         return new object[] { "MP2", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
                     case AudioStreamType.MP3:
@@ -82,7 +84,7 @@ namespace eac3to
 
             AudioStream audioStream = new AudioStream(s);
 
-            switch (audioStream.Name.ToUpper(System.Globalization.CultureInfo.InvariantCulture))
+            switch (audioStream.Name.ToUpperInvariant())
             {
                 case "AC3":
                 case "AC3 EX":
@@ -99,9 +101,11 @@ namespace eac3to
                     audioStream.AudioType = AudioStreamType.EAC3;
                     break;
                 case "TRUEHD":
+                case "TRUEHD (ATMOS)":
                     audioStream.AudioType = AudioStreamType.TrueHD;
                     break;
                 case "TRUEHD/AC3":
+                case "TRUEHD/AC3 (ATMOS)":
                     audioStream.AudioType = AudioStreamType.TrueHD | AudioStreamType.AC3;
                     break;
                 case "PCM":

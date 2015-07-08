@@ -28,6 +28,8 @@ namespace eac3to
     [Flags]
     public enum AudioStreamType
     {
+        [StringValue("NONE")]
+        NONE,
         [StringValue("AC3")]
         AC3,
         [StringValue("E-AC3")]

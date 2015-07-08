@@ -1,3 +1,4 @@
+2564 [HD Streams Extractor] improves handling of TrueHD streams including Atmos support. Patch by bowlingbeeg #69
 2563 [Job]                  fixed cancelling the warning when using "HIGH" priority. Bug #806
 2562 [MP4 Muxer]            switched to ISO 639-2 three letter code for the language (regression of recent MP4box builds)
 2561 [AVI Muxer]            improved logging

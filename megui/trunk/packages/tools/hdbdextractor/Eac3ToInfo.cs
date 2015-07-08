@@ -313,7 +313,6 @@ namespace MeGUI.packages.tools.hdbdextractor
                             if (_log != null)
                                 _log.LogValue("Error receiving output data", ex);
                         }
-
                         return;
                     }
 
@@ -340,7 +339,6 @@ namespace MeGUI.packages.tools.hdbdextractor
                     {
                         foreach (string file in Regex.Match(data, @"\[.+\]").Value.Trim("[]".ToCharArray()).Split("+".ToCharArray()))
                             features[features.Count - 1].Files.Add(new File(file + ".m2ts", features[features.Count - 1].Files.Count + 1));
-
                         return;
                     }
 
@@ -406,6 +404,8 @@ namespace MeGUI.packages.tools.hdbdextractor
                                     _log.LogValue("Error receiving output data", ex);
                             }
                         }
+                        if (_log != null)
+                            _log.LogEvent(data);
                         return;
                     }
 
@@ -416,7 +416,6 @@ namespace MeGUI.packages.tools.hdbdextractor
                         if (backgroundWorker.IsBusy)
                             backgroundWorker.ReportProgress(int.Parse(Regex.Match(data, "[0-9]{1,3}").Value),
                                 string.Format("Analyzing ({0}%)", int.Parse(Regex.Match(data, "[0-9]{1,3}").Value)));
-
                         return;
                     }
 
@@ -466,7 +465,6 @@ namespace MeGUI.packages.tools.hdbdextractor
                         if (backgroundWorker.IsBusy)
                             backgroundWorker.ReportProgress(int.Parse(Regex.Match(data, "[0-9]{1,3}").Value),
                                 string.Format("Processing ({0}%)", int.Parse(Regex.Match(data, "[0-9]{1,3}").Value)));
-
                         return;
                     }
 
@@ -477,7 +475,6 @@ namespace MeGUI.packages.tools.hdbdextractor
                         if (backgroundWorker.IsBusy)
                             backgroundWorker.ReportProgress(int.Parse(Regex.Match(data, "[0-9]{1,3}").Value),
                                 string.Format("Progress ({0}%)", int.Parse(Regex.Match(data, "[0-9]{1,3}").Value)));
-
                         return;
                     }
 
