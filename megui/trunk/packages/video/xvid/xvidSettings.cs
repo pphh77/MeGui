@@ -99,7 +99,7 @@ namespace MeGUI
             CreditsQuantizer = new decimal(20);
             bQuantRatio = 150;
             bQuantOffset = 100;
-            keyFrameBoost = 100;
+            keyFrameBoost = 10;
             keyframeThreshold = 1;
             keyframeReduction = 20;
             overflowControlStrength = 5;

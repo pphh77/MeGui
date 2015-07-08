@@ -1,3 +1,4 @@
+2565 [XviD Encoder]         changed the default -kboost value to 10 (regression of 2547)
 2564 [HD Streams Extractor] improves handling of TrueHD streams including Atmos support. Patch by bowlingbeeg #69
 2563 [Job]                  fixed cancelling the warning when using "HIGH" priority. Bug #806
 2562 [MP4 Muxer]            switched to ISO 639-2 three letter code for the language (regression of recent MP4box builds)
@@ -6,7 +7,7 @@
 2559 [MP4 Muxer]            support UTF-8 for track names. Patch by Eli Bildirici #68
 2558 [XviD Encoder]         changed FourCC to XVID when muxing with FFmpeg (regression of 2546)
 2557 [OneClick]             fixed missing audio files if using DGIndexNV (regression of 2554)
-2556 [XviD]                 fixed not able to set -masking 2 (regression of 2547)
+2556 [XviD Encoder]         fixed not able to set -masking 2 (regression of 2547)
 2555 [Muxer]                fixed using 0 as fps value (regression of 2548)
 2554 [OneClick]             fixed an error when both DGIndex* are disabled (regression of 2551). Bug #801
                             fixed some problems when using the DGIndexIM indexer (regression of 2551)
