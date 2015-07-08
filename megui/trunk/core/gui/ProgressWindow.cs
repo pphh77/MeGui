@@ -170,6 +170,7 @@ namespace MeGUI
             });
         }
         #endregion
+
         #region events
         /// <summary>
 		///  handles the abort button
@@ -181,6 +182,7 @@ namespace MeGUI
 		{
 		    Abort();
 		}
+
 		/// <summary>Handles changes in the priority dropdwon</summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
@@ -198,9 +200,9 @@ namespace MeGUI
                 {
                     PriorityChanged((ProcessPriority)priority.SelectedIndex);
                 }
-                
-                priority.Tag = priority.SelectedIndex;
             }
+            if (priority.SelectedIndex >= 0)
+                priority.Tag = priority.SelectedIndex;
 		}
 
 		private bool WarnPriority(ProcessPriority priority)
