@@ -306,14 +306,14 @@ namespace MeGUI
             bool bFound = false;
             foreach (KeyValuePair<string, string> strLanguage in LanguageSelectionContainer.Languages)
             {
-                if (input.SelectedText.ToLower(System.Globalization.CultureInfo.InvariantCulture).Contains(strLanguage.Key.ToLower(System.Globalization.CultureInfo.InvariantCulture)))
+                if (input.SelectedText.ToLowerInvariant().Contains(strLanguage.Key.ToLowerInvariant()))
                 {
                     SetLanguage(strLanguage.Key);
                     bFound = true;
                     break;
                 }
             }
-            if (!bFound && input.SelectedText.ToLower(System.Globalization.CultureInfo.InvariantCulture).EndsWith(".idx"))
+            if (!bFound && input.SelectedText.ToLowerInvariant().EndsWith(".idx"))
             {
                 List<SubtitleInfo> subTracks;
                 idxReader.readFileProperties(input.SelectedText, out subTracks);
