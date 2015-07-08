@@ -1,3 +1,4 @@
+2562 [MP4 Muxer]            switched to ISO 639-2 three letter code for the language (regression of recent MP4box builds)
 2561 [AVI Muxer]            improved logging
 2560 [FFmpeg Muxer]         force source frame rate (regression of 2546)
 2559 [MP4 Muxer]            support UTF-8 for track names. Patch by Eli Bildirici #68

@@ -312,7 +312,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "MP4BoxMuxer");
                         {
                             if (stream.language.ToLowerInvariant().Equals(strLanguage.Key.ToLowerInvariant()))
                             {
-                                sb.Append(":lang=" + LanguageSelectionContainer.getISO639dot1(strLanguage.Value));
+                                sb.Append(":lang=" + strLanguage.Value);
                                 break;
                             }
                         }
@@ -359,7 +359,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "MP4BoxMuxer");
                         {
                             if (stream.language.ToLowerInvariant().Equals(strLanguage.Key.ToLowerInvariant()))
                             {
-                                sb.Append(":lang=" + LanguageSelectionContainer.getISO639dot1(strLanguage.Value));
+                                sb.Append(":lang=" + strLanguage.Value);
                                 break;
                             }
                         }
