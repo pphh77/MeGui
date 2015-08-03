@@ -86,6 +86,10 @@ namespace MeGUI
         private const int PRODUCT_CORE = 0x00000065;
         private const int PRODUCT_CORE_N = 0x00000062;
         private const int PRODUCT_CORE_COUNTRYSPECIFIC = 0x00000063;
+        private const int PRODUCT_MOBILE_CORE = 0x00000068;
+        private const int PRODUCT_MOBILE_ENTERPRISE = 0x00000085;
+        private const int PRODUCT_EDUCATION = 0x00000079;
+        private const int PRODUCT_EDUCATION_N = 0x0000007A;
         #endregion
 
         #region Public Methods
@@ -145,202 +149,253 @@ namespace MeGUI
             OSVERSIONINFOEX osVersionInfo = new OSVERSIONINFOEX();
             osVersionInfo.dwOSVersionInfoSize = Marshal.SizeOf(typeof(OSVERSIONINFOEX));
             string osName = "UNKNOWN";
-            bool x64Detection = false;
+            bool x64Detection = true;
 
             if (!GetVersionEx(ref osVersionInfo))
-            {
                 return "";
-            }
-            else
+
+            switch (osInfo.Platform)
             {
-                switch (osInfo.Platform)
-                {
-                    case PlatformID.Win32Windows:
+                case PlatformID.Win32Windows:
+                    {
+                        x64Detection = false;
+                        switch (osInfo.Version.Minor)
                         {
-                            switch (osInfo.Version.Minor)
-                            {
-                                case 0: osName = "Windows 95"; break;
-                                case 10:
-                                    {
-                                        if (osInfo.Version.Revision.ToString() == "2222A")
-                                             osName = "Windows 98 Second Edition";
-                                        else osName = "Windows 98";
-                                    } break;
-                                case 90: osName = "Windows Me"; break;
-                            }
-                            break;
+                            case 0: osName = "Windows 95"; break;
+                            case 10:
+                                {
+                                    if (osInfo.Version.Revision.ToString() == "2222A")
+                                        osName = "Windows 98 Second Edition";
+                                    else 
+                                        osName = "Windows 98";
+                                }
+                                break;
+                            case 90: osName = "Windows Me"; break;
                         }
-                    case PlatformID.Win32NT:
+                        break;
+                    }
+                case PlatformID.Win32NT:
+                    {
+                        switch (osInfo.Version.Major)
                         {
-                            switch (osInfo.Version.Major)
-                            {
-                                case 3: osName = "Windows NT 3.51"; break;
-                                case 4:
+                            case 3:
+                                x64Detection = false;
+                                osName = "Windows NT 3.51"; 
+                                break;
+                            case 4:
+                                {
+                                    x64Detection = false;
+                                    switch (osVersionInfo.wProductType)
                                     {
-                                        switch (osVersionInfo.wProductType)
-                                        {
-                                            case 1: osName = "Windows NT 4.0 Workstation"; break;
-                                            case 3: osName = "Windows NT 4.0 Server"; break;
-                                        }
-                                        break;
+                                        case 1: osName = "Windows NT 4.0 Workstation"; break;
+                                        case 3: osName = "Windows NT 4.0 Server"; break;
                                     }
-                                case 5:
+                                    break;
+                                }
+                            case 5:
+                                {
+                                    switch (osInfo.Version.Minor)
                                     {
-                                        switch (osInfo.Version.Minor)
-                                        {
-                                            case 0: // win2K
-                                                {
-                                                    if ((osVersionInfo.wSuiteMask & VER_SUITE_DATACENTER) == VER_SUITE_DATACENTER)
-                                                         osName = "Windows 2000 Datacenter Server";
-                                                    else if ((osVersionInfo.wSuiteMask & VER_SUITE_ENTERPRISE) == VER_SUITE_ENTERPRISE)
-                                                         osName = "Windows 2000 Advanced Server";
-                                                    else
-                                                         osName = "Windows 2000";
-                                                    break;
-                                                }                                            
-                                            case 1: // winXP
-                                                {
-                                                    if ((osVersionInfo.wSuiteMask & VER_SUITE_PERSONAL) == VER_SUITE_PERSONAL)
-                                                         osName = "Windows XP Home Edition";
-                                                    else osName = "Windows XP Professional";
-                                                    x64Detection = true;
-                                                    break;
-                                                }
-                                            case 2: // winserver 2003
-                                                {
-                                                    if ((osVersionInfo.wSuiteMask & VER_SUITE_DATACENTER) == VER_SUITE_DATACENTER)
-                                                         osName = "Windows Server 2003 DataCenter Edition";
-                                                    else if ((osVersionInfo.wSuiteMask & VER_SUITE_ENTERPRISE) == VER_SUITE_ENTERPRISE)
-                                                         osName = "Windows Server 2003 Enterprise Edition";
-                                                    else if ((osVersionInfo.wSuiteMask & VER_SUITE_BLADE) == VER_SUITE_BLADE)
-                                                         osName = "Windows Server 2003 Web Edition";
-                                                    else osName = "Windows Server 2003 Standard Edition";
-                                                    x64Detection = true;
-                                                    break;
-                                                }
-                                        } break;
+                                        case 0: // win2K
+                                            {
+                                                x64Detection = false;
+                                                if ((osVersionInfo.wSuiteMask & VER_SUITE_DATACENTER) == VER_SUITE_DATACENTER)
+                                                    osName = "Windows 2000 Datacenter Server";
+                                                else if ((osVersionInfo.wSuiteMask & VER_SUITE_ENTERPRISE) == VER_SUITE_ENTERPRISE)
+                                                    osName = "Windows 2000 Advanced Server";
+                                                else
+                                                    osName = "Windows 2000";
+                                                break;
+                                            }
+                                        case 1: // winXP
+                                            {
+                                                if ((osVersionInfo.wSuiteMask & VER_SUITE_PERSONAL) == VER_SUITE_PERSONAL)
+                                                    osName = "Windows XP Home Edition";
+                                                else
+                                                    osName = "Windows XP Professional";
+                                                break;
+                                            }
+                                        case 2: // winserver 2003
+                                            {
+                                                if ((osVersionInfo.wSuiteMask & VER_SUITE_DATACENTER) == VER_SUITE_DATACENTER)
+                                                    osName = "Windows Server 2003 DataCenter Edition";
+                                                else if ((osVersionInfo.wSuiteMask & VER_SUITE_ENTERPRISE) == VER_SUITE_ENTERPRISE)
+                                                    osName = "Windows Server 2003 Enterprise Edition";
+                                                else if ((osVersionInfo.wSuiteMask & VER_SUITE_BLADE) == VER_SUITE_BLADE)
+                                                    osName = "Windows Server 2003 Web Edition";
+                                                else 
+                                                    osName = "Windows Server 2003 Standard Edition";
+                                                break;
+                                            }
                                     }
-                                case 6:
+                                    break;
+                                }
+                            case 6:
+                                {
+                                    switch (osInfo.Version.Minor)
                                     {
-                                        x64Detection = true;
-                                        switch (osInfo.Version.Minor)
-                                        {
-                                            case 0:
+                                        case 0:
+                                            {
+                                                switch (osVersionInfo.wProductType)
                                                 {
-                                                    switch (osVersionInfo.wProductType)
-                                                    {
-                                                        case 1: // Vista
+                                                    case 1: // Vista
+                                                        {
+                                                            uint edition = PRODUCT_UNDEFINED;
+                                                            if (GetProductInfo(osVersionInfo.dwMajorVersion,
+                                                                                osVersionInfo.dwMinorVersion,
+                                                                                osVersionInfo.wServicePackMajor,
+                                                                                osVersionInfo.wServicePackMinor,
+                                                                                out edition))
                                                             {
-                                                                uint edition = PRODUCT_UNDEFINED;
-                                                                if (GetProductInfo(osVersionInfo.dwMajorVersion,
-                                                                                   osVersionInfo.dwMinorVersion,
-                                                                                   osVersionInfo.wServicePackMajor,
-                                                                                   osVersionInfo.wServicePackMinor,
-                                                                                   out edition))
+                                                                switch (edition)
                                                                 {
-                                                                    switch (edition)
-                                                                    {
-                                                                        case PRODUCT_ULTIMATE:     osName = "Windows Vista Ultimate Edition";   break;
-                                                                        case PRODUCT_HOME_BASIC:
-                                                                        case PRODUCT_HOME_BASIC_N: osName = "Windows Vista Home Basic Edition"; break;
-                                                                        case PRODUCT_HOME_PREMIUM: osName = "Windows Vista Premium Edition";    break;
-                                                                        case PRODUCT_ENTERPRISE:   osName = "Windows Vista Enterprise Edition"; break;
-                                                                        case PRODUCT_BUSINESS:
-                                                                        case PRODUCT_BUSINESS_N:   osName = "Windows Vista Business Edition";   break;
-                                                                        case PRODUCT_STARTER:      osName = "Windows Vista Starter Edition";    break;
-                                                                        default:                   osName = "Windows Vista";                    break;
-                                                                    }
-                                                                } break;
+                                                                    case PRODUCT_ULTIMATE: osName = "Windows Vista Ultimate Edition"; break;
+                                                                    case PRODUCT_HOME_BASIC:
+                                                                    case PRODUCT_HOME_BASIC_N: osName = "Windows Vista Home Basic Edition"; break;
+                                                                    case PRODUCT_HOME_PREMIUM: osName = "Windows Vista Premium Edition"; break;
+                                                                    case PRODUCT_ENTERPRISE: osName = "Windows Vista Enterprise Edition"; break;
+                                                                    case PRODUCT_BUSINESS:
+                                                                    case PRODUCT_BUSINESS_N: osName = "Windows Vista Business Edition"; break;
+                                                                    case PRODUCT_STARTER: osName = "Windows Vista Starter Edition"; break;
+                                                                    default: osName = "Windows Vista"; break;
+                                                                }
                                                             }
-                                                        case 3: // Server 2008
-                                                            {
-                                                                if ((osVersionInfo.wSuiteMask & VER_SUITE_DATACENTER) == VER_SUITE_DATACENTER)
-                                                                    osName = "Windows Server 2008 Datacenter Server";
-                                                                else if ((osVersionInfo.wSuiteMask & VER_SUITE_ENTERPRISE) == VER_SUITE_ENTERPRISE)
-                                                                    osName = "Windows Server 2008 Advanced Server";
-                                                                else
-                                                                    osName = "Windows Server 2008";
-                                                                break;
-                                                            }
-                                                    } break;
-                                                }
-                                            case 1: // Se7en
-                                                {
-                                                    uint edition = PRODUCT_UNDEFINED;
-                                                    if (GetProductInfo(osVersionInfo.dwMajorVersion,
-                                                                       osVersionInfo.dwMinorVersion,
-                                                                       osVersionInfo.wServicePackMajor,
-                                                                       osVersionInfo.wServicePackMinor,
-                                                                       out edition))
-                                                    {
-                                                        switch (edition)
-                                                        {
-                                                            case PRODUCT_ULTIMATE: osName = "Windows 7 Ultimate Edition"; break;
-                                                            case PRODUCT_HOME_BASIC:
-                                                            case PRODUCT_HOME_BASIC_N: osName = "Windows 7 Home Basic Edition"; break;
-                                                            case PRODUCT_HOME_PREMIUM: osName = "Windows 7 Premium Edition"; break;
-                                                            case PRODUCT_ENTERPRISE: osName = "Windows 7 Enterprise Edition"; break;
-                                                            case PRODUCT_BUSINESS:
-                                                            case PRODUCT_BUSINESS_N: osName = "Windows 7 Professional Edition"; break;
-                                                            case PRODUCT_STARTER: osName = "Windows 7 Starter Edition"; break;
-                                                            default: osName = "Windows 7"; break;
+                                                            break;
                                                         }
-                                                    } break;
-                                                }
-                                            case 2: // Windows 8
-                                                {
-                                                    uint edition = PRODUCT_UNDEFINED;
-                                                    if (GetProductInfo(osVersionInfo.dwMajorVersion,
-                                                                       osVersionInfo.dwMinorVersion,
-                                                                       osVersionInfo.wServicePackMajor,
-                                                                       osVersionInfo.wServicePackMinor,
-                                                                       out edition))
-                                                    {
-                                                        switch (edition)
+                                                    case 3: // Server 2008
                                                         {
-                                                            case PRODUCT_CORE:
-                                                            case PRODUCT_CORE_COUNTRYSPECIFIC:
-                                                            case PRODUCT_CORE_N: osName = "Windows 8 Standard Edition"; break;
-                                                            case PRODUCT_ENTERPRISE: 
-                                                            case PRODUCT_ENTERPRISE_N: osName = "Windows 8 Entreprise Edition"; break;
-                                                            case PRODUCT_PROFESSIONAL:
-                                                            case PRODUCT_PROFESSIONAL_N: osName = "Windows 8 Professional Edition"; break;
-                                                            case PRODUCT_PROFESSIONAL_WMC: osName = "Windows 8 Professional with Media Center Edition"; break;
-                                                            default: osName = "Windows 8"; break;
+                                                            if ((osVersionInfo.wSuiteMask & VER_SUITE_DATACENTER) == VER_SUITE_DATACENTER)
+                                                                osName = "Windows Server 2008 Datacenter Server";
+                                                            else if ((osVersionInfo.wSuiteMask & VER_SUITE_ENTERPRISE) == VER_SUITE_ENTERPRISE)
+                                                                osName = "Windows Server 2008 Advanced Server";
+                                                            else
+                                                                osName = "Windows Server 2008";
+                                                            break;
                                                         }
-                                                    } break;
                                                 }
-                                            case 3: // Windows 8.1
+                                                break;
+                                            }
+                                        case 1: // Se7en
+                                            {
+                                                uint edition = PRODUCT_UNDEFINED;
+                                                if (GetProductInfo(osVersionInfo.dwMajorVersion,
+                                                                    osVersionInfo.dwMinorVersion,
+                                                                    osVersionInfo.wServicePackMajor,
+                                                                    osVersionInfo.wServicePackMinor,
+                                                                    out edition))
                                                 {
-                                                    uint edition = PRODUCT_UNDEFINED;
-                                                    if (GetProductInfo(osVersionInfo.dwMajorVersion,
-                                                                       osVersionInfo.dwMinorVersion,
-                                                                       osVersionInfo.wServicePackMajor,
-                                                                       osVersionInfo.wServicePackMinor,
-                                                                       out edition))
+                                                    switch (edition)
                                                     {
-                                                        switch (edition)
-                                                        {
-                                                            case PRODUCT_CORE:
-                                                            case PRODUCT_CORE_COUNTRYSPECIFIC:
-                                                            case PRODUCT_CORE_N: osName = "Windows 8.1 Standard Edition"; break;
-                                                            case PRODUCT_ENTERPRISE:
-                                                            case PRODUCT_ENTERPRISE_N: osName = "Windows 8.1 Entreprise Edition"; break;
-                                                            case PRODUCT_PROFESSIONAL:
-                                                            case PRODUCT_PROFESSIONAL_N: osName = "Windows 8.1 Professional Edition"; break;
-                                                            case PRODUCT_PROFESSIONAL_WMC: osName = "Windows 8.1 Professional with Media Center Edition"; break;
-                                                            default: osName = "Windows 8.1"; break;
-                                                        }
-                                                    } break;
+                                                        case PRODUCT_ULTIMATE: osName = "Windows 7 Ultimate Edition"; break;
+                                                        case PRODUCT_HOME_BASIC:
+                                                        case PRODUCT_HOME_BASIC_N: osName = "Windows 7 Home Basic Edition"; break;
+                                                        case PRODUCT_HOME_PREMIUM: osName = "Windows 7 Premium Edition"; break;
+                                                        case PRODUCT_ENTERPRISE: osName = "Windows 7 Enterprise Edition"; break;
+                                                        case PRODUCT_BUSINESS:
+                                                        case PRODUCT_BUSINESS_N: osName = "Windows 7 Professional Edition"; break;
+                                                        case PRODUCT_STARTER: osName = "Windows 7 Starter Edition"; break;
+                                                        default: osName = "Windows 7"; break;
+                                                    }
                                                 }
-                                        }
-                                        break;
+                                                break;
+                                            }
+                                        case 2: // Windows 8
+                                            {
+                                                uint edition = PRODUCT_UNDEFINED;
+                                                if (GetProductInfo(osVersionInfo.dwMajorVersion,
+                                                                    osVersionInfo.dwMinorVersion,
+                                                                    osVersionInfo.wServicePackMajor,
+                                                                    osVersionInfo.wServicePackMinor,
+                                                                    out edition))
+                                                {
+                                                    switch (edition)
+                                                    {
+                                                        case PRODUCT_CORE:
+                                                        case PRODUCT_CORE_COUNTRYSPECIFIC:
+                                                        case PRODUCT_CORE_N: osName = "Windows 8 Standard Edition"; break;
+                                                        case PRODUCT_ENTERPRISE:
+                                                        case PRODUCT_ENTERPRISE_N: osName = "Windows 8 Enterprise Edition"; break;
+                                                        case PRODUCT_PROFESSIONAL:
+                                                        case PRODUCT_PROFESSIONAL_N: osName = "Windows 8 Professional Edition"; break;
+                                                        case PRODUCT_PROFESSIONAL_WMC: osName = "Windows 8 Professional with Media Center Edition"; break;
+                                                        default: osName = "Windows 8"; break;
+                                                    }
+                                                }
+                                                break;
+                                            }
+                                        case 3: // Windows 8.1
+                                            {
+                                                uint edition = PRODUCT_UNDEFINED;
+                                                if (GetProductInfo(osVersionInfo.dwMajorVersion,
+                                                                    osVersionInfo.dwMinorVersion,
+                                                                    osVersionInfo.wServicePackMajor,
+                                                                    osVersionInfo.wServicePackMinor,
+                                                                    out edition))
+                                                {
+                                                    switch (edition)
+                                                    {
+                                                        case PRODUCT_CORE:
+                                                        case PRODUCT_CORE_COUNTRYSPECIFIC:
+                                                        case PRODUCT_CORE_N: osName = "Windows 8.1 Standard Edition"; break;
+                                                        case PRODUCT_ENTERPRISE:
+                                                        case PRODUCT_ENTERPRISE_N: osName = "Windows 8.1 Enterprise Edition"; break;
+                                                        case PRODUCT_PROFESSIONAL:
+                                                        case PRODUCT_PROFESSIONAL_N: osName = "Windows 8.1 Professional Edition"; break;
+                                                        case PRODUCT_PROFESSIONAL_WMC: osName = "Windows 8.1 Professional with Media Center Edition"; break;
+                                                        default: osName = "Windows 8.1"; break;
+                                                    }
+                                                }
+                                                break;
+                                            }
                                     }
-                            } break;
+                                    break;
+                                }
+                            case 10:
+                                {
+                                    switch (osInfo.Version.Minor)
+                                    {
+                                        case 0:
+                                            {
+                                                switch (osVersionInfo.wProductType)
+                                                {
+                                                    case 1: // X
+                                                        {
+                                                            uint edition = PRODUCT_UNDEFINED;
+                                                            if (GetProductInfo(osVersionInfo.dwMajorVersion,
+                                                                                osVersionInfo.dwMinorVersion,
+                                                                                osVersionInfo.wServicePackMajor,
+                                                                                osVersionInfo.wServicePackMinor,
+                                                                                out edition))
+                                                            {
+                                                                switch (edition)
+                                                                {
+                                                                    case PRODUCT_CORE:
+                                                                    case PRODUCT_CORE_COUNTRYSPECIFIC:
+                                                                    case PRODUCT_CORE_N: osName = "Windows 10 Home"; break;
+                                                                    case PRODUCT_ENTERPRISE:
+                                                                    case PRODUCT_ENTERPRISE_N: osName = "Windows 10 Enterprise"; break;
+                                                                    case PRODUCT_PROFESSIONAL:
+                                                                    case PRODUCT_PROFESSIONAL_N: osName = "Windows 10 Professional"; break;
+                                                                    case PRODUCT_EDUCATION:
+                                                                    case PRODUCT_EDUCATION_N: osName = "Windows 10 Education"; break;
+                                                                    case PRODUCT_MOBILE_CORE:
+                                                                    case PRODUCT_MOBILE_ENTERPRISE: osName = "Windows 10 Mobile"; break;
+                                                                    default: osName = "Windows 10"; break;
+                                                                }
+                                                            }
+                                                            break;
+                                                        }
+                                                }
+                                                break;
+                                            }
+                                    }
+                                }
+                                break;
                         }
-                }
+                    }
+                    break;
             }
-#if x64
+#if x64            
             osName += " x64";
 #endif
 #if x86

@@ -1,3 +1,4 @@
+2567 [Log]                  added Windows 10 support
 2566                        added ~300 additional languages to select based upon ISO 639-2. Feauture requests #551/#553
 2565 [XviD Encoder]         changed the default -kboost value to 10 (regression of 2547)
 2564 [HD Streams Extractor] improves handling of TrueHD streams including Atmos support. Patch by bowlingbeeg #69
