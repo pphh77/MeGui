@@ -841,6 +841,9 @@ namespace MeGUI
             int index = 1;
             foreach (IMuxing muxer in PackageSystem.MuxerProviders.Values)
             {
+                if (muxer.Shortcut == Shortcut.None)
+                    continue;
+
                 MenuItem newMenuItem = new MenuItem();
                 newMenuItem.Text = muxer.Name;
                 newMenuItem.Tag = muxer;
