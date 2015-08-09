@@ -71,8 +71,8 @@ namespace MeGUI.core.details.mux
                 input.Filename = value.path;
                 if (!string.IsNullOrEmpty(value.language))
                 {
-                    if (!String.IsNullOrEmpty(LanguageSelectionContainer.lookupISOCode(value.language)))
-                        subtitleLanguage.Text = LanguageSelectionContainer.lookupISOCode(value.language);
+                    if (!String.IsNullOrEmpty(LanguageSelectionContainer.LookupISOCode(value.language)))
+                        subtitleLanguage.Text = LanguageSelectionContainer.LookupISOCode(value.language);
                     else
                         subtitleLanguage.Text = value.language;
                 }
@@ -179,7 +179,7 @@ namespace MeGUI.core.details.mux
                 List<SubtitleInfo> subTracks;
                 idxReader.readFileProperties(input.Filename, out subTracks);
                 if (subTracks.Count > 0)
-                    SetLanguage(LanguageSelectionContainer.Short2FullLanguageName(subTracks[0].Name));
+                    SetLanguage(LanguageSelectionContainer.LookupISOCode(subTracks[0].Name));
             }
             raiseEvent();
         }

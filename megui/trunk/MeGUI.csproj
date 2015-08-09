@@ -673,7 +673,6 @@
       <DependentUpon>ExtraSizeTab.cs</DependentUpon>
     </Compile>
     <Compile Include="packages\tools\chaptercreator\BDInfoExtractor.cs" />
-    <Compile Include="packages\tools\chaptercreator\BDInfo\LanguageCodes.cs" />
     <Compile Include="packages\tools\chaptercreator\BDInfo\TSPlaylistFile.cs" />
     <Compile Include="packages\tools\chaptercreator\BDInfo\TSStream.cs" />
     <Compile Include="packages\tools\chaptercreator\BDInfo\TSStreamClip.cs" />

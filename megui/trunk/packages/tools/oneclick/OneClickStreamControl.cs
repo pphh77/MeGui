@@ -105,8 +105,8 @@ namespace MeGUI
                 input.SelectedItem = oItem;
                 if (!string.IsNullOrEmpty(value.Language))
                 {
-                    if (!String.IsNullOrEmpty(LanguageSelectionContainer.lookupISOCode(value.Language)))
-                        subtitleLanguage.Text = LanguageSelectionContainer.lookupISOCode(value.Language);
+                    if (!String.IsNullOrEmpty(LanguageSelectionContainer.LookupISOCode(value.Language)))
+                        subtitleLanguage.Text = LanguageSelectionContainer.LookupISOCode(value.Language);
                     else
                         subtitleLanguage.Text = value.Language;
                 }
@@ -319,7 +319,7 @@ namespace MeGUI
                 idxReader.readFileProperties(input.SelectedText, out subTracks);
                 if (subTracks.Count > 0)
                 {
-                    SetLanguage(LanguageSelectionContainer.Short2FullLanguageName(subTracks[0].Name));
+                    SetLanguage(LanguageSelectionContainer.LookupISOCode(subTracks[0].Name));
                     bFound = true;
                 }
             }

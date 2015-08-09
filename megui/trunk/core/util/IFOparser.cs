@@ -1,6 +1,6 @@
 ﻿// ****************************************************************************
 // 
-// Copyright (C) 2009-2012 Kurtnoise (kurtnoise@free.fr)
+// Copyright (C) 2009-2015 Kurtnoise (kurtnoise@free.fr)
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -187,7 +187,7 @@ namespace MeGUI.core.util
             byte[] buff = new byte[2];
             br.Read(buff, 0, 2);
             string ShortLangCode = String.Format("{0}{1}", (char)buff[0], (char)buff[1]);
-            string audioLang = LanguageSelectionContainer.Short2FullLanguageName(ShortLangCode);
+            string audioLang = LanguageSelectionContainer.LookupISOCode(ShortLangCode);
             fs.Close();
             return audioLang;
         }
@@ -234,7 +234,7 @@ namespace MeGUI.core.util
                     else
                     {
                         string ShortLangCode = String.Format("{0}{1}", (char)buff[0], (char)buff[1]);
-                        subdesc[i] = LanguageSelectionContainer.Short2FullLanguageName(ShortLangCode);
+                        subdesc[i] = LanguageSelectionContainer.LookupISOCode(ShortLangCode);
                     }
 
                     // Go to Code Extension

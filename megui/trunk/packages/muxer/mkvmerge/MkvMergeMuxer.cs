@@ -248,8 +248,8 @@ new JobProcessorFactory(new ProcessorFactory(init), "MkvMergeMuxer");
                                     sb.Append(" --language " + trackID + ":" + strLanguage.Value);
                                     break;
                                 }
-                                else if (((trackID == 0 && string.IsNullOrEmpty(stream.language)) || trackID > 0) 
-                                    && LanguageSelectionContainer.Short2FullLanguageName(strack.Name).ToLowerInvariant().Equals(strLanguage.Key.ToLowerInvariant()))
+                                else if (((trackID == 0 && string.IsNullOrEmpty(stream.language)) || trackID > 0)
+                                    && LanguageSelectionContainer.LookupISOCode(strack.Name).ToLowerInvariant().Equals(strLanguage.Key.ToLowerInvariant()))
                                 {
                                     sb.Append(" --language " + trackID + ":" + strLanguage.Value);
                                     break;

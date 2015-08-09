@@ -479,7 +479,7 @@ namespace MeGUI
                                 ati.AACFlag = 1;
                         }
                     }
-                    ati.Language = atrack.LanguageString;
+                    ati.Language = getLanguage(atrack.Language, atrack.LanguageString);
                     _AudioInfo.Tracks.Add(ati);
                 }
 
@@ -490,7 +490,7 @@ namespace MeGUI
                     int mmgTrackID = 0;
                     if (!Int32.TryParse(oTextTrack.StreamOrder, out mmgTrackID) && oTextTrack.StreamOrder.Contains("-"))
                         Int32.TryParse(oTextTrack.StreamOrder.Split('-')[1], out mmgTrackID);
-                    SubtitleTrackInfo oTrack = new SubtitleTrackInfo(mmgTrackID, oTextTrack.LanguageString, oTextTrack.Title);
+                    SubtitleTrackInfo oTrack = new SubtitleTrackInfo(mmgTrackID, getLanguage(oTextTrack.Language, oTextTrack.LanguageString), oTextTrack.Title);
                     oTrack.DefaultTrack = oTextTrack.DefaultString.ToLowerInvariant().Equals("yes");
                     oTrack.ForcedTrack = oTextTrack.ForcedString.ToLowerInvariant().Equals("yes");
                     oTrack.SourceFileName = file;
@@ -539,7 +539,7 @@ namespace MeGUI
                         int _mmgTrackID = 0;
                         Int32.TryParse(track.StreamOrder, out _mmgTrackID);
 
-                        VideoTrackInfo videoInfo = new VideoTrackInfo(_trackID, _mmgTrackID, track.LanguageString, track.Title, track.CodecString, track.Codec);
+                        VideoTrackInfo videoInfo = new VideoTrackInfo(_trackID, _mmgTrackID, getLanguage(track.Language, track.LanguageString), track.Title, track.CodecString, track.Codec);
                         videoInfo.ContainerType = _strContainer;
                         _VideoInfo.Track = videoInfo;
 
@@ -586,6 +586,26 @@ namespace MeGUI
                     oLog = MainForm.Instance.Log.Info("MediaInfo");
                 oLog.LogValue("MediaInfo - Unhandled Error", ex, ImageType.Error);
             }
+        }
+
+        private string getLanguage(string languageISO, string language)
+        {
+            string temp = string.Empty;
+            if (!String.IsNullOrEmpty(languageISO))
+            {
+                temp = LanguageSelectionContainer.LookupISOCode(languageISO);
+                if (!String.IsNullOrEmpty(temp))
+                    return temp;
+            }
+
+            if (language.Length != 3)
+                return language.Trim();
+
+            temp = LanguageSelectionContainer.LookupISOCode(language);
+            if (String.IsNullOrEmpty(temp))
+                return language.Trim();
+            else
+                return temp;
         }
 
         private void WriteSourceInformation(MediaInfo oInfo, String strFile, LogItem infoLog)
@@ -798,12 +818,13 @@ namespace MeGUI
                         if (oTrack.Type == eac3to.StreamType.Subtitle)
                         {
                             iTextEac3toCount++;
-                            string strLanguageEac3To = oTrack.Name.Trim().Replace("Undetermined", "");
-                            while (oInfo.Text.Count > iTextCount && !oInfo.Text[iTextCount].LanguageString.Trim().Equals(strLanguageEac3To))
+                            string strLanguageEac3To = oTrack.Language;
+                            string strLanguageMediaInfo = getLanguage(oInfo.Text[iTextCount].Language, oInfo.Text[iTextCount].LanguageString);
+                            while (oInfo.Text.Count > iTextCount && !strLanguageMediaInfo.Equals(strLanguageEac3To))
                             {
                                 // this workaround works only if there are additional tracks in MediaInfo which are not available in eac3to (already seen in the wild)
                                 // it works not when tracks are flipped (not noticed yet)
-                                infoLog.LogEvent("Language information does not match. MediaInfo subtitle track will be removed: " + oInfo.Text[iTextCount].LanguageString + " <--> " + oTrack.Name, ImageType.Information);
+                                infoLog.LogEvent("Language information does not match. MediaInfo subtitle track will be removed: " + strLanguageMediaInfo + " <--> " + oTrack.Language, ImageType.Information);
                                 oInfo.Text.RemoveRange(iTextCount, 1);
                             }
 
@@ -813,12 +834,13 @@ namespace MeGUI
                         else if (oTrack.Type == eac3to.StreamType.Audio)
                         {
                             iAudioEac3toCount++;
-                            string strLanguageEac3To = oTrack.Language.Split(',')[0].Trim().Replace("Undetermined", "");
-                            while (oInfo.Audio.Count > iAudioCount && !oInfo.Audio[iAudioCount].LanguageString.Trim().Equals(strLanguageEac3To))
+                            string strLanguageEac3To = oTrack.Language;
+                            string strLanguageMediaInfo = getLanguage(oInfo.Audio[iAudioCount].Language, oInfo.Audio[iAudioCount].LanguageString);
+                            while (oInfo.Audio.Count > iAudioCount && !strLanguageMediaInfo.Equals(strLanguageEac3To))
                             {
                                 // this workaround works only if there are additional tracks in MediaInfo which are not available in eac3to (already seen in the wild)
                                 // it works not when tracks are flipped (not noticed yet)
-                                infoLog.LogEvent("Language information does not match. MediaInfo audio track will be removed: " + oInfo.Audio[iAudioCount].LanguageString + " <--> " + oTrack.Language.Split(',')[0], ImageType.Information);
+                                infoLog.LogEvent("Language information does not match. MediaInfo audio track will be removed: " + strLanguageMediaInfo + " <--> " + oTrack.Language, ImageType.Information);
                                 oInfo.Audio.RemoveRange(iAudioCount, 1);
                             }
 
@@ -828,7 +850,7 @@ namespace MeGUI
                                 oInfo.Audio[iAudioCount++].StreamOrder = oTrack.Number.ToString();
                             }
                         }
-                        else if (oTrack.Type == eac3to.StreamType.Video && !bVideoFound && !oTrack.Name.Contains("(right eye)"))
+                        else if (oTrack.Type == eac3to.StreamType.Video && !bVideoFound && !oTrack.Description.Contains("(right eye)"))
                         {
                             oInfo.Video[0].ID = oTrack.Number.ToString();
                             bVideoFound = true;

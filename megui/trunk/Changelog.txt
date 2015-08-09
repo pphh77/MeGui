@@ -1,3 +1,4 @@
+2569                        improved internal language handling
 2568 [Muxer]                removed FFmpeg Muxer from the muxer menu (regression of 2546)
 2567 [Log]                  added Windows 10 support
 2566                        added ~300 additional languages to select based upon ISO 639-2. Feauture requests #551/#553

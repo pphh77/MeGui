@@ -89,6 +89,7 @@ namespace MeGUI
         {
             // http://www.loc.gov/standards/iso639-2/php/code_list.php
             // https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
+            // Attention: check all tools (eac3to, mkvmerge, mediainfo, ...)
 
             languagesBibliographic = new Dictionary<string, string>();
             languagesReverseBibliographic = new Dictionary<string, string>();
@@ -103,7 +104,7 @@ namespace MeGUI
             addLanguage("Achinese", "ace", "", "");
             addLanguage("Acoli", "ach", "", "");
             addLanguage("Adangme", "ada", "", "");
-            addLanguage("Adygei (Adyghe)", "ady", "", "");
+            addLanguage("Adyghe", "ady", "", "");
             addLanguage("Afar", "aar", "", "aa");
             addLanguage("Afrikaans", "afr", "", "af");
             addLanguage("Ainu", "ain", "", "");
@@ -154,6 +155,7 @@ namespace MeGUI
             addLanguage("Chechen", "che", "", "ce");
             addLanguage("Cherokee", "chr", "", "");
             addLanguage("Cheyenne", "chy", "", "");
+            addLanguage("Chichewa", "nya", "", "ny");
             addLanguage("Chinese", "chi", "zho", "zh");
             addLanguage("Chinook jargon", "chn", "", "");
             addLanguage("Chipewyan", "chp", "", "");
@@ -313,7 +315,7 @@ namespace MeGUI
             addLanguage("Marwari", "mwr", "", "");
             addLanguage("Masai", "mas", "", "");
             addLanguage("Mende", "men", "", "");
-            addLanguage("Micmac", "mic", "", "");
+            addLanguage("Mi'kmaq", "mic", "", "");
             addLanguage("Minangkabau", "min", "", "");
             addLanguage("Mirandese", "mwl", "", "");
             addLanguage("Mohawk", "moh", "", "");
@@ -328,20 +330,18 @@ namespace MeGUI
             addLanguage("Ndebele, South", "nbl", "", "nr");
             addLanguage("Ndonga", "ndo", "", "ng");
             addLanguage("Neapolitan", "nap", "", "");
+            addLanguage("Nepal Bhasa", "new", "", "");
             addLanguage("Nepali", "nep", "", "ne");
-            addLanguage("Newari", "new", "", "");
             addLanguage("Nias", "nia", "", "");
             addLanguage("Niuean", "niu", "", "");
             addLanguage("N'Ko", "nqo", "", "");
             addLanguage("Nogai", "nog", "", "");
             addLanguage("Northern Frisian", "frr", "", "");
             addLanguage("Northern Sami", "sme", "", "se");
-            addLanguage("Northern Sotho", "nso", "", "");
             addLanguage("Norwegian", "nor", "", "no");
             addLanguage("Norwegian Bokmål", "nob", "", "nb");
             addLanguage("Norwegian Nynorsk", "nno", "", "nn");
             addLanguage("Nyamwezi", "nym", "", "");
-            addLanguage("Nyanja", "nya", "", "ny");
             addLanguage("Nyankole", "nyn", "", "");
             addLanguage("Nyoro", "nyo", "", "");
             addLanguage("Nzima", "nzi", "", "");
@@ -354,12 +354,13 @@ namespace MeGUI
             addLanguage("Palauan", "pau", "", "");
             addLanguage("Pampanga", "pam", "", "");
             addLanguage("Pangasinan", "pag", "", "");
+            addLanguage("Panjabi", "pan", "", "pa");
             addLanguage("Papiamento", "pap", "", "");
+            addLanguage("Pedi", "nso", "", "");
             addLanguage("Persian", "per", "fas", "fa");
             addLanguage("Pohnpeian", "pon", "", "");
             addLanguage("Polish", "pol", "", "pl");
             addLanguage("Portuguese", "por", "", "pt");
-            addLanguage("Punjabi", "pan", "", "pa");
             addLanguage("Pushto", "pus", "", "ps");
             addLanguage("Quechua", "que", "", "qu");
             addLanguage("Rajasthani", "raj", "", "");
@@ -475,26 +476,25 @@ namespace MeGUI
 		{
 		}
 
-        public static string lookupISOCode(string code)
-		{
-            if (languagesReverseBibliographic.ContainsKey(code))
-                return languagesReverseBibliographic[code];
-            else if (languagesReverseTerminology.ContainsKey(code))
-                return languagesReverseTerminology[code];
-            else
-                return "";
-		}
-
         ///<summary>
-        ///Convert the 2 char strings to the full language name
+        ///Convert the 2 or 3 char string to the full language name
         ///</summary>
         ///
-        public static string Short2FullLanguageName(string LngCode)
-        {
-            if (languagesReverseISO2.ContainsKey(LngCode))
-                return languagesReverseISO2[LngCode];
-            else
-                return "";
-        }
+        public static string LookupISOCode(string code)
+		{
+            if (code.Length == 2)
+            {
+                if (languagesReverseISO2.ContainsKey(code))
+                    return languagesReverseISO2[code];    
+            }
+            else if (code.Length == 3)
+            {
+                if (languagesReverseBibliographic.ContainsKey(code))
+                    return languagesReverseBibliographic[code];
+                else if (languagesReverseTerminology.ContainsKey(code))
+                    return languagesReverseTerminology[code];
+            }
+            return "";
+		}
 	}
 }

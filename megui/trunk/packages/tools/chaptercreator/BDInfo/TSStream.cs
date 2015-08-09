@@ -161,7 +161,7 @@ namespace BDInfo
             set
             {
                 _LanguageCode = value;
-                LanguageName = LanguageCodes.GetName(value);
+                LanguageName = MeGUI.LanguageSelectionContainer.LookupISOCode(value);
             }
         }
 
