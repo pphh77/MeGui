@@ -44,7 +44,7 @@ namespace eac3to
                         return new object[] { "DTS", "DTSHD", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
                     case AudioStreamType.TrueHD:
                         return new object[] { "THD", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
-                    case (AudioStreamType.TrueHD | AudioStreamType.AC3):
+                    case AudioStreamType.TrueHD_AC3:
                         return new object[] { "THD+AC3", "THD", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
                     case AudioStreamType.MP2:
                         return new object[] { "MP2", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
@@ -107,7 +107,7 @@ namespace eac3to
                     break;
                 case "TRUEHD/AC3":
                 case "TRUEHD/AC3 (ATMOS)":
-                    audioStream.AudioType = AudioStreamType.TrueHD | AudioStreamType.AC3;
+                    audioStream.AudioType = AudioStreamType.TrueHD_AC3;
                     break;
                 case "PCM":
                     audioStream.AudioType = AudioStreamType.PCM;
@@ -139,6 +139,7 @@ namespace eac3to
                 case "VORBIS":
                     audioStream.AudioType = AudioStreamType.VORBIS;
                     break;
+                case "RAW/PCM":
                 case "RAW":
                 default:
                     audioStream.AudioType = AudioStreamType.RAW;

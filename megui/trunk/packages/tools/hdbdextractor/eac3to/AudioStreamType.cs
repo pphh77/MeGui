@@ -38,6 +38,8 @@ namespace eac3to
         DTS,
         [StringValue("TrueHD")]
         TrueHD,
+        [StringValue("TrueHD/AC3")]
+        TrueHD_AC3,
         [StringValue("RAW")]
         RAW,
         [StringValue("PCM")]
