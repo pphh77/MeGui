@@ -45,12 +45,45 @@ namespace eac3to
                 Name = "Joined EVO";
             else if (s.Contains("Joined VOB"))
                 Name = "Joined VOB";
-            else if (s.Contains("Subtitle"))
-                Name = s.Substring(s.LastIndexOf(",") + 1);
             else
-                Name = s.Substring(s.IndexOf(":") + 1, s.IndexOf(',') - s.IndexOf(":") - 1).Trim();
+                Name = "";
 
             Description = s.Substring(s.IndexOf(":") + 1);
+        }
+
+        protected void setLanguage(string s)
+        {
+            char[] separator = { ',' };
+            string[] split = s.Split(separator);
+            string language = split[1].Substring(1, split[1].Length - 1).Trim();
+            switch (language)
+            {
+                case "Modern Greek":    language = "Greek"; break;
+                case "LowGerman":       language = "Low German"; break;
+                case "North Ndebele":   language = "Ndebele, North"; break;
+                case "South Ndebele":   language = "Ndebele, South"; break;
+                case "Bokmål":          language = "Norwegian Bokmål"; break;
+                case "Walamo":          language = "Wolaitta"; break;
+            }
+
+            bool bFound = false;
+            foreach (System.Collections.Generic.KeyValuePair<string, string> strLanguage in MeGUI.LanguageSelectionContainer.Languages)
+            {
+                if (language.ToLowerInvariant().Equals(strLanguage.Key.ToLowerInvariant()))
+                {
+                    bFound = true;
+                    break;
+                }
+            }
+            if (!bFound)
+            {
+                if (this.Type == StreamType.Video)
+                    this.Language = "";
+                else
+                    this.Language = "English";
+            }
+            else
+                this.Language = language; 
         }
 
         public static Stream Parse(string s)

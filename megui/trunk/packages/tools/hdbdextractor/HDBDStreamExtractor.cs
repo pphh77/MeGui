@@ -238,7 +238,8 @@ namespace MeGUI.packages.tools.hdbdextractor
                     case eac3to.StreamType.Join:
                         if (s.Name == "Joined EVO")
                             comboBox.Value = "EVO";
-                        else comboBox.Value = "VOB";
+                        else 
+                            comboBox.Value = "VOB";
                         break;
                     case eac3to.StreamType.Subtitle:
                         switch (s.Description.Substring(11, 3))
@@ -257,37 +258,6 @@ namespace MeGUI.packages.tools.hdbdextractor
                         comboBox.Value = comboBox.Items[0];
                         break;
                 }
-
-                if ((s.Type == eac3to.StreamType.Audio) || (s.Type == eac3to.StreamType.Subtitle))
-                {
-                    char[] separator = { ',' };
-                    string[] split = s.Description.Split(separator, 100);
-
-                    if (s.Name.Contains("Subtitle"))
-                        s.Language = s.Name;
-                    else
-                        s.Language = split[1].Substring(1, split[1].Length - 1);
-
-                    bool bFound = false;
-                    foreach (KeyValuePair<string, string> strLanguage in LanguageSelectionContainer.Languages)
-                    {
-                        if (s.Language.ToLowerInvariant().Contains(strLanguage.Key.ToLowerInvariant()))
-                        {
-                            s.Language = strLanguage.Key;
-                            bFound = true;
-                            break;
-                        }
-                    }
-                    if (!bFound)
-                    {
-                        if (!FolderSelection.Checked && System.IO.Path.GetExtension(FolderInputTextBox.Text).ToLowerInvariant().Equals(".mkv"))
-                            s.Language = "English";
-                        else
-                            s.Language = "";
-                    }
-                }
-                else
-                    s.Language = "";
             }
         }
 
@@ -362,7 +332,7 @@ namespace MeGUI.packages.tools.hdbdextractor
                 if (extractStream.Value != null && int.Parse(extractStream.Value.ToString()) == 1)
                 {
                     if (row.Cells["StreamExtractAsComboBox"].Value == null)
-                        throw new ApplicationException(string.Format("Specify an extraction type for stream:\r\n\n\t{0}: {1}", stream.Number, stream.Name));
+                        throw new ApplicationException(string.Format("Specify an extraction type for stream:\r\n\n\t{0}: {1}", stream.Number, stream.Description));
 
                     if (FolderSelection.Checked)
                         sb.Append(string.Format("{0}:\"{1}\" {2} ", stream.Number,

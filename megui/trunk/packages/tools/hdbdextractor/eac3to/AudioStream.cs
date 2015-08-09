@@ -72,6 +72,7 @@ namespace eac3to
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
 
             base.Type = StreamType.Audio;
+            base.setLanguage(s);
         }
 
         new public static Stream Parse(string s)
@@ -82,9 +83,9 @@ namespace eac3to
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
 
+            string type = s.Substring(s.IndexOf(":") + 1, s.IndexOf(',') - s.IndexOf(":") - 1).Trim();
             AudioStream audioStream = new AudioStream(s);
-
-            switch (audioStream.Name.ToUpperInvariant())
+            switch (type.ToUpperInvariant())
             {
                 case "AC3":
                 case "AC3 EX":
@@ -143,8 +144,6 @@ namespace eac3to
                     audioStream.AudioType = AudioStreamType.RAW;
                     break;
             }
-            audioStream.Language = (s.IndexOf(',') == s.LastIndexOf(',')) ? s.Substring(s.IndexOf(',') + 1).Trim() : s.Substring(s.IndexOf(',') + 1, s.LastIndexOf(',') - s.IndexOf(',') - 1).Trim();
-
             return audioStream;
         }
 

@@ -63,7 +63,7 @@ namespace MeGUI.packages.tools.hdbdextractor
         private MediaInfoFile iFile;
         private bool bFetchAll;
         private int iFeatureToFetch;
-
+        
         private enum OperatingMode
         {
             FileBased,

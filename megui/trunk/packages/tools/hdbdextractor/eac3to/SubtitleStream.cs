@@ -53,8 +53,9 @@ namespace eac3to
         {
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
-
+            
             base.Type = StreamType.Subtitle;
+            base.setLanguage(s);
         }
 
         new public static Stream Parse(string s)
@@ -67,11 +68,8 @@ namespace eac3to
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
 
             SubtitleStream subtitleStream = new SubtitleStream(s);
-
-            subtitleStream.Language = (s.IndexOf(',') == s.LastIndexOf(',')) ? s.Substring(s.IndexOf(',') + 1).Trim() : s.Substring(s.IndexOf(',') + 1, s.LastIndexOf(',') - s.IndexOf(',') - 1).Trim();
             subtitleStream.IsSDH = s.Contains("\"SDH\"") ? true : false;
-
-            return new SubtitleStream(s);
+            return subtitleStream;
         }
 
         public override string ToString()

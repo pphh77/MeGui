@@ -26,6 +26,7 @@ namespace eac3to
     public class VideoStream : Stream
     {
         public VStreamType VType { get; set; }
+        public override string Language { get; set; }
         public string Resolution { get; set; }
         public bool IsProgerssive { get; set; }
         public double Framerate { get; set; }
@@ -59,6 +60,7 @@ namespace eac3to
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
 
             base.Type = StreamType.Video;
+            base.setLanguage(s);
         }
 
         new public static Stream Parse(string s)
@@ -67,12 +69,12 @@ namespace eac3to
 
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
-
+ 
+            string type = s.Substring(s.IndexOf(":") + 1, s.IndexOf(',') - s.IndexOf(":") - 1).Trim();
             VideoStream videoStream = new VideoStream(s);
-
-            switch (videoStream.Name.ToUpper(System.Globalization.CultureInfo.InvariantCulture))
+            switch (type.ToUpperInvariant())
             {
-                case "AVC":
+                case "H264/AVC":
                     videoStream.VType = VStreamType.AVC;
                     break;
                 case "VC-1":
@@ -88,8 +90,10 @@ namespace eac3to
                 case "DIRAC":
                     videoStream.VType = VStreamType.DIRAC;
                     break;
+                default:
+                    videoStream.VType = VStreamType.AVC;
+                    break;
             }
-
             return videoStream;
         }
 
