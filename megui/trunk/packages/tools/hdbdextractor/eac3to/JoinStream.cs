@@ -19,6 +19,7 @@
 // ****************************************************************************
 
 using System;
+using MeGUI.core.util;
 
 namespace eac3to
 {
@@ -41,22 +42,20 @@ namespace eac3to
             }
         }
 
-        public JoinStream(string s) : base(s)
+        public JoinStream(string s, LogItem _log) : base(StreamType.Join, s, _log)
         {
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
-
-            base.Type = StreamType.Join;
         }
 
-        new public static Stream Parse(string s)
+        new public static Stream Parse(string s, LogItem _log)
         {
             //1: Joined EVO file
 
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
 
-            return new JoinStream(s);
+            return new JoinStream(s, _log);
         }
 
         public override string ToString()

@@ -1,3 +1,4 @@
+2572 [HD Streams Extractor] + [MediaInfo] if the language cannot be detected/matched the default MeGUI language will be used
 2571 [HD Streams Extractor] fixed some extract options (regression of 2564)
 2570 [HD Streams Extractor] improved language & name detection
 2569                        improved internal language handling

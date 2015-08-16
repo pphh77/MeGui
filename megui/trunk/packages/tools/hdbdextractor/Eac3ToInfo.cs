@@ -320,7 +320,6 @@ namespace MeGUI.packages.tools.hdbdextractor
                     // "Feature Name"
                     else if (Regex.IsMatch(data, "^\".+\"$", RegexOptions.Compiled))
                     {
-                        // streams[streams.Count - 1].Name = Extensions.CapitalizeAll(data.Trim("\" .".ToCharArray())); //original
                         if (oMode == OperatingMode.FileBased)
                             features[0].Streams[features[0].Streams.Count - 1].Name = Extensions.CapitalizeAll(data.Trim("\" .".ToCharArray()));
                         else
@@ -362,6 +361,8 @@ namespace MeGUI.packages.tools.hdbdextractor
                     // 8: AC3, English, 2.0 channels, 192kbps, 48khz, dialnorm: -27dB
                     else if (Regex.IsMatch(data, "^[0-99]+:.+$", RegexOptions.Compiled))
                     {
+                        if (_log != null)
+                            _log.LogEvent(data);
                         if (oMode == OperatingMode.FileBased)
                         {
                             try
@@ -372,7 +373,7 @@ namespace MeGUI.packages.tools.hdbdextractor
                                     for (int i = 0; i < input.Count; i++)
                                     {
                                         if (System.IO.File.Exists(input[i]) && iFile == null)
-                                            iFile = new MediaInfoFile(input[i]);
+                                            iFile = new MediaInfoFile(input[i], ref _log);
                                         if (iFile != null)
                                         {
                                             dummyFeature.Duration += TimeSpan.FromSeconds(Math.Ceiling(iFile.VideoInfo.FrameCount / iFile.VideoInfo.FPS));
@@ -384,7 +385,7 @@ namespace MeGUI.packages.tools.hdbdextractor
                                     dummyFeature.Description = dummyFeature.Name + ", " + dummyFeature.Duration.ToString();
                                     features.Add(dummyFeature);
                                 }
-                                features[0].Streams.Add(eac3to.Stream.Parse(data));
+                                features[0].Streams.Add(eac3to.Stream.Parse(data, _log));
                             }
                             catch (Exception ex)
                             {
@@ -396,7 +397,7 @@ namespace MeGUI.packages.tools.hdbdextractor
                         {
                             try
                             {
-                                features[Int32.Parse(args.featureNumber) - 1].Streams.Add(Stream.Parse(data));
+                                features[Int32.Parse(args.featureNumber) - 1].Streams.Add(Stream.Parse(data, _log));
                             }
                             catch (Exception ex)
                             {
@@ -404,8 +405,6 @@ namespace MeGUI.packages.tools.hdbdextractor
                                     _log.LogValue("Error receiving output data", ex);
                             }
                         }
-                        if (_log != null)
-                            _log.LogEvent(data);
                         return;
                     }
 

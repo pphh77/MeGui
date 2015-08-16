@@ -19,6 +19,7 @@
 // ****************************************************************************
 
 using System;
+using MeGUI.core.util;
 
 namespace eac3to
 {
@@ -54,16 +55,13 @@ namespace eac3to
             }
         }
 
-        public VideoStream(string s) : base(s)
+        public VideoStream(string s, LogItem _log) : base(StreamType.Video, s, _log)
         {
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
-
-            base.Type = StreamType.Video;
-            base.setLanguage(s);
         }
 
-        new public static Stream Parse(string s)
+        new public static Stream Parse(string s, LogItem _log)
         {
             //3: VC-1, 1080p24 /1.001 (16:9) with pulldown flags
 
@@ -71,7 +69,7 @@ namespace eac3to
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
  
             string type = s.Substring(s.IndexOf(":") + 1, s.IndexOf(',') - s.IndexOf(":") - 1).Trim();
-            VideoStream videoStream = new VideoStream(s);
+            VideoStream videoStream = new VideoStream(s, _log);
             switch (type.ToUpperInvariant())
             {
                 case "H264/AVC":

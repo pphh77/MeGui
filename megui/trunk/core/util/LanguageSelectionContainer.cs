@@ -496,5 +496,12 @@ namespace MeGUI
             }
             return "";
 		}
+
+        public static bool IsLanguageAvailable(string language)
+        {
+            if (languagesBibliographic.ContainsKey(language))
+                return true;
+            return false;
+        }
 	}
 }

@@ -479,7 +479,7 @@ namespace MeGUI
                                 ati.AACFlag = 1;
                         }
                     }
-                    ati.Language = getLanguage(atrack.Language, atrack.LanguageString);
+                    ati.Language = getLanguage(atrack.Language, atrack.LanguageString, ref infoLog, infoLog == null);
                     _AudioInfo.Tracks.Add(ati);
                 }
 
@@ -490,7 +490,7 @@ namespace MeGUI
                     int mmgTrackID = 0;
                     if (!Int32.TryParse(oTextTrack.StreamOrder, out mmgTrackID) && oTextTrack.StreamOrder.Contains("-"))
                         Int32.TryParse(oTextTrack.StreamOrder.Split('-')[1], out mmgTrackID);
-                    SubtitleTrackInfo oTrack = new SubtitleTrackInfo(mmgTrackID, getLanguage(oTextTrack.Language, oTextTrack.LanguageString), oTextTrack.Title);
+                    SubtitleTrackInfo oTrack = new SubtitleTrackInfo(mmgTrackID, getLanguage(oTextTrack.Language, oTextTrack.LanguageString, ref infoLog, infoLog == null), oTextTrack.Title);
                     oTrack.DefaultTrack = oTextTrack.DefaultString.ToLowerInvariant().Equals("yes");
                     oTrack.ForcedTrack = oTextTrack.ForcedString.ToLowerInvariant().Equals("yes");
                     oTrack.SourceFileName = file;
@@ -539,7 +539,7 @@ namespace MeGUI
                         int _mmgTrackID = 0;
                         Int32.TryParse(track.StreamOrder, out _mmgTrackID);
 
-                        VideoTrackInfo videoInfo = new VideoTrackInfo(_trackID, _mmgTrackID, getLanguage(track.Language, track.LanguageString), track.Title, track.CodecString, track.Codec);
+                        VideoTrackInfo videoInfo = new VideoTrackInfo(_trackID, _mmgTrackID, getLanguage(track.Language, track.LanguageString, ref infoLog, infoLog == null), track.Title, track.CodecString, track.Codec);
                         videoInfo.ContainerType = _strContainer;
                         _VideoInfo.Track = videoInfo;
 
@@ -588,8 +588,11 @@ namespace MeGUI
             }
         }
 
-        private string getLanguage(string languageISO, string language)
+        private string getLanguage(string languageISO, string language, ref LogItem oLog, bool bFullProcess)
         {
+            if (!bFullProcess)
+                return language;
+
             string temp = string.Empty;
             if (!String.IsNullOrEmpty(languageISO))
             {
@@ -598,17 +601,23 @@ namespace MeGUI
                     return temp;
             }
 
-            if (language.Length != 3)
-                return language.Trim();
+            if (!String.IsNullOrEmpty(language) && language.Length == 3)
+            {
+                temp = LanguageSelectionContainer.LookupISOCode(language);
+                if (!String.IsNullOrEmpty(temp))
+                    return temp;
+            }
 
-            temp = LanguageSelectionContainer.LookupISOCode(language);
-            if (String.IsNullOrEmpty(temp))
-                return language.Trim();
+            if (oLog == null)
+                oLog = MainForm.Instance.Log.Info("MediaInfo");
+            if (String.IsNullOrEmpty(language) && String.IsNullOrEmpty(languageISO))
+                oLog.LogEvent("The language information is not available for this track. The default MeGUI language has been selected.", ImageType.Information);
             else
-                return temp;
+                oLog.LogEvent("The language information \"" + languageISO + "/" + language + "\" is unknown. The default MeGUI language has been selected instead.", ImageType.Warning);
+           return MeGUI.MainForm.Instance.Settings.DefaultLanguage1;
         }
 
-        private void WriteSourceInformation(MediaInfo oInfo, String strFile, LogItem infoLog)
+        private void WriteSourceInformation(MediaInfo oInfo, string strFile, LogItem infoLog)
         {
             try
             {
@@ -658,6 +667,7 @@ namespace MeGUI
                     oTrack.Info("DefaultString: " + t.DefaultString);
                     oTrack.Info("Forced: " + t.Forced);
                     oTrack.Info("ForcedString: " + t.ForcedString);
+                    t.LanguageString = getLanguage(t.Language, t.LanguageString, ref oTrack, true);
 
                     infoLog.Add(oTrack);
                 }
@@ -687,6 +697,7 @@ namespace MeGUI
                     oTrack.Info("DefaultString: " + t.DefaultString);
                     oTrack.Info("Forced: " + t.Forced);
                     oTrack.Info("ForcedString: " + t.ForcedString);
+                    t.LanguageString = getLanguage(t.Language, t.LanguageString, ref oTrack, true);
 
                     infoLog.Add(oTrack);
                 }
@@ -708,6 +719,7 @@ namespace MeGUI
                     oTrack.Info("DefaultString: " + t.DefaultString);
                     oTrack.Info("Forced: " + t.Forced);
                     oTrack.Info("ForcedString: " + t.ForcedString);
+                    t.LanguageString = getLanguage(t.Language, t.LanguageString, ref oTrack, true);
 
                     infoLog.Add(oTrack);
                 }
@@ -819,7 +831,7 @@ namespace MeGUI
                         {
                             iTextEac3toCount++;
                             string strLanguageEac3To = oTrack.Language;
-                            string strLanguageMediaInfo = getLanguage(oInfo.Text[iTextCount].Language, oInfo.Text[iTextCount].LanguageString);
+                            string strLanguageMediaInfo = getLanguage(oInfo.Text[iTextCount].Language, oInfo.Text[iTextCount].LanguageString, ref infoLog, infoLog == null);
                             while (oInfo.Text.Count > iTextCount && !strLanguageMediaInfo.Equals(strLanguageEac3To))
                             {
                                 // this workaround works only if there are additional tracks in MediaInfo which are not available in eac3to (already seen in the wild)
@@ -835,7 +847,7 @@ namespace MeGUI
                         {
                             iAudioEac3toCount++;
                             string strLanguageEac3To = oTrack.Language;
-                            string strLanguageMediaInfo = getLanguage(oInfo.Audio[iAudioCount].Language, oInfo.Audio[iAudioCount].LanguageString);
+                            string strLanguageMediaInfo = getLanguage(oInfo.Audio[iAudioCount].Language, oInfo.Audio[iAudioCount].LanguageString, ref infoLog, infoLog == null);
                             while (oInfo.Audio.Count > iAudioCount && !strLanguageMediaInfo.Equals(strLanguageEac3To))
                             {
                                 // this workaround works only if there are additional tracks in MediaInfo which are not available in eac3to (already seen in the wild)

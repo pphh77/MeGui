@@ -19,6 +19,7 @@
 // ****************************************************************************
 
 using System;
+using MeGUI.core.util;
 
 namespace eac3to
 {
@@ -49,16 +50,13 @@ namespace eac3to
             }
         }
 
-        public SubtitleStream(string s) : base(s)
+        public SubtitleStream(string s, LogItem _log) : base(StreamType.Subtitle, s, _log)
         {
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
-            
-            base.Type = StreamType.Subtitle;
-            base.setLanguage(s);
         }
 
-        new public static Stream Parse(string s)
+        new public static Stream Parse(string s, LogItem _log)
         {
             //5: Subtitle, English, "SDH"
             //6: Subtitle, French
@@ -67,7 +65,7 @@ namespace eac3to
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
 
-            SubtitleStream subtitleStream = new SubtitleStream(s);
+            SubtitleStream subtitleStream = new SubtitleStream(s, _log);
             subtitleStream.IsSDH = s.Contains("\"SDH\"") ? true : false;
             return subtitleStream;
         }

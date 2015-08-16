@@ -20,6 +20,7 @@
 
 using System;
 using System.Collections.Generic;
+using MeGUI.core.util;
 
 namespace eac3to
 {
@@ -37,22 +38,20 @@ namespace eac3to
             }
         }
 
-        public ChapterStream(string s) : base(s)
+        public ChapterStream(string s, LogItem _log) : base(StreamType.Chapter, s, _log)
         {
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
-
-            base.Type = StreamType.Chapter;
         }
 
-        new public static Stream Parse(string s)
+        new public static Stream Parse(string s, LogItem _log)
         {
             //2: Chapters, 27 chapters without names
 
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
 
-            return new ChapterStream(s);
+            return new ChapterStream(s, _log);
         }
 
         public override string ToString()

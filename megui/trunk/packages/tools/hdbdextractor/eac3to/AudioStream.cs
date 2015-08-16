@@ -19,6 +19,7 @@
 // ****************************************************************************
 
 using System;
+using MeGUI.core.util;
 
 namespace eac3to
 {
@@ -66,16 +67,13 @@ namespace eac3to
             }
         }
 
-        public AudioStream(string s) : base(s)
+        public AudioStream(string s, LogItem _log) : base(StreamType.Audio, s, _log)
         {
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
-
-            base.Type = StreamType.Audio;
-            base.setLanguage(s);
         }
 
-        new public static Stream Parse(string s)
+        new public static Stream Parse(string s, LogItem _log)
         {
             //2: AC3, English, 2.0 channels, 192kbps, 48khz, dialnorm: -27dB, -8ms
             //4: TrueHD, English, 5.1 channels, 48khz, dialnorm: -27dB
@@ -84,7 +82,7 @@ namespace eac3to
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
 
             string type = s.Substring(s.IndexOf(":") + 1, s.IndexOf(',') - s.IndexOf(":") - 1).Trim();
-            AudioStream audioStream = new AudioStream(s);
+            AudioStream audioStream = new AudioStream(s, _log);
             switch (type.ToUpperInvariant())
             {
                 case "AC3":
