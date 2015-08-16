@@ -1190,13 +1190,18 @@ namespace MeGUI
         {
             int compareResult;
             ListViewItem listviewX, listviewY;
+            DateTime dateX, dateY;
 
             // Cast the objects to be compared to ListViewItem objects
             listviewX = (ListViewItem)x;
             listviewY = (ListViewItem)y;
 
             // Compare the two items
-            compareResult = ObjectCompare.Compare(listviewX.SubItems[ColumnToSort].Text, listviewY.SubItems[ColumnToSort].Text);
+            if (DateTime.TryParse(listviewX.SubItems[ColumnToSort].Text, out dateX) &&
+                DateTime.TryParse(listviewY.SubItems[ColumnToSort].Text, out dateY))
+                compareResult = ObjectCompare.Compare(dateX, dateY);
+            else
+                compareResult = ObjectCompare.Compare(listviewX.SubItems[ColumnToSort].Text, listviewY.SubItems[ColumnToSort].Text);
 
             // Calculate correct return value based on object comparison
             if (OrderOfSort == SortOrder.Ascending)
