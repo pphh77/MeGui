@@ -1,5 +1,6 @@
+2574 [Log]                  added .NET 4.6 detection support
 2573 [Update]               sort date columns by date instead of string. Bug #810
-2572 [HD Streams Extractor] + [MediaInfo] if the language cannot be detected/matched the default MeGUI language will be used
+2572 [HD Streams Extractor] + [MediaInfo] if a language cannot be detected/matched the default MeGUI language will be used
 2571 [HD Streams Extractor] fixed some extract options (regression of 2564)
 2570 [HD Streams Extractor] improved language & name detection
 2569                        improved internal language handling

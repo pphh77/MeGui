@@ -615,7 +615,16 @@ namespace MeGUI
                                             }
                                         }
                                         break;
-                                    default: dnvf = "4.x"; break;
+                                    case "6":
+                                        {
+                                            switch (build)
+                                            {
+                                                case "00079": dnvf = "4.6"; break;
+                                                default: dnvf = "4.6.x"; break;
+                                            }
+                                        }
+                                        break;
+                                    default: dnvf = "4." + minor; break;
                                 }
                             }
                             break;
