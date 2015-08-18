@@ -80,21 +80,26 @@ namespace eac3to
                     language = string.Empty;
             }
 
-            if (!MeGUI.LanguageSelectionContainer.IsLanguageAvailable(language))
+            if (MeGUI.LanguageSelectionContainer.IsLanguageAvailable(language))
             {
-                if (this.Type != StreamType.Video)
-                {
-                    if (string.IsNullOrEmpty(language))
-                        _log.LogEvent("The language information is not available for this track. The default MeGUI language has been selected.", ImageType.Information);
-                    else
-                        _log.LogEvent("The language information \"" + language + "\" is unknown. The default MeGUI language has been selected instead.", ImageType.Warning);
-                    this.Language = MeGUI.MainForm.Instance.Settings.DefaultLanguage1;
-                }
-                else
-                    this.Language = "";
+                this.Language = language;
+                return;
+            }
+
+            if (this.Type == StreamType.Video)
+            {
+                if (!string.IsNullOrEmpty(language))
+                    _log.LogEvent("The language information \"" + language + "\" is unknown and has been skipped.", ImageType.Warning);
+                this.Language = "";
             }
             else
-                this.Language = language; 
+            {
+                if (string.IsNullOrEmpty(language))
+                    _log.LogEvent("The language information is not available for this track. The default MeGUI language has been selected.", ImageType.Information);
+                else
+                    _log.LogEvent("The language information \"" + language + "\" is unknown. The default MeGUI language has been selected instead.", ImageType.Warning);
+                this.Language = MeGUI.MainForm.Instance.Settings.DefaultLanguage1;
+            }
         }
 
         public static Stream Parse(string s, LogItem _log)

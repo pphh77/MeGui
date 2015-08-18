@@ -1,3 +1,4 @@
+2575 [HD Streams Extractor] + [MediaInfo] missing language information in a video track will be ignored
 2574 [Log]                  added .NET 4.6 detection support
 2573 [Update]               sort date columns by date instead of string. Bug #810
 2572 [HD Streams Extractor] + [MediaInfo] if a language cannot be detected/matched the default MeGUI language will be used

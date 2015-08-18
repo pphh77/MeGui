@@ -479,7 +479,6 @@ namespace MeGUI
         ///<summary>
         ///Convert the 2 or 3 char string to the full language name
         ///</summary>
-        ///
         public static string LookupISOCode(string code)
 		{
             if (code.Length == 2)
