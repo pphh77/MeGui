@@ -1,3 +1,5 @@
+2578 [Main]                 a second instance of the same executable is blocked
+                            if file permissions are not available MeGUI will not start
 2577 [Update]               improved handling of 7z archives which include files which need a restart
 2576 [Update]               switched the updater to .NET 4.0
 2575 [HD Streams Extractor] + [MediaInfo] missing language information in a video track will be ignored

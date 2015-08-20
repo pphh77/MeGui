@@ -1003,55 +1003,65 @@ namespace MeGUI
             PackageSystem.JobConfigurers.Register(AudioEncodingWindow.Configurer);
         }
 
-        private static Mutex mySingleInstanceMutex = new Mutex(true, "MeGUI_mutex");
-
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
         static void Main(string[] args)
         {
-            // Parse for the need to run the program elevated
-            Boolean bRunElevated = false, bForceAdmin = false;
-            foreach (string strParam in args)
+            // prevent another instance of MeGUI from the same location
+            int iCount = 0;
+            foreach (Process oProc in Process.GetProcessesByName(Application.ProductName))
             {
-                if (strParam.Equals("-elevate"))
-                    bRunElevated = true;
-                else if (strParam.Equals("-forceadmin"))
-                    bForceAdmin = true;
+                if (Application.ExecutablePath.Equals(oProc.MainModule.FileName))
+                    iCount++;
+            }
+            if (iCount > 1)
+            {
+                MessageBox.Show("There is already another instance of the application running.", "MeGUI Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
 
-            // Check if the program can write to the program dir
+            // check if the program can write to the program dir
             if (!FileUtil.IsDirWriteable(Path.GetDirectoryName(Application.ExecutablePath)))
-                bForceAdmin = true;
-
-            // If needed run as elevated process
-            if (bForceAdmin && !bRunElevated)
             {
-                try
+                // parse if the program has already been started elevated
+                Boolean bRunElevated = false;
+                foreach (string strParam in args)
                 {
-                    Process p = new Process();
-                    p.StartInfo.FileName = Application.ExecutablePath;
-                    p.StartInfo.Arguments = "-elevate";
-                    p.StartInfo.Verb = "runas";
-                    p.Start();
-                    return;
+                    if (strParam.Equals("-elevate"))
+                    {
+                        bRunElevated = true;
+                        break;
+                    }
                 }
-                catch
+
+                // if needed run as elevated process
+                if (!bRunElevated)
                 {
+                    try
+                    {
+                        Process p = new Process();
+                        p.StartInfo.FileName = Application.ExecutablePath;
+                        p.StartInfo.Arguments = "-elevate";
+                        p.StartInfo.Verb = "runas";
+                        p.Start();
+                        return;
+                    }
+                    catch
+                    {
+                    }
                 }
+
+                MessageBox.Show("MeGUI cannot be started as it cannot write to the application directory.\rPlease grant the required permissions or move application to an unprotected directory.", "MeGUI Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
 
-            System.Windows.Forms.Application.EnableVisualStyles();
 #if !DEBUG
-            if (!mySingleInstanceMutex.WaitOne(0, false))
-            {
-                if (DialogResult.Yes != MessageBox.Show("Running MeGUI instance detected!\n\rThere's not really much point in running multiple copies of MeGUI, and it can cause problems.\n\rDo You still want to run yet another MeGUI instance?", "Running MeGUI instance detected", MessageBoxButtons.YesNo, MessageBoxIcon.Warning))
-                    return;
-            }
             Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
 #endif
+            Application.EnableVisualStyles();
             CommandlineParser parser = new CommandlineParser();
             parser.Parse(args);
             MainForm mainForm = new MainForm();
@@ -1103,8 +1113,6 @@ namespace MeGUI
             }
             if (restart)
                 pstart.Arguments += "--restart";
-            else
-                pstart.Arguments += "--no-restart";
 
             // Check if the program can write to the program dir
             if (FileUtil.IsDirWriteable(Path.GetDirectoryName(Application.ExecutablePath)))
@@ -1123,11 +1131,11 @@ namespace MeGUI
             try
             {
                 if (!proc.Start())
-                    MessageBox.Show("Couldn't run updater.", "Couldn't run updater.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Could not run updater", "MeGUI Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch
             {
-                MessageBox.Show("Couldn't run updater.", "Couldn't run updater.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Could not run updater", "MeGUI Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         #endregion
