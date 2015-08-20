@@ -282,24 +282,12 @@ namespace MeGUI
                                     return;
                                 }
                             }
+                            if (file.NeedsRestartedCopying)
+                            {
+                                AddFileToReplace(file.Name, e.FileName, file.AvailableVersion.UploadDate.ToString(new System.Globalization.CultureInfo("en-us")));
+                                e.FileName += ".tempcopy";
+                            }
                         };
-
-                        // To-Do: add restarted copying to 7z handler
-                        //if (!file.NeedsRestartedCopying)
-                        //{
-                        //    string targetPath = filepath;
-                        //    string sourcePath = Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, file.Name);
-
-                        //    oArchive.ExtractArchive(sourcePath);
-                        //    extractResult = ManageRestartedCopying(sourcePath, targetPath, file, oUpdate);
-
-                        //    //oArchive.FileExtractionStarted += (o, e) =>
-                        //    //{
-                        //    //    MainForm.Instance.AddFileToReplace(file.Name, e.FileInfo.FileName, file.AvailableVersion.UploadDate.ToString(new System.Globalization.CultureInfo("en-us")));
-                        //    //    e.FileInfo.FileName += ".tempcopy";
-                        //    //};
-                        //}
-                        //else
                         oArchive.ExtractArchive(filepath);
                     }
 

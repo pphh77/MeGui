@@ -82,40 +82,6 @@ namespace MeGUI
             }
         }
 
-        private static UpdateWindow.ErrorState ManageRestartedCopying(string sourcePath, string targetPath, UpdateWindow.iUpgradeable file)
-        {
-            DirectoryInfo fi = new DirectoryInfo(sourcePath);
-            FileInfo[] files = fi.GetFiles("*.*", SearchOption.AllDirectories);
-            foreach (FileInfo f in files)
-            {
-                string directory = Path.Combine(targetPath, f.DirectoryName.Substring(MainForm.Instance.Settings.MeGUIUpdateCache.Length + file.Name.Length + 1));
-
-                if (!Directory.Exists(directory))
-                    Directory.CreateDirectory(directory);
-                f.MoveTo(Path.Combine(directory, f.Name + ".tempcopy"));
-                MainForm.Instance.UpdateHandler.AddFileToReplace(file.Name, f.FullName.Remove(f.FullName.Length - 9), file.AvailableVersion.UploadDate.ToString(new System.Globalization.CultureInfo("en-us")));
-            }
-
-            
-            //try
-            //{
-            //    if (File.Exists(savePath))
-            //    {
-            //        if (bCopyFile == false)
-            //            File.Move(savePath, (savePath + ".backup"));
-            //        else
-            //            File.Copy(savePath, (savePath + ".backup"));
-            //    }
-            //}
-            //catch
-            //{
-            //    oUpdate.AddTextToLog("Old version of " + package + " could not be backed up correctly.", ImageType.Error);
-            //    return UpdateWindow.ErrorState.CouldNotCreateBackup;
-            //}
-
-            return UpdateWindow.ErrorState.Successful;
-        }
-
         public static UpdateWindow.ErrorState ManageBackups(string savePath, string name, bool bCopyFile)
         {
             try

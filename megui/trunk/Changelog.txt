@@ -1,3 +1,5 @@
+2577 [Update]               improved handling of 7z archives which include files which need a restart
+2576 [Update]               switched the updater to .NET 4.0
 2575 [HD Streams Extractor] + [MediaInfo] missing language information in a video track will be ignored
 2574 [Log]                  added .NET 4.6 detection support
 2573 [Update]               sort date columns by date instead of string. Bug #810
