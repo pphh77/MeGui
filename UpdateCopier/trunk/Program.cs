@@ -1,3 +1,23 @@
+// ****************************************************************************
+// 
+// Copyright (C) 2005-2015 Doom9 & al
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// 
+// ****************************************************************************
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -14,6 +34,7 @@ namespace UpdateCopier
         public List<string> tempFilename = new List<string>();
         public string newVersion;
     }
+
     class Program
     {
         static void showCommandlineErrorMessage(string[] args)
@@ -22,7 +43,7 @@ namespace UpdateCopier
             foreach (string arg in args)
                 cmdline.AppendLine(arg);
             MessageBox.Show("Error in commandline update arguments: there aren't enough. No program files will be updated. Commandline:\r\n"
-                + cmdline.ToString(), "Error in commandline",
+                + cmdline.ToString(), "MeGUI Update Error",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
@@ -30,15 +51,14 @@ namespace UpdateCopier
         {
             string appName = null;
             appName = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "megui.exe");
-            bool bDebug = false;
-#if DEBUG
-            bDebug = true;
-#endif
-            if (!File.Exists(appName) && !bDebug)
+
+#if !DEBUG
+            if (!File.Exists(appName))
             {
-                MessageBox.Show(appName + " not found. \nNo files will be updated.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(appName + " not found. \nNo files will be updated.", "MeGUI Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+#endif
 
             StringBuilder commandline = new StringBuilder();
             List<Exception> errorsEncountered = new List<Exception>();
@@ -51,11 +71,6 @@ namespace UpdateCopier
                 if (args[i] == "--restart")
                 {
                     bRestart = true;
-                    i++;
-                }
-                else if (args[i] == "--no-restart")
-                {
-                    bRestart = false;
                     i++;
                 }
                 else if (args[i] == "--component")
@@ -155,7 +170,7 @@ namespace UpdateCopier
             {
                 if (errorsEncountered.Count == 0)
                 {
-                    MessageBox.Show("Files updated but failed to restart MeGUI. You'll have to start it yourself.", "Failed to restart MeGUI",
+                    MessageBox.Show("Files updated but failed to restart MeGUI. You'll have to start it yourself.", "MeGUI Update Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 else
@@ -164,15 +179,17 @@ namespace UpdateCopier
                     foreach (Exception e in errorsEncountered)
                         message += e.Message + "\r\n";
                     message += "Failed to restart MeGUI";
-                    MessageBox.Show(message, "Errors in update", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(message, "MeGUI Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+
             if (errorsEncountered.Count == 0)
                 return;
+
             string message1 = "The following errors were encountered when updating MeGUI:\r\n";
             foreach (Exception e in errorsEncountered)
                 message1 += e.Message + "\r\n";
-            MessageBox.Show(message1, "Errors in update", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(message1, "MeGUI Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }
