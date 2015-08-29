@@ -163,6 +163,7 @@
     <None Include="Changelog.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="Changelog_full.txt" />
     <Content Include="gpl.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -191,7 +192,6 @@
     <Compile Include="core\details\AudioTrackInfo.cs" />
     <Compile Include="core\details\CleanupJob.cs" />
     <Compile Include="core\details\CodecManager.cs" />
-    <Compile Include="core\details\CommandlineParser.cs" />
     <Compile Include="core\details\DependencyChain.cs" />
     <Compile Include="core\details\DialogManager.cs" />
     <Compile Include="core\details\DialogSettings.cs" />

@@ -20,176 +20,243 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Diagnostics;
-using System.Text;
 using System.IO;
 using System.Windows.Forms;
+using System.Xml;
+using System.Xml.Serialization;
 
-namespace UpdateCopier
+namespace Update
 {
-    public class CommandlineUpgradeData
+    public class FileData
     {
-        public List<string> filename = new List<string>();
-        public List<string> tempFilename = new List<string>();
-        public string newVersion;
+        public string Source = string.Empty; // temp file
+        public string Destination = string.Empty; // destination file
+    }
+
+    public class UpgradeData
+    {
+        public string Package = string.Empty;
+        public List<FileData> Files = new List<FileData>();
+        public Version Version = new Version();
+    }
+
+    public class Version
+    {
+        public Version() { }
+
+        public Version(string version, string url)
+        {
+            this.fileVersion = version;
+            this.url = url;
+        }
+
+        private string fileVersion = string.Empty;
+        public string FileVersion
+        {
+            get { return fileVersion; }
+            set { fileVersion = value; }
+        }
+
+        private string url = string.Empty;
+        public string Url
+        {
+            get { return url; }
+            set { url = value; }
+        }
+
+        private DateTime uploadDate = DateTime.MinValue;
+        public DateTime UploadDate
+        {
+            get { return uploadDate; }
+            set { uploadDate = value; }
+        }
+
+        private string web = string.Empty;
+        public string Web
+        {
+            get { return web; }
+            set { web = value; }
+        }
     }
 
     class Program
     {
-        static void showCommandlineErrorMessage(string[] args)
-        {
-            StringBuilder cmdline = new StringBuilder();
-            foreach (string arg in args)
-                cmdline.AppendLine(arg);
-            MessageBox.Show("Error in commandline update arguments: there aren't enough. No program files will be updated. Commandline:\r\n"
-                + cmdline.ToString(), "MeGUI Update Error",
-                MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
+        static List<string> errorsEncountered = new List<string>();
 
+        [STAThread]
         static void Main(string[] args)
         {
-            string appName = null;
-            appName = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "megui.exe");
+            try
+            {
+                // detect if MeGUI should be restarted
+                bool bRestart = false;
+                for (int i = 0; i < args.Length; i++)
+                {
+                    if (args[i] == "--restart")
+                        bRestart = true;
+                }
+
+                // wait till MeGUI is closed
+                int iMax = 0;
+                bool bFound = false;
+                do
+                {
+                    bFound = false;
+                    foreach (Process oProc in Process.GetProcessesByName("MeGUI"))
+                    {
+                        if (Path.GetDirectoryName(Application.ExecutablePath).Equals(Path.GetDirectoryName(oProc.MainModule.FileName)))
+                            bFound = true;
+                    }
+                    if (bFound)
+                        System.Threading.Thread.Sleep(200);
+                } while (bFound && iMax++ < 200);
+
+                if (iMax > 200)
+                {
+                    errorsEncountered.Add("MeGUI is still running. Update aborted.");
+                    exit(false);
+                }
+
+                // checks if the main application is available
+                string file = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "megui.exe");
 
 #if !DEBUG
-            if (!File.Exists(appName))
-            {
-                MessageBox.Show(appName + " not found. \nNo files will be updated.", "MeGUI Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
+                if (!File.Exists(file))
+                {
+                    errorsEncountered.Add(file + " not found");
+                    exit(false);
+                }
 #endif
+                file = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "update.arg");
+                if (!File.Exists(file))
+                {
+                    errorsEncountered.Add(file + " not found");
+                    exit(bRestart);
+                }
 
-            StringBuilder commandline = new StringBuilder();
-            List<Exception> errorsEncountered = new List<Exception>();
-            Dictionary<string, CommandlineUpgradeData> filesToCopy = new Dictionary<string,CommandlineUpgradeData>();
-            List<string> filesToInstall = new List<string>();
-            bool bRestart = false;
-            string lastComponentName = null;
-            for (int i = 0; i < args.Length; i += 1)
-            {
-                if (args[i] == "--restart")
+                List<UpgradeData> oData = new List<UpgradeData>();
+                using (Stream fs = new FileStream(file, FileMode.Open))
                 {
-                    bRestart = true;
-                    i++;
+                    XmlReader reader = new XmlTextReader(fs);
+                    XmlSerializer serializer = new XmlSerializer(typeof(List<UpgradeData>));
+                    if (serializer.CanDeserialize(reader))
+                        oData = serializer.Deserialize(reader) as List<UpgradeData>;
                 }
-                else if (args[i] == "--component")
+
+                if (oData.Count == 0)
                 {
-                    if (args.Length > i + 2)
-                    {
-                        CommandlineUpgradeData data = new CommandlineUpgradeData();
-                        data.newVersion = args[i+2];
-                        filesToCopy.Add(args[i+1], data);
-                        lastComponentName = args[i+1];
-                        i += 2;
-                    }
-                    else
-                    {
-                        showCommandlineErrorMessage(args);
-                        return;
-                    }
+                    errorsEncountered.Add("No valid update data provided");
+                    exit(bRestart);
                 }
-                else
+
+                foreach (UpgradeData oPackage in oData)
                 {
-                    if (args.Length > i + 1 && lastComponentName != null)
+                    bool bOK = true;
+                    foreach (FileData oFile in oPackage.Files)
                     {
-                        if (Path.GetExtension(args[i]).ToLower().Equals(".zip") ||
-                            Path.GetExtension(args[i]).ToLower().Equals(".7z"))
+                        try
                         {
-                            if (filesToCopy.ContainsKey(lastComponentName))
-                                filesToCopy.Remove(lastComponentName);
-                            try
+                            if (!File.Exists(oFile.Source))
                             {
-                                if (File.Exists(args[i]))
-                                    File.Delete(args[i]);
-                                if (File.Exists(args[i + 1]))
-                                    File.Delete(args[i + 1]);
+                                bOK = false;
+                                errorsEncountered.Add(oPackage.Package + ": file not found - " + oFile.Source);
+                                continue;
                             }
-                            catch (Exception e)
-                            {
-                                errorsEncountered.Add(e);
-                            }
+
+                            File.Delete(oFile.Destination);
+                            File.Move(oFile.Source, oFile.Destination);
                         }
-                        else if (filesToCopy.ContainsKey(lastComponentName))
+                        catch (Exception e)
                         {
-                            filesToCopy[lastComponentName].filename.Add(args[i]);
-                            filesToCopy[lastComponentName].tempFilename.Add(args[i+1]);
-                        }
-                        i++;
-                    }
-                    else
-                    {
-                        showCommandlineErrorMessage(args);
-                        return;
-                    }
-                }
-            }
-
-            Thread.Sleep(2000);
-            foreach (string file in filesToCopy.Keys)
-            {
-                bool succeeded = true;
-                for (int i = 0; i < filesToCopy[file].tempFilename.Count; i++)
-                {
-                    try
-                    {
-                        if (File.Exists(filesToCopy[file].tempFilename[i]))
-                        {
-                            File.Delete(filesToCopy[file].filename[i]);
-                            File.Move(filesToCopy[file].tempFilename[i], filesToCopy[file].filename[i]);
+                            bOK = false;
+                            errorsEncountered.Add(oPackage.Package + ": " + e.Message);
                         }
                     }
-                    catch (IOException)
-                    {
-                        succeeded = false;
-                    }
-                    catch (Exception e)
-                    {
-                        succeeded = false;
-                        errorsEncountered.Add(e);
-                    }
+                    oPackage.Files = new List<FileData>();
+                    if (!bOK)
+                        oPackage.Version = new Version();
                 }
-                if (succeeded)
-                    commandline.AppendFormat(@"--upgraded ""{0}"" ""{1}"" ", file, filesToCopy[file].newVersion);
-                else
-                    commandline.AppendFormat(@"--upgrade-failed ""{0}"" ", file);
+
+                // create update file
+                using (Stream fs = new FileStream(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "megui.arg"), FileMode.Create))
+                {
+                    XmlSerializer serializer = new XmlSerializer(typeof(List<UpgradeData>));
+                    XmlWriterSettings settings = new XmlWriterSettings();
+                    settings.Indent = true;
+                    XmlWriter writer = XmlTextWriter.Create(fs, settings);
+                    serializer.Serialize(writer, oData);
+                }
+
+                deleteTempFiles();
+
+                exit(bRestart);
             }
-            if (!bRestart)
-                commandline.Append("--dont-start");
-
-            foreach (string file in filesToInstall)
-                commandline.AppendFormat(@"--install ""{0}"" ", file);
-
-            Process proc = new Process();
-            ProcessStartInfo pstart = new ProcessStartInfo();
-            pstart.FileName = appName;
-            pstart.Arguments = commandline.ToString();
-            pstart.UseShellExecute = false;
-            proc.StartInfo = pstart;
-            if (!proc.Start())
+            catch (Exception ex)
             {
-                if (errorsEncountered.Count == 0)
-                {
-                    MessageBox.Show("Files updated but failed to restart MeGUI. You'll have to start it yourself.", "MeGUI Update Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                else
-                {
-                    string message = "The following errors were encountered when updating MeGUI:\r\n";
-                    foreach (Exception e in errorsEncountered)
-                        message += e.Message + "\r\n";
-                    message += "Failed to restart MeGUI";
-                    MessageBox.Show(message, "MeGUI Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                errorsEncountered.Add(ex.Message);
+                exit(true);
+            }
+        }
+
+        /// <summary>
+        /// shows error message if available and exists
+        /// </summary>
+        private static void exit(bool bRestart)
+        {
+            if (errorsEncountered.Count > 0)
+            {
+                string error = String.Empty;
+                foreach (string msg in errorsEncountered)
+                    error += msg + "\r\n";
+                MessageBox.Show(error, "MeGUI Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-            if (errorsEncountered.Count == 0)
-                return;
+            // delete update file
+            string file = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "update.arg");
+            if (File.Exists(file))
+                File.Delete(file);
 
-            string message1 = "The following errors were encountered when updating MeGUI:\r\n";
-            foreach (Exception e in errorsEncountered)
-                message1 += e.Message + "\r\n";
-            MessageBox.Show(message1, "MeGUI Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            try
+            {
+                using (Process proc = new Process())
+                {
+                    ProcessStartInfo pstart = new ProcessStartInfo();
+                    pstart.FileName = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "megui.exe");
+                    if (!bRestart)
+                        pstart.Arguments = "--dont-start";
+                    pstart.UseShellExecute = false;
+                    proc.StartInfo = pstart;
+                    if (!proc.Start())
+                        MessageBox.Show("Failed to start MeGUI", "MeGUI Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to start MeGUI: " + ex.Message, "MeGUI Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            // exit program
+            System.Environment.Exit(0);
+        }
+
+        /// <summary>
+        /// deletes all temporary update files in case something is left behind
+        /// </summary>
+        private static void deleteTempFiles()
+        {
+            string meguiFolder = Path.GetDirectoryName(Application.ExecutablePath);
+            if (Directory.Exists(meguiFolder))
+            {
+                try
+                {
+                    Array.ForEach(Directory.GetFiles(meguiFolder, "*.tempcopy", SearchOption.AllDirectories), delegate (string path) { File.Delete(path); });
+                }
+                catch (Exception ex)
+                {
+                    errorsEncountered.Add(ex.Message);
+                }
+            }
         }
     }
 }

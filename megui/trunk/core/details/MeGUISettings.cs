@@ -19,7 +19,6 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -81,7 +80,8 @@ namespace MeGUI
         private ProxyMode httpProxyMode;
         private ProgramSettings avimuxgui, avisynth, avisynthplugins, besplit, dgindexim, dgindex, dgindexnv,
                                 eac3to, ffmpeg, ffms, flac, lame, lsmash, mkvmerge, mp4box, neroaacenc, oggenc,
-                                opus, pgcdemux, qaac, fdkaac, tsmuxer, vobsub, x264, x264_10b, x265, xvid;
+                                opus, pgcdemux, qaac, fdkaac, tsmuxer, vobsub, x264, x264_10b, x265, xvid, 
+                                mediainfo, megui_core, megui_help, megui_libs, megui_updater;
         #endregion
         public MeGUISettings()
 		{
@@ -1214,6 +1214,30 @@ namespace MeGUI
             get { return fdkaac; }
             set { fdkaac = value; }
         }
+
+        public ProgramSettings MediaInfo
+        {
+            get { return mediainfo; }
+            set { mediainfo = value; }
+        }
+
+        public ProgramSettings MeGUI_Core
+        {
+            get { return megui_updater; }
+            set { megui_updater = value; }
+        }
+
+        public ProgramSettings MeGUI_Libraries
+        {
+            get { return megui_libs; }
+            set { megui_libs = value; }
+        }
+
+        public ProgramSettings MeGUI_Updater
+        {
+            get { return megui_updater; }
+            set { megui_updater = value; }
+        }
         #endregion
 
         private bool bPortableAviSynth;
@@ -1313,6 +1337,16 @@ namespace MeGUI
                 lame = new ProgramSettings("lame");
             if (lsmash == null)
                 lsmash = new ProgramSettings("lsmash");
+            if (mediainfo == null)
+                mediainfo = new ProgramSettings("mediainfo");
+            if (megui_core == null)
+                megui_core = new ProgramSettings("core");
+            if (megui_help == null)
+                megui_help = new ProgramSettings("data");
+            if (megui_libs == null)
+                megui_libs = new ProgramSettings("libs");
+            if (megui_updater == null)
+                megui_updater = new ProgramSettings("updater");
             if (mkvmerge == null)
                 mkvmerge = new ProgramSettings("mkvmerge");
             if (mp4box == null)
@@ -1368,6 +1402,7 @@ namespace MeGUI
             avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\leakkerneldeint.dll"));
             avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\nicaudio.dll"));
             avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\tdeint.dll"));
+            avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\TimeStretch.dll"));
             avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\tivtc.dll"));
             avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\tomsmocomp.dll"));
             avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\undot.dll"));
@@ -1389,6 +1424,21 @@ namespace MeGUI
             flac.UpdateInformation("flac", "FLAC", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\flac\flac.exe"));
             lame.UpdateInformation("lame", "LAME", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\lame\lame.exe"));
             lsmash.UpdateInformation("lsmash", "L-SMASH Works", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\lsmash\LSMASHSource.dll"));
+            mediainfo.UpdateInformation("mediainfo", "MediaInfo", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"MediaInfo.dll"));
+            mediainfo.Required = true;
+            megui_core.UpdateInformation("core", "MeGUI", Application.ExecutablePath);
+            megui_core.Required = true;
+            megui_help.UpdateInformation("data", "MeGUI Help", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"Data\ContextHelp.xml"));
+            megui_help.Required = true;
+            megui_libs.UpdateInformation("libs", "MeGUI Libraries", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"7z.dll"));
+            megui_libs.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"AvisynthWrapper.dll"));
+            megui_libs.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"ICSharpCode.SharpZipLib.dll"));
+            megui_libs.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"MediaInfoWrapper.dll"));
+            megui_libs.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"MessageBoxExLib.dll"));
+            megui_libs.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"SevenZipSharp.dll"));
+            megui_libs.Required = true;
+            megui_updater.UpdateInformation("updater", "MeGUI Updater", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"update.exe"));
+            megui_updater.Required = true;
             mkvmerge.UpdateInformation("mkvmerge", "mkvmerge", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\mkvmerge\mkvmerge.exe"));
             mkvmerge.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\mkvmerge\mkvextract.exe"));
             mp4box.UpdateInformation("mp4box", "MP4Box", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\mp4box\mp4box.exe"));

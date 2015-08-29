@@ -1,3 +1,5 @@
+2579 [Update]               improved handling of packages which require a restart
+                            merged several MeGUI dlls into one package
 2578 [Main]                 a second instance of the same executable is blocked
                             if file permissions are not available MeGUI will not start
 2577 [Update]               improved handling of 7z archives which include files which need a restart

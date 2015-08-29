@@ -148,16 +148,7 @@ namespace MeGUI
             switch (package)
             {
                 case "audio":
-                case "TXviD":
-                case "core":
-                case "libs":
-                case "mediainfo":
-                case "mediainfowrapper":
-                case "sevenzip":
-                case "sevenzipsharp":
-                case "data":
-                case "avswrapper":
-                case "updatecopier": return true;
+                case "TXviD": return true;
                 default: return false;
             }
         }
@@ -178,29 +169,6 @@ namespace MeGUI
         public static bool IsComponentMissing()
         {
             ArrayList arrPath = new ArrayList();
-            string strPath;
-
-            //base 
-            arrPath.Add(System.Windows.Forms.Application.ExecutablePath);
-            //libs":
-            strPath = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
-            arrPath.Add((Path.Combine(strPath, @"ICSharpCode.SharpZipLib.dll")));
-            arrPath.Add((Path.Combine(strPath, @"MessageBoxExLib.dll")));
-            //mediainfo
-            arrPath.Add(Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), @"MediaInfo.dll"));
-            //mediainfowrapper
-            arrPath.Add(Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), @"MediaInfoWrapper.dll"));
-            //sevenzip
-            arrPath.Add(Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), @"7z.dll"));
-            //sevenzipsharp
-            arrPath.Add(Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), @"SevenZipSharp.dll"));
-            //data
-            arrPath.Add(Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), @"Data\ContextHelp.xml"));
-            //avswrapper
-            arrPath.Add((Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), @"AvisynthWrapper.dll")));
-            //updatecopier
-            arrPath.Add((Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), @"updatecopier.exe")));
-
             foreach (ProgramSettings pSettings in MainForm.Instance.ProgramSettings)
             {
                 if (!pSettings.UpdateAllowed())

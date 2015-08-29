@@ -37,6 +37,19 @@ using MeGUI.core.util;
 
 namespace MeGUI
 {
+    public class FileData
+    {
+        public string Source = string.Empty; // temp file
+        public string Destination = string.Empty; // destination file
+    }
+
+    public class UpgradeData
+    {
+        public string Package = string.Empty;
+        public List<FileData> Files = new List<FileData>();
+        public UpdateWindow.Version Version = new UpdateWindow.Version();
+    }
+
     public class UpdateHandler
     {
         private string _updateServerURL;
@@ -44,7 +57,7 @@ namespace MeGUI
         private StringBuilder _updateLogText = new StringBuilder();
         private XmlDocument _updateXML;
         private UpdateWindow _updateWindow;
-        private Dictionary<string, CommandlineUpgradeData> filesToReplace = new Dictionary<string, CommandlineUpgradeData>();
+        private List<UpgradeData> packagesToUpdateAtRestart = new List<UpgradeData>();
         private UpdateWindow.iUpgradeableCollection _updateData = null;
         private System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
         private bool _abortUpdate, _updateRunning;
@@ -86,9 +99,9 @@ namespace MeGUI
             }
         }
 
-        public Dictionary<string, CommandlineUpgradeData> FilesToReplace
+        public List<UpgradeData> PackagesToUpdateAtRestart
         {
-            get { return filesToReplace; }
+            get { return packagesToUpdateAtRestart; }
         }
 
         public UpdateHandler()
@@ -102,11 +115,56 @@ namespace MeGUI
             // load saved _updateData
             LoadSettings();
 
+            // process the upgrade data
+            ProcessUpgrade();
+
             // start initial update check
             GetUpdateInformation(false);
 
             if (_updateMode == UpdateMode.Disabled)
                 _updateLog.LogEvent("Automatic update is disabled");
+        }
+
+        private void ProcessUpgrade()
+        {
+            try
+            {
+                string file = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "megui.arg");
+                if (!File.Exists(file))
+                    return;
+
+                List<UpgradeData> oData = new List<UpgradeData>();
+                using (Stream fs = new FileStream(file, FileMode.Open))
+                {
+                    XmlReader reader = new XmlTextReader(fs);
+                    XmlSerializer serializer = new XmlSerializer(typeof(List<UpgradeData>));
+                    if (serializer.CanDeserialize(reader))
+                        oData = serializer.Deserialize(reader) as List<UpgradeData>;
+                }
+
+                int iCount = 0;
+                foreach (UpgradeData oPackage in oData)
+                {
+                    if (String.IsNullOrEmpty(oPackage.Version.FileVersion) || oPackage.Version.UploadDate == DateTime.MinValue)
+                        continue;
+
+                    UpdateWindow.iUpgradeable up = UpdateData.FindByName(oPackage.Package);
+                    if (up == null)
+                        continue;
+
+                    iCount++;
+                    up.CurrentVersion = oPackage.Version;
+                }
+
+                if (iCount > 0)
+                    SaveSettings();
+
+                File.Delete(file);
+            }
+            catch (Exception ex)
+            {
+                AddTextToLog("Could not process package upgrade: " + ex.Message, ImageType.Error, true);
+            }
         }
 
         public void GetUpdateInformation(bool bWait)
@@ -284,7 +342,7 @@ namespace MeGUI
                             }
                             if (file.NeedsRestartedCopying)
                             {
-                                AddFileToReplace(file.Name, e.FileName, file.AvailableVersion.UploadDate.ToString(new System.Globalization.CultureInfo("en-us")));
+                                AddFileToReplace(file.Name, e.FileName, file.AvailableVersion);
                                 e.FileName += ".tempcopy";
                             }
                         };
@@ -296,15 +354,10 @@ namespace MeGUI
 
                     if (extractResult != UpdateWindow.ErrorState.Successful)
                         return extractResult;
-
-                    if (!file.NeedsRestartedCopying)
-                        file.CurrentVersion = file.AvailableVersion;  // the current installed version is now the latest available version
-                    else
-                        file.CurrentVersion.FileVersion = file.AvailableVersion.FileVersion; // after the restart the new files will be active
                 }
                 catch
                 {
-                    AddTextToLog("Could not extract " + file.Name + ". Deleting file. Please run updater again.", ImageType.Error, true);
+                    AddTextToLog("Could not extract " + file.Name + ". Deleting file. Please run the update again.", ImageType.Error, true);
                     UpdateCacher.DeleteCacheFile(file.AvailableVersion.Url);
                     return UpdateWindow.ErrorState.CouldNotExtract;
                 }
@@ -334,7 +387,7 @@ namespace MeGUI
                             }
                             if (file.NeedsRestartedCopying)
                             {
-                                AddFileToReplace(file.Name, filename, file.AvailableVersion.UploadDate.ToString(new System.Globalization.CultureInfo("en-us")));
+                                AddFileToReplace(file.Name, filename, file.AvailableVersion);
                                 filename += ".tempcopy";
                             }
 
@@ -343,15 +396,11 @@ namespace MeGUI
                                 FileUtil.copyData(zip, outputWriter);
                             File.SetLastWriteTime(filename, zipentry.DateTime);
                         }
-                        if (!file.NeedsRestartedCopying)
-                            file.CurrentVersion = file.AvailableVersion; // the current installed version is now the latest available version
-                        else
-                            file.CurrentVersion.FileVersion = file.AvailableVersion.FileVersion; // after the restart the new files will be active
                     }
                 }
                 catch
                 {
-                    AddTextToLog("Could not extract " + file.Name + ". Deleting file. Please run updater again.", ImageType.Error, true);
+                    AddTextToLog("Could not extract " + file.Name + ". Deleting file. Please run the update again.", ImageType.Error, true);
                     UpdateCacher.DeleteCacheFile(file.AvailableVersion.Url);
                     return UpdateWindow.ErrorState.CouldNotExtract;
                 }
@@ -396,9 +445,9 @@ namespace MeGUI
             // there are updated or missing files, display the window
             if (bIsComponentMissing)
             {
-                if (AskToInstallComponents(filesToReplace.Keys.Count > 0))
+                if (AskToInstallComponents(packagesToUpdateAtRestart.Count > 0))
                 {
-                    if (filesToReplace.Keys.Count > 0) // restart required
+                    if (packagesToUpdateAtRestart.Count > 0) // restart required
                     {
                         MainForm.Instance.Restart = true;
                         MainForm.Instance.Invoke(new MethodInvoker(delegate { MainForm.Instance.Close(); }));
@@ -415,9 +464,9 @@ namespace MeGUI
 
             if (UpdateCacher.IsComponentMissing() && !MainForm.Instance.Restart)
             {
-                if (AskToInstallComponents(filesToReplace.Keys.Count > 0))
+                if (AskToInstallComponents(packagesToUpdateAtRestart.Count > 0))
                 {
-                    if (filesToReplace.Keys.Count > 0) // restart required
+                    if (packagesToUpdateAtRestart.Count > 0) // restart required
                     {
                         MainForm.Instance.Restart = true;
                         MainForm.Instance.Invoke(new MethodInvoker(delegate { MainForm.Instance.Close(); }));
@@ -465,19 +514,20 @@ namespace MeGUI
                 return false;
         }
 
-        public void AddFileToReplace(string iUpgradeableName, string filename, string newUploadDate)
+        public void AddFileToReplace(string package, string fileName, UpdateWindow.Version version)
         {
-            CommandlineUpgradeData data = new CommandlineUpgradeData();
-            data.filename.Add(filename);
-            data.tempFilename.Add(filename + ".tempcopy");
-            data.newUploadDate = newUploadDate;
-            if (filesToReplace.ContainsKey(iUpgradeableName))
+            foreach (UpgradeData oData in packagesToUpdateAtRestart)
             {
-                filesToReplace[iUpgradeableName].tempFilename.Add(filename + ".tempcopy");
-                filesToReplace[iUpgradeableName].filename.Add(filename);
-                return;
+                if (oData.Package.Equals(package))
+                {
+                    oData.Files.Add(new FileData() { Source = fileName + ".tempcopy", Destination = fileName });
+                    return;
+                }
             }
-            filesToReplace.Add(iUpgradeableName, data);
+            
+            UpgradeData data = new UpgradeData() { Package = package, Version = version};
+            data.Files.Add(new FileData() { Source = fileName + ".tempcopy", Destination = fileName });
+            packagesToUpdateAtRestart.Add(data);
         }
 
         public void ProcessUpdate()
@@ -654,7 +704,9 @@ namespace MeGUI
             UpdateWindow.ErrorState state = file.Install(file);
             if (state == UpdateWindow.ErrorState.Successful)
             {
-                file.CurrentVersion = file.AvailableVersion;
+                // the current installed version is now the latest available version if no restart is needed
+                if (!file.NeedsRestartedCopying)
+                    file.CurrentVersion = file.AvailableVersion;
                 return UpdateWindow.ErrorState.Successful;
             }
 
@@ -1122,19 +1174,6 @@ namespace MeGUI
                 AddTextToLog("Could not save update package settings", ImageType.Error, true);
             }
         }
-
-        public void UpdateUploadDate(string name, string strDate)
-        {
-            UpdateWindow.iUpgradeable up = UpdateData.FindByName(name);
-            if (up == null)
-                return;
-
-            DateTime oDate;
-            bool bReady = DateTime.TryParse(strDate, new System.Globalization.CultureInfo("en-us"), System.Globalization.DateTimeStyles.None, out oDate);
-            if (bReady)
-                up.CurrentVersion.UploadDate = oDate;
-        }
-
         #endregion
     }
 }

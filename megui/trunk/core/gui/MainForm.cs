@@ -25,6 +25,7 @@ using System.Drawing;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
+using System.Xml;
 using System.Xml.Serialization;
 
 using MeGUI.core.details;
@@ -58,16 +59,6 @@ namespace MeGUI
         private LogItem _eac3toLog;
         private UpdateHandler _updateHandler;
         private List<ProgramSettings> _programsettings;
-        public List<ProgramSettings> ProgramSettings { get { return _programsettings; } set { _programsettings = value; } }
-        public bool IsHiddenMode { get { return trayIcon.Visible; } }
-        public bool IsOverlayIconActive { get { return taskbarIcon != null; } }
-        public string LogFile { get { return strLogFile; } }
-        public LogItem OneClickLog { get { return _oneClickLog; } set { _oneClickLog = value; } }
-        public LogItem AVSScriptCreatorLog { get { return _aVSScriptCreatorLog; } set { _aVSScriptCreatorLog = value; } }
-        public LogItem FileIndexerLog { get { return _fileIndexerLog; } set { _fileIndexerLog = value; } }
-        public LogItem Eac3toLog { get { return _eac3toLog; } set { _eac3toLog = value; } }
-        public UpdateHandler UpdateHandler { get { return _updateHandler; } set { _updateHandler = value; } }
-        public MuxProvider MuxProvider { get { return muxProvider; } }
         private bool restart = false;
         private DialogManager dialogManager;
         private string path; // path the program was started from
@@ -78,6 +69,16 @@ namespace MeGUI
         private MeGUISettings settings = new MeGUISettings();
         private ProfileManager profileManager;
         private CodecManager codecs;
+        public List<ProgramSettings> ProgramSettings { get { return _programsettings; } set { _programsettings = value; } }
+        public bool IsHiddenMode { get { return trayIcon.Visible; } }
+        public bool IsOverlayIconActive { get { return taskbarIcon != null; } }
+        public string LogFile { get { return strLogFile; } }
+        public LogItem OneClickLog { get { return _oneClickLog; } set { _oneClickLog = value; } }
+        public LogItem AVSScriptCreatorLog { get { return _aVSScriptCreatorLog; } set { _aVSScriptCreatorLog = value; } }
+        public LogItem FileIndexerLog { get { return _fileIndexerLog; } set { _fileIndexerLog = value; } }
+        public LogItem Eac3toLog { get { return _eac3toLog; } set { _eac3toLog = value; } }
+        public UpdateHandler UpdateHandler { get { return _updateHandler; } set { _updateHandler = value; } }
+        public MuxProvider MuxProvider { get { return muxProvider; } }
         #endregion
 
         public void RegisterForm(Form f)
@@ -141,7 +142,7 @@ namespace MeGUI
         public MainForm()
         {
             // Log File Handling
-            string strMeGUILogPath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath) + @"\logs";
+            string strMeGUILogPath = Path.GetDirectoryName(Application.ExecutablePath) + @"\logs";
             FileUtil.ensureDirectoryExists(strMeGUILogPath);
             strLogFile = strMeGUILogPath + @"\logfile-" + DateTime.Now.ToString("yy'-'MM'-'dd'_'HH'-'mm'-'ss") + ".log";
             FileUtil.WriteToFile(strLogFile, "Preliminary log file only. During closing of MeGUI the well formed log file will be written.\r\n\r\n", false);
@@ -793,19 +794,6 @@ namespace MeGUI
 
         #region MeGUIInfo
         #region start and end
-        public void handleCommandline(CommandlineParser parser)
-        {
-            foreach (string file in parser.failedUpgrades)
-                System.Windows.Forms.MessageBox.Show("Failed to upgrade '" + file + "'.", "Upgrade failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-            if (parser.upgradeData.Count > 0)
-            {
-                foreach (string file in parser.upgradeData.Keys)
-                    _updateHandler.UpdateUploadDate(file, parser.upgradeData[file]);
-                _updateHandler.SaveSettings();
-            }
-        }
-
         public void setGUIInfo()
         {
             fillMenus();
@@ -1062,11 +1050,17 @@ namespace MeGUI
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
 #endif
             Application.EnableVisualStyles();
-            CommandlineParser parser = new CommandlineParser();
-            parser.Parse(args);
+
             MainForm mainForm = new MainForm();
-            mainForm.handleCommandline(parser);
-            if (parser.start)
+
+            // start MeGUI form if not blocked
+            bool bStart = true;
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (args[i] == "--dont-start")
+                    bStart = false;
+            }
+            if (bStart)
                 Application.Run(mainForm);
         }
 
@@ -1095,26 +1089,32 @@ namespace MeGUI
 
         private void runRestarter()
         {
-            if (_updateHandler.FilesToReplace.Keys.Count == 0)
+            if (_updateHandler.PackagesToUpdateAtRestart.Count == 0)
                 return;
+
+            // check if the old updater is still available and delete if found
+            if (File.Exists(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"updatecopier.exe")))
+                File.Delete(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"updatecopier.exe"));
+
+            if (File.Exists(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"LinqBridge.dll")))
+                File.Delete(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"LinqBridge.dll"));
+           
+            using (Stream fs = new FileStream(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "update.arg"), FileMode.Create))
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(List<UpgradeData>));
+                XmlWriterSettings settings = new XmlWriterSettings();
+                settings.Indent = true;
+                XmlWriter writer = XmlTextWriter.Create(fs, settings);
+                serializer.Serialize(writer, _updateHandler.PackagesToUpdateAtRestart);
+            }
 
             Process proc = new Process();
             ProcessStartInfo pstart = new ProcessStartInfo();
-            pstart.FileName = Path.Combine(Application.StartupPath, "updatecopier.exe");
-            foreach (string file in _updateHandler.FilesToReplace.Keys)
-            {
-                pstart.Arguments += string.Format("--component \"{0}\" \"{1}\" ", file, _updateHandler.FilesToReplace[file].newUploadDate);
-                for (int i = 0; i < _updateHandler.FilesToReplace[file].filename.Count; i++)
-                {
-                    pstart.Arguments += string.Format("\"{0}\" \"{1}\" ",
-                       _updateHandler.FilesToReplace[file].filename[i],
-                       _updateHandler.FilesToReplace[file].tempFilename[i]);
-                }
-            }
+            pstart.FileName = MainForm.Instance.settings.MeGUI_Updater.Path;
             if (restart)
-                pstart.Arguments += "--restart";
+                pstart.Arguments += "--restart ";
 
-            // Check if the program can write to the program dir
+            // check if the program can write to the program dir
             if (FileUtil.IsDirWriteable(Path.GetDirectoryName(Application.ExecutablePath)))
             {
                 pstart.CreateNoWindow = true;
@@ -1122,7 +1122,7 @@ namespace MeGUI
             }
             else
             {
-                // Need admin permissions
+                // need admin permissions
                 proc.StartInfo.Verb = "runas";
                 pstart.UseShellExecute = true;
             }
@@ -1415,12 +1415,6 @@ namespace MeGUI
             if (this.WindowState != FormWindowState.Minimized && this.Visible == true)
                 settings.MainFormSize = this.ClientSize;
         }
-    }
-    public class CommandlineUpgradeData
-    {
-        public List<string> filename = new List<string>();
-        public List<string> tempFilename = new List<string>();
-        public string newUploadDate;
     }
 }
         #endregion

@@ -116,23 +116,8 @@ namespace MeGUI
             public bool isAvailable()
             {
                 ArrayList arrPath = new ArrayList();
-                string strPath;
-
                 switch (this.name)
                 {
-                    case "base": arrPath.Add(System.Windows.Forms.Application.ExecutablePath); break;
-                    case "libs":
-                        strPath = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
-                        arrPath.Add((Path.Combine(strPath, @"ICSharpCode.SharpZipLib.dll")));
-                        arrPath.Add((Path.Combine(strPath, @"MessageBoxExLib.dll")));
-                        break;
-                    case "mediainfo": arrPath.Add(Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), @"MediaInfo.dll")); break;
-                    case "mediainfowrapper": arrPath.Add(Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), @"MediaInfoWrapper.dll")); break;
-                    case "sevenzip": arrPath.Add(Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), @"7z.dll")); break;
-                    case "sevenzipsharp": arrPath.Add(Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), @"SevenZipSharp.dll")); break;
-                    case "data": arrPath.Add(Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), @"Data\ContextHelp.xml")); break;
-                    case "avswrapper": arrPath.Add((Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), @"AvisynthWrapper.dll"))); break;
-                    case "updatecopier": arrPath.Add((Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), @"updatecopier.exe"))); break;
                     case "neroaacenc":
                         if (MainForm.Instance.Settings.UseNeroAacEnc)
                         {
@@ -534,34 +519,36 @@ namespace MeGUI
 
         public class Version : IComparable<Version>
         {
-            public Version()
-            {
-            }
+            public Version() { }
+
             public Version(string version, string url)
             {
                 this.fileVersion = version;
                 this.url = url;
             }
-            private string fileVersion;
-            private string url;
-            private DateTime uploadDate;
-            private string web;
 
+            private string fileVersion = string.Empty;
             public string FileVersion
             {
                 get { return fileVersion; }
                 set { fileVersion = value; }
             }
+
+            private string url = string.Empty;
             public string Url
             {
                 get { return url; }
                 set { url = value; }
             }
+
+            private DateTime uploadDate = DateTime.MinValue;
             public DateTime UploadDate
             {
-                get { return uploadDate;  }
+                get { return uploadDate; }
                 set { uploadDate = value; }
             }
+
+            private string web = string.Empty;
             public string Web
             {
                 get { return web; }
