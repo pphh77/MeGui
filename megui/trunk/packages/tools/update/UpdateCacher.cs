@@ -39,9 +39,6 @@ namespace MeGUI
     {
         public static void flushOldCachedFilesAsync(UpdateWindow.iUpgradeableCollection upgradeData)
         {
-            if (MainForm.Instance.Settings.AlwaysBackUpFiles)
-                return;
-
             string updateCache = MainForm.Instance.Settings.MeGUIUpdateCache;
             if (String.IsNullOrEmpty(updateCache) || !Directory.Exists(updateCache))
                 return;
@@ -62,11 +59,12 @@ namespace MeGUI
                 if (urls.IndexOf(f.Name.ToLowerInvariant()) >= 0)
                     continue;
 
-                if (DateTime.Now - f.LastWriteTime > new TimeSpan(MainForm.Instance.Settings.DisablePackageInterval, 0, 0, 0, 0))
-                {
-                    f.Delete();
-                    MainForm.Instance.UpdateHandler.AddTextToLog("Deleted cached file " + f.Name, ImageType.Information, false);
-                }
+                if (f.Name.StartsWith("_obsolete_"))
+                    continue;
+
+                //f.LastWriteTimeUtc = DateTime.UtcNow;
+                f.MoveTo(Path.Combine(updateCache, "_obsolete_" + f.Name));
+                MainForm.Instance.UpdateHandler.AddTextToLog("Marked file as obsolete: " + f.Name.Substring(10), ImageType.Information, false);
             }
             files = fi.GetFiles("*.7z");
             foreach (FileInfo f in files)
@@ -74,10 +72,25 @@ namespace MeGUI
                 if (urls.IndexOf(f.Name.ToLowerInvariant()) >= 0)
                     continue;
 
-                if (DateTime.Now - f.LastWriteTime > new TimeSpan(MainForm.Instance.Settings.DisablePackageInterval, 0, 0, 0, 0))
+                if (f.Name.StartsWith("_obsolete_"))
+                    continue;
+
+                f.LastWriteTimeUtc = DateTime.UtcNow;
+                f.MoveTo(Path.Combine(updateCache, "_obsolete_" + f.Name));
+                MainForm.Instance.UpdateHandler.AddTextToLog("Marked file as obsolete: " + f.Name.Substring(10), ImageType.Information, false);
+            }
+
+            files = fi.GetFiles("_obsolete_*.*");
+            foreach (FileInfo f in files)
+            {
+                if (urls.IndexOf(f.Name.ToLowerInvariant()) >= 0)
+                    continue;
+
+                // delete file if it is obsolete for more than 90 days
+                if (DateTime.Now - f.LastWriteTime > new TimeSpan(90, 0, 0, 0, 0))
                 {
                     f.Delete();
-                    MainForm.Instance.UpdateHandler.AddTextToLog("Deleted cached file " + f.Name, ImageType.Information, false);
+                    MainForm.Instance.UpdateHandler.AddTextToLog("Deleted obsolete file: " + f.Name.Substring(10), ImageType.Information, false);
                 }
             }
         }
@@ -217,7 +230,11 @@ namespace MeGUI
                 err = UpdateWindow.ErrorState.CouldNotDownloadFile;
 
             if (!File.Exists(file))
-                return false;
+            {
+                if (!File.Exists(Path.Combine(Path.GetDirectoryName(file), "_obsolete_" + Path.GetFileName(file))))
+                    return false;
+                File.Move(Path.Combine(Path.GetDirectoryName(file), "_obsolete_" + Path.GetFileName(file)), file);
+            }
 
             FileInfo finfo = new FileInfo(file);
             if (finfo.Length == 0)

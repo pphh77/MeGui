@@ -1,3 +1,4 @@
+2581 [Update]               if a update cache file is obsolete it will be retained for 90 days
 2580 [Update]               changed backup to be disabled by default
 2579 [Update]               improved handling of packages which require a restart
                             merged several MeGUI dlls into one package
