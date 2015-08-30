@@ -136,7 +136,7 @@ namespace MeGUI
             defaultOutputDir = "";
             tempDirMP4 = "";
             addTimePosition = true;
-            alwaysbackupfiles = true;
+            alwaysbackupfiles = false;
             strMainFileFormat = "";
             strMainAudioFormat = "";
             strLastSourcePath = "";
