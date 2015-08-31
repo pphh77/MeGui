@@ -62,7 +62,7 @@ namespace MeGUI
                 if (f.Name.StartsWith("_obsolete_"))
                     continue;
 
-                //f.LastWriteTimeUtc = DateTime.UtcNow;
+                f.LastWriteTimeUtc = DateTime.UtcNow;
                 f.MoveTo(Path.Combine(updateCache, "_obsolete_" + f.Name));
                 MainForm.Instance.UpdateHandler.AddTextToLog("Marked file as obsolete: " + f.Name.Substring(10), ImageType.Information, false);
             }

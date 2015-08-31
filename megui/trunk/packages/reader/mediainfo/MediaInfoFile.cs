@@ -606,6 +606,9 @@ namespace MeGUI
                 temp = LanguageSelectionContainer.LookupISOCode(language);
                 if (!String.IsNullOrEmpty(temp))
                     return temp;
+
+                if (LanguageSelectionContainer.IsLanguageAvailable(language))
+                    return language;
             }
 
             if (bVideoTrack)
