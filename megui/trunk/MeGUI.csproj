@@ -238,6 +238,9 @@
     <Compile Include="core\details\video\VideoConfigurationPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="core\details\video\VideoConfigurationPanel.Designer.cs">
+      <DependentUpon>VideoConfigurationPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="core\details\video\VideoEncodingComponent.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -287,6 +290,9 @@
     <Compile Include="core\gui\CustomProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="core\gui\VideoPlayer.Designer.cs">
+      <DependentUpon>VideoPlayer.cs</DependentUpon>
+    </Compile>
     <Compile Include="packages\audio\fdkaac\FDKAACSettings.cs" />
     <Compile Include="packages\audio\fdkaac\FDKAACConfigurationPanel.cs">
       <SubType>UserControl</SubType>
@@ -297,6 +303,9 @@
     <Compile Include="packages\muxer\ffmpeg\FFmpegMuxer.cs" />
     <Compile Include="packages\reader\lmash\lsmashReader.cs" />
     <Compile Include="packages\reader\ttxt\ttxtReader.cs" />
+    <Compile Include="packages\tools\autoencode\AutoEncodeWindow.Designer.cs">
+      <DependentUpon>AutoEncodeWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="packages\tools\avscreator\AviSynthProfileConfigPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -463,6 +472,9 @@
       <DependentUpon>TextViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="packages\tools\chaptercreator\BDInfo\TSStreamFile.cs" />
+    <Compile Include="packages\tools\cqmeditor\QuantizerMatrixDialog.Designer.cs">
+      <DependentUpon>QuantizerMatrixDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="packages\tools\update\ProgramSettings.cs" />
     <Compile Include="packages\tools\update\UpdateCacher.cs" />
     <Compile Include="packages\tools\update\UpdateHandler.cs" />
