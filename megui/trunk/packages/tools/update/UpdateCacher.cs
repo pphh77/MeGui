@@ -21,12 +21,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.Net;
-using System.Text;
-using System.Threading;
-using System.Windows.Forms;
 
 using ICSharpCode.SharpZipLib.Zip;
 using SevenZip;
@@ -121,6 +116,61 @@ namespace MeGUI
             catch
             {
                 MainForm.Instance.UpdateHandler.AddTextToLog("Old version of " + name + " could not be backed up correctly.", ImageType.Error, true);
+                return UpdateWindow.ErrorState.CouldNotCreateBackup;
+            }
+
+            return UpdateWindow.ErrorState.Successful;
+        }
+
+        public static UpdateWindow.ErrorState PreparePackageFolder(string packageName)
+        {
+            ProgramSettings oPackage = UpdateCacher.GetPackage(packageName);
+            if (oPackage == null)
+                return UpdateWindow.ErrorState.Successful;
+
+            string packagePath = Path.GetDirectoryName(oPackage.Path);
+            if (MainForm.Instance.Settings.AlwaysBackUpFiles)
+            {
+                try
+                {   
+                    // remove all old backup files found
+                    Array.ForEach(Directory.GetFiles(packagePath, "*.backup", SearchOption.AllDirectories), delegate (string path) { File.Delete(path); });
+                }
+                catch
+                {
+                    MainForm.Instance.UpdateHandler.AddTextToLog("Outdated backup version of " + packageName + " could not be deleted. Check if it is in use.", ImageType.Error, true);
+                    return UpdateWindow.ErrorState.CouldNotCreateBackup;
+                }
+            }
+
+            try
+            {
+                DirectoryInfo fi = new DirectoryInfo(packagePath);
+                FileInfo[] files = fi.GetFiles("*.*", SearchOption.AllDirectories);
+                foreach (FileInfo f in files)
+                {
+                    // only continue when file can be deleted/renamed
+                    bool bFound = false;
+                    foreach (string strFile in oPackage.DoNotDeleteFilesOnUpdate)
+                    {
+                        if (f.FullName.Equals(strFile))
+                        {
+                            bFound = true;
+                            break;
+                        }
+                    }
+                    if (bFound)
+                        continue;
+
+                    if (!MainForm.Instance.Settings.AlwaysBackUpFiles)
+                        f.Delete();
+                    else
+                        f.MoveTo(Path.Combine(f.Directory.FullName, f.Name + ".backup"));
+                }
+            }
+            catch
+            {
+                MainForm.Instance.UpdateHandler.AddTextToLog("Old version of " + packageName + " could not be accessed correctly.", ImageType.Error, true);
                 return UpdateWindow.ErrorState.CouldNotCreateBackup;
             }
 

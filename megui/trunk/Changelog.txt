@@ -1,3 +1,4 @@
+2584 [Update]               clean package directory during update
 2582 [MediaInfo]            fixed language detection for VOB files (regression of 2572)
 2581 [Update]               if a update cache file is obsolete it will be retained for 90 days
 2580 [Update]               changed backup to be disabled by default

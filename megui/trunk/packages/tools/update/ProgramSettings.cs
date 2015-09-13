@@ -24,9 +24,6 @@ using System.IO;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 
-using MeGUI.core.util;
-using MeGUI.core.gui;
-
 namespace MeGUI
 {
     public class ProgramSettings
@@ -37,10 +34,12 @@ namespace MeGUI
         private string _name;
         private string _displayname;
         private List<string> _files;
+        private List<string> _doNotDeleteFilesOnUpdate;
 
         public ProgramSettings()
         {
             _files = new List<string>();
+            _doNotDeleteFilesOnUpdate = new List<string>();
             _enabled = _required = false;
             _path = _name = _displayname = String.Empty;
             _lastused = new DateTime();
@@ -50,6 +49,7 @@ namespace MeGUI
         public ProgramSettings(string name)
         {
             _files = new List<string>();
+            _doNotDeleteFilesOnUpdate = new List<string>();
             _enabled = _required = false;
             _path = String.Empty;
             _lastused = new DateTime();
@@ -108,6 +108,13 @@ namespace MeGUI
         {
             get { return _files; }
             set { _files = value; }
+        }
+
+        [XmlIgnore()]
+        public List<string> DoNotDeleteFilesOnUpdate
+        {
+            get { return _doNotDeleteFilesOnUpdate; }
+            set { _doNotDeleteFilesOnUpdate = value; }
         }
 
         [XmlIgnore()]

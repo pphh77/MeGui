@@ -318,6 +318,13 @@ namespace MeGUI
                 return UpdateWindow.ErrorState.CouldNotSaveNewFile;
             }
 
+            if (file is UpdateWindow.ProgramFile)
+            {
+                UpdateWindow.ErrorState err = UpdateCacher.PreparePackageFolder(file.Name);
+                if (err != UpdateWindow.ErrorState.Successful)
+                    return err;
+            }
+
             if (file.AvailableVersion.Url.EndsWith(".7z"))
             {
                 try
@@ -331,6 +338,9 @@ namespace MeGUI
                         };
                         oArchive.FileExists += (o, e) =>
                         {
+                            if (file is UpdateWindow.ProgramFile)
+                                return;
+
                             if (MainForm.Instance.Settings.AlwaysBackUpFiles)
                             {
                                 extractResult = UpdateCacher.ManageBackups(e.FileName, file.Name, file.NeedsRestartedCopying);
@@ -379,7 +389,7 @@ namespace MeGUI
                                     Directory.CreateDirectory(filename);
                                 continue;
                             }
-                            if (MainForm.Instance.Settings.AlwaysBackUpFiles)
+                            if (!(file is UpdateWindow.ProgramFile) && MainForm.Instance.Settings.AlwaysBackUpFiles)
                             {
                                 UpdateWindow.ErrorState result = UpdateCacher.ManageBackups(filename, file.Name, file.NeedsRestartedCopying);
                                 if (result != UpdateWindow.ErrorState.Successful)
