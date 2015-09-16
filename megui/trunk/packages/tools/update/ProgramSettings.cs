@@ -184,6 +184,21 @@ namespace MeGUI
                 return false;
         }
 
+        public bool PackageToBeShown()
+        {
+            if ((_name.Equals("dgindexim") && !MainForm.Instance.Settings.UseDGIndexIM) ||
+                (_name.Equals("dgindexnv") && !MainForm.Instance.Settings.UseDGIndexNV) ||
+                (_name.Equals("fdkaac") && !MainForm.Instance.Settings.UseFDKAac) ||
+                (_name.Equals("neroaacenc") && !MainForm.Instance.Settings.UseNeroAacEnc) ||
+                (_name.Equals("qaac") && !MainForm.Instance.Settings.UseQAAC) ||
+                (_name.Equals("x265") && !MainForm.Instance.Settings.UseX265))
+            {
+                _enabled = false;
+                return false;
+            }
+            return true;
+        }
+
         private bool FilesAvailable()
         {
             foreach (String file in _files)

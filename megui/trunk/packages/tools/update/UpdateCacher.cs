@@ -34,59 +34,67 @@ namespace MeGUI
     {
         public static void flushOldCachedFilesAsync(UpdateWindow.iUpgradeableCollection upgradeData)
         {
-            string updateCache = MainForm.Instance.Settings.MeGUIUpdateCache;
-            if (String.IsNullOrEmpty(updateCache) || !Directory.Exists(updateCache))
-                return;
-
-            List<string> urls = new List<string>();
-            foreach (UpdateWindow.iUpgradeable u in upgradeData)
+            try
             {
-                if (!String.IsNullOrEmpty(u.AvailableVersion.Url))
-                    urls.Add(u.AvailableVersion.Url.ToLowerInvariant());
-                if (!urls.Contains(u.CurrentVersion.Url) && !String.IsNullOrEmpty(u.CurrentVersion.Url))
-                    urls.Add(u.CurrentVersion.Url.ToLowerInvariant());
-            }
+                string updateCache = MainForm.Instance.Settings.MeGUIUpdateCache;
+                if (String.IsNullOrEmpty(updateCache) || !Directory.Exists(updateCache))
+                    return;
 
-            DirectoryInfo fi = new DirectoryInfo(updateCache);
-            FileInfo[] files = fi.GetFiles("*.zip");
-            foreach (FileInfo f in files)
-            {
-                if (urls.IndexOf(f.Name.ToLowerInvariant()) >= 0)
-                    continue;
-
-                if (f.Name.StartsWith("_obsolete_"))
-                    continue;
-
-                f.LastWriteTimeUtc = DateTime.UtcNow;
-                f.MoveTo(Path.Combine(updateCache, "_obsolete_" + f.Name));
-                MainForm.Instance.UpdateHandler.AddTextToLog("Marked file as obsolete: " + f.Name.Substring(10), ImageType.Information, false);
-            }
-            files = fi.GetFiles("*.7z");
-            foreach (FileInfo f in files)
-            {
-                if (urls.IndexOf(f.Name.ToLowerInvariant()) >= 0)
-                    continue;
-
-                if (f.Name.StartsWith("_obsolete_"))
-                    continue;
-
-                f.LastWriteTimeUtc = DateTime.UtcNow;
-                f.MoveTo(Path.Combine(updateCache, "_obsolete_" + f.Name));
-                MainForm.Instance.UpdateHandler.AddTextToLog("Marked file as obsolete: " + f.Name.Substring(10), ImageType.Information, false);
-            }
-
-            files = fi.GetFiles("_obsolete_*.*");
-            foreach (FileInfo f in files)
-            {
-                if (urls.IndexOf(f.Name.ToLowerInvariant()) >= 0)
-                    continue;
-
-                // delete file if it is obsolete for more than 90 days
-                if (DateTime.Now - f.LastWriteTime > new TimeSpan(90, 0, 0, 0, 0))
+                List<string> urls = new List<string>();
+                foreach (UpdateWindow.iUpgradeable u in upgradeData)
                 {
-                    f.Delete();
-                    MainForm.Instance.UpdateHandler.AddTextToLog("Deleted obsolete file: " + f.Name.Substring(10), ImageType.Information, false);
+                    if (!String.IsNullOrEmpty(u.AvailableVersion.Url))
+                        urls.Add(u.AvailableVersion.Url.ToLowerInvariant());
+                    if (!urls.Contains(u.CurrentVersion.Url) && !String.IsNullOrEmpty(u.CurrentVersion.Url))
+                        urls.Add(u.CurrentVersion.Url.ToLowerInvariant());
                 }
+
+                DirectoryInfo fi = new DirectoryInfo(updateCache);
+                FileInfo[] files = fi.GetFiles("*.zip");
+                foreach (FileInfo f in files)
+                {
+                    if (urls.IndexOf(f.Name.ToLowerInvariant()) >= 0)
+                        continue;
+
+                    if (f.Name.StartsWith("_obsolete_"))
+                        continue;
+
+                    f.LastWriteTimeUtc = DateTime.UtcNow;
+                    f.MoveTo(Path.Combine(updateCache, "_obsolete_" + f.Name));
+                    MainForm.Instance.UpdateHandler.AddTextToLog("Marked file as obsolete: " + f.Name.Substring(10), ImageType.Information, false);
+                }
+
+                files = fi.GetFiles("*.7z");
+                foreach (FileInfo f in files)
+                {
+                    if (urls.IndexOf(f.Name.ToLowerInvariant()) >= 0)
+                        continue;
+
+                    if (f.Name.StartsWith("_obsolete_"))
+                        continue;
+
+                    f.LastWriteTimeUtc = DateTime.UtcNow;
+                    f.MoveTo(Path.Combine(updateCache, "_obsolete_" + f.Name));
+                    MainForm.Instance.UpdateHandler.AddTextToLog("Marked file as obsolete: " + f.Name.Substring(10), ImageType.Information, false);
+                }
+
+                files = fi.GetFiles("_obsolete_*.*");
+                foreach (FileInfo f in files)
+                {
+                    if (urls.IndexOf(f.Name.ToLowerInvariant()) >= 0)
+                        continue;
+
+                    // delete file if it is obsolete for more than 90 days
+                    if (DateTime.Now - f.LastWriteTime > new TimeSpan(90, 0, 0, 0, 0))
+                    {
+                        f.Delete();
+                        MainForm.Instance.UpdateHandler.AddTextToLog("Deleted obsolete file: " + f.Name.Substring(10), ImageType.Information, false);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MainForm.Instance.UpdateHandler.AddTextToLog("Old package data could not be cleaned: " + ex.Message, ImageType.Error, false);
             }
         }
 
@@ -136,9 +144,9 @@ namespace MeGUI
                     // remove all old backup files found
                     Array.ForEach(Directory.GetFiles(packagePath, "*.backup", SearchOption.AllDirectories), delegate (string path) { File.Delete(path); });
                 }
-                catch
+                catch (Exception ex)
                 {
-                    MainForm.Instance.UpdateHandler.AddTextToLog("Outdated backup version of " + packageName + " could not be deleted. Check if it is in use.", ImageType.Error, true);
+                    MainForm.Instance.UpdateHandler.AddTextToLog("Outdated backup version of " + oPackage.DisplayName + " could not be deleted. Check if it is in use. " + ex.Message, ImageType.Error, true);
                     return UpdateWindow.ErrorState.CouldNotCreateBackup;
                 }
             }
@@ -168,9 +176,9 @@ namespace MeGUI
                         f.MoveTo(Path.Combine(f.Directory.FullName, f.Name + ".backup"));
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                MainForm.Instance.UpdateHandler.AddTextToLog("Old version of " + packageName + " could not be accessed correctly.", ImageType.Error, true);
+                MainForm.Instance.UpdateHandler.AddTextToLog("Old version of " + oPackage.DisplayName + " could not be accessed correctly. Check if it is in use. " + ex.Message, ImageType.Error, true);
                 return UpdateWindow.ErrorState.CouldNotCreateBackup;
             }
 
@@ -297,19 +305,17 @@ namespace MeGUI
             {
                 // check the 7-zip file
                 err = UpdateWindow.ErrorState.CouldNotExtract;
+                bool bOK = true;
                 try
                 {
                     using (SevenZipExtractor oArchive = new SevenZipExtractor(file))
                     {
                         if (oArchive.Check() == false)
-                        {
-                            MainForm.Instance.UpdateHandler.AddTextToLog("Could not extract " + file + ". Deleting file.", ImageType.Information, true);
-                            DeleteCacheFile(file);
-                            return false;
-                        }
+                            bOK = false;
                     }
                 }
-                catch
+                catch { bOK = false; }
+                if (!bOK)
                 {
                     MainForm.Instance.UpdateHandler.AddTextToLog("Could not extract " + file + ". Deleting file.", ImageType.Error, true);
                     DeleteCacheFile(file);
@@ -320,20 +326,17 @@ namespace MeGUI
             {
                 // check the zip file
                 err = UpdateWindow.ErrorState.CouldNotExtract;
+                bool bOK = true;
                 try
                 {
                     using (ZipFile zipFile = new ZipFile(file))
                     {
                         if (zipFile.TestArchive(true) == false)
-                        {
-                            zipFile.Close();
-                            MainForm.Instance.UpdateHandler.AddTextToLog("Could not extract " + file + ". Deleting file.", ImageType.Information, true);
-                            DeleteCacheFile(file);
-                            return false;
-                        }
+                            bOK = false;
                     }
                 }
-                catch
+                catch { bOK = false; }
+                if (!bOK)
                 {
                     MainForm.Instance.UpdateHandler.AddTextToLog("Could not extract " + file + ". Deleting file.", ImageType.Error, true);
                     DeleteCacheFile(file);

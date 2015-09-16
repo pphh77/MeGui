@@ -1413,13 +1413,20 @@ namespace MeGUI
             dgindexim.UpdateInformation("dgindexim", "DGIndexIM", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\dgindexim\dgindexim.exe"));
             dgindexim.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\dgindexim\DGDecodeIM.dll"));
             dgindexim.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\dgindexim\libmfxsw32.dll"));
+            if (!MainForm.Instance.Settings.UseDGIndexIM)
+                UpdateCacher.CheckPackage("dgindexim", false, false);
             dgindexim.DoNotDeleteFilesOnUpdate.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\dgindexim\license.txt"));
             dgindex.UpdateInformation("dgindex", "DGIndex", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\dgindex\dgindex.exe"));
             dgindex.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\dgindex\dgdecode.dll"));
             dgindexnv.UpdateInformation("dgindexnv", "DGIndexNV", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\dgindexnv\dgindexnv.exe"));
             dgindexnv.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\dgindexnv\dgdecodenv.dll"));
             dgindexnv.DoNotDeleteFilesOnUpdate.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\dgindexnv\license.txt"));
+            if (!MainForm.Instance.Settings.UseDGIndexNV)
+                UpdateCacher.CheckPackage("dgindexnv", false, false);
             eac3to.UpdateInformation("eac3to", "eac3to", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\eac3to\eac3to.exe"));
+            fdkaac.UpdateInformation("fdkaac", "FDK-AAC", FDKAacPath);
+            if (!MainForm.Instance.Settings.UseFDKAac)
+                UpdateCacher.CheckPackage("fdkaac", false, false);
             ffmpeg.UpdateInformation("ffmpeg", "FFmpeg", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\ffmpeg\ffmpeg.exe"));
             ffms.UpdateInformation("ffms", "FFMS", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\ffms\ffmsindex.exe"));
             ffms.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\ffms\ffms2.dll"));
@@ -1445,11 +1452,14 @@ namespace MeGUI
             mkvmerge.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\mkvmerge\mkvextract.exe"));
             mp4box.UpdateInformation("mp4box", "MP4Box", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\mp4box\mp4box.exe"));
             neroaacenc.UpdateInformation("neroaacenc", "NeroAACEnc", NeroAacEncPath);
+            if (!MainForm.Instance.Settings.UseNeroAacEnc)
+                UpdateCacher.CheckPackage("neroaacenc", false, false);
             oggenc.UpdateInformation("oggenc2", "OggEnc2", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\oggenc2\oggenc2.exe"));
             opus.UpdateInformation("opus", "Opus", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\opus\opusenc.exe"));
             pgcdemux.UpdateInformation("pgcdemux", "PgcDemux", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\pgcdemux\pgcdemux.exe"));
             qaac.UpdateInformation("qaac", "QAAC", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\qaac\qaac.exe"));
-            fdkaac.UpdateInformation("fdkaac", "FDK-AAC", FDKAacPath);
+            if (!MainForm.Instance.Settings.UseQAAC)
+                UpdateCacher.CheckPackage("qaac", false, false);
             tsmuxer.UpdateInformation("tsmuxer", "tsMuxeR", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\tsmuxer\tsmuxer.exe"));
             vobsub.UpdateInformation("vobsub", "VobSub", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\vobsub\vobsub.dll"));
 #if x64
@@ -1470,6 +1480,8 @@ namespace MeGUI
             x265.UpdateInformation("x265", "x265", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x265\avs4x265.exe"));
             x265.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x265\x86\x265.exe"));
             x265.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x265\x64\x265.exe"));
+            if (!MainForm.Instance.Settings.UseX265)
+                UpdateCacher.CheckPackage("x265", false, false);
             xvid.UpdateInformation("xvid_encraw", "Xvid", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\xvid_encraw\xvid_encraw.exe"));
        }
         #endregion

@@ -774,9 +774,14 @@ namespace MeGUI
 
             foreach (iUpgradeable file in MainForm.Instance.UpdateHandler.UpdateData)
             {
+                // only add a package to the view if it is not completly disabled in the settings
+                ProgramSettings pSettings = UpdateCacher.GetPackage(file.Name);
+                if (pSettings != null && !pSettings.PackageToBeShown())
+                    continue;
+
                 if (!bShowAllFiles)
                 {
-                    ProgramSettings pSettings = UpdateCacher.GetPackage(file.Name);
+                    
                     if (file.DownloadChecked)
                         AddToListview(file.CreateListViewItem());
                 }

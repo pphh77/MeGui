@@ -299,7 +299,7 @@ namespace MeGUI
                 filepath = Path.GetDirectoryName(file.SavePath);
             else
             {
-                AddTextToLog("The path to save " + file.Name + " to is invalid.", ImageType.Error, true);
+                AddTextToLog("The path to save " + file.DisplayName + " to is invalid.", ImageType.Error, true);
                 return UpdateWindow.ErrorState.CouldNotSaveNewFile;
             }
             if (file.SavePath != null)
@@ -343,7 +343,7 @@ namespace MeGUI
 
                             if (MainForm.Instance.Settings.AlwaysBackUpFiles)
                             {
-                                extractResult = UpdateCacher.ManageBackups(e.FileName, file.Name, file.NeedsRestartedCopying);
+                                extractResult = UpdateCacher.ManageBackups(e.FileName, file.DisplayName, file.NeedsRestartedCopying);
                                 if (extractResult != UpdateWindow.ErrorState.Successful)
                                 {
                                     e.Cancel = true;
@@ -352,7 +352,7 @@ namespace MeGUI
                             }
                             if (file.NeedsRestartedCopying)
                             {
-                                AddFileToReplace(file.Name, e.FileName, file.AvailableVersion);
+                                AddFileToReplace(file.DisplayName, e.FileName, file.AvailableVersion);
                                 e.FileName += ".tempcopy";
                             }
                         };
@@ -367,7 +367,7 @@ namespace MeGUI
                 }
                 catch
                 {
-                    AddTextToLog("Could not extract " + file.Name + ". Deleting file. Please run the update again.", ImageType.Error, true);
+                    AddTextToLog("Could not extract " + file.DisplayName + ". Deleting file. Please run the update again.", ImageType.Error, true);
                     UpdateCacher.DeleteCacheFile(file.AvailableVersion.Url);
                     return UpdateWindow.ErrorState.CouldNotExtract;
                 }
@@ -391,7 +391,7 @@ namespace MeGUI
                             }
                             if (!(file is UpdateWindow.ProgramFile) && MainForm.Instance.Settings.AlwaysBackUpFiles)
                             {
-                                UpdateWindow.ErrorState result = UpdateCacher.ManageBackups(filename, file.Name, file.NeedsRestartedCopying);
+                                UpdateWindow.ErrorState result = UpdateCacher.ManageBackups(filename, file.DisplayName, file.NeedsRestartedCopying);
                                 if (result != UpdateWindow.ErrorState.Successful)
                                     return result;
                             }
@@ -410,14 +410,14 @@ namespace MeGUI
                 }
                 catch
                 {
-                    AddTextToLog("Could not extract " + file.Name + ". Deleting file. Please run the update again.", ImageType.Error, true);
+                    AddTextToLog("Could not extract " + file.DisplayName + ". Deleting file. Please run the update again.", ImageType.Error, true);
                     UpdateCacher.DeleteCacheFile(file.AvailableVersion.Url);
                     return UpdateWindow.ErrorState.CouldNotExtract;
                 }
             }
             else
             {
-                AddTextToLog("Package " + file.Name + " could not be extracted.", ImageType.Error, true);
+                AddTextToLog("Package " + file.DisplayName + " could not be extracted.", ImageType.Error, true);
                 return UpdateWindow.ErrorState.CouldNotExtract;
             }
 
@@ -584,7 +584,7 @@ namespace MeGUI
                         strText = "MeGUI cannot find " + file.DisplayName + " on your system or it is outdated.\nDue to the licensing the component is not included on the MeGUI update server.\n\nTherefore please download the file on your own and extract neroaacenc.exe to:\n" + strPath + "\n\nIf necessary change the path in the settings:\n\"Settings\\External Program Settings\"\n\nWould you like to download it now?";
                     }
                     else
-                        strText = "MeGUI cannot find " + file.DisplayName + " on your system or it is outdated.\nDue to the licensing the component is not included on the MeGUI update server.\n\nTherefore please download the file on your own, extract & compile it and set the path to the " + file.Name + ".exe in the MeGUI settings\n(\"Settings\\External Program Settings\").\n\nWould you like to download it now?";
+                        strText = "MeGUI cannot find " + file.DisplayName + " on your system or it is outdated.\nDue to the licensing the component is not included on the MeGUI update server.\n\nTherefore please download the file on your own, extract & compile it and set the path to the executable in the MeGUI settings\n(\"Settings\\External Program Settings\").\n\nWould you like to download it now?";
 
                     if (MessageBox.Show(strText, "Component not found", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                     {
@@ -701,13 +701,13 @@ namespace MeGUI
         {
             if (file.RequiredBuild > 0 && new System.Version(Application.ProductVersion).Build < file.RequiredBuild)
             {
-                AddTextToLog(string.Format("Could not install module '{0}' as at least MeGUI build {1} is required.", file.Name, file.RequiredBuild), ImageType.Information, true);
+                AddTextToLog(string.Format("Could not install module '{0}' as at least MeGUI build {1} is required.", file.DisplayName, file.RequiredBuild), ImageType.Information, true);
                 return UpdateWindow.ErrorState.RequirementNotMet;
             }
 
             if (!String.IsNullOrEmpty(file.RequiredNET) && String.IsNullOrEmpty(OSInfo.GetDotNetVersion(file.RequiredNET)))
             {
-                AddTextToLog(string.Format("Could not install module '{0}' as .NET {1} is required.", file.Name, file.RequiredNET), ImageType.Warning, true);
+                AddTextToLog(string.Format("Could not install module '{0}' as .NET {1} is required.", file.DisplayName, file.RequiredNET), ImageType.Warning, true);
                 return UpdateWindow.ErrorState.RequirementNotMet;
             }
 
@@ -720,7 +720,7 @@ namespace MeGUI
                 return UpdateWindow.ErrorState.Successful;
             }
 
-            AddTextToLog(string.Format("Could not install module '{0}'.", file.Name), ImageType.Error, true);
+            AddTextToLog(string.Format("Could not install module '{0}'.", file.DisplayName), ImageType.Error, true);
             return state;
         }
 

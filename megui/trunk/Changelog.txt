@@ -1,3 +1,4 @@
+2586 [Update]               if a package needs to be enabled in the settings it will not be shown in the update window
 2585 [DGIndexIM/NV]         copy license.txt to the other indexer if possible
 2584 [Update]               clean package directory during update
 2582 [MediaInfo]            fixed language detection for VOB files (regression of 2572)
