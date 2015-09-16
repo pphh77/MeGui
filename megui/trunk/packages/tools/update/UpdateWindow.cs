@@ -275,6 +275,14 @@ namespace MeGUI
                 set { downloadChecked = value; }
             }
 
+            private int iRestartCount = 0;
+            [XmlIgnore]
+            public int RestartCount
+            {
+                get { return iRestartCount; }
+                set { iRestartCount = value; }
+            }
+
             private string savePath;
             [XmlIgnore]
             public string SavePath

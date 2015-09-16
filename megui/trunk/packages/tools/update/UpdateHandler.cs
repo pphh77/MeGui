@@ -352,6 +352,7 @@ namespace MeGUI
                             }
                             if (file.NeedsRestartedCopying)
                             {
+                                file.RestartCount++;
                                 AddFileToReplace(file.DisplayName, e.FileName, file.AvailableVersion);
                                 e.FileName += ".tempcopy";
                             }
@@ -395,8 +396,9 @@ namespace MeGUI
                                 if (result != UpdateWindow.ErrorState.Successful)
                                     return result;
                             }
-                            if (file.NeedsRestartedCopying)
+                            if (file.NeedsRestartedCopying && File.Exists(filename))
                             {
+                                file.RestartCount++;
                                 AddFileToReplace(file.Name, filename, file.AvailableVersion);
                                 filename += ".tempcopy";
                             }
@@ -715,7 +717,7 @@ namespace MeGUI
             if (state == UpdateWindow.ErrorState.Successful)
             {
                 // the current installed version is now the latest available version if no restart is needed
-                if (!file.NeedsRestartedCopying)
+                if (file.RestartCount == 0)
                     file.CurrentVersion = file.AvailableVersion;
                 return UpdateWindow.ErrorState.Successful;
             }

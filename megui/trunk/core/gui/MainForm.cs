@@ -1089,7 +1089,7 @@ namespace MeGUI
 
         private void runRestarter()
         {
-            if (_updateHandler.PackagesToUpdateAtRestart.Count == 0)
+            if (_updateHandler.PackagesToUpdateAtRestart.Count == 0 && !restart)
                 return;
 
             // check if the old updater is still available and delete if found
@@ -1098,14 +1098,17 @@ namespace MeGUI
 
             if (File.Exists(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"LinqBridge.dll")))
                 File.Delete(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"LinqBridge.dll"));
-           
-            using (Stream fs = new FileStream(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "update.arg"), FileMode.Create))
+
+            if (_updateHandler.PackagesToUpdateAtRestart.Count > 0)
             {
-                XmlSerializer serializer = new XmlSerializer(typeof(List<UpgradeData>));
-                XmlWriterSettings settings = new XmlWriterSettings();
-                settings.Indent = true;
-                XmlWriter writer = XmlTextWriter.Create(fs, settings);
-                serializer.Serialize(writer, _updateHandler.PackagesToUpdateAtRestart);
+                using (Stream fs = new FileStream(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "update.arg"), FileMode.Create))
+                {
+                    XmlSerializer serializer = new XmlSerializer(typeof(List<UpgradeData>));
+                    XmlWriterSettings settings = new XmlWriterSettings();
+                    settings.Indent = true;
+                    XmlWriter writer = XmlTextWriter.Create(fs, settings);
+                    serializer.Serialize(writer, _updateHandler.PackagesToUpdateAtRestart);
+                }
             }
 
             Process proc = new Process();

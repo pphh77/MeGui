@@ -1,4 +1,5 @@
-2587                        removed unnecessary runtime files at startup
+2588 [Update]               improved restart handling
+2587                        remove unnecessary runtime files at startup
 2586 [Update]               if a package needs to be enabled in the settings it will not be shown in the update window
 2585 [DGIndexIM/NV]         copy license.txt to the other indexer if possible
 2584 [Update]               clean package directory during update

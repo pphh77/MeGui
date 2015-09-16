@@ -130,10 +130,7 @@ namespace Update
 #endif
                 file = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "update.arg");
                 if (!File.Exists(file))
-                {
-                    errorsEncountered.Add(file + " not found");
                     exit(bRestart);
-                }
 
                 List<UpgradeData> oData = new List<UpgradeData>();
                 using (Stream fs = new FileStream(file, FileMode.Open))
