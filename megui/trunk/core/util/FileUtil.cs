@@ -422,7 +422,7 @@ namespace MeGUI.core.util
             bool bFoundInstalledAviSynth = false;
 
             // remove msvc files
-            LSMASHFileActions(true);
+            DeleteRuntimeFiles();
             PortableAviSynthActions(true);
 
             // detect system installation
@@ -529,6 +529,34 @@ namespace MeGUI.core.util
             fileDate = File.GetLastWriteTimeUtc(fileName).ToString("dd-MM-yyyy");
             fileProductName = FileProperties.ProductName;
             return true;
+        }
+
+        /// <summary>
+        /// Delete runtime files
+        /// </summary>
+        public static void DeleteRuntimeFiles()
+        {
+            ArrayList targetDirectories = new ArrayList();
+            targetDirectories.Add(Path.GetDirectoryName(Application.ExecutablePath));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.FFmpeg.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X264_10B.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.XviD.Path));
+
+            foreach (String dir in targetDirectories)
+            {
+                if (!Directory.Exists(dir))
+                    continue;
+
+                DirectoryInfo fi = new DirectoryInfo(dir);
+                FileInfo[] files = fi.GetFiles("msvc*.dll");
+                foreach (FileInfo f in files)
+                {
+                    try { f.Delete(); }
+                    catch { }
+                }
+            }
         }
 
         /// <summary>
