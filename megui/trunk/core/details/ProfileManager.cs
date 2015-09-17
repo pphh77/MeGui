@@ -160,6 +160,12 @@ namespace MeGUI
             return Path.Combine(path, SaveFolderName);
         }
 
+        public void SaveProfiles()
+        {
+            WriteProfiles(path, AllProfiles);
+            saveSelectedProfiles();
+        }
+
         /// <summary>
         /// saves all the profiles
         /// this is called when the program exists and ensures that all
@@ -167,23 +173,56 @@ namespace MeGUI
         /// </summary>
         public static void WriteProfiles(string path, IEnumerable<Profile> profiles)
         {
+            string profilesFolder = GetSaveFolder(path);
+
+            // remove old backup files
             try
             {
-                FileUtil.DeleteDirectoryIfExists(GetSaveFolder(path), true);
+                Array.ForEach(Directory.GetFiles(profilesFolder, "*.backup", SearchOption.AllDirectories), delegate (string filePath) { File.Delete(filePath); });
             }
             catch (Exception ex)
             {
-                MessageBox.Show("There was an error clearing the profiles folder before deletion: " + ex.Message, "Error saving profiles", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                LogItem _oLog = MainForm.Instance.Log.Info("Error");
+                _oLog.LogValue("Old backup profile files could not be deleted", ex, ImageType.Error);
+                return;
+            }
+
+            // backup old profiles
+            try
+            {
+                DirectoryInfo fi = new DirectoryInfo(profilesFolder);
+                FileInfo[] files = fi.GetFiles("*.xml", SearchOption.AllDirectories);
+                foreach (FileInfo f in files)
+                {
+                    f.CopyTo(Path.Combine(f.Directory.FullName, Path.ChangeExtension(f.Name, ".backup")));
+                }
+            }
+            catch (Exception ex)
+            {
+                LogItem _oLog = MainForm.Instance.Log.Info("Error");
+                _oLog.LogValue("Backup profile files could not be created", ex, ImageType.Error);
+                
+                // remove backup files
+                try
+                {
+                    Array.ForEach(Directory.GetFiles(profilesFolder, "*.backup", SearchOption.AllDirectories), delegate (string filePath) { File.Delete(filePath); });
+                }
+                catch (Exception e)
+                {
+                    _oLog.LogValue("Backup profile files could not be deleted", e, ImageType.Error);
+                }
+                return;
             }
 
             foreach (Profile p in profiles)
-                Util.XmlSerialize(p, profilePath(path, p));
-        }
-
-        public void SaveProfiles()
-        {
-            WriteProfiles(path, AllProfiles);
-            saveSelectedProfiles();
+            {
+                if (!Util.XmlSerialize(p, profilePath(path, p)))
+                {
+                    string backupFile = Path.ChangeExtension(profilePath(path, p), ".backup");
+                    if (File.Exists(backupFile))
+                        File.Copy(backupFile, profilePath(path, p), true);
+                }
+            }
         }
 
         private void saveSelectedProfiles()
@@ -313,7 +352,6 @@ namespace MeGUI
         public static List<Profile> ReadAllProfiles(string path, bool bSilentError)
         {
             ProfileManager p = new ProfileManager(path);
-
             List<Profile> ps = new List<Profile>();
 
             foreach (ProfileType t in p.profileTypes)
@@ -448,7 +486,6 @@ namespace MeGUI
             }
         }
         #endregion
-
 
         #region misc operations
         private static Type GetSettingsType(Profile p)
@@ -641,6 +678,7 @@ namespace MeGUI
                 return;
 
             SProfiles = w.Profiles;
+            MainForm.Instance.Profiles.SaveProfiles();
         }
 
         public SpecificProfileType(string name)

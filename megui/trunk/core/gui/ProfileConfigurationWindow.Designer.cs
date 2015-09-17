@@ -55,8 +55,8 @@ namespace MeGUI.core.gui
             // 
             // presetsGroupbox
             // 
-            this.presetsGroupbox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.presetsGroupbox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.presetsGroupbox.Controls.Add(this.updateButton);
             this.presetsGroupbox.Controls.Add(this.loadDefaultsButton);
             this.presetsGroupbox.Controls.Add(this.videoProfile);
@@ -67,7 +67,7 @@ namespace MeGUI.core.gui
             this.presetsGroupbox.Size = new System.Drawing.Size(400, 48);
             this.presetsGroupbox.TabIndex = 44;
             this.presetsGroupbox.TabStop = false;
-            this.presetsGroupbox.Text = "Presets";
+            this.presetsGroupbox.Text = " Presets ";
             // 
             // updateButton
             // 
@@ -93,10 +93,10 @@ namespace MeGUI.core.gui
             // 
             // videoProfile
             // 
-            this.videoProfile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.videoProfile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.videoProfile.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.videoProfile.Location = new System.Drawing.Point(8, 18);
+            this.videoProfile.Location = new System.Drawing.Point(8, 19);
             this.videoProfile.Name = "videoProfile";
             this.videoProfile.Size = new System.Drawing.Size(121, 21);
             this.videoProfile.Sorted = true;
@@ -125,9 +125,9 @@ namespace MeGUI.core.gui
             // 
             // panel1
             // 
-            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panel1.Location = new System.Drawing.Point(2, 2);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(411, 399);

@@ -1,3 +1,6 @@
+2589 [Profile]              "Load Defaults" resets the selected profile (before it was the scratchpad one)
+                            improved profile saving
+                            profiles will be saved to disk also when a profile is changed
 2588 [Update]               improved restart handling
 2587                        remove unnecessary runtime files at startup
 2586 [Update]               if a package needs to be enabled in the settings it will not be shown in the update window

@@ -19,12 +19,6 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
 
 namespace MeGUI.core.gui
 {
@@ -38,8 +32,6 @@ namespace MeGUI.core.gui
         private void config_Click(object sender, EventArgs e)
         {
             Manager.Configure(SelectedProfile);
-            //RefreshProfiles();
         }
     }
 }
-

@@ -20,11 +20,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 using MeGUI.core.plugins.interfaces;
@@ -64,11 +60,6 @@ namespace MeGUI.core.gui
             }
         }
 
-
-
-/*        public ProfileConfigurationWindow(ProfileManager p, Control sPanel, Gettable<TSettings> s, string initialProfile)
-            : this(p, sPanel, s, initialProfile, new TSettings().getSettingsType()) { }*/
-
         public ProfileConfigurationWindow(TPanel t, string title)
         {
             InitializeComponent();
@@ -86,13 +77,17 @@ namespace MeGUI.core.gui
 
         private void loadDefaultsButton_Click(object sender, EventArgs e)
         {
+            GenericProfile<TSettings> prof = SelectedProfile;
             s.Settings = new TSettings();
-            putSettingsInScratchpad();
+            prof.Settings = s.Settings;
         }
 
         private void updateButton_Click(object sender, EventArgs e)
         {
             GenericProfile<TSettings> prof = SelectedProfile;
+            if (s.Settings.Equals(prof.BaseSettings))
+                return;
+
             prof.Settings = s.Settings;
         }
 
@@ -101,9 +96,11 @@ namespace MeGUI.core.gui
             string profileName = InputBox.Show("Please give the preset a name", "Please give the preset a name", "");
             if (profileName == null)
                 return;
+
             profileName = profileName.Trim();
             if (profileName.Length == 0)
                 return;
+
             GenericProfile<TSettings> prof = new GenericProfile<TSettings>(profileName, s.Settings);
             if (byName(profileName) != null)
                 MessageBox.Show("Sorry, presets must have unique names", "Duplicate preset name", MessageBoxButtons.OK);
@@ -167,12 +164,12 @@ namespace MeGUI.core.gui
             GenericProfile<TSettings> prof = (GenericProfile<TSettings>)this.videoProfile.SelectedItem;
             Debug.Assert(prof != null);
 
+            if (prof.Name == ProfileManager.ScratchPadName)
+                return;
+
+            int iIndex = this.videoProfile.SelectedIndex;
             videoProfile.Items.Remove(prof);
-            
-            if (prof.Name == ProfileManager.ScratchPadName && videoProfile.Items.Count > 0)
-                videoProfile.SelectedIndex = 0;
-            else
-                loadDefaultsButton_Click(null, null);
+            videoProfile.SelectedIndex = iIndex > 0 ? (iIndex - 1) : 0;
         }
 
         private void okButton_Click(object sender, EventArgs e)
@@ -181,52 +178,37 @@ namespace MeGUI.core.gui
             this.Close();
         }
 
-        private void putSettingsInScratchpad()
-        {
-            TSettings s = Settings;
-            GenericProfile<TSettings> p = scratchPadProfile;
-
-            if (p == null)
-            {
-                p = new GenericProfile<TSettings>(ProfileManager.ScratchPadName, s);
-                videoProfile.Items.Add(p);
-            }
-
-            p.Settings = s;
-            videoProfile.SelectedItem = p;
-        }
-
         private void ProfileConfigurationWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (bCloseFormWithoutSaving == true)
                 return;
 
             Profile prof = SelectedProfile;
+            if (Settings.Equals(prof.BaseSettings))
+                return;
+
             if (prof.Name == ProfileManager.ScratchPadName)
                 prof.BaseSettings = Settings;
-            else if (!Settings.Equals(prof.BaseSettings))
+            else
             {
-                switch (MessageBox.Show("Profile has been changed. Update the selected profile? (Pressing No will save your changes to the scratchpad)",
-                    "Profile update", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question))
+                switch (MessageBox.Show("The selected profile has been changed. Do you want to save the changes?",
+                    "Profile update", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
                 {
                     case DialogResult.Yes:
                         prof.BaseSettings = Settings;
                         break;
 
                     case DialogResult.No:
-                        putSettingsInScratchpad();
-                        break;
-
-                    case DialogResult.Cancel:
                         if (bSaveSettings == true)
                         {
                             bSaveSettings = false;
                             e.Cancel = true;
                         }
+                        this.DialogResult = DialogResult.Cancel;
                         return;
                 }
             }
-            this.DialogResult = DialogResult.OK;            
+            this.DialogResult = DialogResult.OK;
         }
 
         private void cancelButton_Click(object sender, EventArgs e)

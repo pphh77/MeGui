@@ -762,21 +762,10 @@ namespace MeGUI
             this.profileManager.SaveProfiles();
             this.saveSettings();
             _updateHandler.SaveSettings();
-            this.saveApplicationSettings();
             jobControl1.saveJobs();
             this.saveLog();
             deleteFiles();
             this.runRestarter();
-            Application.ApplicationExit += new EventHandler(Application_ApplicationExit);
-        }
-
-        void Application_ApplicationExit(object sender, EventArgs e)
-        {
-            MeGUI.Properties.Settings.Default.Save();
-        }
-
-        private void saveApplicationSettings()
-        {
         }
 
         private void deleteFiles()
@@ -786,7 +775,8 @@ namespace MeGUI
                 try
                 {
                     FileUtil.DeleteDirectoryIfExists(file, true);
-                    if (File.Exists(file)) File.Delete(file);
+                    if (File.Exists(file))
+                        File.Delete(file);
                 }
                 catch { }
             }

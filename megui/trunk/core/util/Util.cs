@@ -93,7 +93,7 @@ namespace MeGUI.core.util
                 m();
         }
 
-        public static void XmlSerialize(object o, string path)
+        public static bool XmlSerialize(object o, string path)
         {
             FileUtil.ensureDirectoryExists(Path.GetDirectoryName(path));
             XmlSerializer ser = new XmlSerializer(o.GetType());
@@ -113,8 +113,10 @@ namespace MeGUI.core.util
                     catch (Exception) { }
                     LogItem _oLog = MainForm.Instance.Log.Info("Error");
                     _oLog.LogValue("XmlSerialize: " + path, e, ImageType.Error);
+                    return false;
                 }
             }
+            return true;
         }
 
         public static T XmlDeserializeOrDefault<T>(string path)
