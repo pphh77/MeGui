@@ -49,6 +49,11 @@ namespace MeGUI
 
     public class ProfileManager
     {
+        public static readonly string ScratchPadName = "*scratchpad*";
+        private string path;
+        private List<ProfileType> profileTypes = new List<ProfileType>();
+        private List<ProfileGroup> profileGroups = new List<ProfileGroup>();
+
         #region init
         public ProfileManager(string path)
         {
@@ -72,14 +77,6 @@ namespace MeGUI
             SafeRegister<AviSynthSettings, AviSynthProfileConfigPanel>();
         }
         #endregion
-
-        public static readonly string ScratchPadName = "*scratchpad*";
-
-        string path;
-        private List<ProfileType> profileTypes = new List<ProfileType>();
-        private List<ProfileGroup> profileGroups = new List<ProfileGroup>();
-
-
 
         #region registration 
         public bool SafeRegister<TSettings, TPanel>(params string[] groups)
@@ -160,10 +157,12 @@ namespace MeGUI
             return Path.Combine(path, SaveFolderName);
         }
 
-        public void SaveProfiles()
+        public bool SaveProfiles()
         {
-            WriteProfiles(path, AllProfiles);
-            saveSelectedProfiles();
+            bool bOK = saveSelectedProfiles();
+            if (!WriteProfiles(path, AllProfiles))
+                bOK = false;
+            return bOK;
         }
 
         /// <summary>
@@ -171,7 +170,7 @@ namespace MeGUI
         /// this is called when the program exists and ensures that all
         /// currently defined profiles are saved, overwriting currently existing ones
         /// </summary>
-        public static void WriteProfiles(string path, IEnumerable<Profile> profiles)
+        public static bool WriteProfiles(string path, IEnumerable<Profile> profiles)
         {
             string profilesFolder = GetSaveFolder(path);
 
@@ -184,7 +183,7 @@ namespace MeGUI
             {
                 LogItem _oLog = MainForm.Instance.Log.Info("Error");
                 _oLog.LogValue("Old backup profile files could not be deleted", ex, ImageType.Error);
-                return;
+                return false;
             }
 
             // backup old profiles
@@ -211,9 +210,10 @@ namespace MeGUI
                 {
                     _oLog.LogValue("Backup profile files could not be deleted", e, ImageType.Error);
                 }
-                return;
+                return false;
             }
 
+            bool bSuccess = true;
             foreach (Profile p in profiles)
             {
                 if (!Util.XmlSerialize(p, profilePath(path, p)))
@@ -221,32 +221,39 @@ namespace MeGUI
                     string backupFile = Path.ChangeExtension(profilePath(path, p), ".backup");
                     if (File.Exists(backupFile))
                         File.Copy(backupFile, profilePath(path, p), true);
+                    bSuccess = false;
                 }
             }
+
+            return bSuccess;
         }
 
-        private void saveSelectedProfiles()
+        private bool saveSelectedProfiles()
         {
             string filename = Path.Combine(GetSaveFolder(path), "SelectedProfiles.xml");
             XmlSerializer ser = null;
-            using (Stream s = File.Open(filename, System.IO.FileMode.Create, System.IO.FileAccess.Write))
+            bool bOK = true;
+            try
             {
-                try
+                using (Stream s = File.Open(filename, System.IO.FileMode.Create, System.IO.FileAccess.Write))
                 {
                     // Hacky workaround because serialization of dictionaries isn't possible
-                    string[] groupKeys = profileGroups.ConvertAll<string>(delegate(ProfileGroup g) { return g.ID; }).ToArray();
-                    string[] groupValues = profileGroups.ConvertAll<string>(delegate(ProfileGroup g) { return g.SelectedChild; }).ToArray();
-                    string[] keys = profileTypes.ConvertAll<string>(delegate(ProfileType p) { return p.ID; }).ToArray();
-                    string[] values = profileTypes.ConvertAll<string>(delegate(ProfileType p) { return p.SelectedProfile.Name; }).ToArray();
+                    string[] groupKeys = profileGroups.ConvertAll<string>(delegate (ProfileGroup g) { return g.ID; }).ToArray();
+                    string[] groupValues = profileGroups.ConvertAll<string>(delegate (ProfileGroup g) { return g.SelectedChild; }).ToArray();
+                    string[] keys = profileTypes.ConvertAll<string>(delegate (ProfileType p) { return p.ID; }).ToArray();
+                    string[] values = profileTypes.ConvertAll<string>(delegate (ProfileType p) { return p.SelectedProfile.Name; }).ToArray();
                     string[][] data = new string[][] { keys, values, groupKeys, groupValues };
                     ser = new XmlSerializer(data.GetType());
                     ser.Serialize(s, data);
                 }
-                catch (Exception e)
-                {
-                    MessageBox.Show("List of selected profiles could not be saved. Error message: " + e.Message, "Error saving profile", MessageBoxButtons.OK);
-                }
             }
+            catch (Exception e)
+            {
+                LogItem _oLog = MainForm.Instance.Log.Info("Error");
+                _oLog.LogValue("List of selected profiles could not be saved", e, ImageType.Error);
+                bOK = false;
+            }
+            return bOK;
         }
 
         private void loadSelectedProfiles()

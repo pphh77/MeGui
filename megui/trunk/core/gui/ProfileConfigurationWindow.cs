@@ -41,7 +41,9 @@ namespace MeGUI.core.gui
         }
 
         private TPanel s;
-        private bool bCloseFormWithoutSaving = false, bSaveSettings = false;
+        private bool bCloseFormWithoutSaving = false;
+        private bool bSaveSettings = false;
+        private bool bSettingsChanged = false;
 
         private TSettings Settings
         {
@@ -77,9 +79,8 @@ namespace MeGUI.core.gui
 
         private void loadDefaultsButton_Click(object sender, EventArgs e)
         {
-            GenericProfile<TSettings> prof = SelectedProfile;
             s.Settings = new TSettings();
-            prof.Settings = s.Settings;
+            bSettingsChanged = true;
         }
 
         private void updateButton_Click(object sender, EventArgs e)
@@ -89,6 +90,7 @@ namespace MeGUI.core.gui
                 return;
 
             prof.Settings = s.Settings;
+            bSettingsChanged = true;
         }
 
         private void newVideoProfileButton_Click(object sender, EventArgs e)
@@ -108,6 +110,7 @@ namespace MeGUI.core.gui
             {
                 videoProfile.Items.Add(prof);
                 videoProfile.SelectedItem = prof;
+                bSettingsChanged = true;
             }
         }
 
@@ -118,11 +121,13 @@ namespace MeGUI.core.gui
             {
                 // We can't just set videoProfile.SelectedItem = value, because the profiles in videoProfile are cloned
                 foreach (GenericProfile<TSettings> p in videoProfile.Items)
+                {
                     if (p.Name == value.Name)
                     {
                         videoProfile.SelectedItem = p;
                         return;
                     }
+                }
             }
         }
 
@@ -170,6 +175,7 @@ namespace MeGUI.core.gui
             int iIndex = this.videoProfile.SelectedIndex;
             videoProfile.Items.Remove(prof);
             videoProfile.SelectedIndex = iIndex > 0 ? (iIndex - 1) : 0;
+            bSettingsChanged = true;
         }
 
         private void okButton_Click(object sender, EventArgs e)
@@ -178,33 +184,57 @@ namespace MeGUI.core.gui
             this.Close();
         }
 
+        private void putSettingsInScratchpad()
+        {
+            TSettings s = Settings;
+            GenericProfile<TSettings> p = scratchPadProfile;
+
+            if (p == null)
+            {
+                p = new GenericProfile<TSettings>(ProfileManager.ScratchPadName, s);
+                videoProfile.Items.Add(p);
+            }
+
+            p.Settings = s;
+            videoProfile.SelectedItem = p;
+        }
+
         private void ProfileConfigurationWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
+            this.DialogResult = DialogResult.Cancel;
+
             if (bCloseFormWithoutSaving == true)
                 return;
 
             Profile prof = SelectedProfile;
             if (Settings.Equals(prof.BaseSettings))
+            {
+                if (bSettingsChanged)
+                    this.DialogResult = DialogResult.OK;
                 return;
+            }
 
             if (prof.Name == ProfileManager.ScratchPadName)
                 prof.BaseSettings = Settings;
             else
             {
-                switch (MessageBox.Show("The selected profile has been changed. Do you want to save the changes?",
-                    "Profile update", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
+                switch (MessageBox.Show("The selected profile has been modified. Update the selected profile? (Pressing No will save your changes to the scratchpad)",
+                    "Profile update", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question))
                 {
                     case DialogResult.Yes:
                         prof.BaseSettings = Settings;
                         break;
 
                     case DialogResult.No:
+                        putSettingsInScratchpad();
+                        break;
+
+                    case DialogResult.Cancel:
                         if (bSaveSettings == true)
                         {
                             bSaveSettings = false;
                             e.Cancel = true;
                         }
-                        this.DialogResult = DialogResult.Cancel;
                         return;
                 }
             }

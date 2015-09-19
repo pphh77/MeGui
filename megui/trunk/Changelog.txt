@@ -1,3 +1,5 @@
+2590 [Profile]              improved profile saving II
+                            fixed missing option to save to scratchpad (regression of 2589)
 2589 [Profile]              "Load Defaults" resets the selected profile (before it was the scratchpad one)
                             improved profile saving
                             profiles will be saved to disk also when a profile is changed

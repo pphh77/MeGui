@@ -157,27 +157,27 @@ namespace MeGUI.core.util
             XmlSerializer ser = new XmlSerializer(typeof(T));
             if (File.Exists(path))
             {
-                using (Stream s = File.OpenRead(path))
+                try
                 {
-                    try
+                    using (Stream s = File.OpenRead(path))
                     {
                         return (T)ser.Deserialize(s);
                     }
-                    catch (Exception e)
+                }
+                catch (Exception e)
+                {
+                    if (!bSilentError)
                     {
-                        s.Close();
-                        if (!bSilentError)
-                        {
-                            MessageBox.Show("File '" + path + "' could not be loaded!\n\nIt will be moved to the backup directory.", "Error loading File", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            FileUtil.BackupFile(path, true);
-                        }
-                        LogItem _oLog = MainForm.Instance.Log.Info("Error");
-                        _oLog.LogValue("XmlDeserialize: " + path, e, ImageType.Error);
-                        return null;
+                        MessageBox.Show("File '" + path + "' could not be loaded!\n\nIt will be moved to the backup directory.", "Error loading File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        FileUtil.BackupFile(path, true);
                     }
+                    LogItem _oLog = MainForm.Instance.Log.Info("Error");
+                    _oLog.LogValue("XmlDeserialize: " + path, e, ImageType.Error);
+                    return null;
                 }
             }
-            else return null;
+            else
+                return null;
         }
 
 

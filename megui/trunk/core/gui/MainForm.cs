@@ -229,7 +229,8 @@ namespace MeGUI
             }
             if (!e.Cancel)
             {
-                CloseSilent();
+                if (!CloseSilent())
+                    e.Cancel = true; // abort closing
             }
             base.OnClosing(e);
         }
@@ -390,14 +391,14 @@ namespace MeGUI
         /// </summary>
         public void runAfterEncodingCommands()
         {
-            if (Jobs.CurrentAfterEncoding == AfterEncoding.DoNothing) return;
-            this.profileManager.SaveProfiles();
-            this.saveSettings();
-            jobControl1.saveJobs();
-            this.saveLog();
+            if (Jobs.CurrentAfterEncoding == AfterEncoding.DoNothing)
+                return;
 
             if (Jobs.CurrentAfterEncoding == AfterEncoding.Shutdown)
             {
+                if (!CloseSilent())
+                    return; // abort closing
+
                 using (CountdownWindow countdown = new CountdownWindow(30))
                 {
                     if (countdown.ShowDialog() == DialogResult.OK)
@@ -410,13 +411,12 @@ namespace MeGUI
                     }
                     else
                         Log.LogEvent("User aborted shutdown");
-
                 }
             }
             else if (Jobs.CurrentAfterEncoding == AfterEncoding.CloseMeGUI)
             {
-                this.CloseSilent();
-                Application.Exit();
+                if (CloseSilent())
+                    Application.Exit();
             }
             else if (Jobs.CurrentAfterEncoding == AfterEncoding.RunCommand && !String.IsNullOrEmpty(settings.AfterEncodingCommand))
             {
@@ -434,13 +434,18 @@ namespace MeGUI
                     p.StartInfo = psi;
                     p.Start();
                 }
-                catch (Exception ex) { MessageBox.Show("Error when attempting to run command: " + ex.Message, "Run command failed", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+                catch (Exception ex) { MessageBox.Show("Error when attempting to run after encoding command: " + ex.Message, "Run command failed", MessageBoxButtons.OK, MessageBoxIcon.Error); }
             }
         }
 
         public LogItem Log
         {
-            get { return logTree1.Log; }
+            get
+            {
+                if (logTree1 == null)
+                    return new LogItem("Log", ImageType.NoImage); ;
+                return logTree1.Log;
+            }
         }
 
         /// <summary>
@@ -757,15 +762,23 @@ namespace MeGUI
             RegisterForm(this);
         }
 
-        internal void CloseSilent()
+        internal bool CloseSilent()
         {
-            this.profileManager.SaveProfiles();
+            while (!this.profileManager.SaveProfiles())
+            {
+                DialogResult dR = MessageBox.Show("The profiles could not be saved.\r\nIf you ignore this problem, profile data may be lost!", "Profile backup failed", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Warning);
+                if (dR == DialogResult.Abort)
+                    return false;
+                else if (dR == DialogResult.Ignore)
+                    break;
+            }
             this.saveSettings();
             _updateHandler.SaveSettings();
             jobControl1.saveJobs();
             this.saveLog();
             deleteFiles();
             this.runRestarter();
+            return true;
         }
 
         private void deleteFiles()
