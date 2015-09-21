@@ -97,24 +97,24 @@ namespace MeGUI.core.util
         {
             FileUtil.ensureDirectoryExists(Path.GetDirectoryName(path));
             XmlSerializer ser = new XmlSerializer(o.GetType());
-            using (Stream s = File.Open(path, System.IO.FileMode.Create, System.IO.FileAccess.Write))
+            
+            try
             {
-                try
+                using (Stream s = File.Open(path, System.IO.FileMode.Create, System.IO.FileAccess.Write))
                 {
                     ser.Serialize(s, o);
                 }
-                catch (Exception e)
+            }
+            catch (Exception e)
+            {
+                try
                 {
-                    s.Close();
-                    try
-                    {
-                        File.Delete(path);
-                    }
-                    catch (Exception) { }
-                    LogItem _oLog = MainForm.Instance.Log.Info("Error");
-                    _oLog.LogValue("XmlSerialize: " + path, e, ImageType.Error);
-                    return false;
+                    File.Delete(path);
                 }
+                catch (Exception) { }
+                LogItem _oLog = MainForm.Instance.Log.Info("Error");
+                _oLog.LogValue("XmlSerialize: " + path, e, ImageType.Error);
+                return false;
             }
             return true;
         }
@@ -125,22 +125,22 @@ namespace MeGUI.core.util
             XmlSerializer ser = new XmlSerializer(typeof(T));
             if (File.Exists(path))
             {
-                using (Stream s = File.OpenRead(path))
+                try
                 {
-                    try
+                    using (Stream s = File.OpenRead(path))
                     {
                         return (T)ser.Deserialize(s);
                     }
-                    catch (Exception)
-                    {
-                        s.Close();
-                        MessageBox.Show("File '" + path + "' could not be loaded!\n\nIt will be moved to the backup directory.", "Error loading File", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        FileUtil.BackupFile(path, true);
-                        return null;
-                    }
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("File '" + path + "' could not be loaded!\n\nIt will be moved to the backup directory.", "Error loading File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    FileUtil.BackupFile(path, true);
+                    return null;
                 }
             }
-            else return new T();
+            else
+                return new T();
         }
 
         public static object XmlDeserialize(string path, Type t, bool bSilentError)

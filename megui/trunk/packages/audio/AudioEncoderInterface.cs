@@ -213,8 +213,11 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             if (su.IsComplete = (su.IsComplete || su.WasAborted || su.HasError))
             {
                 _mre.Set();  // Make sure nothing is waiting for pause to stop
-                stdoutDone.WaitOne(); // wait for stdout to finish processing
-                stderrDone.WaitOne(); // wait for stderr to finish processing
+                if (_encoderProcess != null)
+                {
+                    stdoutDone.WaitOne(); // wait for stdout to finish processing
+                    stderrDone.WaitOne(); // wait for stderr to finish processing
+                }
 
                 if (!su.HasError && !su.WasAborted)
                 {
@@ -474,8 +477,8 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                             raiseEvent("Finalizing encoder");
                             while (!_encoderProcess.HasExited) // wait until the process has terminated without locking the GUI
                             {
-                                System.Windows.Forms.Application.DoEvents();
-                                System.Threading.Thread.Sleep(100);
+                                Application.DoEvents();
+                                Thread.Sleep(100);
                             }
                             _encoderProcess.WaitForExit();
                             _readFromStdErrThread.Join();
@@ -493,8 +496,8 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                                 _encoderProcess.Kill();
                                 while (!_encoderProcess.HasExited) // wait until the process has terminated without locking the GUI
                                 {
-                                    System.Windows.Forms.Application.DoEvents();
-                                    System.Threading.Thread.Sleep(100);
+                                    Application.DoEvents();
+                                    Thread.Sleep(100);
                                 }
                                 _encoderProcess.WaitForExit();
                                 _readFromStdErrThread.Join();
@@ -708,13 +711,24 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
         internal void Abort()
         {
             _encoderThread.Abort();
+            while (_encoderThread.IsAlive)
+            {
+                Application.DoEvents();
+                Thread.Sleep(100);
+            }
             _encoderThread = null;
+            if (_encoderProcess == null)
+            {
+                deleteTempFiles();
+                su.WasAborted = true;
+                raiseEvent();
+            }
         }
 
         private bool OpenSourceWithFFAudioSource(out StringBuilder sbOpen)
         {
             sbOpen = new StringBuilder();
-            sbOpen.Append(VideoUtil.getFFMSAudioInputLine(audioJob.Input, null, -1));
+            sbOpen.Append("HelpMeRonda" + VideoUtil.getFFMSAudioInputLine(audioJob.Input, null, -1) + "xxxx");
             _log.LogEvent("Trying to open the file with FFAudioSource()", ImageType.Information);
             string strErrorText = String.Empty;
             if (AudioUtil.AVSScriptHasAudio(sbOpen.ToString(), out strErrorText))
@@ -2015,26 +2029,32 @@ function x_upmixC" + id + @"(clip stereo)
 					{
 					    case ProcessPriority.IDLE:
 							_encoderThread.Priority = ThreadPriority.Lowest;
-                            _encoderProcess.PriorityClass = ProcessPriorityClass.Idle;
+                            if (_encoderProcess != null)
+                                _encoderProcess.PriorityClass = ProcessPriorityClass.Idle;
 							break;
 						case ProcessPriority.BELOW_NORMAL:
 							_encoderThread.Priority = ThreadPriority.BelowNormal;
-                            _encoderProcess.PriorityClass = ProcessPriorityClass.BelowNormal;
+                            if (_encoderProcess != null)
+                                _encoderProcess.PriorityClass = ProcessPriorityClass.BelowNormal;
 							break;
 						case ProcessPriority.NORMAL:
 							_encoderThread.Priority = ThreadPriority.Normal;
-                            _encoderProcess.PriorityClass = ProcessPriorityClass.Normal;
+                            if (_encoderProcess != null)
+                                _encoderProcess.PriorityClass = ProcessPriorityClass.Normal;
 							break;
 						case ProcessPriority.ABOVE_NORMAL:
 							_encoderThread.Priority = ThreadPriority.AboveNormal;
-                            _encoderProcess.PriorityClass = ProcessPriorityClass.AboveNormal;
+                            if (_encoderProcess != null)
+                                _encoderProcess.PriorityClass = ProcessPriorityClass.AboveNormal;
 							break;
 						case ProcessPriority.HIGH:
 							_encoderThread.Priority = ThreadPriority.Highest;
-                            _encoderProcess.PriorityClass = ProcessPriorityClass.High;
+                            if (_encoderProcess != null)
+                                _encoderProcess.PriorityClass = ProcessPriorityClass.High;
 							break;
 				    }
-                    VistaStuff.SetProcessPriority(_encoderProcess.Handle, _encoderProcess.PriorityClass);
+                    if (_encoderProcess != null)
+                        VistaStuff.SetProcessPriority(_encoderProcess.Handle, _encoderProcess.PriorityClass);
                     MainForm.Instance.Settings.ProcessingPriority = priority;
                     return;
                 }
