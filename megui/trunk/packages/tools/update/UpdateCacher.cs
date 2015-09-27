@@ -96,6 +96,29 @@ namespace MeGUI
             {
                 MainForm.Instance.UpdateHandler.AddTextToLog("Old package data could not be cleaned: " + ex.Message, ImageType.Error, false);
             }
+
+            try
+            {
+                string strMeGUILogPath = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath) + @"\logs";
+                if (String.IsNullOrEmpty(strMeGUILogPath) || !Directory.Exists(strMeGUILogPath))
+                    return;
+
+                DirectoryInfo fi = new DirectoryInfo(strMeGUILogPath);
+                FileInfo[] files = fi.GetFiles("*.*");
+                foreach (FileInfo f in files)
+                {
+                    // delete file if it is obsolete for more than 90 days
+                    if (DateTime.Now - f.LastWriteTime > new TimeSpan(90, 0, 0, 0, 0))
+                    {
+                        f.Delete();
+                        MainForm.Instance.UpdateHandler.AddTextToLog("Deleted obsolete file: " + f.Name.Substring(10), ImageType.Information, false);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MainForm.Instance.UpdateHandler.AddTextToLog("Old log data could not be cleaned: " + ex.Message, ImageType.Error, false);
+            }
         }
 
         public static UpdateWindow.ErrorState ManageBackups(string savePath, string name, bool bCopyFile)
