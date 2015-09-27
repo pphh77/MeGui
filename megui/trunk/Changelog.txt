@@ -1,3 +1,4 @@
+2596 [DGIndexIM/NV]         improved error handling
 2595 [DGIndexIM/NV]         fixed crash when the indexer directory is not available (regression of 2585)
 2594 [Update]               fixed update installation detection (regression of 2586)
 2593 [L-SMASH Indexer]      improved support for 10bit files

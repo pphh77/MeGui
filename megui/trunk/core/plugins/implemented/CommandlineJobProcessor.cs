@@ -22,10 +22,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Threading;
 
-using MeGUI.core.plugins.implemented;
 using MeGUI.core.util;
 
 namespace MeGUI
@@ -99,7 +97,6 @@ namespace MeGUI
 
             if (!String.IsNullOrEmpty(job.Output))
             {
-                
                 if (File.Exists(job.Output))
                 {
                     MediaInfoFile oInfo = new MediaInfoFile(job.Output, ref log);

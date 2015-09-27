@@ -19,7 +19,6 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -106,6 +105,14 @@ namespace MeGUI
                     sb.Append(" -a"); // demux everything
                 return sb.ToString();
             }
+        }
+
+        protected override void doExitConfig()
+        {
+            if (!File.Exists(job.Output))
+                su.HasError = true;
+
+            base.doExitConfig();
         }
     }
 }

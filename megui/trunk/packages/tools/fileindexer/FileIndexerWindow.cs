@@ -524,6 +524,9 @@ namespace MeGUI
 
         public static bool isDGMFile(string input)
         {
+            if (!File.Exists(input))
+                return false;
+
             using (StreamReader sr = new StreamReader(input, System.Text.Encoding.Default))
             {
                 string line = sr.ReadLine();
