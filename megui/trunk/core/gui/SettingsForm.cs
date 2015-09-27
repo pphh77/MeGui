@@ -429,6 +429,7 @@ namespace MeGUI
                 if (File.Exists(Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexIM.Path), "license.txt")))
                 {
                     // license.txt available in the other indexer directory. copy it
+                    Directory.CreateDirectory(Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexNV.Path));
                     File.Copy(Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexIM.Path), "license.txt"), Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexNV.Path), "license.txt"));
                 }
                 else
@@ -447,6 +448,7 @@ namespace MeGUI
                 if (File.Exists(Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexNV.Path), "license.txt")))
                 {
                     // license.txt available in the other indexer directory. copy it
+                    Directory.CreateDirectory(Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexIM.Path));
                     File.Copy(Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexNV.Path), "license.txt"), Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexIM.Path), "license.txt"));
                 }
                 else
