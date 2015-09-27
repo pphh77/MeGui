@@ -1,3 +1,4 @@
+2592 [Profile]              fixed profile deletion (regression of 2590)
 2591 [AudioEncoder]         improved job abort and priority change. Bug #813
 2590 [Profile]              improved profile saving II
                             fixed missing option to save to scratchpad (regression of 2589)

@@ -213,6 +213,18 @@ namespace MeGUI
                 return false;
             }
 
+            // remove old profile files
+            try
+            {
+                Array.ForEach(Directory.GetFiles(profilesFolder, "*.xml", SearchOption.AllDirectories), delegate (string filePath) { File.Delete(filePath); });
+            }
+            catch (Exception ex)
+            {
+                LogItem _oLog = MainForm.Instance.Log.Info("Error");
+                _oLog.LogValue("Old profile files could not be deleted", ex, ImageType.Error);
+                return false;
+            }
+
             bool bSuccess = true;
             foreach (Profile p in profiles)
             {
