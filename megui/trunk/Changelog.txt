@@ -1,3 +1,4 @@
+2594 [Update]               fixed update installation detection (regression of 2586)
 2593 [L-SMASH Indexer]      improved support for 10bit files
 2592 [Profile]              fixed profile deletion (regression of 2590)
 2591 [AudioEncoder]         improved job abort and priority change. Bug #813

@@ -353,7 +353,7 @@ namespace MeGUI
                             if (file.NeedsRestartedCopying)
                             {
                                 file.RestartCount++;
-                                AddFileToReplace(file.DisplayName, e.FileName, file.AvailableVersion);
+                                AddFileToReplace(file.Name, e.FileName, file.AvailableVersion);
                                 e.FileName += ".tempcopy";
                             }
                         };
