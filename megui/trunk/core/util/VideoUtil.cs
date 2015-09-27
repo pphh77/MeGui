@@ -889,21 +889,21 @@ namespace MeGUI
             return script.ToString();
         }
 
-        public static string getLSMASHVideoInputLine(string inputFile, string indexFile, double fps)
+        public static string getLSMASHVideoInputLine(string inputFile, string indexFile, double fps, bool b8Bit)
         {
             UpdateCacher.CheckPackage("lsmash");
             int fpsnum, fpsden;
             getFPSFraction(fps, inputFile, out fpsnum, out fpsden);
-            return getLSMASHBasicInputLine(inputFile, indexFile, -1, 0, fpsnum, fpsden, true);
+            return getLSMASHBasicInputLine(inputFile, indexFile, -1, 0, fpsnum, fpsden, true, b8Bit);
         }
 
         public static string getLSMASHAudioInputLine(string inputFile, string indexFile, int track)
         {
             UpdateCacher.CheckPackage("lsmash");
-            return getLSMASHBasicInputLine(inputFile, indexFile, track, 0, 0, 0, false);
+            return getLSMASHBasicInputLine(inputFile, indexFile, track, 0, 0, 0, false, true);
         }
 
-        private static string getLSMASHBasicInputLine(string inputFile, string indexFile, int track, int rffmode, int fpsnum, int fpsden, bool video)
+        private static string getLSMASHBasicInputLine(string inputFile, string indexFile, int track, int rffmode, int fpsnum, int fpsden, bool video, bool b8Bit)
         {
             StringBuilder script = new StringBuilder();
             script.AppendFormat("LoadPlugin(\"{0}\"){1}",
@@ -921,10 +921,11 @@ namespace MeGUI
                 || extension.Equals(".3gp") || extension.Equals(".3g2") || extension.Equals(".qt"));
             if (video)
             {
-                script.AppendFormat("{0}(\"{1}\"{2})",
+                script.AppendFormat("{0}(\"{1}\"{2}{3})",
                     (bUseLsmash ? "LSMASHVideoSource" : "LWLibavVideoSource"),
                     (!String.IsNullOrEmpty(indexFile) ? indexFile : inputFile),
-                    (track > -1 ? (bUseLsmash ? ", track=" + track : ", stream_index=" + track) : String.Empty));
+                    (track > -1 ? (bUseLsmash ? ", track=" + track : ", stream_index=" + track) : String.Empty),
+                    (!b8Bit ? ", format=\"YUV420P8\"" : String.Empty));
             }
             else
             {

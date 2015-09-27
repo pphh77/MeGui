@@ -576,6 +576,8 @@ namespace MeGUI
                             infoLog.LogEvent("fps cannot be determined. 23.976 will be used as default.", ImageType.Warning);
                         }
                         _VideoInfo.FPS = (double)fps;
+
+                        Int32.TryParse(track.BitDepth, out _VideoInfo.BitDepth);
                     }
                 }
                 info.Dispose();
@@ -1533,6 +1535,7 @@ namespace MeGUI
         public int FPS_D;  // online needed for AVS file check
         public int PGCNumber;
         public int PGCCount;
+        public int BitDepth;
 
         private string _strVideoScanType;
         private VideoCodec _vCodec;
@@ -1555,6 +1558,7 @@ namespace MeGUI
             FPS_D = fps_d;
             PGCCount = 0;
             PGCNumber = 0;
+            BitDepth = 8;
         }
 
         public VideoTrackInfo Track

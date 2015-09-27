@@ -183,7 +183,17 @@ namespace MeGUI
                     inputLine = VideoUtil.getFFMSVideoInputLine(input, indexFile, fps);
                     break;
                 case PossibleSources.lsmash:
-                    inputLine = VideoUtil.getLSMASHVideoInputLine(input, indexFile, fps);
+                    bool b8bit = true;
+                    if (File.Exists(input))
+                    {
+                        using (MediaInfoFile oInfo = new MediaInfoFile(input))
+                        {
+                            if (oInfo.VideoInfo.HasVideo)
+                                if (oInfo.VideoInfo.BitDepth > 8)
+                                    b8bit = false;
+                        }
+                    }
+                    inputLine = VideoUtil.getLSMASHVideoInputLine(input, indexFile, fps, b8bit);
                     break;
                 case PossibleSources.vdr:
                     inputLine = "AVISource(\"" + input + "\", audio=false)" + VideoUtil.getAssumeFPS(fps, input);

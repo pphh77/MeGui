@@ -86,7 +86,18 @@ namespace MeGUI
             StringBuilder strAVSScript = new StringBuilder();
             string outputIndex = job.Output;
 
-            strAVSScript.Append(VideoUtil.getLSMASHVideoInputLine(job.Input, job.Output, 0));
+            bool b8bit = true;
+            if (File.Exists(job.Input))
+            {
+                using (MediaInfoFile oInfo = new MediaInfoFile(job.Input))
+                {
+                    if (oInfo.VideoInfo.HasVideo)
+                        if (oInfo.VideoInfo.BitDepth > 8)
+                            b8bit = false;
+                }
+            }
+
+            strAVSScript.Append(VideoUtil.getLSMASHVideoInputLine(job.Input, job.Output, 0, b8bit));
             stdoutLog.LogValue("AviSynth script", strAVSScript.ToString(), ImageType.Information);
             job.Output = job.Input + ".lwi";
             if (File.Exists(job.Output))
