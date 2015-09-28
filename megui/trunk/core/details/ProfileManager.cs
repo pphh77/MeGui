@@ -159,8 +159,8 @@ namespace MeGUI
 
         public bool SaveProfiles()
         {
-            bool bOK = saveSelectedProfiles();
-            if (!WriteProfiles(path, AllProfiles))
+            bool bOK = WriteProfiles(path, AllProfiles);
+            if (!saveSelectedProfiles())
                 bOK = false;
             return bOK;
         }
@@ -174,19 +174,11 @@ namespace MeGUI
         {
             string profilesFolder = GetSaveFolder(path);
 
-            // remove old backup files
-            try
-            {
-                Array.ForEach(Directory.GetFiles(profilesFolder, "*.backup", SearchOption.AllDirectories), delegate (string filePath) { File.Delete(filePath); });
-            }
-            catch (Exception ex)
-            {
-                LogItem _oLog = MainForm.Instance.Log.Info("Error");
-                _oLog.LogValue("Old backup profile files could not be deleted", ex, ImageType.Error);
+            // remove old backup files if available
+            if (!deleteFiles(profilesFolder, "*.backup"))
                 return false;
-            }
 
-            // backup old profiles
+            // backup profiles
             try
             {
                 DirectoryInfo fi = new DirectoryInfo(profilesFolder);
@@ -200,44 +192,72 @@ namespace MeGUI
             {
                 LogItem _oLog = MainForm.Instance.Log.Info("Error");
                 _oLog.LogValue("Backup profile files could not be created", ex, ImageType.Error);
-                
+
                 // remove backup files
-                try
-                {
-                    Array.ForEach(Directory.GetFiles(profilesFolder, "*.backup", SearchOption.AllDirectories), delegate (string filePath) { File.Delete(filePath); });
-                }
-                catch (Exception e)
-                {
-                    _oLog.LogValue("Backup profile files could not be deleted", e, ImageType.Error);
-                }
+                deleteFiles(profilesFolder, "*.backup");
                 return false;
             }
 
-            // remove old profile files
-            try
+            // remove profile files
+            if (!deleteFiles(profilesFolder, "*.xml"))
             {
-                Array.ForEach(Directory.GetFiles(profilesFolder, "*.xml", SearchOption.AllDirectories), delegate (string filePath) { File.Delete(filePath); });
-            }
-            catch (Exception ex)
-            {
-                LogItem _oLog = MainForm.Instance.Log.Info("Error");
-                _oLog.LogValue("Old profile files could not be deleted", ex, ImageType.Error);
+                // restore backup
+                try
+                {
+                    DirectoryInfo fi = new DirectoryInfo(profilesFolder);
+                    FileInfo[] files = fi.GetFiles("*.backup", SearchOption.AllDirectories);
+                    foreach (FileInfo f in files)
+                    {
+                        f.CopyTo(Path.Combine(f.Directory.FullName, Path.ChangeExtension(f.Name, ".xml")));
+                    }
+                }
+                catch (Exception e)
+                {
+                    LogItem _oLog = MainForm.Instance.Log.Info("Error");
+                    _oLog.LogValue("Profile files could not be restored", e, ImageType.Error);
+                }
                 return false;
             }
 
             bool bSuccess = true;
-            foreach (Profile p in profiles)
+            try
             {
-                if (!Util.XmlSerialize(p, profilePath(path, p)))
+                foreach (Profile p in profiles)
                 {
-                    string backupFile = Path.ChangeExtension(profilePath(path, p), ".backup");
-                    if (File.Exists(backupFile))
-                        File.Copy(backupFile, profilePath(path, p), true);
-                    bSuccess = false;
+                    if (!Util.XmlSerialize(p, profilePath(path, p)))
+                    {
+                        string backupFile = Path.ChangeExtension(profilePath(path, p), ".backup");
+                        if (File.Exists(backupFile))
+                            File.Copy(backupFile, profilePath(path, p), true);
+                        bSuccess = false;
+                    }
                 }
+
+                deleteFiles(profilesFolder, "*.backup");
+            }
+            catch (Exception ex)
+            {
+                LogItem _oLog = MainForm.Instance.Log.Info("Error");
+                _oLog.LogValue("Profile files could not be created", ex, ImageType.Error);
+                bSuccess = false;
             }
 
             return bSuccess;
+        }
+
+        private static bool deleteFiles(string path, string files)
+        {
+            try
+            {
+                Array.ForEach(Directory.GetFiles(path, files, SearchOption.AllDirectories), delegate (string filePath) { File.Delete(filePath); });
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogItem _oLog = MainForm.Instance.Log.Info("Error");
+                _oLog.LogValue("Files could not be deleted", ex, ImageType.Error);
+                return false;
+            }
         }
 
         private bool saveSelectedProfiles()

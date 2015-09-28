@@ -1,3 +1,4 @@
+2599 [Profile]              fixed unsaved selected profile (regression of 2590)
 2598 [Log]                  delete log files after 90 days
 2597 [QAAC]                 do not delete portable dll files during update
 2596 [DGIndexIM/NV]         improved error handling
