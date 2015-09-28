@@ -1441,9 +1441,9 @@ namespace MeGUI
         private void keepInputResolution_CheckedChanged(object sender, EventArgs e)
         {
             if (keepInputResolution.Checked)
-                horizontalResolution.Enabled = autoCrop.Enabled = signalAR.Enabled = false;
+                horizontalResolution.Enabled = autoCrop.Enabled = signalAR.Enabled = ar.Enabled = false;
             else
-                horizontalResolution.Enabled = autoCrop.Enabled = signalAR.Enabled = true;
+                horizontalResolution.Enabled = autoCrop.Enabled = signalAR.Enabled = ar.Enabled = true;
         }
 
         private void chkDontEncodeVideo_CheckedChanged(object sender, EventArgs e)
