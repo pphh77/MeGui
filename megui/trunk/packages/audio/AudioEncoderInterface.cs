@@ -728,7 +728,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
         private bool OpenSourceWithFFAudioSource(out StringBuilder sbOpen)
         {
             sbOpen = new StringBuilder();
-            sbOpen.Append("HelpMeRonda" + VideoUtil.getFFMSAudioInputLine(audioJob.Input, null, -1) + "xxxx");
+            sbOpen.Append(VideoUtil.getFFMSAudioInputLine(audioJob.Input, null, -1) + "xxxx");
             _log.LogEvent("Trying to open the file with FFAudioSource()", ImageType.Information);
             string strErrorText = String.Empty;
             if (AudioUtil.AVSScriptHasAudio(sbOpen.ToString(), out strErrorText))
