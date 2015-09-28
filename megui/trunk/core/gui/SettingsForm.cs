@@ -354,20 +354,28 @@ namespace MeGUI
 
         private void backupfiles_CheckedChanged(object sender, EventArgs e)
         {
-            if (!backupfiles.Checked)
+            if (backupfiles.Checked && !internalSettings.AlwaysBackUpFiles)
             {
-                string meguiToolsFolder = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\'));
-                if (Directory.Exists(meguiToolsFolder))
+                if (MessageBox.Show("If you enable this feature the MeGUI folder size will not be limited as downloaded files and logs are not deleted anymore.", "Backup requested", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.Cancel)
                 {
-                    try
-                    {  // remove all backup files found
-                        Array.ForEach(Directory.GetFiles(meguiToolsFolder, "*.backup", SearchOption.AllDirectories),
-                          delegate(string path) { File.Delete(path); });
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    backupfiles.Checked = false;
+                }
+            }
+
+            if (backupfiles.Checked)
+                return;
+
+            string meguiToolsFolder = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\'));
+            if (Directory.Exists(meguiToolsFolder))
+            {
+                try
+                {  // remove all backup files found
+                    Array.ForEach(Directory.GetFiles(meguiToolsFolder, "*.backup", SearchOption.AllDirectories),
+                        delegate(string path) { File.Delete(path); });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }

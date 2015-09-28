@@ -774,6 +774,7 @@ namespace MeGUI
             }
             this.saveSettings();
             _updateHandler.SaveSettings();
+            UpdateCacher.RemoveOldFiles();
             jobControl1.saveJobs();
             this.saveLog();
             deleteFiles();

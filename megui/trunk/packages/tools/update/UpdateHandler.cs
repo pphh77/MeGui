@@ -672,8 +672,6 @@ namespace MeGUI
                     AddTextToLog("Packages which have not been successfully updated: " + (failedFiles.Count + missingFiles.Count), ImageType.Error, true);
             }
 
-            UpdateCacher.flushOldCachedFilesAsync(UpdateData);
-
             if (_updateMode == UpdateMode.Automatic && (failedFiles.Count + missingFiles.Count) == 0)
             {
                 if (_updateWindow != null)

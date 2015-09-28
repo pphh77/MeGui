@@ -32,8 +32,10 @@ namespace MeGUI
 {
     class UpdateCacher
     {
-        public static void flushOldCachedFilesAsync(UpdateWindow.iUpgradeableCollection upgradeData)
+        public static void RemoveOldFiles()
         {
+            UpdateWindow.iUpgradeableCollection upgradeData = MainForm.Instance.UpdateHandler.UpdateData;
+
             try
             {
                 string updateCache = MainForm.Instance.Settings.MeGUIUpdateCache;
@@ -78,17 +80,20 @@ namespace MeGUI
                     MainForm.Instance.UpdateHandler.AddTextToLog("Marked file as obsolete: " + f.Name.Substring(10), ImageType.Information, false);
                 }
 
-                files = fi.GetFiles("_obsolete_*.*");
-                foreach (FileInfo f in files)
+                if (!MainForm.Instance.Settings.AlwaysBackUpFiles)
                 {
-                    if (urls.IndexOf(f.Name.ToLowerInvariant()) >= 0)
-                        continue;
-
-                    // delete file if it is obsolete for more than 90 days
-                    if (DateTime.Now - f.LastWriteTime > new TimeSpan(90, 0, 0, 0, 0))
+                    files = fi.GetFiles("_obsolete_*.*");
+                    foreach (FileInfo f in files)
                     {
-                        f.Delete();
-                        MainForm.Instance.UpdateHandler.AddTextToLog("Deleted obsolete file: " + f.Name.Substring(10), ImageType.Information, false);
+                        if (urls.IndexOf(f.Name.ToLowerInvariant()) >= 0)
+                            continue;
+
+                        // delete file if it is obsolete for more than 90 days
+                        if (DateTime.Now - f.LastWriteTime > new TimeSpan(90, 0, 0, 0, 0))
+                        {
+                            f.Delete();
+                            MainForm.Instance.UpdateHandler.AddTextToLog("Deleted obsolete file: " + f.Name.Substring(10), ImageType.Information, false);
+                        }
                     }
                 }
             }
@@ -97,6 +102,9 @@ namespace MeGUI
                 MainForm.Instance.UpdateHandler.AddTextToLog("Old package data could not be cleaned: " + ex.Message, ImageType.Error, false);
             }
 
+            if (MainForm.Instance.Settings.AlwaysBackUpFiles)
+                return;
+
             try
             {
                 string strMeGUILogPath = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath) + @"\logs";
@@ -104,7 +112,7 @@ namespace MeGUI
                     return;
 
                 DirectoryInfo fi = new DirectoryInfo(strMeGUILogPath);
-                FileInfo[] files = fi.GetFiles("*.*");
+                FileInfo[] files = fi.GetFiles("*.log");
                 foreach (FileInfo f in files)
                 {
                     // delete file if it is obsolete for more than 90 days
