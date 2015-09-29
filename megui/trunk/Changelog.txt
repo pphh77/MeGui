@@ -1,3 +1,4 @@
+2603 [AudioEncoder]         fixed FFAudioSource. part II (regression of 2591)
 2602 [AudioEncoder]         fixed FFAudioSource (regression of 2591)
 2601 [OneClick]             fixed DAR button behaviour
 2600                        obsolete packages and log files will only be deleted if the backup option is disabled
