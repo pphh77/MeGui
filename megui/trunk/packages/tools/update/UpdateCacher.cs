@@ -192,7 +192,15 @@ namespace MeGUI
                     bool bFound = false;
                     foreach (string strFile in oPackage.DoNotDeleteFilesOnUpdate)
                     {
-                        if (f.FullName.Equals(strFile))
+                        if (f.FullName.ToLowerInvariant().Equals(strFile.ToLowerInvariant()))
+                        {
+                            bFound = true;
+                            break;
+                        }
+                    }
+                    foreach (string strFolder in oPackage.DoNotDeleteFoldersOnUpdate)
+                    {
+                        if (f.DirectoryName.ToLowerInvariant().StartsWith(strFolder.ToLowerInvariant()))
                         {
                             bFound = true;
                             break;

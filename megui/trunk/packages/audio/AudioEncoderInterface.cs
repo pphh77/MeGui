@@ -208,9 +208,10 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
 ");
         }
 
+        private bool bShowError = false;
         private void raiseEvent()
         {
-            if (su.IsComplete = (su.IsComplete || su.WasAborted || su.HasError))
+            if (su.IsComplete || su.WasAborted || su.HasError)
             {
                 _mre.Set();  // Make sure nothing is waiting for pause to stop
                 if (_encoderProcess != null)
@@ -226,12 +227,20 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                         MediaInfoFile oInfo = new MediaInfoFile(audioJob.Output, ref _log);
                     }
                 }
-                else if (su.HasError && audioJob.Settings is QaacSettings && _encoderStdErr.ToLowerInvariant().Contains("coreaudiotoolbox.dll"))
+                else if (su.HasError && !bShowError && audioJob.Settings is QaacSettings && _encoderStdErr.ToLowerInvariant().Contains("coreaudiotoolbox.dll"))
                 {
-                    _log.LogEvent("CoreAudioToolbox.dll is missing and must be installed. Please have a look at https://sites.google.com/site/qaacpage", ImageType.Error);
-                    if (MessageBox.Show("CoreAudioToolbox.dll is missing and must be installed.\r\nOtherwise QAAC cannot be used.\r\n\r\nDo you want to open the installation instructions?", "CoreAudioToolbox.dll missing", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
-                        System.Diagnostics.Process.Start("https://sites.google.com/site/qaacpage");
+                    bShowError = true; 
+                    _log.LogEvent("CoreAudioToolbox.dll is missing and must be installed. Please have a look at the install.txt in the qaac folder.", ImageType.Error);
+                    string installFile = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\qaac\install.txt");
+                    if (File.Exists(installFile))
+                    {
+                        if (MessageBox.Show("CoreAudioToolbox.dll is missing and must be installed.\r\nOtherwise QAAC cannot be used.\r\n\r\nDo you want to open the installation instructions?", "CoreAudioToolbox.dll missing", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
+                            System.Diagnostics.Process.Start(installFile);
+                    }
+                    else
+                        MessageBox.Show("CoreAudioToolbox.dll is missing and must be installed.\r\nOtherwise QAAC cannot be used", "CoreAudioToolbox.dll missing", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+                su.IsComplete = true;
             }
             if (StatusUpdate != null)
                 StatusUpdate(su);

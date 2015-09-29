@@ -35,11 +35,13 @@ namespace MeGUI
         private string _displayname;
         private List<string> _files;
         private List<string> _doNotDeleteFilesOnUpdate;
+        private List<string> _doNotDeleteFoldersOnUpdate;
 
         public ProgramSettings()
         {
             _files = new List<string>();
             _doNotDeleteFilesOnUpdate = new List<string>();
+            _doNotDeleteFoldersOnUpdate = new List<string>();
             _enabled = _required = false;
             _path = _name = _displayname = String.Empty;
             _lastused = new DateTime();
@@ -115,6 +117,13 @@ namespace MeGUI
         {
             get { return _doNotDeleteFilesOnUpdate; }
             set { _doNotDeleteFilesOnUpdate = value; }
+        }
+
+        [XmlIgnore()]
+        public List<string> DoNotDeleteFoldersOnUpdate
+        {
+            get { return _doNotDeleteFoldersOnUpdate; }
+            set { _doNotDeleteFoldersOnUpdate = value; }
         }
 
         [XmlIgnore()]

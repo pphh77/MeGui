@@ -1,3 +1,4 @@
+2604 [QAAC]                 do not delete portable runtime files during an update if they are in the QTfiles subdirectory
 2603 [AudioEncoder]         fixed FFAudioSource. part II (regression of 2591)
 2602 [AudioEncoder]         fixed FFAudioSource (regression of 2591)
 2601 [OneClick]             fixed DAR button behaviour
