@@ -79,9 +79,9 @@ namespace MeGUI
         private AfterEncoding afterEncoding;
         private ProxyMode httpProxyMode;
         private ProgramSettings avimuxgui, avisynth, avisynthplugins, besplit, dgindexim, dgindex, dgindexnv,
-                                eac3to, ffmpeg, ffms, flac, lame, lsmash, mkvmerge, mp4box, neroaacenc, oggenc,
-                                opus, pgcdemux, qaac, fdkaac, tsmuxer, vobsub, x264, x264_10b, x265, xvid, 
-                                mediainfo, megui_core, megui_help, megui_libs, megui_updater;
+                                eac3to, fdkaac, ffmpeg, ffms, flac, lame, lsmash, mediainfo, megui_core, megui_help, 
+                                megui_libs, megui_updater, mkvmerge, mp4box, neroaacenc, oggenc,
+                                opus, pgcdemux, qaac, tsmuxer, vobsub, x264, x264_10b, x265, xvid;
         #endregion
         public MeGUISettings()
 		{
@@ -1089,6 +1089,12 @@ namespace MeGUI
             set { eac3to = value; }
         }
 
+        public ProgramSettings Fdkaac
+        {
+            get { return fdkaac; }
+            set { fdkaac = value; }
+        }
+
         /// <summary>
         /// program settings of ffmpeg
         /// </summary>
@@ -1120,6 +1126,30 @@ namespace MeGUI
         {
             get { return lsmash; }
             set { lsmash = value; }
+        }
+
+        public ProgramSettings MediaInfo
+        {
+            get { return mediainfo; }
+            set { mediainfo = value; }
+        }
+
+        public ProgramSettings MeGUI_Core
+        {
+            get { return megui_core; }
+            set { megui_core = value; }
+        }
+
+        public ProgramSettings MeGUI_Libraries
+        {
+            get { return megui_libs; }
+            set { megui_libs = value; }
+        }
+
+        public ProgramSettings MeGUI_Updater
+        {
+            get { return megui_updater; }
+            set { megui_updater = value; }
         }
 
         /// <summary>
@@ -1207,36 +1237,6 @@ namespace MeGUI
         {
             get { return xvid; }
             set { xvid = value; }
-        }
-
-        public ProgramSettings Fdkaac
-        {
-            get { return fdkaac; }
-            set { fdkaac = value; }
-        }
-
-        public ProgramSettings MediaInfo
-        {
-            get { return mediainfo; }
-            set { mediainfo = value; }
-        }
-
-        public ProgramSettings MeGUI_Core
-        {
-            get { return megui_updater; }
-            set { megui_updater = value; }
-        }
-
-        public ProgramSettings MeGUI_Libraries
-        {
-            get { return megui_libs; }
-            set { megui_libs = value; }
-        }
-
-        public ProgramSettings MeGUI_Updater
-        {
-            get { return megui_updater; }
-            set { megui_updater = value; }
         }
         #endregion
 

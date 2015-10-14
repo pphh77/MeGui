@@ -87,8 +87,6 @@ namespace MeGUI
             set
             {
                 _lastused = value;
-                if (_lastused.AddDays(MainForm.Instance.Settings.DisablePackageInterval) <= DateTime.Now)
-                    _enabled = false;
             }
         }
 
@@ -189,8 +187,9 @@ namespace MeGUI
         {
             if (_required || (_enabled && _lastused.AddDays(MainForm.Instance.Settings.DisablePackageInterval) > DateTime.Now))
                 return true;
-            else
-                return false;
+            else if (!_required && _enabled && _lastused.AddDays(MainForm.Instance.Settings.DisablePackageInterval) <= DateTime.Now)
+                _enabled = false;
+            return false;
         }
 
         public bool PackageToBeShown()
