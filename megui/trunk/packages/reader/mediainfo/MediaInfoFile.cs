@@ -27,7 +27,6 @@ using System.Text.RegularExpressions;
 
 using MediaInfoWrapper;
 
-using MeGUI.core.details;
 using MeGUI.core.util;
 using MeGUI.packages.tools.hdbdextractor;
 
@@ -625,12 +624,17 @@ namespace MeGUI
             }
             else
             {
-                if (oLog == null)
-                    oLog = MainForm.Instance.Log.Info("MediaInfo");
                 if (String.IsNullOrEmpty(language) && String.IsNullOrEmpty(languageISO))
-                    oLog.LogEvent("The language information is not available for this track. The default MeGUI language has been selected.", ImageType.Information);
+                {
+                    if (oLog != null)
+                        oLog.LogEvent("The language information is not available for this track. The default MeGUI language has been selected.", ImageType.Information);
+                }
                 else
+                {
+                    if (oLog == null)
+                        oLog = MainForm.Instance.Log.Info("MediaInfo");
                     oLog.LogEvent("The language information \"" + languageISO + "/" + language + "\" is unknown. The default MeGUI language has been selected instead.", ImageType.Warning);
+                }
                return MeGUI.MainForm.Instance.Settings.DefaultLanguage1;
             }
         }
