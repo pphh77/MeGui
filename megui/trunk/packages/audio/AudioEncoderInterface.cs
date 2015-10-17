@@ -19,7 +19,6 @@
 // ****************************************************************************
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -30,8 +29,6 @@ using System.Threading;
 using System.Windows.Forms;
 
 using MeGUI.core.util;
-
-using MediaInfoWrapper;
 
 namespace MeGUI
 {
@@ -833,27 +830,8 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
         private bool OpenSourceWithImportAVS(out StringBuilder sbOpen, MediaInfoFile oInfo)
         {
             sbOpen = new StringBuilder();
-
-            try
-            {
-                if (oInfo.HasAudio)
-                    sbOpen.AppendFormat("Import(\"{0}\"){1}", audioJob.Input, Environment.NewLine);
-            }
-            catch { }
-
-            string strErrorText = String.Empty;
-            _log.LogEvent("Trying to open the file with Import()", ImageType.Information);
-            if (sbOpen.Length > 0 && AudioUtil.AVSScriptHasAudio(sbOpen.ToString(), out strErrorText))
-            {
-                _log.LogEvent("Successfully opened the file with Import()", ImageType.Information);
-                return true;
-            }
-            sbOpen = new StringBuilder();
-            if (String.IsNullOrEmpty(strErrorText))
-                _log.LogEvent("Failed opening the file with Import()", ImageType.Information);
-            else
-                _log.LogEvent("Failed opening the file with Import(). " + strErrorText, ImageType.Information);
-            return false;
+            sbOpen.AppendFormat("Import(\"{0}\"){1}", audioJob.Input, Environment.NewLine);
+            return true;
         }
 
         private bool OpenSourceWithNicAudio(out StringBuilder sbOpen, MediaInfoFile oInfo, bool bForce)
@@ -1120,25 +1098,21 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             string strChannelPositions = string.Empty;
             int iChannelCount = 0;
             int iAVSChannelCount = 0;
-            if (Path.GetExtension(audioJob.Input).ToLowerInvariant().Equals(".avs"))
+            if (oInfo.ContainerFileTypeString.Equals("AVS"))
             {
-                if (AudioUtil.AVSFileHasAudio(audioJob.Input))
-                {
-                    iChannelCount = AudioUtil.getChannelCountFromAVSFile(audioJob.Input);
-                    strChannelPositions = AudioUtil.getChannelPositionsFromAVSFile(audioJob.Input);
-                    script.AppendFormat(@"# detected channels: {0}{1}", oInfo.AudioInfo.Tracks[0].NbChannels, Environment.NewLine);
-                    script.AppendFormat(@"# detected channel positions: {0}{1}", strChannelPositions, Environment.NewLine);
-                }
+                iChannelCount = AudioUtil.getChannelCountFromAVSFile(audioJob.Input);
+                if (iChannelCount <= 0)
+                    int.TryParse(oInfo.AudioInfo.Tracks[0].NbChannels.Split(' ')[0], out iChannelCount);
+                strChannelPositions = AudioUtil.getChannelPositionsFromAVSFile(audioJob.Input);
+                script.AppendFormat(@"# detected channels: {0}{1}", oInfo.AudioInfo.Tracks[0].NbChannels, Environment.NewLine);
+                script.AppendFormat(@"# detected channel positions: {0}{1}", strChannelPositions, Environment.NewLine);
             }
             else
             {
-                if (oInfo.HasAudio)
-                {
-                    int.TryParse(oInfo.AudioInfo.Tracks[0].NbChannels.Split(' ')[0], out iChannelCount);
-                    strChannelPositions = oInfo.AudioInfo.Tracks[0].ChannelPositions;
-                    script.AppendFormat(@"# detected channels: {0}{1}", oInfo.AudioInfo.Tracks[0].NbChannels, Environment.NewLine);
-                    script.AppendFormat(@"# detected channel positions: {0}{1}", strChannelPositions, Environment.NewLine);
-                }
+                int.TryParse(oInfo.AudioInfo.Tracks[0].NbChannels.Split(' ')[0], out iChannelCount);
+                strChannelPositions = oInfo.AudioInfo.Tracks[0].ChannelPositions;
+                script.AppendFormat(@"# detected channels: {0}{1}", oInfo.AudioInfo.Tracks[0].NbChannels, Environment.NewLine);
+                script.AppendFormat(@"# detected channel positions: {0}{1}", strChannelPositions, Environment.NewLine);
             }
             using (AvsFile avi = AvsFile.ParseScript(script.ToString()))
                 iAVSChannelCount = avi.Clip.ChannelsCount;

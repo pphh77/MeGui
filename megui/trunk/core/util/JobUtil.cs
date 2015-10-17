@@ -24,9 +24,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using System.Threading;
 using System.Windows.Forms;
-using System.Xml.Serialization;
 
 using MeGUI.core.details;
 using MeGUI.core.util;
@@ -42,23 +40,12 @@ namespace MeGUI
     {
        
         #region start/stop
-		MainForm mainForm;
-        string mbtreeFile = ".stats.mbtree";
 
-		public JobUtil(MainForm mainForm)
-		{
-			this.mainForm = mainForm;
-        }
+		public JobUtil() { }
 
         #endregion
 		#region job generation
 		#region single job generation
-        
-        public VideoJob generateVideoJob(string input, string output, VideoCodecSettings settings, Dar? dar, Zone[] zones)
-        {
-            return generateVideoJob(input, output, settings, false, dar, zones);
-        }
-        
         /// <summary>
 		/// generates a videojob from the given settings
 		/// returns the job and whether or not this is an automated job (in which case another job
@@ -68,33 +55,28 @@ namespace MeGUI
 		/// <param name="output">the video output</param>
 		/// <param name="settings">the codec settings for this job</param>
 		/// <returns>the generated job or null if there was an error with the video source</returns>
-		public VideoJob generateVideoJob(string input, string output, VideoCodecSettings settings, bool skipVideoCheck, Dar? dar, Zone[] zones)
+		public static VideoJob generateVideoJob(string input, string output, VideoCodecSettings settings, Dar? dar, Zone[] zones)
 		{
 			VideoJob job = new VideoJob(input, output, settings, dar, zones);
 			
 			if (Path.GetDirectoryName(settings.Logfile).Equals("")) // no path set
 				settings.Logfile = Path.ChangeExtension(output, ".stats");
-            if (job.Settings.SettingsID.Equals("x264"))
-                mbtreeFile = Path.ChangeExtension(output, ".stats.mbtree");
 			if (job.Settings.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.twopassAutomated) // automated 2 pass, change type to 2 pass 2nd pass
 			{
 				job.Settings.VideoEncodingType = VideoCodecSettings.VideoEncodingMode.twopass2;
 			}
             else if (job.Settings.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.threepassAutomated) // automated 3 pass, change type to 3 pass first pass
 			{
-				if (mainForm.Settings.OverwriteStats)
+				if (MainForm.Instance.Settings.OverwriteStats)
                     job.Settings.VideoEncodingType = VideoCodecSettings.VideoEncodingMode.threepass3;
 				else
                     job.Settings.VideoEncodingType = VideoCodecSettings.VideoEncodingMode.twopass2; // 2 pass 2nd pass.. doesn't overwrite the stats file
 			}
 
-            if (!skipVideoCheck)
-                checkVideo(job.Input);
-
             return job;
 		}
 
-        private void checkVideo(string p)
+        private static void checkVideo(string p)
         {
             ulong a;
             double b;
@@ -104,7 +86,7 @@ namespace MeGUI
         /// sets the number of encoder threads in function of the number of processors found on the system
         /// </summary>
         /// <param name="settings"></param>
-        private void adjustNbThreads(VideoCodecSettings settings)
+        private static void adjustNbThreads(VideoCodecSettings settings)
         {
             string nbProc = System.Environment.GetEnvironmentVariable("NUMBER_OF_PROCESSORS");
             if (!String.IsNullOrEmpty(nbProc))
@@ -118,14 +100,14 @@ namespace MeGUI
             }
         }
 
-        public JobChain GenerateMuxJobs(VideoStream video, decimal? framerate, MuxStream[] audioStreamsArray, 
+        public static JobChain GenerateMuxJobs(VideoStream video, decimal? framerate, MuxStream[] audioStreamsArray, 
             MuxableType[] audioTypes, MuxStream[] subtitleStreamsArray, MuxableType[] subTypes,
             string chapterFile, MuxableType chapterInputType, ContainerType container, string output, 
             FileSize? splitSize, List<string> inputsToDelete, string deviceType, MuxableType deviceOutputType, bool alwaysMuxOutput)
         {
             Debug.Assert(splitSize == null || splitSize.Value != FileSize.Empty);
 
-            MuxProvider prov = mainForm.MuxProvider;
+            MuxProvider prov = MainForm.Instance.MuxProvider;
             List<MuxableType> allTypes = new List<MuxableType>();
             List<MuxableType> tempTypes = new List<MuxableType>();
             List<MuxableType> duplicateTypes = new List<MuxableType>();
@@ -297,14 +279,14 @@ namespace MeGUI
 		#endregion
 		#region job preparation (aka multiple job generation)
 
-        public JobChain AddVideoJobs(string movieInput, string movieOutput, VideoCodecSettings settings,
-            int introEndFrame, int creditsStartFrame, Dar? dar, bool prerender, bool checkVideo, Zone[] zones)
+        public static JobChain AddVideoJobs(string movieInput, string movieOutput, VideoCodecSettings settings,
+            int introEndFrame, int creditsStartFrame, Dar? dar, bool prerender, Zone[] zones, int frameCount)
         {
             JobChain jobs = null;
-            bool cont = getFinalZoneConfiguration(settings, introEndFrame, creditsStartFrame, ref zones);
+            bool cont = GetFinalZoneConfiguration(settings, introEndFrame, creditsStartFrame, ref zones, frameCount);
             if (!cont) // abort
                 return jobs;
-            return prepareVideoJob(movieInput, movieOutput, settings, dar, prerender, checkVideo, zones);
+            return prepareVideoJob(movieInput, movieOutput, settings, dar, prerender, zones);
         }
 
 		/// <summary>
@@ -314,10 +296,10 @@ namespace MeGUI
 		/// then, all the generated jobs are returned
 		/// </summary>
 		/// <returns>an Array of VideoJobs in the order they are to be encoded</returns>
-		public JobChain prepareVideoJob(string movieInput, string movieOutput, VideoCodecSettings settings, Dar? dar, bool prerender, bool checkVideo, Zone[] zones)
+		public static JobChain prepareVideoJob(string movieInput, string movieOutput, VideoCodecSettings settings, Dar? dar, bool prerender, Zone[] zones)
 		{
             //Check to see if output file already exists before creating the job.
-            if (File.Exists(movieOutput) && !mainForm.DialogManager.overwriteJobOutput(movieOutput))
+            if (File.Exists(movieOutput) && !MainForm.Instance.DialogManager.overwriteJobOutput(movieOutput))
                 return null;
 
 			bool twoPasses = false, threePasses = false;
@@ -360,25 +342,11 @@ namespace MeGUI
                     return null;
                 }
                 indexJob = new FFMSIndexJob(hfyuFile, null, 0, null, false);
-                prerenderJob = this.generateVideoJob(movieInput, hfyuFile, new hfyuSettings(), dar, zones);
+                prerenderJob = generateVideoJob(movieInput, hfyuFile, new hfyuSettings(), dar, zones);
                 if (prerenderJob == null)
                     return null;
             }
-            if (checkVideo)
-            {
-                VideoUtil vUtil = new VideoUtil(mainForm);
-                string error = vUtil.checkVideo(movieInput);
-                if (error != null)
-                {
-                    bool bContinue = mainForm.DialogManager.createJobs(error);
-                    if (!bContinue)
-                    {
-                        MessageBox.Show("Job creation aborted due to invalid AviSynth script");
-                        return null;
-                    }
-                }
-            }
-            VideoJob job = this.generateVideoJob(inputAVS, movieOutput, settings, prerender, dar, zones);
+            VideoJob job = generateVideoJob(inputAVS, movieOutput, settings, dar, zones);
 			VideoJob firstpass = null;
 			VideoJob middlepass = null;
 			if (job != null)
@@ -387,7 +355,10 @@ namespace MeGUI
 				{
 					job.FilesToDelete.Add(job.Settings.Logfile);
                     if (job.Settings.SettingsID.Equals("x264"))
+                    {
+                        string mbtreeFile = Path.ChangeExtension(job.Output, ".stats.mbtree");
                         job.FilesToDelete.Add(mbtreeFile);
+                    }
                     firstpass = cloneJob(job);
 					firstpass.Output = ""; // the first pass has no output
                     firstpass.Settings.VideoEncodingType = VideoCodecSettings.VideoEncodingMode.twopass1;
@@ -397,7 +368,7 @@ namespace MeGUI
                         firstpass.Settings.VideoEncodingType = VideoCodecSettings.VideoEncodingMode.threepass1; // change to 3 pass 3rd pass just for show
 						middlepass = cloneJob(job);
                         middlepass.Settings.VideoEncodingType = VideoCodecSettings.VideoEncodingMode.threepass2; // 3 pass 2nd pass
-                        if (mainForm.Settings.Keep2of3passOutput) // give the 2nd pass a new name
+                        if (MainForm.Instance.Settings.Keep2of3passOutput) // give the 2nd pass a new name
                         {
                             middlepass.Output = Path.Combine(Path.GetDirectoryName(job.Output), Path.GetFileNameWithoutExtension(job.Output)
                                 + "-2ndpass" + Path.GetExtension(job.Output));
@@ -433,7 +404,7 @@ namespace MeGUI
 		/// </summary>
 		/// <param name="oldJob">the job to be cloned</param>
 		/// <returns>the cloned job</returns>
-		private VideoJob cloneJob(VideoJob oldJob)
+		private static VideoJob cloneJob(VideoJob oldJob)
 		{
 			VideoJob job = new VideoJob();
 			job.Input = oldJob.Input;
@@ -451,7 +422,7 @@ namespace MeGUI
 		/// </summary>
 		/// <param name="job">the job whose video bitrate is to be updated</param>
 		/// <param name="bitrate">the new desired video bitrate</param>
-		public void updateVideoBitrate(VideoJob job, int bitrate)
+		public static void updateVideoBitrate(VideoJob job, int bitrate)
 		{
 			job.Settings.BitrateQuantizer = bitrate;
 		}
@@ -468,22 +439,22 @@ namespace MeGUI
 		{
             int d1, d2, d3, d4;
             Dar d;
-            return GetAllInputProperties(out nbOfFrames, out framerate, out d1, out d2, out d3, out d4, out d, video);
+            return GetAllInputProperties(video, out nbOfFrames, out framerate, out d1, out d2, out d3, out d4, out d);
 		}
         /// <summary>
         /// gets the number of frames, framerate, horizontal and vertical resolution from a video source
         /// </summary>
+        /// <param name="video">the video whose properties are to be read</param>
         /// <param name="nbOfFrames">the number of frames</param>
         /// <param name="framerate">the framerate</param>
+        /// <param name="framerate_d">the FPS_D</param>
+        /// <param name="framerate_n">the FPS_N</param>
         /// <param name="hRes">the horizontal resolution</param>
         /// <param name="vRes">the vertical resolution</param>
-        /// <param name="video">the video whose properties are to be read</param>
+        /// <param name="dar">the dar value</param>
         /// <returns>whether the source could be opened or not</returns>
-        public static bool GetAllInputProperties(out ulong nbOfFrames, out double framerate, out int framerate_n, out int framerate_d, out int hRes, out int vRes, out Dar dar, string video)
+        public static bool GetAllInputProperties(string video, out ulong nbOfFrames, out double framerate, out int framerate_n, out int framerate_d, out int hRes, out int vRes, out Dar dar)
 		{
-            nbOfFrames = 0;
-            hRes = vRes = 0;
-            framerate = 0.0;
             try
 			{
                 using (AvsFile avi = AvsFile.OpenScriptFile(video))
@@ -517,7 +488,7 @@ namespace MeGUI
 		public static bool GetAllInputProperties(out ulong nbOfFrames, out double framerate, out int hRes, out int vRes, out Dar dar, string video)
 		{
             int fn, fd;
-            return GetAllInputProperties(out nbOfFrames, out framerate, out fn, out fd, out hRes, out vRes, out dar, video);
+            return GetAllInputProperties(video, out nbOfFrames, out framerate, out fn, out fd, out hRes, out vRes, out dar);
 		}
 
 		/// <summary>
@@ -525,7 +496,7 @@ namespace MeGUI
 		/// </summary>
 		/// <param name="path"></param>
 		/// <returns></returns>
-		public ulong getNumberOfFrames(string path)
+		public static ulong GetNumberOfFrames(string path)
 		{
 			ulong retval = 0;
 			double framerate = 0.0;
@@ -538,7 +509,7 @@ namespace MeGUI
 		/// </summary>
 		/// <param name="path"></param>
 		/// <returns></returns>
-		public double getFramerate(string path)
+		public static double getFramerate(string path)
 		{
 			ulong retval = 0;
 			double framerate = 0.0;
@@ -554,7 +525,7 @@ namespace MeGUI
 		/// <param name="zones">a set of zones to be analyzed</param>
 		/// <param name="nbOfFrames">number of frames the video source has</param>
 		/// <returns>an array of all the zones</returns>
-		public Zone[] createHelperZones(Zone[] zones, int nbOfFrames)
+		public static Zone[] createHelperZones(Zone[] zones, int nbOfFrames)
 		{
 			ArrayList newZones = new ArrayList();
 			Zone z = zones[0];
@@ -646,19 +617,19 @@ namespace MeGUI
 			}
 			return retval;
 		}
-		/// <summary>
-		/// compiles the final zone configuration based on intro end frame, credits start frame and the configured zones
-		/// </summary>
-		/// <param name="vSettings">the video settings containing the list of configured zones</param>
-		/// <param name="introEndFrame">the frame where the intro ends</param>
-		/// <param name="creditsStartFrame">the frame where the credits begin</param>
-		/// <param name="newZones">the zones that are returned</param>
-		/// <returns>an array of zones objects in the proper order</returns>
-		public bool getFinalZoneConfiguration(VideoCodecSettings vSettings, int introEndFrame, int creditsStartFrame, ref Zone[] zones)
+        /// <summary>
+        /// compiles the final zone configuration based on intro end frame, credits start frame and the configured zones
+        /// </summary>
+        /// <param name="vSettings">the video settings containing the list of configured zones</param>
+        /// <param name="introEndFrame">the frame where the intro ends</param>
+        /// <param name="creditsStartFrame">the frame where the credits begin</param>
+        /// <param name="zones">the zones that are returned</param>
+        /// <param name="frameCount">total number of frames in the video</param>
+        /// <returns>an array of zones objects in the proper order</returns>
+        public static bool GetFinalZoneConfiguration(VideoCodecSettings vSettings, int introEndFrame, int creditsStartFrame, ref Zone[] zones, int frameCount)
 		{
-			Zone introZone = new Zone();
+            Zone introZone = new Zone();
 			Zone creditsZone = new Zone();
-			ulong nbOfFrames = getNumberOfFrames(mainForm.Video.VideoInput);
 			bool doIntroZone = false, doCreditsZone = false;
 			int flushZonesStart = 0, flushZonesEnd = 0;
 			if (introEndFrame > 0) // add the intro zone
@@ -700,7 +671,7 @@ namespace MeGUI
 			if (creditsStartFrame > 0) // add the credits zone
 			{
 				creditsZone.startFrame = creditsStartFrame;
-				creditsZone.endFrame = (int)nbOfFrames-1;
+				creditsZone.endFrame = frameCount - 1;
 				creditsZone.mode = ZONEMODE.Quantizer;
 				creditsZone.modifier = vSettings.CreditsQuantizer;
 				if (zones.Length > 0)
@@ -757,7 +728,7 @@ namespace MeGUI
 			}
 			if (vSettings is xvidSettings && newZones.Length > 0)
 			{
-				Zone[] xvidZones = createHelperZones(newZones, (int)nbOfFrames);
+				Zone[] xvidZones = createHelperZones(newZones, frameCount);
 				if (xvidZones == null)
 					return false;
 				else

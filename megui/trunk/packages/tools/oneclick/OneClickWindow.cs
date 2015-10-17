@@ -61,8 +61,6 @@ namespace MeGUI
         /// </summary>
         private ContainerType[] acceptableContainerTypes;
 
-        private VideoUtil vUtil;
-        private MainForm mainForm;
         private MuxProvider muxProvider;
         private MediaInfoFile _videoInputInfo;
 
@@ -76,7 +74,7 @@ namespace MeGUI
         #region OneClick profiles
         private void initOneClickHandler()
         {
-            oneclickProfile.Manager = mainForm.Profiles;
+            oneclickProfile.Manager = MainForm.Instance.Profiles;
         }
 
         private void initTabs()
@@ -115,17 +113,15 @@ namespace MeGUI
         #endregion
         
         #region init
-        public OneClickWindow(MainForm mainForm)
+        public OneClickWindow()
         {
-            this.mainForm = mainForm;
-            this._oLog = mainForm.OneClickLog;
+            this._oLog = MainForm.Instance.OneClickLog;
             if (_oLog == null)
             {
-                _oLog = mainForm.Log.Info("OneClick");
-                mainForm.OneClickLog = _oLog;
+                _oLog = MainForm.Instance.Log.Info("OneClick");
+                MainForm.Instance.OneClickLog = _oLog;
             }
-            vUtil = new VideoUtil(mainForm);
-            this.muxProvider = mainForm.MuxProvider;
+            this.muxProvider = MainForm.Instance.MuxProvider;
             acceptableContainerTypes = muxProvider.GetSupportedContainers().ToArray();
             InitializeComponent();
 
@@ -138,10 +134,10 @@ namespace MeGUI
             }
 
             beingCalled = true;
-            videoProfile.Manager = mainForm.Profiles;
+            videoProfile.Manager = MainForm.Instance.Profiles;
             initTabs();
             initAudioHandler();
-            avsProfile.Manager = mainForm.Profiles;
+            avsProfile.Manager = MainForm.Instance.Profiles;
             initOneClickHandler();
             beingCalled = false;
             updatePossibleContainers();
@@ -152,11 +148,11 @@ namespace MeGUI
                 devicetype.Items.Add("Standard");
                 devicetype.Items.AddRange(muxProvider.GetSupportedDevices((ContainerType)this.containerFormat.SelectedItem).ToArray());
             }
-            if (containerFormat.SelectedItem.ToString().Equals(mainForm.Settings.AedSettings.Container))
+            if (containerFormat.SelectedItem.ToString().Equals(MainForm.Instance.Settings.AedSettings.Container))
             {
                 foreach (object o in devicetype.Items) // I know this is ugly, but using the DeviceOutputType doesn't work unless we're switching to manual serialization
                 {
-                    if (o.ToString().Equals(mainForm.Settings.AedSettings.DeviceOutputType))
+                    if (o.ToString().Equals(MainForm.Instance.Settings.AedSettings.DeviceOutputType))
                     {
                         devicetype.SelectedItem = o;
                         break;
@@ -250,11 +246,11 @@ namespace MeGUI
             devicetype.Items.Clear();
             devicetype.Items.Add("Standard");
             devicetype.Items.AddRange(muxProvider.GetSupportedDevices((ContainerType)this.containerFormat.SelectedItem).ToArray());
-            if (containerFormat.SelectedItem.ToString().Equals(mainForm.Settings.AedSettings.Container))
+            if (containerFormat.SelectedItem.ToString().Equals(MainForm.Instance.Settings.AedSettings.Container))
             {
                 foreach (object o in devicetype.Items) // I know this is ugly, but using the DeviceOutputType doesn't work unless we're switching to manual serialization
                 {
-                    if (o.ToString().Equals(mainForm.Settings.AedSettings.DeviceOutputType))
+                    if (o.ToString().Equals(MainForm.Instance.Settings.AedSettings.DeviceOutputType))
                     {
                         devicetype.SelectedItem = o;
                         break;
@@ -1286,9 +1282,9 @@ namespace MeGUI
                 if (oTrack.TrackInfo != null)
                     _oLog.LogEvent("Subtitle: " + oTrack.TrackInfo.SourceFileName + " (" + oTrack.TrackInfo.ToString() + ")");
             }
-            
+
             // add jobs to queue
-            mainForm.Jobs.addJobsWithDependencies(finalJobChain, !bBatchProcessing);
+            MainForm.Instance.Jobs.addJobsWithDependencies(finalJobChain, !bBatchProcessing);
 
             if (!this.openOnQueue.Checked && this.Visible)
             {
@@ -2003,7 +1999,7 @@ namespace MeGUI
 
         public void Run(MainForm info)
         {
-            OneClickWindow ocmt = new OneClickWindow(info);
+            OneClickWindow ocmt = new OneClickWindow();
             ocmt.Show();
         }
 

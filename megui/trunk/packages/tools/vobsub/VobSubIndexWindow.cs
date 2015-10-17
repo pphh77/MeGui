@@ -37,17 +37,11 @@ namespace MeGUI
         #region variables
         private bool dialogMode = false;
         private bool configured = false;
-        private MainForm mainForm;
-        private VideoUtil vUtil;
-        private JobUtil jobUtil;
         #endregion
         #region start / stop
         public VobSubIndexWindow(MainForm mainForm)
         {
             InitializeComponent();
-            this.mainForm = mainForm;
-            this.vUtil = new VideoUtil(mainForm);
-            this.jobUtil = new JobUtil(mainForm);
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -71,7 +65,7 @@ namespace MeGUI
                     if (!dialogMode)
                     {
                         SubtitleIndexJob job = generateJob();
-                        mainForm.Jobs.addJobsToQueue(job);
+                        MainForm.Instance.Jobs.addJobsToQueue(job);
                         if (this.closeOnQueue.Checked)
                             this.Close();
                     }

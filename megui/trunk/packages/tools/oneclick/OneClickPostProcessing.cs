@@ -35,7 +35,7 @@ namespace MeGUI
         private static IJobProcessor init(MainForm mf, Job j)
         {
             if (j is OneClickPostProcessingJob)
-                return new OneClickPostProcessing(mf);
+                return new OneClickPostProcessing();
             return null;
         }
 
@@ -48,9 +48,7 @@ namespace MeGUI
         private LogItem _log;
 
         #region OneClick properties
-        private MainForm mainForm;
         Dictionary<int, string> audioFiles;
-        private VideoUtil vUtil;
         private AVCLevels al = new AVCLevels();
         private bool finished = false;
         private bool interlaced = false;
@@ -58,11 +56,7 @@ namespace MeGUI
         string qpfile = string.Empty;
         #endregion
 
-        internal OneClickPostProcessing(MainForm mf)
-        {
-            mainForm = mf;
-            this.vUtil = new VideoUtil(mainForm);
-        }
+        internal OneClickPostProcessing() { }
 
         #region JobHandling
 
@@ -214,7 +208,7 @@ namespace MeGUI
                         arrMuxStreams.Add(oAudioTrack.DirectMuxAudio);
                 }
                 if (audioFiles.Count == 0 && job.PostprocessingProperties.IndexType != FileIndexerWindow.IndexType.NONE && !job.PostprocessingProperties.Eac3toDemux)
-                    audioFiles = vUtil.getAllDemuxedAudio(arrAudioTracks, new List<AudioTrackInfo>(), out arrAudioFilesDelete, job.IndexFile, _log);
+                    audioFiles = VideoUtil.getAllDemuxedAudio(arrAudioTracks, new List<AudioTrackInfo>(), out arrAudioFilesDelete, job.IndexFile, _log);
 
                 fillInAudioInformation(ref arrAudioJobs, arrMuxStreams);
 
@@ -292,14 +286,24 @@ namespace MeGUI
                         job.PostprocessingProperties.AutoCrop, job.PostprocessingProperties.KeepInputResolution,
                         job.PostprocessingProperties.UseChaptersMarks);
 
-                    ulong length;
-                    double framerate;
-                    JobUtil.getInputProperties(out length, out framerate, avsFile);
+                    // check AVS file 
+                    ulong frameCount;
+                    double frameRate;
+                    string error = VideoUtil.CheckAVS(avsFile, out frameCount, out frameRate);
+                    if (error != null)
+                    {
+                        bool bContinue = MainForm.Instance.DialogManager.createJobs(error);
+                        if (!bContinue)
+                        {
+                            _log.Error("Job creation aborted due to invalid AviSynth script");
+                            return;
+                        }
+                    }
+
                     myVideo.Input = avsFile;
-                    myVideo.Output = Path.Combine(job.PostprocessingProperties.WorkingDirectory,
-                        Path.GetFileNameWithoutExtension(job.Input) + "_Video");
-                    myVideo.NumberOfFrames = length;
-                    myVideo.Framerate = (decimal)framerate;
+                    myVideo.Output = Path.Combine(job.PostprocessingProperties.WorkingDirectory, Path.GetFileNameWithoutExtension(job.Input) + "_Video");
+                    myVideo.NumberOfFrames = frameCount;
+                    myVideo.Framerate = (decimal)frameRate;
                     myVideo.DAR = dar;
                     myVideo.VideoType = new MuxableType((new VideoEncoderProvider().GetSupportedOutput(videoSettings.EncoderType))[0], videoSettings.Codec);
                     myVideo.Settings = videoSettings;
@@ -319,6 +323,7 @@ namespace MeGUI
                     myVideo.Settings = videoSettings;
                     videoSettings.VideoName = oInfo.VideoInfo.Track.Name;
                     myVideo.Framerate = (decimal)oInfo.VideoInfo.FPS;
+                    myVideo.NumberOfFrames = oInfo.VideoInfo.FrameCount;
                 }
 
                 intermediateFiles.Add(avsFile);
@@ -366,7 +371,7 @@ namespace MeGUI
                         }
                     }
 
-                    JobChain c = vUtil.GenerateJobSeries(myVideo, job.PostprocessingProperties.FinalOutput, arrAudioJobs.ToArray(), 
+                    JobChain c = VideoUtil.GenerateJobSeries(myVideo, job.PostprocessingProperties.FinalOutput, arrAudioJobs.ToArray(), 
                         subtitles.ToArray(), job.PostprocessingProperties.ChapterFile, job.PostprocessingProperties.OutputSize,
                         job.PostprocessingProperties.Splitting, job.PostprocessingProperties.Container,
                         job.PostprocessingProperties.PrerenderJob, arrMuxStreams.ToArray(),
@@ -379,12 +384,12 @@ namespace MeGUI
                     }
 
                     c = CleanupJob.AddAfter(c, intermediateFiles, job.PostprocessingProperties.FinalOutput);
-                    mainForm.Jobs.addJobsWithDependencies(c, false);
+                    MainForm.Instance.Jobs.addJobsWithDependencies(c, false);
 
                     // batch processing other input files if necessary
                     if (job.PostprocessingProperties.FilesToProcess.Count > 0)
                     {
-                        OneClickWindow ocw = new OneClickWindow(mainForm);
+                        OneClickWindow ocw = new OneClickWindow();
                         ocw.setBatchProcessing(job.PostprocessingProperties.FilesToProcess, job.PostprocessingProperties.OneClickSetting);
                     }
                 }
@@ -593,11 +598,20 @@ namespace MeGUI
                 return "";
             }
 
+            int inputWidth = (int)iMediaFile.VideoInfo.Width;
+            int inputHeight = (int)iMediaFile.VideoInfo.Height;
+            int inputFPS_D = (int)iMediaFile.VideoInfo.FPS_D;
+            int inputFPS_N = (int)iMediaFile.VideoInfo.FPS_N;
+            int inputFrameCount = (int)iMediaFile.VideoInfo.FrameCount;
+
+            // force destruction of AVS script
+            iMediaFile.Dispose();
+
             Dar? suggestedDar = null;
             if (desiredOutputWidth == 0)
-                desiredOutputWidth = outputWidthIncludingPadding = (int)iMediaFile.VideoInfo.Width;
-            else if (!avsSettings.Upsize && desiredOutputWidth > (int)iMediaFile.VideoInfo.Width)
-                outputWidthIncludingPadding = (int)iMediaFile.VideoInfo.Width;
+                desiredOutputWidth = outputWidthIncludingPadding = inputWidth;
+            else if (!avsSettings.Upsize && desiredOutputWidth > inputWidth)
+                outputWidthIncludingPadding = inputWidth;
             else
                 outputWidthIncludingPadding = desiredOutputWidth;
             CropValues paddingValues;
@@ -609,16 +623,16 @@ namespace MeGUI
                 resizeEnabled = !keepInputResolution;
                 CropValues cropValuesTemp = cropValues.Clone();
                 int outputHeightIncludingPaddingTemp = 0;
-                Resolution.GetResolution((int)iMediaFile.VideoInfo.Width, (int)iMediaFile.VideoInfo.Height, customDAR,
+                Resolution.GetResolution(inputWidth, inputHeight, customDAR,
                     ref cropValuesTemp, autoCrop && !keepInputResolution, mod, ref resizeEnabled, false, signalAR, true,
-                    avsSettings.AcceptableAspectError, xTargetDevice, Convert.ToDouble(iMediaFile.VideoInfo.FPS_N) / iMediaFile.VideoInfo.FPS_D,
+                    avsSettings.AcceptableAspectError, xTargetDevice, Convert.ToDouble(inputFPS_N) / inputFPS_D,
                     ref outputWidthWithoutUpsizing, ref outputHeightIncludingPaddingTemp, out paddingValues, out suggestedDar, _log);
             }
 
             resizeEnabled = !keepInputResolution;
-            Resolution.GetResolution((int)iMediaFile.VideoInfo.Width, (int)iMediaFile.VideoInfo.Height, customDAR,
+            Resolution.GetResolution(inputWidth, inputHeight, customDAR,
                 ref cropValues, autoCrop && !keepInputResolution, mod, ref resizeEnabled, avsSettings.Upsize, signalAR, true,
-                avsSettings.AcceptableAspectError, xTargetDevice, Convert.ToDouble(iMediaFile.VideoInfo.FPS_N) / iMediaFile.VideoInfo.FPS_D, 
+                avsSettings.AcceptableAspectError, xTargetDevice, Convert.ToDouble(inputFPS_N) / inputFPS_D, 
                 ref outputWidthIncludingPadding, ref outputHeightIncludingPadding, out paddingValues, out suggestedDar, _log);
             keepInputResolution = !resizeEnabled;
             if ((keepInputResolution || signalAR) && suggestedDar.HasValue)
@@ -627,7 +641,7 @@ namespace MeGUI
             // log calculated output resolution
             outputWidthCropped = outputWidthIncludingPadding - paddingValues.left - paddingValues.right;
             outputHeightCropped = outputHeightIncludingPadding - paddingValues.bottom - paddingValues.top;
-            _log.LogValue("Input resolution", iMediaFile.VideoInfo.Width + "x" + iMediaFile.VideoInfo.Height);
+            _log.LogValue("Input resolution", inputWidth + "x" + inputHeight);
             _log.LogValue("Desired maximum width", desiredOutputWidth);
             if (!avsSettings.Upsize && outputWidthIncludingPadding < desiredOutputWidth)
                 _log.LogEvent("Desired maximum width not reached. Enable upsizing in the AviSynth profile if you want to force it.");
@@ -659,8 +673,8 @@ namespace MeGUI
             {
                 raiseEvent("Automatic deinterlacing...   ***PLEASE WAIT***");
                 string d2vPath = indexFile;
-                _sourceDetector = new SourceDetector(inputLine, d2vPath, false,
-                    mainForm.Settings.SourceDetectorSettings,
+                _sourceDetector = new SourceDetector(inputLine, d2vPath, false, inputFrameCount,
+                    MainForm.Instance.Settings.SourceDetectorSettings,
                     new UpdateSourceDetectionStatus(analyseUpdate),
                     new FinishedAnalysis(finishedAnalysis));
                 finished = false;
@@ -687,9 +701,9 @@ namespace MeGUI
 
             if (!keepInputResolution)
             {
-                resizeLine = ScriptServer.GetResizeLine(!signalAR || avsSettings.Mod16Method == mod16Method.resize || outputWidthIncludingPadding > 0 || (int)iMediaFile.VideoInfo.Width != outputWidthCropped,
+                resizeLine = ScriptServer.GetResizeLine(!signalAR || avsSettings.Mod16Method == mod16Method.resize || outputWidthIncludingPadding > 0 || inputWidth != outputWidthCropped,
                                                         outputWidthCropped, outputHeightCropped, outputWidthIncludingPadding, outputHeightIncludingPadding, (ResizeFilterType)avsSettings.ResizeMethod,
-                                                        autoCrop, cropValues, (int)iMediaFile.VideoInfo.Width, (int)iMediaFile.VideoInfo.Height);
+                                                        autoCrop, cropValues, inputWidth, inputHeight);
             }
 
             string newScript = ScriptServer.CreateScriptFromTemplate(avsSettings.Template, inputLine, cropLine, resizeLine, denoiseLines, deinterlaceLines);
@@ -748,6 +762,7 @@ namespace MeGUI
                 _log.LogValue("Error saving AviSynth script", i, ImageType.Error);
                 return "";
             }
+            
             return strOutputAVSFile;
         }
 

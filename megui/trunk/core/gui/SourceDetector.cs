@@ -20,13 +20,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Globalization;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -50,9 +45,15 @@ namespace MeGUI
 
     public enum SourceType
     {
-        UNKNOWN, NOT_ENOUGH_SECTIONS,
-        PROGRESSIVE, INTERLACED, FILM, DECIMATING,
-        HYBRID_FILM_INTERLACED, HYBRID_PROGRESSIVE_INTERLACED, HYBRID_PROGRESSIVE_FILM
+        UNKNOWN,
+        NOT_ENOUGH_SECTIONS,
+        PROGRESSIVE,
+        INTERLACED,
+        FILM,
+        DECIMATING,
+        HYBRID_FILM_INTERLACED,
+        HYBRID_PROGRESSIVE_INTERLACED,
+        HYBRID_PROGRESSIVE_FILM
     };
 
     public enum FieldOrder
@@ -62,16 +63,15 @@ namespace MeGUI
 
     public class SourceDetector
     {
-        public SourceDetector(string avsScript, string d2vFile, 
-            bool isAnime, SourceDetectorSettings settings,
-            UpdateSourceDetectionStatus updateMethod,
-            FinishedAnalysis finishedMethod)
+        public SourceDetector(string avsScript, string d2vFile, bool isAnime, int iFrameCount,
+            SourceDetectorSettings settings, UpdateSourceDetectionStatus updateMethod, FinishedAnalysis finishedMethod)
         {
 
             this.script = avsScript;
             this.d2vFileName = d2vFile;
             this.settings = settings;
             this.isAnime = isAnime;
+            this.frameCount = iFrameCount;
             analyseUpdate += updateMethod;
             finishedAnalysis += finishedMethod;
             
@@ -92,6 +92,7 @@ namespace MeGUI
         private event UpdateSourceDetectionStatus analyseUpdate;
         private event FinishedAnalysis finishedAnalysis;
         private string script, d2vFileName, trimmedFilteredLine;
+        private int frameCount;
         private SourceType type;
         private int decimateM;
         private int tffCount = 0, bffCount = 0;
@@ -178,28 +179,8 @@ namespace MeGUI
         }
         #endregion
         #region script generation and running
-        private void runScript(int scriptType, int frameCount, string trimLine)
+        private void runScript(int scriptType, string trimLine)
         {
-            int numFrames = 0;
-            try
-            {
-                using (AvsFile af = AvsFile.ParseScript(script))
-                {
-                    numFrames = (int)af.VideoInfo.FrameCount;
-                }
-            }
-            catch (Exception e)
-            {
-                error = true;
-                errorMessage = "The input clip for source detection could not be opened.\r\n"
-                    + e.Message;
-                finishProcessing();
-                return;
-            }
-
-            if (frameCount > 0)
-                numFrames = frameCount;
-
             const int selectLength = 5; // This used to be variable, but I found no need to. It's useful to keep this name, though
             int selectEvery = (int) ((100.0 * (double)selectLength) / ((double)settings.AnalysePercent));
 
@@ -209,12 +190,10 @@ namespace MeGUI
                 minAnalyseSections = minAnalyseSections / 2 + 1; // We add one to prevent getting 0;
 
             // Check if we need to modify the SelectRangeEvery parameters:
-            if (((double)selectLength * (double)numFrames / (double)selectEvery) < (int)minAnalyseSections * 5) 
+            if (((double)selectLength * (double)frameCount / (double)selectEvery) < (int)minAnalyseSections * 5) 
             {
-                if (numFrames >= minAnalyseSections * 5) // If there are actually enough frames
-                {
-                    selectEvery = (int)((((double)numFrames) / ((double)minAnalyseSections * 5.0)) * (double)selectLength);
-                }
+                if (frameCount >= minAnalyseSections * 5) // If there are actually enough frames
+                    selectEvery = (int)((((double)frameCount) / ((double)minAnalyseSections * 5.0)) * (double)selectLength);
                 else
                     // if there aren't enough frames, analyse everything -- that's got to be good enough
                     selectEvery = selectLength;
@@ -225,8 +204,7 @@ namespace MeGUI
             if (File.Exists(logFileName))
                 File.Delete(logFileName);
 
-            string resultScript = ScriptServer.getScript(scriptType, script, trimLine, logFileName,
-                selectEvery, selectLength);
+            string resultScript = ScriptServer.getScript(scriptType, script, trimLine, logFileName, selectEvery, selectLength);
 
             // stax
             MethodInvoker mi = delegate {
@@ -238,7 +216,7 @@ namespace MeGUI
                     if (!continueWorking)
                         return;
                     if (scriptType == 0) // detection
-                        analyse(logFileName, selectEvery, selectLength, numFrames);
+                        analyse(logFileName, selectEvery, selectLength, frameCount);
                     else if (scriptType == 1) // field order
                         analyseFF(logFileName);
                 }
@@ -592,14 +570,14 @@ namespace MeGUI
                     analysis += "Source is declared interlaced.\r\n";
                     type = SourceType.INTERLACED;
                     stillWorking = true;
-                    runScript(1, -1, "#no trimming"); //field order script
+                    runScript(1, "#no trimming"); //field order script
                 }
                 else
                 {
                     analysis += "Source is declared telecined.\r\n";
                     type = SourceType.FILM;
                     stillWorking = true;
-                    runScript(1, -1, "#no trimming"); //field order script
+                    runScript(1, "#no trimming"); //field order script
                 }
             }
             #endregion
@@ -621,7 +599,7 @@ namespace MeGUI
                     }
                     type = SourceType.HYBRID_FILM_INTERLACED;
                     stillWorking = true;
-                    runScript(1, -1, "#no trimming");
+                    runScript(1, "#no trimming");
 
                 }
                 else if (array[0] == numInt)
@@ -632,7 +610,7 @@ namespace MeGUI
                         type = SourceType.HYBRID_FILM_INTERLACED;
                         majorityFilm = true;
                         stillWorking = true;
-                        runScript(1, -1, "#no trimming");
+                        runScript(1, "#no trimming");
                     }
                     else
                     {
@@ -651,7 +629,7 @@ namespace MeGUI
                                 numPortions[1], sectionCount, inputFrames, "telecined", out trimLine, out frameCount);
                         }
                         stillWorking = true;
-                        runScript(1, frameCount, trimLine);
+                        runScript(1, trimLine);
                     }
                 }
                 else if (array[0] == numTC)
@@ -663,7 +641,7 @@ namespace MeGUI
                         majorityFilm = false;
 
                         stillWorking = true;
-                        runScript(1, -1, "#no trimming");
+                        runScript(1, "#no trimming");
                     }
                     else
                     {
@@ -690,7 +668,7 @@ namespace MeGUI
                             analysis += "This should be deinterlaced by a deinterlacer that tries to weave it before deinterlacing.\r\n";
                         }
                         stillWorking = true;
-                        runScript(1, frameCount, trimLine); //field order script
+                        runScript(1, trimLine); //field order script
                     }
                 }
             }
@@ -733,7 +711,7 @@ namespace MeGUI
         #region Program interface
         public void analyse()
         {
-            runScript(0, -1, "#no trimming");
+            runScript(0, "#no trimming");
         }
         public void stop()
         {

@@ -64,7 +64,6 @@ namespace MeGUI
         private string path; // path the program was started from
         private MediaFileFactory mediaFileFactory;
         private PackageSystem packageSystem = new PackageSystem();
-        private JobUtil jobUtil;
         private MuxProvider muxProvider;
         private MeGUISettings settings = new MeGUISettings();
         private ProfileManager profileManager;
@@ -362,15 +361,8 @@ namespace MeGUI
 
         #endregion
         #region GUI updates
-        #region job postprocessing
-        #endregion
+
         #region helper methods
-
-        public JobUtil JobUtil
-        {
-            get { return jobUtil; }
-        }
-
         public string TitleText
         {
             get
@@ -476,10 +468,11 @@ namespace MeGUI
         #region menu actions
         private void mnuFileOpen_Click(object sender, EventArgs e)
         {
+            MediaInfoFile oInfo;
             openFileDialog.Filter = "All files|*.*";
             openFileDialog.Title = "Select your input file";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
-                openFile(openFileDialog.FileName, false);
+                openFile(openFileDialog.FileName, out oInfo);
         }
         private void mnuViewMinimizeToTray_Click(object sender, EventArgs e)
         {
@@ -603,7 +596,7 @@ namespace MeGUI
         {
             if (DialogManager.useOneClick())
             {
-                OneClickWindow ocmt = new OneClickWindow(this);
+                OneClickWindow ocmt = new OneClickWindow();
                 ocmt.setInput(fileName);
                 ocmt.ShowDialog();
             }
@@ -614,8 +607,15 @@ namespace MeGUI
                 mpegInput.Show();
             }
         }
-        public bool openFile(string file, bool openVideo)
+
+        /// <summary>
+        /// tries to open the selected input file
+        /// </summary>
+        /// <returns>true if it is a proper video AVS file</returns>
+        public bool openFile(string file, out MediaInfoFile iFile)
         {
+            iFile = null;
+
             if (Path.GetExtension(file.ToLowerInvariant()).Equals(".zip"))
             {
                 importProfiles(file);
@@ -624,13 +624,13 @@ namespace MeGUI
 
             if (Directory.Exists(file))
             {
-                OneClickWindow ocmt = new OneClickWindow(this);
+                OneClickWindow ocmt = new OneClickWindow();
                 ocmt.setInput(file);
                 ocmt.ShowDialog();
-                return true;
+                return false;
             }
 
-            MediaInfoFile iFile = new MediaInfoFile(file);
+            iFile = new MediaInfoFile(file);
             if (iFile.HasVideo)
             {
                 FileIndexerWindow.IndexType x;
@@ -640,17 +640,16 @@ namespace MeGUI
                 }
                 else
                 {
+                    this.tabControl1.SelectedIndex = 0;
                     if (iFile.HasAudio)
                         audioEncodingComponent1.openAudioFile(file);
                     if (iFile.ContainerFileTypeString.Equals("AVS"))
                     {
                         Video.openVideoFile(file);
-                        if (openVideo)
-                            return true;
+                        return true;
                     }
                     else
                         openOtherVideoFile(file);
-                    this.tabControl1.SelectedIndex = 0;
                 }
             }
             else if (iFile.HasAudio)
@@ -684,13 +683,14 @@ namespace MeGUI
         #region Drag 'n' Drop
         private void MeGUI_DragDrop(object sender, DragEventArgs e)
         {
+            MediaInfoFile oInfo;
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
             Thread openFileThread = new Thread((ThreadStart)delegate 
             {
                 if (this.InvokeRequired)
-                    Invoke(new MethodInvoker(delegate { openFile(files[0], false); }));
+                    Invoke(new MethodInvoker(delegate { openFile(files[0], out oInfo); }));
                 else
-                    openFile(files[0], false); 
+                    openFile(files[0], out oInfo); 
             });
             openFileThread.Start();
         }
@@ -753,7 +753,7 @@ namespace MeGUI
 
         private void mnuToolsAdaptiveMuxer_Click(object sender, EventArgs e)
         {
-            AdaptiveMuxWindow amw = new AdaptiveMuxWindow(this);
+            AdaptiveMuxWindow amw = new AdaptiveMuxWindow();
             amw.Show();
         }
 
@@ -815,7 +815,6 @@ namespace MeGUI
             this.muxProvider = new MuxProvider(this);
             this.codecs = new CodecManager();
             this.path = System.Windows.Forms.Application.StartupPath;
-            this.jobUtil = new JobUtil(this);
             this.addPackages();
             this.profileManager = new ProfileManager(this.path);
             this.profileManager.LoadProfiles();

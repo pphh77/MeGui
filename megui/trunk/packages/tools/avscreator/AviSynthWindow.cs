@@ -21,7 +21,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -383,7 +382,7 @@ namespace MeGUI
                         switch (iResult)
                         {
                             case 0:
-                                OneClickWindow ocmt = new OneClickWindow(mainForm);
+                                OneClickWindow ocmt = new OneClickWindow();
                                 ocmt.setInput(videoInput);
                                 ocmt.Show();
                                 this.Close();
@@ -1011,8 +1010,24 @@ namespace MeGUI
                     string source = ScriptServer.GetInputLine(input.Filename, indexFile, false, sourceType, false, false, false, 0, false);
                     if (nvDeInt.Enabled) 
                         source += ")";
+
+                    // get number of frames
+                    int numFrames = 0;
+                    try
+                    {
+                        using (AvsFile af = AvsFile.ParseScript(source))
+                        {
+                            numFrames = (int)af.VideoInfo.FrameCount;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("The input clip for source detection could not be opened.\r\n" + ex.Message, "Analysis Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
                     detector = new SourceDetector(source,
-                        input.Filename, deintIsAnime.Checked,
+                        input.Filename, deintIsAnime.Checked, numFrames,
                         mainForm.Settings.SourceDetectorSettings,
                         new UpdateSourceDetectionStatus(analyseUpdate),
                         new FinishedAnalysis(finishedAnalysis));

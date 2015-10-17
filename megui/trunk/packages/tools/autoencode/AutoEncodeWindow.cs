@@ -19,12 +19,8 @@
 // ****************************************************************************
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 
 using MeGUI.core.details;
@@ -42,9 +38,6 @@ namespace MeGUI
 		#region variables
         private List<AudioJob> audioStreams;
         private bool prerender;
-        private MainForm mainForm;
-		private JobUtil jobUtil;
-		private VideoUtil vUtil;
         private VideoInfo vInfo;
         private LogItem log = new LogItem("AutoEncode job generation log", ImageType.Information);
 		private bool isBitrateMode = true;
@@ -55,18 +48,14 @@ namespace MeGUI
 		{
             InitializeComponent();
         }
-        public AutoEncodeWindow(VideoStream videoStream, List<AudioJob> audioStreams, MainForm mainForm, bool prerender, VideoInfo vInfo)
-            : this()
+        public AutoEncodeWindow(VideoStream videoStream, List<AudioJob> audioStreams, bool prerender, VideoInfo vInfo) : this()
         {
             this.vInfo = vInfo;
-            mainForm.Log.Add(log);
+            MainForm.Instance.Log.Add(log);
             this.videoStream = videoStream;
             this.audioStreams = audioStreams;
             this.prerender = prerender;
-			this.mainForm = mainForm;
-			jobUtil = new JobUtil(mainForm);
-			vUtil = new VideoUtil(mainForm);
-            muxProvider = mainForm.MuxProvider;
+            muxProvider = MainForm.Instance.MuxProvider;
             container.Items.AddRange(muxProvider.GetSupportedContainers().ToArray());
             splitting.MinimumFileSize = new FileSize(Unit.MB, 1);
         }
@@ -109,24 +98,24 @@ namespace MeGUI
 
             this.muxedOutput.Filename = Path.ChangeExtension(muxedName, (this.container.SelectedItem as ContainerType).Extension);
 
-            splitting.Value = mainForm.Settings.AedSettings.SplitSize;
-            if (mainForm.Settings.AedSettings.FileSizeMode)
+            splitting.Value = MainForm.Instance.Settings.AedSettings.SplitSize;
+            if (MainForm.Instance.Settings.AedSettings.FileSizeMode)
             {
                 FileSizeRadio.Checked = true;
-                targetSize.Value = mainForm.Settings.AedSettings.FileSize;
+                targetSize.Value = MainForm.Instance.Settings.AedSettings.FileSize;
             }
-            else if (mainForm.Settings.AedSettings.BitrateMode)
+            else if (MainForm.Instance.Settings.AedSettings.BitrateMode)
             {
                 averageBitrateRadio.Checked = true;
-                projectedBitrateKBits.Text = mainForm.Settings.AedSettings.Bitrate.ToString();
+                projectedBitrateKBits.Text = MainForm.Instance.Settings.AedSettings.Bitrate.ToString();
             }
             else
                 noTargetRadio.Checked = true;
-            if (mainForm.Settings.AedSettings.AddAdditionalContent)
+            if (MainForm.Instance.Settings.AedSettings.AddAdditionalContent)
                 addSubsNChapters.Checked = true;
             foreach (object o in container.Items) // I know this is ugly, but using the ContainerType doesn't work unless we're switching to manual serialization
             {
-                if (o.ToString().Equals(mainForm.Settings.AedSettings.Container))
+                if (o.ToString().Equals(MainForm.Instance.Settings.AedSettings.Container))
                 {
                     container.SelectedItem = o;
                     break;
@@ -134,7 +123,7 @@ namespace MeGUI
             }
             foreach (object o in device.Items) // I know this is ugly, but using the DeviceOutputType doesn't work unless we're switching to manual serialization
             {
-                if (o.ToString().Equals(mainForm.Settings.AedSettings.DeviceOutputType))
+                if (o.ToString().Equals(MainForm.Instance.Settings.AedSettings.DeviceOutputType))
                 {
                     device.SelectedItem = o;
                     break;
@@ -165,11 +154,11 @@ namespace MeGUI
                 this.device.Items.Add("Standard");
                 this.device.Items.AddRange(supportedOutputDeviceTypes.ToArray());
 
-                if (container.SelectedItem.ToString().Equals(mainForm.Settings.AedSettings.Container))
+                if (container.SelectedItem.ToString().Equals(MainForm.Instance.Settings.AedSettings.Container))
                 {
                     foreach (object o in device.Items) // I know this is ugly, but using the DeviceOutputType doesn't work unless we're switching to manual serialization
                     {
-                        if (o.ToString().Equals(mainForm.Settings.AedSettings.DeviceOutputType))
+                        if (o.ToString().Equals(MainForm.Instance.Settings.AedSettings.DeviceOutputType))
                         {
                             device.SelectedItem = o;
                             break;
@@ -354,8 +343,8 @@ namespace MeGUI
 
                 if (addSubsNChapters.Checked)
 				{
-                    AdaptiveMuxWindow amw = new AdaptiveMuxWindow(mainForm);
-                    amw.setMinimizedMode(videoOutput, "", videoStream.Settings.EncoderType, jobUtil.getFramerate(videoInput), audio,
+                    AdaptiveMuxWindow amw = new AdaptiveMuxWindow();
+                    amw.setMinimizedMode(videoOutput, "", videoStream.Settings.EncoderType, JobUtil.getFramerate(videoInput), audio,
                         muxTypes, muxedOutput, splitSize, cot);
                     if (amw.ShowDialog() == DialogResult.OK)
                         amw.getAdditionalStreams(out audio, out subtitles, out chapters, out muxedOutput, out cot);
@@ -363,7 +352,7 @@ namespace MeGUI
                         return;
                 }
                 removeStreamsToBeEncoded(ref audio, aStreams);
-                mainForm.Jobs.addJobsWithDependencies(vUtil.GenerateJobSeries(this.videoStream, muxedOutput, aStreams, subtitles, chapters,
+                MainForm.Instance.Jobs.addJobsWithDependencies(VideoUtil.GenerateJobSeries(this.videoStream, muxedOutput, aStreams, subtitles, chapters,
                     desiredSize, splitSize, cot, this.prerender, audio, log, this.device.Text, vInfo.Zones, null, null, false), true);
                 this.Close();
 			}
@@ -481,19 +470,32 @@ namespace MeGUI
                 return;
             }
 
+            // close video player so that the AviSynth script is also closed
+            info.ClosePlayer();
+
+            ulong frameCount;
+            double frameRate;
+            error = VideoUtil.CheckAVS(info.Video.VideoInput, out frameCount, out frameRate);
+            if (error != null)
+            {
+                bool bContinue = MainForm.Instance.DialogManager.createJobs(error);
+                if (!bContinue)
+                {
+                    MessageBox.Show("Job creation aborted due to invalid AviSynth script");
+                    return;
+                }
+            }
+
             VideoCodecSettings vSettings = info.Video.CurrentSettings.Clone();
             Zone[] zones = info.Video.Info.Zones; // We can't simply modify the zones in place because that would reveal the final zones config to the user, including the credits/start zones
-            bool cont = info.JobUtil.getFinalZoneConfiguration(vSettings, info.Video.Info.IntroEndFrame, info.Video.Info.CreditsStartFrame, ref zones);
+            bool cont = JobUtil.GetFinalZoneConfiguration(vSettings, info.Video.Info.IntroEndFrame, info.Video.Info.CreditsStartFrame, ref zones, (int)frameCount);
             if (cont)
             {
-                ulong length = 0;
-                double framerate = 0.0;
                 VideoStream myVideo = new VideoStream();
-                JobUtil.getInputProperties(out length, out framerate, info.Video.VideoInput);
                 myVideo.Input = info.Video.Info.VideoInput;
                 myVideo.Output = info.Video.Info.VideoOutput;
-                myVideo.NumberOfFrames = length;
-                myVideo.Framerate = (decimal)framerate;
+                myVideo.NumberOfFrames = frameCount;
+                myVideo.Framerate = (decimal)frameRate;
                 myVideo.DAR = info.Video.Info.DAR;
                 myVideo.VideoType = info.Video.CurrentMuxableVideoType;
                 myVideo.Settings = vSettings;
@@ -501,11 +503,10 @@ namespace MeGUI
                 VideoInfo vInfo = info.Video.Info.Clone(); // so we don't modify the data on the main form
                 vInfo.Zones = zones;
 
-                using (AutoEncodeWindow aew = new AutoEncodeWindow(myVideo, info.Audio.AudioStreams, info, info.Video.PrerenderJob, vInfo))
+                using (AutoEncodeWindow aew = new AutoEncodeWindow(myVideo, info.Audio.AudioStreams, info.Video.PrerenderJob, vInfo))
                 {
                     if (aew.init())
                     {
-                        info.ClosePlayer();
                         aew.ShowDialog();
                     }
                     else

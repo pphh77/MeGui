@@ -19,33 +19,26 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 
 using MeGUI.core.details;
-using MeGUI.core.details.video;
 using MeGUI.core.gui;
-using MeGUI.core.plugins.interfaces;
 using MeGUI.core.util;
-using MeGUI.packages.video;
 
 namespace MeGUI
 {
     public partial class VideoEncodingComponent : UserControl
     {
-        private VideoPlayer player; // window that shows a preview of the video
-        private MainForm mainForm = MainForm.Instance;
-
         #region video info
         private VideoInfo info; 
-        public double FrameRate;
+        private VideoPlayer player; // window that shows a preview of the video
+        private MediaInfoFile oInfo;
+        private VideoEncoderProvider videoEncoderProvider = new VideoEncoderProvider();
+
         private void initVideoInfo()
         {
+            oInfo = null;
             info = new VideoInfo();
             info.VideoInputChanged += new StringChanged(delegate(object _, string val)
             {
@@ -85,13 +78,12 @@ namespace MeGUI
             }
         }
 	
-        private VideoEncoderProvider videoEncoderProvider = new VideoEncoderProvider();
         public VideoEncodingComponent()
         {
             initVideoInfo();
             InitializeComponent();
-            if (mainForm != null)  // Fix to allow VS2008 designer to load Form1
-                videoProfile.Manager = mainForm.Profiles;
+            if (MainForm.Instance != null)  // Fix to allow VS2008 designer to load Form1
+                videoProfile.Manager = MainForm.Instance.Profiles;
         }
         #endregion
         #region extra properties
@@ -119,7 +111,7 @@ namespace MeGUI
         #region event handlers
         private void videoInput_FileSelected(FileBar sender, FileBarEventArgs args)
         {
-            if (!string.IsNullOrEmpty(videoInput.Filename) && !mainForm.openFile(videoInput.Filename, true))
+            if (!string.IsNullOrEmpty(videoInput.Filename) && !MainForm.Instance.openFile(videoInput.Filename, out oInfo))
             {
                 videoInput.Filename = String.Empty;
                 videoOutput.Filename = String.Empty;
@@ -143,17 +135,16 @@ namespace MeGUI
                 player.Close();
             player = new VideoPlayer();
             info.DAR = null; // to be sure to initialize DAR values
-            bool videoLoaded = player.loadVideo(mainForm, fileName, PREVIEWTYPE.CREDITS, true);
+            bool videoLoaded = player.loadVideo(MainForm.Instance, fileName, PREVIEWTYPE.CREDITS, true);
             if (videoLoaded)
             {
                 info.DAR = info.DAR ?? player.File.VideoInfo.DAR;
                 player.DAR = info.DAR; 
-                FrameRate = player.Framerate;
                 player.IntroCreditsFrameSet += new IntroCreditsFrameSetCallback(player_IntroCreditsFrameSet);
                 player.Closed += new EventHandler(player_Closed);
                 player.Show();
                 player.SetScreenSize();
-                if (mainForm.Settings.AlwaysOnTop)
+                if (MainForm.Instance.Settings.AlwaysOnTop)
                     player.TopMost = true;
             }
         }
@@ -196,8 +187,21 @@ namespace MeGUI
                     videoOutput = Path.ChangeExtension(videoOutput, "m4v");
             }
 
-            JobChain prepareJobs = mainForm.JobUtil.AddVideoJobs(info.VideoInput, videoOutput, this.CurrentSettings.Clone(),
-                info.IntroEndFrame, info.CreditsStartFrame, info.DAR, PrerenderJob, true, info.Zones);
+            ulong frameCount;
+            double frameRate;
+            string error = VideoUtil.CheckAVS(info.VideoInput, out frameCount, out frameRate);
+            if (error != null)
+            {
+                bool bContinue = MainForm.Instance.DialogManager.createJobs(error);
+                if (!bContinue)
+                {
+                    MessageBox.Show("Job creation aborted due to invalid AviSynth script");
+                    return;
+                }
+            }
+
+            JobChain prepareJobs = JobUtil.AddVideoJobs(info.VideoInput, videoOutput, this.CurrentSettings.Clone(),
+                info.IntroEndFrame, info.CreditsStartFrame, info.DAR, PrerenderJob, info.Zones, (int)frameCount);
 
             if (!fileType.Text.StartsWith("RAW") 
                 && (!vSettings.SettingsID.Equals("x264") || !fileType.Text.Equals("MKV") || MainForm.Instance.Settings.UseExternalMuxerX264))
@@ -232,7 +236,7 @@ namespace MeGUI
                 // add job to queue
                 prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(mJob));
             }
-            mainForm.Jobs.addJobsWithDependencies(prepareJobs, true);
+            MainForm.Instance.Jobs.addJobsWithDependencies(prepareJobs, true);
         }
 
         private bool bInitialStart = true;
@@ -305,34 +309,27 @@ namespace MeGUI
         {
             get { return new MuxableType(CurrentVideoOutputType, CurrentSettings.Codec); }
         }
+
         public void openVideoFile(string fileName)
         {
-            if (AudioUtil.AVSFileHasAudio(fileName))
-                mainForm.Audio.openAudioFile(fileName);
-
             info.CreditsStartFrame = -1;
             info.IntroEndFrame = -1;
             info.VideoInput = fileName;
-            info.DAR = null;
+            info.DAR = oInfo.VideoInfo.DAR;
             info.Zones = null;
 
-            if (mainForm.Settings.AutoOpenScript)
+            if (MainForm.Instance.Settings.AutoOpenScript)
                 openAvisynthScript(fileName);
-            else
-            {
-                using (AvsFile avi = AvsFile.OpenScriptFile(fileName))
-                {
-                    info.DAR = avi.VideoInfo.DAR;
-                }
-            }
+
             string filePath;
-            if (string.IsNullOrEmpty(filePath = mainForm.Settings.DefaultOutputDir))
+            if (string.IsNullOrEmpty(filePath = MainForm.Instance.Settings.DefaultOutputDir))
                 filePath = Path.GetDirectoryName(fileName);
             string fileNameNoExtension = Path.GetFileNameWithoutExtension(fileName);
-            this.VideoOutput = Path.Combine(filePath, fileNameNoExtension) + mainForm.Settings.VideoExtension + ".extension";
+            this.VideoOutput = Path.Combine(filePath, fileNameNoExtension) + MainForm.Instance.Settings.VideoExtension + ".extension";
             this.VideoOutput = Path.ChangeExtension(this.VideoOutput, this.CurrentVideoOutputType.Extension);
             updateIOConfig();
         }
+
         private bool isFirstPass()
         {
             VideoCodecSettings settings = CurrentSettings;
@@ -373,7 +370,6 @@ namespace MeGUI
         /// <param name="e"></param>
         private void player_Closed(object sender, EventArgs e)
         {
-            info.DAR = player.DAR;
             this.player = null;
         }
         /// <summary>
@@ -467,7 +463,7 @@ namespace MeGUI
             }
 
             AviSynthJob job = new AviSynthJob(VideoInput);
-            mainForm.Jobs.addJobsToQueue(new AviSynthJob(VideoInput));
+            MainForm.Instance.Jobs.addJobsToQueue(new AviSynthJob(VideoInput));
         }
 
         VideoEncoderType lastCodec = null;
@@ -509,7 +505,7 @@ namespace MeGUI
             }
 
             ClosePlayer();
-            ZonesWindow zw = new ZonesWindow(mainForm, VideoInput);
+            ZonesWindow zw = new ZonesWindow(MainForm.Instance, VideoInput);
             zw.Zones = Info.Zones;
             if (zw.ShowDialog() == DialogResult.OK)
                 Info.Zones = zw.Zones;

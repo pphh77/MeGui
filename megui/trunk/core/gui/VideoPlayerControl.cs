@@ -283,7 +283,8 @@ namespace MeGUI.core.gui
                 {
                     using (Bitmap b = getFrame(pos))
                     {
-                        if (b == null) continue;
+                        if (b == null)
+                            continue;
 
                         //if (cropMargin != Padding.Empty) // only crop when necessary            
                         //    cropImage(b);

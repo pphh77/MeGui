@@ -921,7 +921,7 @@ namespace MeGUI
                             oVideo.Width = avi.VideoInfo.Width.ToString();
                             oVideo.Height = avi.VideoInfo.Height.ToString();
                             oVideo.FrameCount = avi.VideoInfo.FrameCount.ToString();
-                            oVideo.FrameRate = avi.VideoInfo.FPS.ToString(culture);
+                            oVideo.FrameRate = avi.VideoInfo.FPS.ToString(culture);  
                             _VideoInfo.FPS_D = avi.VideoInfo.FPS_D;
                             _VideoInfo.FPS_N = avi.VideoInfo.FPS_N;
                             if (avi.Clip.interlaced_frame > 0)
@@ -931,6 +931,7 @@ namespace MeGUI
                             oVideo.Codec = "AVS Video";
                             oVideo.CodecString = "AVS";
                             oVideo.Format = "AVS";
+                            _VideoInfo.DAR = avi.VideoInfo.DAR;
                             oVideo.AspectRatio = avi.VideoInfo.DAR.X + ":" + avi.VideoInfo.DAR.Y;
                             oVideo.Delay = "0";
                             oInfo.Video.Add(oVideo);

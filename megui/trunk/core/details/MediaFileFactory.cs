@@ -18,10 +18,6 @@
 // 
 // ****************************************************************************
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace MeGUI
 {
     public class MediaFileFactory
@@ -43,14 +39,15 @@ namespace MeGUI
                     continue;
                 try
                 {
-                    IMediaFile mFile = factory.Open(file);
-                    if (mFile != null && handleLevel > bestHandleLevel)
+                    if (handleLevel > bestHandleLevel)
                     {
-                        bestHandleLevel = handleLevel;
-                        bestMediaFile = mFile;
+                        IMediaFile mFile = factory.Open(file);
+                        if (mFile != null)
+                        {
+                            bestHandleLevel = handleLevel;
+                            bestMediaFile = mFile;
+                        }
                     }
-                    else if (mFile != null)
-                        mFile.Dispose();
                 }
                 catch {}
             }

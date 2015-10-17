@@ -32,17 +32,14 @@ namespace MeGUI
     public partial class AdaptiveMuxWindow : baseMuxWindow
     {
         private MuxProvider muxProvider;
-        private JobUtil jobUtil;
         private bool minimizedMode = false;
         private VideoEncoderType knownVideoType;
         private AudioEncoderType[] knownAudioTypes;
         private ContainerType lastSelectedContainerType = null;
 
-        public AdaptiveMuxWindow(MainForm mainForm)
-            : base(mainForm, null)
+        public AdaptiveMuxWindow(): base(MainForm.Instance, null)
         {
             InitializeComponent();
-            jobUtil = new JobUtil(mainForm);
             muxProvider = mainForm.MuxProvider;
 
             audioTracks[0].Filter = VideoUtil.GenerateCombinedFilter(ContainerManager.AudioTypes.ValuesArray);
@@ -257,7 +254,7 @@ namespace MeGUI
                         deviceOutputType = new MuxableType(type, null);
                 }
 
-                return jobUtil.GenerateMuxJobs(myVideo, fps.Value, audioStreams, audioTypes, subtitleStreams,
+                return JobUtil.GenerateMuxJobs(myVideo, fps.Value, audioStreams, audioTypes, subtitleStreams,
                     subtitleTypes, this.chapters.Filename, chapterInputType, (cbContainer.SelectedItem as ContainerType), 
                     output.Filename, splitSize, new List<string>(), this.cbType.Text, deviceOutputType, false);
             }

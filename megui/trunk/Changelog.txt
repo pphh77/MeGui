@@ -1,4 +1,5 @@
-2606 [MediaInfo]           reduced log messages if the language information is emtpy
+2607                        reduced number of required AviSynth script accesses
+2606 [MediaInfo]            reduced log messages if the language information is emtpy
 2605 [Update]               fixed not using the proper package disable date from the server configuration (regression of 2523)
 2604 [QAAC]                 do not delete portable runtime files during an update if they are in the QTfiles subdirectory
 2603 [AudioEncoder]         fixed FFAudioSource. part II (regression of 2591)

@@ -48,9 +48,6 @@ namespace MeGUI
         private List<AudioTrackInfo> audioTracks = new List<AudioTrackInfo>();
         private bool dialogMode = false; // $%£%$^>*"%$%%$#{"!!! Affects the public behaviour!
         private bool configured = false;
-        private MainForm mainForm;
-        private VideoUtil vUtil;
-        private JobUtil jobUtil;
         #endregion
 
         #region start / stop
@@ -84,21 +81,16 @@ namespace MeGUI
         public FileIndexerWindow(MainForm mainForm)
         {
             InitializeComponent();
-            this.mainForm = mainForm;
-            this.vUtil = new VideoUtil(mainForm);
-            this.jobUtil = new JobUtil(mainForm);
             CheckDGIIndexer();
         }
 
-        public FileIndexerWindow(MainForm mainForm, string fileName)
-            : this(mainForm)
+        public FileIndexerWindow(MainForm mainForm, string fileName) : this(mainForm)
         {
             CheckDGIIndexer();
             openVideo(fileName);
         }
 
-        public FileIndexerWindow(MainForm mainForm, string fileName, bool autoReturn)
-            : this(mainForm, fileName)
+        public FileIndexerWindow(MainForm mainForm, string fileName, bool autoReturn) : this(mainForm, fileName)
         {
             CheckDGIIndexer();
             openVideo(fileName);
@@ -252,11 +244,11 @@ namespace MeGUI
         }
         private void openVideo(string fileName)
         {
-            this._oLog = mainForm.FileIndexerLog;
+            this._oLog = MainForm.Instance.FileIndexerLog;
             if (_oLog == null)
             {
-                _oLog = mainForm.Log.Info("FileIndexer");
-                mainForm.FileIndexerLog = _oLog;
+                _oLog = MainForm.Instance.Log.Info("FileIndexer");
+                MainForm.Instance.FileIndexerLog = _oLog;
             }
             MediaInfoFile iFile = new MediaInfoFile(fileName, ref _oLog);
 
@@ -379,7 +371,7 @@ namespace MeGUI
             {
                 string projectPath = "";
                 string fileNameNoPath = Path.GetFileName(this.input.Filename);
-                if (string.IsNullOrEmpty(projectPath = mainForm.Settings.DefaultOutputDir))
+                if (string.IsNullOrEmpty(projectPath = MainForm.Instance.Settings.DefaultOutputDir))
                     projectPath = Path.GetDirectoryName(this.input.Filename);
                 switch (IndexerUsed)
                 {
@@ -452,7 +444,7 @@ namespace MeGUI
                 case IndexType.D2V:
                     {
                         prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(generateD2VIndexJob(videoInput)));
-                        mainForm.Jobs.addJobsWithDependencies(prepareJobs, true);
+                        MainForm.Instance.Jobs.addJobsWithDependencies(prepareJobs, true);
                         if (this.closeOnQueue.Checked)
                             this.Close();
                         break;
@@ -460,7 +452,7 @@ namespace MeGUI
                 case IndexType.DGI:
                     {
                         prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(generateDGNVIndexJob(videoInput)));
-                        mainForm.Jobs.addJobsWithDependencies(prepareJobs, true);
+                        MainForm.Instance.Jobs.addJobsWithDependencies(prepareJobs, true);
                         if (this.closeOnQueue.Checked)
                             this.Close();
                         break;
@@ -468,7 +460,7 @@ namespace MeGUI
                 case IndexType.DGM:
                     {
                         prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(generateDGMIndexJob(videoInput)));
-                        mainForm.Jobs.addJobsWithDependencies(prepareJobs, true);
+                        MainForm.Instance.Jobs.addJobsWithDependencies(prepareJobs, true);
                         if (this.closeOnQueue.Checked)
                             this.Close();
                         break;
@@ -486,7 +478,7 @@ namespace MeGUI
                             prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(extractJob));
                         }
                         prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(job));
-                        mainForm.Jobs.addJobsWithDependencies(prepareJobs, true);
+                        MainForm.Instance.Jobs.addJobsWithDependencies(prepareJobs, true);
                         if (this.closeOnQueue.Checked)
                             this.Close();
                         break;
@@ -504,7 +496,7 @@ namespace MeGUI
                             prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(extractJob));
                         }
                         prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(job));
-                        mainForm.Jobs.addJobsWithDependencies(prepareJobs, true);
+                        MainForm.Instance.Jobs.addJobsWithDependencies(prepareJobs, true);
                         if (this.closeOnQueue.Checked)
                             this.Close();
                         break;
@@ -699,9 +691,8 @@ namespace MeGUI
             D2VIndexJob job = (D2VIndexJob)ajob;
 
             StringBuilder logBuilder = new StringBuilder();
-            VideoUtil vUtil = new VideoUtil(mainForm);
             List<string> arrFilesToDelete = new List<string>();
-            Dictionary<int, string> audioFiles = vUtil.getAllDemuxedAudio(job.AudioTracks, new List<AudioTrackInfo>(), out arrFilesToDelete, job.Output, null);
+            Dictionary<int, string> audioFiles = VideoUtil.getAllDemuxedAudio(job.AudioTracks, new List<AudioTrackInfo>(), out arrFilesToDelete, job.Output, null);
             if (job.LoadSources)
             {
                 if (job.DemuxMode != 0 && audioFiles.Count > 0)
@@ -738,9 +729,8 @@ namespace MeGUI
             DGIIndexJob job = (DGIIndexJob)ajob;
 
             StringBuilder logBuilder = new StringBuilder();
-            VideoUtil vUtil = new VideoUtil(mainForm);
             List<string> arrFilesToDelete = new List<string>();
-            Dictionary<int, string> audioFiles = vUtil.getAllDemuxedAudio(job.AudioTracks, new List<AudioTrackInfo>(), out arrFilesToDelete, job.Output, null);
+            Dictionary<int, string> audioFiles = VideoUtil.getAllDemuxedAudio(job.AudioTracks, new List<AudioTrackInfo>(), out arrFilesToDelete, job.Output, null);
             if (job.LoadSources)
             {
                 if (job.DemuxMode != 0 && audioFiles.Count > 0)
@@ -778,9 +768,8 @@ namespace MeGUI
             DGMIndexJob job = (DGMIndexJob)ajob;
 
             StringBuilder logBuilder = new StringBuilder();
-            VideoUtil vUtil = new VideoUtil(mainForm);
             List<string> arrFilesToDelete = new List<string>();
-            Dictionary<int, string> audioFiles = vUtil.getAllDemuxedAudio(job.AudioTracks, new List<AudioTrackInfo>(), out arrFilesToDelete, job.Output, null);
+            Dictionary<int, string> audioFiles = VideoUtil.getAllDemuxedAudio(job.AudioTracks, new List<AudioTrackInfo>(), out arrFilesToDelete, job.Output, null);
             if (job.LoadSources)
             {
                 if (job.DemuxMode != 0 && audioFiles.Count > 0)
@@ -817,9 +806,8 @@ namespace MeGUI
             FFMSIndexJob job = (FFMSIndexJob)ajob;
 
             StringBuilder logBuilder = new StringBuilder();
-            VideoUtil vUtil = new VideoUtil(mainForm);
             List<string> arrFilesToDelete = new List<string>();
-            Dictionary<int, string> audioFiles = vUtil.getAllDemuxedAudio(job.AudioTracks, job.AudioTracksDemux, out arrFilesToDelete, job.Output, null);
+            Dictionary<int, string> audioFiles = VideoUtil.getAllDemuxedAudio(job.AudioTracks, job.AudioTracksDemux, out arrFilesToDelete, job.Output, null);
             if (job.LoadSources)
             {
                 if (job.DemuxMode != 0)
@@ -857,9 +845,8 @@ namespace MeGUI
             LSMASHIndexJob job = (LSMASHIndexJob)ajob;
 
             StringBuilder logBuilder = new StringBuilder();
-            VideoUtil vUtil = new VideoUtil(mainForm);
             List<string> arrFilesToDelete = new List<string>();
-            Dictionary<int, string> audioFiles = vUtil.getAllDemuxedAudio(job.AudioTracks, job.AudioTracksDemux, out arrFilesToDelete, job.Output, null);
+            Dictionary<int, string> audioFiles = VideoUtil.getAllDemuxedAudio(job.AudioTracks, job.AudioTracksDemux, out arrFilesToDelete, job.Output, null);
             if (job.LoadSources)
             {
                 if (job.DemuxMode != 0)

@@ -19,12 +19,9 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 
-using MeGUI.core.plugins.implemented;
 using MeGUI.core.util;
 
 namespace MeGUI
@@ -42,9 +39,11 @@ namespace MeGUI
         protected int fps_n = 0, fps_d = 0;
         protected bool usesSAR = false;
         #endregion
+
         public CommandlineVideoEncoder() : base()
         {
         }
+
         #region helper methods
         protected override void checkJobIO()
         {
@@ -64,6 +63,7 @@ namespace MeGUI
             su.Status = "Encoding video...";
             getInputProperties(job);
         }
+
         /// <summary>
         /// tries to open the video source and gets the number of frames from it, or 
         /// exits with an error
@@ -75,7 +75,7 @@ namespace MeGUI
         {
             double fps;
             Dar d;
-            JobUtil.GetAllInputProperties(out numberOfFrames, out fps, out fps_n, out fps_d, out hres, out vres, out d, job.Input);
+            JobUtil.GetAllInputProperties(job.Input, out numberOfFrames, out fps, out fps_n, out fps_d, out hres, out vres, out d);
             dar = job.DAR;
             su.NbFramesTotal = numberOfFrames;
             su.ClipLength = TimeSpan.FromSeconds((double)numberOfFrames / fps);
@@ -88,6 +88,7 @@ namespace MeGUI
 
             base.doExitConfig();
         }
+
         /// <summary>
         /// compiles final bitrate statistics
         /// </summary>

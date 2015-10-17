@@ -19,12 +19,7 @@
 // ****************************************************************************
 
 using System;
-using System.Drawing;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Xml.Serialization;
-
-using MeGUI.core.util;
 
 namespace MeGUI
 {
@@ -32,7 +27,6 @@ namespace MeGUI
 
     public class d2vFileFactory : IMediaFileFactory
     {
-
         #region IMediaFileFactory Members
         public IMediaFile Open(string file)
         {
@@ -41,7 +35,7 @@ namespace MeGUI
 
         public int HandleLevel(string file)
         {
-            if (file.ToLower(System.Globalization.CultureInfo.InvariantCulture).EndsWith(".d2v"))
+            if (file.ToLowerInvariant().EndsWith(".d2v"))
                 return 10;
             return -1;
         }

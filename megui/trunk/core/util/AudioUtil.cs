@@ -71,11 +71,11 @@ namespace MeGUI
         {
             try
             {
-                if (!Path.GetExtension(strAVSScript).ToLower(System.Globalization.CultureInfo.InvariantCulture).Equals(".avs"))
+                if (!Path.GetExtension(strAVSScript).ToLowerInvariant().Equals(".avs"))
                     return false;
                 using (AviSynthScriptEnvironment env = new AviSynthScriptEnvironment())
                     using (AviSynthClip a = env.OpenScriptFile(strAVSScript))
-                        if (a.ChannelsCount == 0)
+                        if (!a.HasAudio)
                             return false;
                 return true;
             }
@@ -89,7 +89,7 @@ namespace MeGUI
         {
             try
             {
-                if (!Path.GetExtension(strAVSScript).ToLower(System.Globalization.CultureInfo.InvariantCulture).Equals(".avs"))
+                if (!Path.GetExtension(strAVSScript).ToLowerInvariant().Equals(".avs"))
                     return 0;
                 using (AviSynthScriptEnvironment env = new AviSynthScriptEnvironment())
                     using (AviSynthClip a = env.OpenScriptFile(strAVSScript))
@@ -144,16 +144,6 @@ namespace MeGUI
                         }
                     }
                 }
-
-                if (iChannelCount == 0)
-                {
-                    using (AvsFile avi = AvsFile.OpenScriptFile(strAVSFile))
-                    {
-                        if (avi.Clip.HasAudio)
-                            Int32.TryParse(avi.Clip.ChannelsCount.ToString(), out iChannelCount);
-                    }
-                }
-
                 return iChannelCount;
             }
             catch

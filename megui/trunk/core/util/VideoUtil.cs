@@ -20,7 +20,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -36,14 +35,7 @@ namespace MeGUI
 	/// </summary>
 	public class VideoUtil
     {
-
-        private MainForm mainForm;
-		private JobUtil jobUtil;
-		public VideoUtil(MainForm mainForm)
-		{
-			this.mainForm = mainForm;
-			jobUtil = new JobUtil(mainForm);
-        }
+		public VideoUtil()	{ }
 
 		#region finding source information
 		
@@ -208,7 +200,7 @@ namespace MeGUI
         /// <param name="audioTrackIDs">list of audio TrackIDs</param>
 		/// <param name="projectName">the name of the dgindex project</param>
 		/// <returns>an array of string of filenames</returns>
-        public Dictionary<int, string> getAllDemuxedAudio(List<AudioTrackInfo> audioTracks, List<AudioTrackInfo> audioTracksDemux, out List<string> arrDeleteFiles, string projectName, LogItem log)
+        public static Dictionary<int, string> getAllDemuxedAudio(List<AudioTrackInfo> audioTracks, List<AudioTrackInfo> audioTracksDemux, out List<string> arrDeleteFiles, string projectName, LogItem log)
         {
 		    Dictionary<int, string> audioFiles = new Dictionary<int, string>();
             arrDeleteFiles = new List<string>();
@@ -314,7 +306,7 @@ namespace MeGUI
 		/// <param name="aStreams">all encodable audio streams</param>
 		/// <param name="audio">all muxable audio streams</param>
 		/// <returns>the info to be added to the log</returns>
-		public LogItem eliminatedDuplicateFilenames(ref string videoOutput, ref string muxedOutput, AudioJob[] aStreams)
+		public static LogItem eliminatedDuplicateFilenames(ref string videoOutput, ref string muxedOutput, AudioJob[] aStreams)
 		{
             LogItem log = new LogItem("Eliminating duplicate filenames");
             if (!String.IsNullOrEmpty(videoOutput))
@@ -374,27 +366,33 @@ namespace MeGUI
         #endregion
 
         #region source checking
-        public string checkVideo(string avsFile)
+        public static string CheckAVS(string avsFile, out ulong frameCount, out double frameRate)
         {
-            return checkVideo(avsFile, true);
+            return checkAVS(avsFile, true, out frameCount, out frameRate);
         }
         
-        private string checkVideo(string avsFile, bool tryToFix)
+        private static string checkAVS(string avsFile, bool tryToFix, out ulong frameCount, out double frameRate)
         {
+            frameCount = 0;
+            frameRate = 0;
+
             try
             {
                 using (AvsFile avi = AvsFile.OpenScriptFile(avsFile))
                 {
+                    checked { frameCount = (ulong)avi.VideoInfo.FrameCount; }
+                    frameRate = avi.VideoInfo.FPS;
+
                     if (avi.Clip.OriginalColorspace != AviSynthColorspace.YV12 && avi.Clip.OriginalColorspace != AviSynthColorspace.I420)
                     {
                         if (tryToFix && !isConvertedToYV12(avsFile))
                         {
-                            bool convert = mainForm.DialogManager.addConvertToYV12(avi.Clip.OriginalColorspace.ToString());
+                            bool convert = MainForm.Instance.DialogManager.addConvertToYV12(avi.Clip.OriginalColorspace.ToString());
                             if (convert)
                             {
                                 if (appendConvertToYV12(avsFile))
                                 {
-                                    string sResult = checkVideo(avsFile, false); // Check everything again, to see if it is all fixed now
+                                    string sResult = checkAVS(avsFile, false, out frameCount, out frameRate); // Check everything again, to see if it is all fixed now
                                     if (sResult == null)
                                         return null;
                                     else
@@ -424,7 +422,7 @@ namespace MeGUI
             return null;
         }
 
-        private bool appendConvertToYV12(string file)
+        private static bool appendConvertToYV12(string file)
         {
             try
             {
@@ -439,7 +437,7 @@ namespace MeGUI
             return true;
         }
 
-        private bool isConvertedToYV12(string file)
+        private static bool isConvertedToYV12(string file)
         {
             try
             {
@@ -464,17 +462,17 @@ namespace MeGUI
         }
 
         delegate VideoCodecSettings CurrentSettingsDelegate();
-        private VideoCodecSettings GetCurrentVideoSettings()
+        private static VideoCodecSettings GetCurrentVideoSettings()
         {
-            if (mainForm.InvokeRequired)
-                return (VideoCodecSettings)mainForm.Invoke(new CurrentSettingsDelegate(GetCurrentVideoSettings));
+            if (MainForm.Instance.InvokeRequired)
+                return (VideoCodecSettings)MainForm.Instance.Invoke(new CurrentSettingsDelegate(GetCurrentVideoSettings));
             else
-                return mainForm.Video.CurrentSettings;
+                return MainForm.Instance.Video.CurrentSettings;
         }
         #endregion
 
         #region new stuff
-        public JobChain GenerateJobSeries(VideoStream video, string muxedOutput, AudioJob[] audioStreams,
+        public static JobChain GenerateJobSeries(VideoStream video, string muxedOutput, AudioJob[] audioStreams,
             MuxStream[] subtitles, string chapters, FileSize? desiredSize, FileSize? splitSize, 
             ContainerType container, bool prerender, MuxStream[] muxOnlyAudio, LogItem log, string deviceType, 
             Zone[] zones, string videoFileToMux, OneClickAudioTrack[] audioTracks, bool alwaysMuxOutput)
@@ -484,7 +482,7 @@ namespace MeGUI
                 if (video.Settings.VideoEncodingType != VideoCodecSettings.VideoEncodingMode.twopassAutomated
                     && video.Settings.VideoEncodingType != VideoCodecSettings.VideoEncodingMode.threepassAutomated) // no automated 2/3 pass
                 {
-                    if (this.mainForm.Settings.NbPasses == 2)
+                    if (MainForm.Instance.Settings.NbPasses == 2)
                         video.Settings.VideoEncodingType = VideoCodecSettings.VideoEncodingMode.twopassAutomated; // automated 2 pass
                     else if (video.Settings.MaxNumberOfPasses == 3)
                         video.Settings.VideoEncodingType = VideoCodecSettings.VideoEncodingMode.threepassAutomated;
@@ -501,7 +499,7 @@ namespace MeGUI
             else
             {
                 video.Output = videoOutput;
-                vjobs = jobUtil.prepareVideoJob(video.Input, video.Output, video.Settings, video.DAR, prerender, true, zones);
+                vjobs = JobUtil.prepareVideoJob(video.Input, video.Output, video.Settings, video.DAR, prerender, zones);
                 if (vjobs == null) return null;
             }
             
@@ -577,7 +575,7 @@ namespace MeGUI
                 inputsToDelete.Add(video.Output);
             inputsToDelete.AddRange(Array.ConvertAll<AudioJob, string>(audioStreams, delegate(AudioJob a) { return a.Output; }));
 
-            JobChain muxJobs = jobUtil.GenerateMuxJobs(video, null, allAudioToMux.ToArray(), allInputAudioTypes.ToArray(),
+            JobChain muxJobs = JobUtil.GenerateMuxJobs(video, null, allAudioToMux.ToArray(), allInputAudioTypes.ToArray(),
                 subtitles, allInputSubtitleTypes.ToArray(), chapters, chapterInputType, container, muxedOutput, splitSize, inputsToDelete, 
                 deviceType, deviceOutputType, alwaysMuxOutput);
 
@@ -605,7 +603,7 @@ namespace MeGUI
                     new SequentialChain(muxJobs));
         }
 
-        private void fixFileNameExtensions(VideoStream video, AudioJob[] audioStreams, ContainerType container)
+        private static void fixFileNameExtensions(VideoStream video, AudioJob[] audioStreams, ContainerType container)
         {
             AudioEncoderType[] audioCodecs = new AudioEncoderType[audioStreams.Length];
             for (int i = 0; i < audioStreams.Length; i++)
@@ -614,9 +612,9 @@ namespace MeGUI
             }
             MuxPath path;
             if (video.Settings == null)
-                path = mainForm.MuxProvider.GetMuxPath(VideoEncoderType.X264, audioCodecs, container);
+                path = MainForm.Instance.MuxProvider.GetMuxPath(VideoEncoderType.X264, audioCodecs, container);
             else
-                path = mainForm.MuxProvider.GetMuxPath(video.Settings.EncoderType, audioCodecs, container);
+                path = MainForm.Instance.MuxProvider.GetMuxPath(video.Settings.EncoderType, audioCodecs, container);
             if (path == null)
                 return;
             List<AudioType> audioTypes = new List<AudioType>();
@@ -835,7 +833,7 @@ namespace MeGUI
             UpdateCacher.CheckPackage("ffms");
             int fpsnum, fpsden;
             getFPSFraction(fps, inputFile, out fpsnum, out fpsden);
-            return getFFMSBasicInputLine(!isFFMSDefaultPluginRequired(), inputFile, indexFile, -1, 0, fpsnum, fpsden, true);             
+            return getFFMSBasicInputLine(!isFFMSDefaultPluginRequired(), inputFile, indexFile, -1, 0, fpsnum, fpsden, true);
         }
 
         public static string getFFMSAudioInputLine(string inputFile, string indexFile, int track)
@@ -858,7 +856,7 @@ namespace MeGUI
             StringBuilder script = new StringBuilder();
             script.AppendFormat("Load{0}Plugin(\"{1}\"){2}",
                 (loadCPlugin ? "C" : String.Empty),
-                Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.FFMS.Path), "ffms2.dll"), 
+                Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.FFMS.Path), "ffms2.dll"),
                 Environment.NewLine);
 
             if (inputFile.ToLowerInvariant().EndsWith(".ffindex"))
@@ -880,12 +878,12 @@ namespace MeGUI
             else
             {
                 // use FFAudioSource
-                script.AppendFormat("FFAudioSource(\"{0}\"{1}{2}){3}", 
+                script.AppendFormat("FFAudioSource(\"{0}\"{1}{2}){3}",
                     inputFile,
                     (track > -1 ? ", track=" + track : String.Empty),
                     (!String.IsNullOrEmpty(indexFile) ? ", cachefile=\"" + indexFile + "\"" : String.Empty),
                     Environment.NewLine);
-            }           
+            }
             return script.ToString();
         }
 
