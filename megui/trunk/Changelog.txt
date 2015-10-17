@@ -1,3 +1,5 @@
+2609                        removed the DPI aware flag (requires Windows Vista+)
+                            The application will now look blurry when not using 100% DPI but all controls are visible
 2608 [QAAC]                 fixed a crash when the settings have to be recreated (regression of 2604)
 2607                        reduced number of required AviSynth script accesses
 2606 [MediaInfo]            reduced log messages if the language information is emtpy
