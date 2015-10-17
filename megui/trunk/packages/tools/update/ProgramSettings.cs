@@ -52,6 +52,7 @@ namespace MeGUI
         {
             _files = new List<string>();
             _doNotDeleteFilesOnUpdate = new List<string>();
+            _doNotDeleteFoldersOnUpdate = new List<string>();
             _enabled = _required = false;
             _path = String.Empty;
             _lastused = new DateTime();

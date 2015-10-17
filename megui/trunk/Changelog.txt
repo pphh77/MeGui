@@ -1,3 +1,4 @@
+2608 [QAAC]                 fixed a crash when the settings have to be recreated (regression of 2604)
 2607                        reduced number of required AviSynth script accesses
 2606 [MediaInfo]            reduced log messages if the language information is emtpy
 2605 [Update]               fixed not using the proper package disable date from the server configuration (regression of 2523)
