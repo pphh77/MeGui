@@ -645,7 +645,7 @@ namespace MeGUI
                         audioEncodingComponent1.openAudioFile(file);
                     if (iFile.ContainerFileTypeString.Equals("AVS"))
                     {
-                        Video.openVideoFile(file);
+                        Video.openVideoFile(file, iFile);
                         return true;
                     }
                     else

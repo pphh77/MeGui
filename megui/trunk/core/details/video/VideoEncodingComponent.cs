@@ -310,8 +310,21 @@ namespace MeGUI
             get { return new MuxableType(CurrentVideoOutputType, CurrentSettings.Codec); }
         }
 
-        public void openVideoFile(string fileName)
+        public void openVideoFile(string fileName, MediaInfoFile oNewInfo)
         {
+            if (oNewInfo == null)
+            {
+                if (oInfo != null)
+                {
+                    if (!oInfo.FileName.ToLowerInvariant().Equals(fileName.ToLowerInvariant()))
+                        oInfo = new MediaInfoFile(fileName);
+                }
+                else
+                    oInfo = new MediaInfoFile(fileName);
+            }
+            else
+                oInfo = oNewInfo;
+
             info.CreditsStartFrame = -1;
             info.IntroEndFrame = -1;
             info.VideoInput = fileName;

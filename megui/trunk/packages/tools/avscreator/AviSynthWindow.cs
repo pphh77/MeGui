@@ -212,7 +212,7 @@ namespace MeGUI
                 if(player != null)
 				    player.Close();
 				this.Close();
-                OpenScript(fileName);
+                OpenScript(fileName, null);
             }
 		}
 		#endregion
@@ -1441,7 +1441,7 @@ namespace MeGUI
                 updateEverything(sender != null, false, false);
         }
     }
-    public delegate void OpenScriptCallback(string avisynthScript);
+    public delegate void OpenScriptCallback(string avisynthScript, MediaInfoFile oInfo);
     public enum PossibleSources { d2v, dgm, dgi, vdr, directShow, avs, ffindex, lsmash };
     public enum mod16Method : int { none = -1, resize = 0, overcrop, nonMod16, mod4Horizontal, undercrop };
     public enum modValue : int { mod16 = 0, mod8, mod4, mod2 };
