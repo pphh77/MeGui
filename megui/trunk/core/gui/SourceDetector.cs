@@ -41,6 +41,11 @@ namespace MeGUI
         public bool majorityFilm;
         public bool isAnime;
         public string analysisResult;
+
+        public SourceInfo()
+        {
+            decimateM = 1;
+        }
     }
 
     public enum SourceType
@@ -94,7 +99,7 @@ namespace MeGUI
         private string script, d2vFileName, trimmedFilteredLine;
         private int frameCount;
         private SourceType type;
-        private int decimateM;
+        private int decimateM = 1;
         private int tffCount = 0, bffCount = 0;
         private FieldOrder fieldOrder = FieldOrder.UNKNOWN;
         public bool majorityFilm, usingPortions;
