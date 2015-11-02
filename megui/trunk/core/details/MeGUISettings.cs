@@ -1426,6 +1426,7 @@ namespace MeGUI
             if (!MainForm.Instance.Settings.UseDGIndexNV)
                 UpdateCacher.CheckPackage("dgindexnv", false, false);
             eac3to.UpdateInformation("eac3to", "eac3to", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\eac3to\eac3to.exe"));
+            eac3to.DoNotDeleteFilesOnUpdate.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\eac3to\neroaacenc.exe"));
             fdkaac.UpdateInformation("fdkaac", "FDK-AAC", FDKAacPath);
             if (!MainForm.Instance.Settings.UseFDKAac)
                 UpdateCacher.CheckPackage("fdkaac", false, false);

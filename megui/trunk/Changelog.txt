@@ -1,3 +1,4 @@
+2613 [Update]               do not delete NeroAacEnc during eac3to update
 2612 [AVS Script Creator]   fixed "Analayse" function (regression of 2611)
 2611 [AVS Script Creator]   fixed value range for cycleR in TDecimate()
 2610                        fixed not able to open AVS scripts in some use cases (regression of 2607)
