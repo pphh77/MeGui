@@ -914,9 +914,7 @@ namespace MeGUI
                 (indexFile.ToLowerInvariant().Equals(inputFile.ToLowerInvariant() + ".lwi") || !File.Exists(indexFile)))
                 indexFile = null;
 
-            string extension = Path.GetExtension(inputFile).ToLowerInvariant();
-            bool bUseLsmash = (extension.Equals(".mp4") || extension.Equals(".m4v") || extension.Equals(".mov") 
-                || extension.Equals(".3gp") || extension.Equals(".3g2") || extension.Equals(".qt"));
+            bool bUseLsmash = UseLSMASHVideoSource(inputFile);
             if (video)
             {
                 script.AppendFormat("{0}(\"{1}\"{2}{3})",
@@ -934,6 +932,13 @@ namespace MeGUI
                     Environment.NewLine);
             }
             return script.ToString();
+        }
+
+        public static bool UseLSMASHVideoSource(string inputFile)
+        {
+            string extension = Path.GetExtension(inputFile).ToLowerInvariant();
+            return (extension.Equals(".mp4") || extension.Equals(".m4v") || extension.Equals(".mov")
+                || extension.Equals(".3gp") || extension.Equals(".3g2") || extension.Equals(".qt"));
         }
 
         public static string getAssumeFPS(double fps, string strInput)

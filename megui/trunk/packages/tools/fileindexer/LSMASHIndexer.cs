@@ -107,7 +107,7 @@ namespace MeGUI
                 stderrLog.LogEvent(strErrorText, ImageType.Error);
                 su.HasError = true;
             }
-            else
+            else if (!VideoUtil.UseLSMASHVideoSource(job.Input))
             {
                 string inputIndex = job.Output;
                 if (!String.IsNullOrEmpty(outputIndex) && !outputIndex.ToLowerInvariant().Equals(inputIndex.ToLowerInvariant()))
@@ -122,7 +122,7 @@ namespace MeGUI
                     }
                     catch (Exception e)
                     {
-                        stderrLog.LogEvent(inputIndex + ".lwi not moved to " + outputIndex + ". error: " + e.Message, ImageType.Error);
+                        stderrLog.LogEvent(inputIndex + " not moved to " + outputIndex + ". error: " + e.Message, ImageType.Error);
                         su.HasError = true;
                     }
                 }
