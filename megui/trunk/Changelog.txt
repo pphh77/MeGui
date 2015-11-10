@@ -1,3 +1,4 @@
+2616 [HD Streams Extractor] improved feature selection
 2615 [AVS Script Creator]   improved "Analyse" handling
 2614 [L-SMASH Indexer]      do not expect a cache file for LSMASH*Source()
 2613 [Update]               do not delete NeroAacEnc during eac3to update

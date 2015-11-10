@@ -21,14 +21,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 using MeGUI.core.plugins.interfaces;
-using MeGUI.core.details;
-using MeGUI.core.util;
 using eac3to;
 
 namespace MeGUI.packages.tools.hdbdextractor
@@ -60,31 +56,38 @@ namespace MeGUI.packages.tools.hdbdextractor
         {
             SetToolStripProgressBarValue(0);
             SetToolStripLabelText(Extensions.GetStringValue(((ResultState)e.Result)));
-            ResetCursor(Cursors.Default);
-
-            if (e.Result != null)
+            
+            if (e.Result == null)
             {
-                switch ((ResultState)e.Result)
-                {
-                    case ResultState.FeatureCompleted:
-                        FeatureDataGridView.DataSource = _oEac3toInfo.Features;
-                        FeatureButton.Enabled = true;
-                        FeatureDataGridView.SelectionChanged += new System.EventHandler(this.FeatureDataGridView_SelectionChanged);
-                        if (_oEac3toInfo.Features.Count == 1)
-                            FeatureDataGridView.Rows[0].Selected = true;
-                        break;
-                    case ResultState.StreamCompleted:
-                        if (FileSelection.Checked)
-                            StreamDataGridView.DataSource = _oEac3toInfo.Features[0].Streams;
-                        else
-                            StreamDataGridView.DataSource = ((eac3to.Feature)FeatureDataGridView.SelectedRows[0].DataBoundItem).Streams;
-                        SelectTracks();
-                        FeatureButton.Enabled = true;
-                        break;
-                    case ResultState.ExtractCompleted:
-                        QueueButton.Enabled = true;
-                        break;
-                }
+                ResetCursor(Cursors.Default);
+                return;
+            }
+
+            switch ((ResultState)e.Result)
+            {
+                case ResultState.FeatureCompleted:
+                    FeatureDataGridView.DataSource = _oEac3toInfo.Features;
+                    FeatureDataGridView.SelectionChanged += new System.EventHandler(this.FeatureDataGridView_SelectionChanged);
+                    StreamDataGridView.ClearSelection();
+                    StreamDataGridView.DataSource = null;
+                    StreamDataGridView.Rows.Clear();
+                    StreamDataGridView.DataSource = typeof(eac3to.Stream);
+                    ResetCursor(Cursors.Default);
+                    if (_oEac3toInfo.Features.Count == 1)
+                        FeatureDataGridView.Rows[0].Selected = true;
+                    break;
+                case ResultState.StreamCompleted:
+                    if (FileSelection.Checked)
+                        StreamDataGridView.DataSource = _oEac3toInfo.Features[0].Streams;
+                    else
+                        StreamDataGridView.DataSource = ((eac3to.Feature)FeatureDataGridView.SelectedRows[0].DataBoundItem).Streams;
+                    SelectTracks();
+                    ResetCursor(Cursors.Default);
+                    break;
+                case ResultState.ExtractCompleted:
+                    QueueButton.Enabled = true;
+                    ResetCursor(Cursors.Default);
+                    break;
             }
         }
         #endregion
@@ -119,10 +122,14 @@ namespace MeGUI.packages.tools.hdbdextractor
         {
             lock (this)
             {
-                if (this.InvokeRequired)
-                    this.BeginInvoke(new ResetCursorCallback(ResetCursor), cursor);
-                else
+                if (!this.InvokeRequired)
+                {
                     this.Cursor = cursor;
+                    StreamDataGridView.Cursor = cursor;
+                    FeatureDataGridView.Enabled = (cursor == Cursors.WaitCursor) ? false : true;
+                }
+                else
+                    this.BeginInvoke(new ResetCursorCallback(ResetCursor), cursor);
             }
         }
 
@@ -131,24 +138,23 @@ namespace MeGUI.packages.tools.hdbdextractor
             string myinput = "";
             string outputFolder = "";
             DialogResult dr;
-            int idx = 0;
             input.Clear();
 
             if (FolderSelection.Checked)
             {
-                folderBrowserDialog1.SelectedPath = MainForm.Instance.Settings.LastSourcePath;
+                folderBrowserDialog1.SelectedPath = MainForm.Instance.Settings.Eac3toLastFolderPath;
                 folderBrowserDialog1.Description = "Choose an input directory";
                 folderBrowserDialog1.ShowNewFolderButton = false;
                 dr = folderBrowserDialog1.ShowDialog();
                 if (dr != DialogResult.OK)
                     return;
+                MainForm.Instance.Settings.Eac3toLastFolderPath = folderBrowserDialog1.SelectedPath;
+
                 inputType = 1;
                 if (folderBrowserDialog1.SelectedPath.EndsWith(":\\"))
                     myinput = folderBrowserDialog1.SelectedPath;
                 else
                     myinput = folderBrowserDialog1.SelectedPath + System.IO.Path.DirectorySeparatorChar;
-                if (dr == DialogResult.OK)
-                    MainForm.Instance.Settings.LastSourcePath = myinput;
                 outputFolder = myinput.Substring(0, myinput.LastIndexOf("\\") + 1);
                 input.Add(myinput);
             }
@@ -157,7 +163,9 @@ namespace MeGUI.packages.tools.hdbdextractor
                 dr = openFileDialog1.ShowDialog();
                 if (dr != DialogResult.OK)
                     return;
+
                 inputType = 2;
+                int idx = 0;
                 foreach (String file in openFileDialog1.FileNames)
                 {
                     if (idx == 0)
@@ -186,38 +194,33 @@ namespace MeGUI.packages.tools.hdbdextractor
                 else
                     FolderOutputTextBox.Text = outputFolder;
             }
-            FeatureButton_Click(null, null);
-        }
 
-        private void FolderOutputSourceButton_Click(object sender, EventArgs e)
-        {
-            folderBrowserDialog1.SelectedPath = MainForm.Instance.Settings.LastDestinationPath;
-            folderBrowserDialog1.Description = "Choose an output directory";
-            folderBrowserDialog1.ShowNewFolderButton = true;
-            DialogResult dr = folderBrowserDialog1.ShowDialog();
-
-            if (dr == DialogResult.OK)
-            {
-                FolderOutputTextBox.Text = folderBrowserDialog1.SelectedPath;
-                MainForm.Instance.Settings.LastDestinationPath = folderBrowserDialog1.SelectedPath;
-            }
-        }
-
-        private void FeatureButton_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty(FolderInputTextBox.Text))
-            {
-                MessageBox.Show("Configure input source folder prior to retrieving features.", "Feature Retrieval", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
-                return;
-            }
-
-            FeatureButton.Enabled = false;
-            Cursor = Cursors.WaitCursor;
+            FeatureDataGridView.DataSource = null;
+            FeatureDataGridView.Rows.Clear();
+            FeatureDataGridView.ClearSelection();
+            StreamDataGridView.DataSource = null;
+            StreamDataGridView.Rows.Clear();
+            StreamDataGridView.ClearSelection();
 
             _oEac3toInfo = new Eac3toInfo(input, null, null);
             _oEac3toInfo.FetchInformationCompleted += new OnFetchInformationCompletedHandler(SetData);
             _oEac3toInfo.ProgressChanged += new OnProgressChangedHandler(SetProgress);
+
+            ResetCursor(Cursors.WaitCursor);
             _oEac3toInfo.FetchFeatureInformation();
+        }
+
+        private void FolderOutputSourceButton_Click(object sender, EventArgs e)
+        {
+            folderBrowserDialog1.SelectedPath = MainForm.Instance.Settings.Eac3toLastDestinationPath;
+            folderBrowserDialog1.Description = "Choose an output directory";
+            folderBrowserDialog1.ShowNewFolderButton = true;
+            DialogResult dr = folderBrowserDialog1.ShowDialog();
+            if (dr != DialogResult.OK)
+                return;
+
+            FolderOutputTextBox.Text = folderBrowserDialog1.SelectedPath;
+            MainForm.Instance.Settings.Eac3toLastDestinationPath = folderBrowserDialog1.SelectedPath;
         }
 
         private void StreamDataGridView_DataSourceChanged(object sender, EventArgs e)
@@ -290,7 +293,6 @@ namespace MeGUI.packages.tools.hdbdextractor
                 return;
             }
 
-
             eac3toArgs args = new eac3toArgs();
             args.eac3toPath = MainForm.Instance.Settings.Eac3to.Path;
             if (FolderSelection.Checked)
@@ -329,25 +331,25 @@ namespace MeGUI.packages.tools.hdbdextractor
                 Stream stream = row.DataBoundItem as Stream;
                 DataGridViewCheckBoxCell extractStream = row.Cells["StreamExtractCheckBox"] as DataGridViewCheckBoxCell;
 
-                if (extractStream.Value != null && int.Parse(extractStream.Value.ToString()) == 1)
-                {
-                    if (row.Cells["StreamExtractAsComboBox"].Value == null)
-                        throw new ApplicationException(string.Format("Specify an extraction type for stream:\r\n\n\t{0}: {1}", stream.Number, stream.Description));
+                if (extractStream.Value == null || int.Parse(extractStream.Value.ToString()) != 1)
+                    continue;
 
-                    if (FolderSelection.Checked)
-                        sb.Append(string.Format("{0}:\"{1}\" {2} ", stream.Number,
-                            System.IO.Path.Combine(FolderOutputTextBox.Text, string.Format("F{0}_T{1}_{2} - {3}.{4}", ((Feature)FeatureDataGridView.SelectedRows[0].DataBoundItem).Number, stream.Number, Extensions.GetStringValue(stream.Type), row.Cells["languageDataGridViewTextBoxColumn"].Value, (row.Cells["StreamExtractAsComboBox"].Value).ToString().ToLowerInvariant())),
-                            row.Cells["StreamAddOptionsTextBox"].Value).Trim());
-                    else
-                        sb.Append(string.Format("{0}:\"{1}\" {2} ", stream.Number,
-                            System.IO.Path.Combine(FolderOutputTextBox.Text, string.Format("T{0}_{1} - {2}.{3}", stream.Number, Extensions.GetStringValue(stream.Type), row.Cells["languageDataGridViewTextBoxColumn"].Value, (row.Cells["StreamExtractAsComboBox"].Value).ToString().ToLowerInvariant())),
-                            row.Cells["StreamAddOptionsTextBox"].Value).Trim());
+                if (row.Cells["StreamExtractAsComboBox"].Value == null)
+                    throw new ApplicationException(string.Format("Specify an extraction type for stream:\r\n\n\t{0}: {1}", stream.Number, stream.Description));
 
-                    if (row.Cells["StreamExtractAsComboBox"].Value.Equals(AudioCodec.DTS.ID))
-                        sb.Append(" -core");
+                if (FolderSelection.Checked)
+                    sb.Append(string.Format("{0}:\"{1}\" {2} ", stream.Number,
+                        System.IO.Path.Combine(FolderOutputTextBox.Text, string.Format("F{0}_T{1}_{2} - {3}.{4}", ((Feature)FeatureDataGridView.SelectedRows[0].DataBoundItem).Number, stream.Number, Extensions.GetStringValue(stream.Type), row.Cells["languageDataGridViewTextBoxColumn"].Value, (row.Cells["StreamExtractAsComboBox"].Value).ToString().ToLowerInvariant())),
+                        row.Cells["StreamAddOptionsTextBox"].Value).Trim());
+                else
+                    sb.Append(string.Format("{0}:\"{1}\" {2} ", stream.Number,
+                        System.IO.Path.Combine(FolderOutputTextBox.Text, string.Format("T{0}_{1} - {2}.{3}", stream.Number, Extensions.GetStringValue(stream.Type), row.Cells["languageDataGridViewTextBoxColumn"].Value, (row.Cells["StreamExtractAsComboBox"].Value).ToString().ToLowerInvariant())),
+                        row.Cells["StreamAddOptionsTextBox"].Value).Trim());
 
-                    sb.Append(" ");
-                }
+                if (row.Cells["StreamExtractAsComboBox"].Value.Equals(AudioCodec.DTS.ID))
+                    sb.Append(" -core");
+
+                sb.Append(" ");
             }
 
             return sb.ToString();
@@ -386,70 +388,65 @@ namespace MeGUI.packages.tools.hdbdextractor
 
         private void FeatureDataGridView_SelectionChanged(object sender, EventArgs e)
         {
+            if (_oEac3toInfo.IsBusy()) // disallow selection change
+                return;
+
             // only fire after the Databind has completed on grid and a row is selected
-            if (FeatureDataGridView.Rows.Count == _oEac3toInfo.Features.Count && FeatureDataGridView.SelectedRows.Count == 1)
+            if (FeatureDataGridView.Rows.Count != _oEac3toInfo.Features.Count || FeatureDataGridView.SelectedRows.Count != 1)
+                return;
+
+            Feature feature = FeatureDataGridView.SelectedRows[0].DataBoundItem as Feature;
+
+            // Check for Streams
+            if (feature.Streams != null && feature.Streams.Count > 0)
             {
-                if (_oEac3toInfo.IsBusy()) // disallow selection change
+                // use already collected streams
+                StreamDataGridView.DataSource = feature.Streams;
+                SelectTracks();
+                return;
+            }
+
+            // reset stream view
+            StreamDataGridView.DataSource = null;
+            StreamDataGridView.Rows.Clear();
+            StreamDataGridView.ClearSelection();
+
+            // create dummy input string for megui job
+            if (feature.Description.Contains("EVO"))
+            {
+                if (feature.Description.Contains("+"))
                 {
-                    if (FeatureDataGridView.Tag != null)
-                    {
-                        FeatureDataGridView.SelectionChanged -= new System.EventHandler(this.FeatureDataGridView_SelectionChanged);
-                        FeatureDataGridView.CurrentRow.Selected = false;
-                        FeatureDataGridView.Rows[int.Parse(FeatureDataGridView.Tag.ToString())].Selected = true;
-                        FeatureDataGridView.SelectionChanged += new System.EventHandler(this.FeatureDataGridView_SelectionChanged);
-                    }
+                    if (FolderInputTextBox.Text.ToUpperInvariant().Contains("HVDVD_TS"))
+                        dummyInput = FolderInputTextBox.Text.Substring(0, FolderInputTextBox.Text.IndexOf("HVDVD_TS")) + "HVDVD_TS\\" + feature.Description.Substring(0, feature.Description.IndexOf("+"));
+                    else
+                        dummyInput = FolderInputTextBox.Text + "HVDVD_TS\\" + feature.Description.Substring(0, feature.Description.IndexOf("+"));
                 }
-                else // backgroundworker is not busy, allow selection change
+                else
                 {
-                    Feature feature = FeatureDataGridView.SelectedRows[0].DataBoundItem as Feature;
-
-                    // Check for Streams
-                    if (feature.Streams == null || feature.Streams.Count == 0)
-                    {
-                        // create dummy input string for megui job
-                        if (feature.Description.Contains("EVO"))
-                        {
-                            if (feature.Description.Contains("+"))
-                            {
-                                if (FolderInputTextBox.Text.ToUpperInvariant().Contains("HVDVD_TS"))
-                                    dummyInput = FolderInputTextBox.Text.Substring(0, FolderInputTextBox.Text.IndexOf("HVDVD_TS")) + "HVDVD_TS\\" + feature.Description.Substring(0, feature.Description.IndexOf("+"));
-                                else
-                                    dummyInput = FolderInputTextBox.Text + "HVDVD_TS\\" + feature.Description.Substring(0, feature.Description.IndexOf("+"));
-                            }
-                            else
-                            {
-                                if (FolderInputTextBox.Text.ToUpperInvariant().Contains("HVDVD_TS"))
-                                    dummyInput = FolderInputTextBox.Text.Substring(0, FolderInputTextBox.Text.IndexOf("HVDVD_TS")) + "HVDVD_TS\\" + feature.Description.Substring(0, feature.Description.IndexOf(","));
-                                else
-                                    dummyInput = FolderInputTextBox.Text + "HVDVD_TS\\" + feature.Description.Substring(0, feature.Description.IndexOf(","));
-                            }
-                        }
-                        else if (feature.Description.Contains("(angle"))
-                        {   
-                            dummyInput = getBDMVPath(FolderInputTextBox.Text, feature.Description.Substring(0, feature.Description.IndexOf(" (")));
-                        }
-                        else if (feature.Description.Substring(feature.Description.LastIndexOf(".") + 1, 4) == "m2ts")
-                        {
-                            string des = feature.Description.Substring(feature.Description.IndexOf(",") + 2, feature.Description.LastIndexOf(",") - feature.Description.IndexOf(",") - 2);
-
-                            if (des.Contains("+")) // seamless branching
-                                dummyInput = getBDMVPath(FolderInputTextBox.Text, feature.Description.Substring(0, feature.Description.IndexOf(",")));
-                            else
-                                dummyInput = getBDMVPath(FolderInputTextBox.Text, des);
-                        }
-                        else
-                            dummyInput = getBDMVPath(FolderInputTextBox.Text, feature.Description.Substring(0, feature.Description.IndexOf(",")));
-
-                        Cursor = Cursors.WaitCursor;
-                        _oEac3toInfo.FetchStreamInformation(((Feature)FeatureDataGridView.SelectedRows[0].DataBoundItem).Number);
-                    }
-                    else // use already collected streams
-                    {
-                        StreamDataGridView.DataSource = feature.Streams;
-                        SelectTracks();
-                    }
+                    if (FolderInputTextBox.Text.ToUpperInvariant().Contains("HVDVD_TS"))
+                        dummyInput = FolderInputTextBox.Text.Substring(0, FolderInputTextBox.Text.IndexOf("HVDVD_TS")) + "HVDVD_TS\\" + feature.Description.Substring(0, feature.Description.IndexOf(","));
+                    else
+                        dummyInput = FolderInputTextBox.Text + "HVDVD_TS\\" + feature.Description.Substring(0, feature.Description.IndexOf(","));
                 }
             }
+            else if (feature.Description.Contains("(angle"))
+            {   
+                dummyInput = getBDMVPath(FolderInputTextBox.Text, feature.Description.Substring(0, feature.Description.IndexOf(" (")));
+            }
+            else if (feature.Description.Substring(feature.Description.LastIndexOf(".") + 1, 4) == "m2ts")
+            {
+                string des = feature.Description.Substring(feature.Description.IndexOf(",") + 2, feature.Description.LastIndexOf(",") - feature.Description.IndexOf(",") - 2);
+
+                if (des.Contains("+")) // seamless branching
+                    dummyInput = getBDMVPath(FolderInputTextBox.Text, feature.Description.Substring(0, feature.Description.IndexOf(",")));
+                else
+                    dummyInput = getBDMVPath(FolderInputTextBox.Text, des);
+            }
+            else
+                dummyInput = getBDMVPath(FolderInputTextBox.Text, feature.Description.Substring(0, feature.Description.IndexOf(",")));
+
+            ResetCursor(Cursors.WaitCursor);
+            _oEac3toInfo.FetchStreamInformation(((Feature)FeatureDataGridView.SelectedRows[0].DataBoundItem).Number);
         }
 
         private void FeatureDataGridView_DataBindingComplete(object sender, System.Windows.Forms.DataGridViewBindingCompleteEventArgs e)
@@ -457,30 +454,25 @@ namespace MeGUI.packages.tools.hdbdextractor
             FeatureDataGridView.ClearSelection();
         }
 
-        private void FeatureDataGridView_RowLeave(object sender, System.Windows.Forms.DataGridViewCellEventArgs e)
-        {
-            FeatureDataGridView.Tag = e.RowIndex;
-        }
-
         private void FeatureDataGridView_DataSourceChanged(object sender, EventArgs e)
         {
+            if (FeatureDataGridView.Rows.Count == 0)
+                return;
+
             foreach (DataGridViewRow row in FeatureDataGridView.Rows)
             {
                 Feature feature = row.DataBoundItem as Feature;
                 DataGridViewComboBoxCell comboBox = row.Cells["FeatureFileDataGridViewComboBoxColumn"] as DataGridViewComboBoxCell;
 
-                if (feature != null)
-                {
-                    if (feature.Files != null || feature.Files.Count > 0)
-                    {
-                        foreach (File file in feature.Files)
-                        {
-                            comboBox.Items.Add(file.FullName);
+                if (feature == null || feature.Files == null || feature.Files.Count == 0)
+                    continue;
 
-                            if (file.Index == 1)
-                                comboBox.Value = file.FullName;
-                        }
-                    }
+                foreach (File file in feature.Files)
+                {
+                    comboBox.Items.Add(file.FullName);
+
+                    if (file.Index == 1)
+                        comboBox.Value = file.FullName;
                 }
             }
         }
@@ -488,7 +480,7 @@ namespace MeGUI.packages.tools.hdbdextractor
 
         private void SelectTracks()
         {
-            if (!MainForm.Instance.Settings.AutoSelectHDStreams)
+            if (!MainForm.Instance.Settings.Eac3toAutoSelectStreams)
                 return;
 
             bool bVideoSelected = false;

@@ -72,14 +72,6 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.FeatureBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.StreamGroupBox = new System.Windows.Forms.GroupBox();
             this.StreamDataGridView = new MeGUI.packages.tools.hdbdextractor.CustomDataGridView();
-            this.StreamsBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.OutputGroupBox = new System.Windows.Forms.GroupBox();
-            this.FolderOutputSourceButton = new System.Windows.Forms.Button();
-            this.FolderOutputTextBox = new System.Windows.Forms.TextBox();
-            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.FeatureButton = new System.Windows.Forms.Button();
-            this.extractTypesBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.closeOnQueue = new System.Windows.Forms.CheckBox();
             this.StreamNumberTextBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.StreamExtractCheckBox = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.StreamTypeTextBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -88,6 +80,13 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.StreamAddOptionsTextBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.languageDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.nameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.StreamsBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.OutputGroupBox = new System.Windows.Forms.GroupBox();
+            this.FolderOutputSourceButton = new System.Windows.Forms.Button();
+            this.FolderOutputTextBox = new System.Windows.Forms.TextBox();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.extractTypesBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.closeOnQueue = new System.Windows.Forms.CheckBox();
             this.StatusStrip.SuspendLayout();
             this.InputGroupBox.SuspendLayout();
             this.FeatureGroupBox.SuspendLayout();
@@ -272,7 +271,6 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.FeatureDataGridView.TabIndex = 13;
             this.FeatureDataGridView.DataSourceChanged += new System.EventHandler(this.FeatureDataGridView_DataSourceChanged);
             this.FeatureDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.FeatureDataGridView_DataBindingComplete);
-            this.FeatureDataGridView.RowLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.FeatureDataGridView_RowLeave);
             // 
             // FeatureNumberDataGridViewTextBoxColumn1
             // 
@@ -372,76 +370,6 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.StreamDataGridView.TabIndex = 7;
             this.StreamDataGridView.DataSourceChanged += new System.EventHandler(this.StreamDataGridView_DataSourceChanged);
             // 
-            // StreamsBindingSource
-            // 
-            this.StreamsBindingSource.DataSource = typeof(eac3to.Stream);
-            // 
-            // OutputGroupBox
-            // 
-            this.OutputGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.OutputGroupBox.Controls.Add(this.FolderOutputSourceButton);
-            this.OutputGroupBox.Controls.Add(this.FolderOutputTextBox);
-            this.OutputGroupBox.Location = new System.Drawing.Point(381, 12);
-            this.OutputGroupBox.Name = "OutputGroupBox";
-            this.OutputGroupBox.Size = new System.Drawing.Size(366, 74);
-            this.OutputGroupBox.TabIndex = 1;
-            this.OutputGroupBox.TabStop = false;
-            this.OutputGroupBox.Text = " Output ";
-            // 
-            // FolderOutputSourceButton
-            // 
-            this.FolderOutputSourceButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.FolderOutputSourceButton.Location = new System.Drawing.Point(331, 47);
-            this.FolderOutputSourceButton.Name = "FolderOutputSourceButton";
-            this.FolderOutputSourceButton.Size = new System.Drawing.Size(29, 23);
-            this.FolderOutputSourceButton.TabIndex = 2;
-            this.FolderOutputSourceButton.Text = "...";
-            this.FolderOutputSourceButton.UseVisualStyleBackColor = true;
-            this.FolderOutputSourceButton.Click += new System.EventHandler(this.FolderOutputSourceButton_Click);
-            // 
-            // FolderOutputTextBox
-            // 
-            this.FolderOutputTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.FolderOutputTextBox.Location = new System.Drawing.Point(6, 48);
-            this.FolderOutputTextBox.Name = "FolderOutputTextBox";
-            this.FolderOutputTextBox.Size = new System.Drawing.Size(322, 21);
-            this.FolderOutputTextBox.TabIndex = 1;
-            // 
-            // openFileDialog1
-            // 
-            this.openFileDialog1.Filter = resources.GetString("openFileDialog1.Filter");
-            this.openFileDialog1.FilterIndex = 5;
-            this.openFileDialog1.Multiselect = true;
-            // 
-            // FeatureButton
-            // 
-            this.FeatureButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.FeatureButton.Location = new System.Drawing.Point(512, 390);
-            this.FeatureButton.Name = "FeatureButton";
-            this.FeatureButton.Size = new System.Drawing.Size(75, 23);
-            this.FeatureButton.TabIndex = 18;
-            this.FeatureButton.Text = "Features";
-            this.FeatureButton.UseVisualStyleBackColor = true;
-            this.FeatureButton.Visible = false;
-            // 
-            // extractTypesBindingSource
-            // 
-            this.extractTypesBindingSource.DataMember = "ExtractTypes";
-            this.extractTypesBindingSource.DataSource = this.StreamsBindingSource;
-            // 
-            // closeOnQueue
-            // 
-            this.closeOnQueue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.closeOnQueue.Checked = true;
-            this.closeOnQueue.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.closeOnQueue.Location = new System.Drawing.Point(514, 390);
-            this.closeOnQueue.Name = "closeOnQueue";
-            this.closeOnQueue.Size = new System.Drawing.Size(74, 24);
-            this.closeOnQueue.TabIndex = 19;
-            this.closeOnQueue.Text = "and close";
-            // 
             // StreamNumberTextBox
             // 
             this.StreamNumberTextBox.DataPropertyName = "Number";
@@ -517,13 +445,71 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.nameDataGridViewTextBoxColumn.Name = "nameDataGridViewTextBoxColumn";
             this.nameDataGridViewTextBoxColumn.ToolTipText = "Stream name";
             // 
+            // StreamsBindingSource
+            // 
+            this.StreamsBindingSource.DataSource = typeof(eac3to.Stream);
+            // 
+            // OutputGroupBox
+            // 
+            this.OutputGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.OutputGroupBox.Controls.Add(this.FolderOutputSourceButton);
+            this.OutputGroupBox.Controls.Add(this.FolderOutputTextBox);
+            this.OutputGroupBox.Location = new System.Drawing.Point(381, 12);
+            this.OutputGroupBox.Name = "OutputGroupBox";
+            this.OutputGroupBox.Size = new System.Drawing.Size(366, 74);
+            this.OutputGroupBox.TabIndex = 1;
+            this.OutputGroupBox.TabStop = false;
+            this.OutputGroupBox.Text = " Output ";
+            // 
+            // FolderOutputSourceButton
+            // 
+            this.FolderOutputSourceButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.FolderOutputSourceButton.Location = new System.Drawing.Point(331, 47);
+            this.FolderOutputSourceButton.Name = "FolderOutputSourceButton";
+            this.FolderOutputSourceButton.Size = new System.Drawing.Size(29, 23);
+            this.FolderOutputSourceButton.TabIndex = 2;
+            this.FolderOutputSourceButton.Text = "...";
+            this.FolderOutputSourceButton.UseVisualStyleBackColor = true;
+            this.FolderOutputSourceButton.Click += new System.EventHandler(this.FolderOutputSourceButton_Click);
+            // 
+            // FolderOutputTextBox
+            // 
+            this.FolderOutputTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.FolderOutputTextBox.Location = new System.Drawing.Point(6, 48);
+            this.FolderOutputTextBox.Name = "FolderOutputTextBox";
+            this.FolderOutputTextBox.Size = new System.Drawing.Size(322, 21);
+            this.FolderOutputTextBox.TabIndex = 1;
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.Filter = resources.GetString("openFileDialog1.Filter");
+            this.openFileDialog1.FilterIndex = 5;
+            this.openFileDialog1.Multiselect = true;
+            // 
+            // extractTypesBindingSource
+            // 
+            this.extractTypesBindingSource.DataMember = "ExtractTypes";
+            this.extractTypesBindingSource.DataSource = this.StreamsBindingSource;
+            // 
+            // closeOnQueue
+            // 
+            this.closeOnQueue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.closeOnQueue.Checked = true;
+            this.closeOnQueue.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.closeOnQueue.Location = new System.Drawing.Point(514, 390);
+            this.closeOnQueue.Name = "closeOnQueue";
+            this.closeOnQueue.Size = new System.Drawing.Size(74, 24);
+            this.closeOnQueue.TabIndex = 19;
+            this.closeOnQueue.Text = "and close";
+            // 
             // HdBdStreamExtractor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(759, 443);
             this.Controls.Add(this.closeOnQueue);
-            this.Controls.Add(this.FeatureButton);
             this.Controls.Add(this.OutputGroupBox);
             this.Controls.Add(this.StreamGroupBox);
             this.Controls.Add(this.FeatureGroupBox);
@@ -584,7 +570,6 @@ namespace MeGUI.packages.tools.hdbdextractor
         private System.Windows.Forms.RadioButton FolderSelection;
         private System.Windows.Forms.RadioButton FileSelection;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
-        private System.Windows.Forms.Button FeatureButton;
         private System.Windows.Forms.BindingSource extractTypesBindingSource;
         private System.Windows.Forms.CheckBox closeOnQueue;
         private System.Windows.Forms.DataGridViewTextBoxColumn FeatureNumberDataGridViewTextBoxColumn1;

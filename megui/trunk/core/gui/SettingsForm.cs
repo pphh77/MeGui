@@ -228,7 +228,7 @@ namespace MeGUI
 				settings.Keep2of3passOutput = keep2ndPassOutput.Checked;
 				settings.OverwriteStats = keep2ndPassLogFile.Checked;
 				settings.NbPasses = (int)nbPasses.Value;
-                settings.AutoSelectHDStreams = chkSelectHDTracks.Checked;
+                settings.Eac3toAutoSelectStreams = chkSelectHDTracks.Checked;
                 settings.AedSettings = this.autoEncodeDefaults;
                 settings.AlwaysOnTop = chAlwaysOnTop.Checked;
                 settings.DefaultOutputDir = defaultOutputDir.Filename;
@@ -320,7 +320,7 @@ namespace MeGUI
 				keep2ndPassOutput.Checked = settings.Keep2of3passOutput;
 				keep2ndPassLogFile.Checked = settings.OverwriteStats;
 				nbPasses.Value = (decimal)settings.NbPasses;
-                chkSelectHDTracks.Checked = settings.AutoSelectHDStreams;
+                chkSelectHDTracks.Checked = settings.Eac3toAutoSelectStreams;
                 this.autoEncodeDefaults = settings.AedSettings;
                 chAlwaysOnTop.Checked = settings.AlwaysOnTop;
                 cbHttpProxyMode.SelectedIndex = (int)settings.HttpProxyMode;

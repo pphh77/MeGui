@@ -49,12 +49,12 @@ namespace MeGUI
         private DateTime lastUpdateCheck;
         private string strMainAudioFormat, strMainFileFormat, meguiupdatecache,
                        defaultLanguage1, defaultLanguage2, afterEncodingCommand, videoExtension, audioExtension,
-                       strLastDestinationPath, strLastSourcePath, tempDirMP4, neroAacEncPath, fdkAacPath,
-                       httpproxyaddress, httpproxyport, httpproxyuid, httpproxypwd, defaultOutputDir,
+                       strEac3toLastFolderPath, strEac3toLastDestinationPath, tempDirMP4, neroAacEncPath,
+                       fdkAacPath, httpproxyaddress, httpproxyport, httpproxyuid, httpproxypwd, defaultOutputDir,
                        appendToForcedStreams, lastUsedOneClickFolder, lastUpdateServer;
         private bool autoForceFilm, autoStartQueue, autoOpenScript, bUseQAAC, bUseX265, bUseDGIndexNV, bUseDGIndexIM,
                      overwriteStats, keep2of3passOutput, autoUpdate, deleteCompletedJobs, deleteIntermediateFiles,
-                     deleteAbortedOutput, openProgressWindow, autoSelectHDStreams, bUseFDKAac,
+                     deleteAbortedOutput, openProgressWindow, bEac3toAutoSelectStreams, bUseFDKAac,
                      alwaysOnTop, addTimePosition, alwaysbackupfiles, bUseITU, bEac3toLastUsedFileMode,
                      bAutoLoadDG, bAutoStartQueueStartup, b64bitX264, bAlwayUsePortableAviSynth,
                      bEnsureCorrectPlaybackSpeed, bOpenAVSInThread, bExternalMuxerX264, bUseNeroAacEnc;
@@ -123,8 +123,10 @@ namespace MeGUI
 			nbPasses = 2;
 			deleteIntermediateFiles = true;
 			deleteAbortedOutput = true;
-            autoSelectHDStreams = true;
-			openProgressWindow = true;
+            bEac3toAutoSelectStreams = true;
+            strEac3toLastFolderPath = strEac3toLastDestinationPath = "";
+            bEac3toLastUsedFileMode = false;
+            openProgressWindow = true;
             videoExtension = "";
             audioExtension = "";
             alwaysOnTop = false;
@@ -139,8 +141,6 @@ namespace MeGUI
             alwaysbackupfiles = false;
             strMainFileFormat = "";
             strMainAudioFormat = "";
-            strLastSourcePath = "";
-            strLastDestinationPath = "";
             minComplexity = 72;
             maxComplexity = 78;
             mainFormLocation = new Point(0, 0);
@@ -175,7 +175,6 @@ namespace MeGUI
             lastUsedOneClickFolder = "";
             bUseNeroAacEnc = bUseFDKAac = bUseQAAC = bUseX265 = bUseDGIndexNV = bUseDGIndexIM = false;
             chapterCreatorMinimumLength = 900;
-            bEac3toLastUsedFileMode = false;
             bExternalMuxerX264 = true;
         }
 
@@ -337,22 +336,31 @@ namespace MeGUI
             set { customDARs = value; }
         }
 
-        public string LastSourcePath
+        public string Eac3toLastFolderPath
         {
-            get { return strLastSourcePath; }
-            set { strLastSourcePath = value; }
+            get { return strEac3toLastFolderPath; }
+            set { strEac3toLastFolderPath = value; }
         }
 
-        public string LastDestinationPath
+        public string Eac3toLastDestinationPath
         {
-            get { return strLastDestinationPath; }
-            set { strLastDestinationPath = value; }
+            get { return strEac3toLastDestinationPath; }
+            set { strEac3toLastDestinationPath = value; }
         }
 
         public bool Eac3toLastUsedFileMode
         {
             get { return bEac3toLastUsedFileMode; }
             set { bEac3toLastUsedFileMode = value; }
+        }
+
+        /// <summary>
+        /// true if HD Streams Extractor should automatically select tracks
+        /// </summary>
+        public bool Eac3toAutoSelectStreams
+        {
+            get { return bEac3toAutoSelectStreams; }
+            set { bEac3toAutoSelectStreams = value; }
         }
 
         /// <summary>
@@ -613,15 +621,6 @@ namespace MeGUI
         {
             get { return bAutoLoadDG; }
             set { bAutoLoadDG = value; }
-        }
-
-        /// <summary>
-        /// true if HD Streams Extractor should automatically select tracks
-        /// </summary>
-        public bool AutoSelectHDStreams
-        {
-            get { return autoSelectHDStreams; }
-            set { autoSelectHDStreams = value; }
         }
 
         /// <summary>
