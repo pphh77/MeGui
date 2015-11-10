@@ -472,10 +472,6 @@ namespace MeGUI
             addLanguage("Zuni", "zun", "", "");
         }
 
-		private LanguageSelectionContainer()
-		{
-		}
-
         ///<summary>
         ///Convert the 2 or 3 char string to the full language name
         ///</summary>
@@ -501,6 +497,55 @@ namespace MeGUI
             if (languagesBibliographic.ContainsKey(language))
                 return true;
             return false;
+        }
+
+        public static string GetLanguageFromFileName(string strFileName)
+        {
+            ArrayList arrText = new ArrayList();
+            string strText = string.Empty;
+            foreach (char c in strFileName.ToLowerInvariant())
+            {
+                if (!char.IsLetter(c))
+                {
+                    if (!String.IsNullOrEmpty(strText))
+                        arrText.Add(strText);
+                    strText = string.Empty;
+                }
+                else
+                    strText += c;
+            }
+            if (!String.IsNullOrEmpty(strText))
+                arrText.Add(strText);
+            arrText.Reverse();
+
+            foreach (string strTextPart in arrText)
+            {
+                foreach (KeyValuePair<string, string> strLanguage in languagesBibliographic)
+                {
+                    if (strTextPart.Equals(strLanguage.Key.ToLowerInvariant()))
+                        return strLanguage.Key;
+                }
+            }
+
+            foreach (string strTextPart in arrText)
+            {
+                foreach (KeyValuePair<string, string> strLanguage in languagesBibliographic)
+                {
+                    if (strTextPart.Equals(strLanguage.Value.ToLowerInvariant()))
+                        return strLanguage.Key;
+                }
+            }
+
+            foreach (string strTextPart in arrText)
+            {
+                foreach (KeyValuePair<string, string> strLanguage in languagesTerminology)
+                {
+                    if (strTextPart.Equals(strLanguage.Value.ToLowerInvariant()))
+                        return strLanguage.Key;
+                }
+            }
+
+            return string.Empty;
         }
 	}
 }

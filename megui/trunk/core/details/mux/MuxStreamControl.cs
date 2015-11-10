@@ -164,23 +164,19 @@ namespace MeGUI.core.details.mux
         {
             audioDelay.Value = PrettyFormatting.getDelayAndCheck(input.Filename) ?? 0;
 
-            bool bFound = false;
-            foreach (KeyValuePair<string,string> strLanguage in LanguageSelectionContainer.Languages)
+            string strLanguage = LanguageSelectionContainer.GetLanguageFromFileName(System.IO.Path.GetFileNameWithoutExtension(input.Filename));
+            if (!String.IsNullOrEmpty(strLanguage))
             {
-                if (input.Filename.ToLowerInvariant().Contains(strLanguage.Key.ToLowerInvariant()))
-                {
-                    SetLanguage(strLanguage.Key);
-                    bFound = true;
-                    break;
-                }
+                SetLanguage(strLanguage);
             }
-            if (!bFound && input.Filename.ToLowerInvariant().EndsWith(".idx"))
+            else if (input.Filename.ToLowerInvariant().EndsWith(".idx"))
             {
                 List<SubtitleInfo> subTracks;
                 idxReader.readFileProperties(input.Filename, out subTracks);
                 if (subTracks.Count > 0)
                     SetLanguage(LanguageSelectionContainer.LookupISOCode(subTracks[0].Name));
             }
+
             raiseEvent();
         }
 

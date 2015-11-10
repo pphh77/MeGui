@@ -331,14 +331,9 @@ namespace MeGUI
                 // determine audio language 
                 foreach (MuxStream stream in audio)
                 {
-                    foreach (KeyValuePair<string, string> strLanguage in LanguageSelectionContainer.Languages)
-                    {
-                        if (Path.GetFileNameWithoutExtension(stream.path).ToLowerInvariant().Contains(strLanguage.Key.ToLowerInvariant()))
-                        {
-                            stream.language = strLanguage.Key;
-                            break;
-                        }
-                    }
+                    string strLanguage = LanguageSelectionContainer.GetLanguageFromFileName(Path.GetFileNameWithoutExtension(stream.path));
+                    if (!String.IsNullOrEmpty(strLanguage))
+                        stream.language = strLanguage;
                 }
 
                 if (addSubsNChapters.Checked)

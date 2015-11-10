@@ -304,16 +304,12 @@ namespace MeGUI
         {
             // get language
             bool bFound = false;
-            foreach (KeyValuePair<string, string> strLanguage in LanguageSelectionContainer.Languages)
+            string strLanguage = LanguageSelectionContainer.GetLanguageFromFileName(System.IO.Path.GetFileNameWithoutExtension(input.SelectedText));
+            if (!String.IsNullOrEmpty(strLanguage))
             {
-                if (input.SelectedText.ToLowerInvariant().Contains(strLanguage.Key.ToLowerInvariant()))
-                {
-                    SetLanguage(strLanguage.Key);
-                    bFound = true;
-                    break;
-                }
+                SetLanguage(strLanguage);
             }
-            if (!bFound && input.SelectedText.ToLowerInvariant().EndsWith(".idx"))
+            else if (input.SelectedText.ToLowerInvariant().EndsWith(".idx"))
             {
                 List<SubtitleInfo> subTracks;
                 idxReader.readFileProperties(input.SelectedText, out subTracks);
