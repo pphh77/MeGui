@@ -922,7 +922,7 @@ namespace MeGUI
             this.analyseButton.Name = "analyseButton";
             this.analyseButton.Size = new System.Drawing.Size(98, 23);
             this.analyseButton.TabIndex = 8;
-            this.analyseButton.Text = "Analyse...";
+            this.analyseButton.Text = "Analyse";
             this.analyseButton.UseVisualStyleBackColor = true;
             this.analyseButton.Click += new System.EventHandler(this.analyseButton_Click);
             // 

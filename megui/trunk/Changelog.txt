@@ -1,6 +1,7 @@
-2614 [L-SMASH Indexer]      do not expect cache file for LWLibav*Source()
+2615 [AVS Script Creator]   improved "Analyse" handling
+2614 [L-SMASH Indexer]      do not expect a cache file for LSMASH*Source()
 2613 [Update]               do not delete NeroAacEnc during eac3to update
-2612 [AVS Script Creator]   fixed "Analayse" function (regression of 2611)
+2612 [AVS Script Creator]   fixed "Analyse" function (regression of 2611)
 2611 [AVS Script Creator]   fixed value range for cycleR in TDecimate()
 2610                        fixed not able to open AVS scripts in some use cases (regression of 2607)
 2609                        removed the DPI aware flag (requires Windows Vista+)

@@ -1003,51 +1003,57 @@ namespace MeGUI
         #region autodeint
         private void analyseButton_Click(object sender, EventArgs e)
         {
-            if (input.Filename.Length > 0)
+            if (input.Filename.Length == 0)
             {
-                if (detector == null) // We want to start the analysis
-                {
-                    string source = ScriptServer.GetInputLine(input.Filename, indexFile, false, sourceType, false, false, false, 0, false);
-                    if (nvDeInt.Enabled) 
-                        source += ")";
-
-                    // get number of frames
-                    int numFrames = 0;
-                    try
-                    {
-                        using (AvsFile af = AvsFile.ParseScript(source))
-                        {
-                            numFrames = (int)af.VideoInfo.FrameCount;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("The input clip for source detection could not be opened.\r\n" + ex.Message, "Analysis Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-
-                    detector = new SourceDetector(source,
-                        input.Filename, deintIsAnime.Checked, numFrames,
-                        mainForm.Settings.SourceDetectorSettings,
-                        new UpdateSourceDetectionStatus(analyseUpdate),
-                        new FinishedAnalysis(finishedAnalysis));
-                        detector.analyse();
-                        deintStatusLabel.Text = "Analysing...";
-                        analyseButton.Text = "Abort";
-                }
-                else // We want to cancel the analysis
-                {
-                    detector.stop();
-                    deintStatusLabel.Text = "Analysis aborted!";
-                    detector = null;
-                    analyseButton.Text = "Analyse";
-                    this.deintProgressBar.Value = 0;
-                }
-            }
-            else
                 MessageBox.Show("Can't run any analysis as there is no selected video to analyse.",
                     "Please select a video input file", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (detector == null && analyseButton.Text.Equals("Analyse")) // We want to start the analysis
+            {
+                analyseButton.Text = "Abort";
+
+                string source = ScriptServer.GetInputLine(input.Filename, indexFile, false, sourceType, false, false, false, 0, false);
+                if (nvDeInt.Enabled)
+                    source += ")";
+
+                // get number of frames
+                int numFrames = 0;
+                try
+                {
+                    using (AvsFile af = AvsFile.ParseScript(source))
+                    {
+                        numFrames = (int)af.VideoInfo.FrameCount;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("The input clip for source detection could not be opened.\r\n" + ex.Message, "Analysis Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                detector = new SourceDetector(source,
+                    input.Filename, deintIsAnime.Checked, numFrames,
+                    mainForm.Settings.SourceDetectorSettings,
+                    new UpdateSourceDetectionStatus(analyseUpdate),
+                    new FinishedAnalysis(finishedAnalysis));
+                    detector.analyse();
+                deintStatusLabel.Text = "Analysing...";
+            }
+            else // We want to cancel the analysis
+            {
+                if (detector != null)
+                {
+                    detector.stop();
+                    detector = null;
+                }
+                analyseButton.Text = "Analyse";
+                this.deintProgressBar.Value = 0;
+                deintStatusLabel.Text = "";
+            }
         }
+                
 
         public void finishedAnalysis(SourceInfo info, bool error, string errorMessage)
         {
