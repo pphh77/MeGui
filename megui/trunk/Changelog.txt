@@ -1,3 +1,4 @@
+2619 [OneClick]             fixed language detection (regression of 2617)
 2618 [HD Streams Extractor] fixed "+ Options" handling in case of an error (regression of 2486)
 2617 [Muxer] + [OneClick]   improved language detection based on the file name. bug #819
 2616 [HD Streams Extractor] improved feature selection

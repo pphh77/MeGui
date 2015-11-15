@@ -308,6 +308,7 @@ namespace MeGUI
             if (!String.IsNullOrEmpty(strLanguage))
             {
                 SetLanguage(strLanguage);
+                bFound = true;
             }
             else if (input.SelectedText.ToLowerInvariant().EndsWith(".idx"))
             {
