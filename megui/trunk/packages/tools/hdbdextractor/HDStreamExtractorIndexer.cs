@@ -19,11 +19,9 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using MeGUI.core.details;
 using MeGUI.core.util;
 
 namespace MeGUI
@@ -89,23 +87,30 @@ namespace MeGUI
         /// </summary>
         protected override void getErrorLine()
         {
-            string[] entry = Regex.Split(job.Args, "[0-9]{1,3}:\\\"");
-            if (entry.Length < 2 || entry[1].Length < 3)
-                return;
-
-            string fileName = entry[1].Substring(0, entry[1].Length - 2);
-            fileName = FileUtil.AddToFileName(System.IO.Path.ChangeExtension(fileName, "txt"), " - Log");
-            if (!System.IO.File.Exists(fileName))
-                return;
-
-            using (System.IO.StreamReader file = new System.IO.StreamReader(fileName))
+            try
             {
-                string line;
-                while ((line = file.ReadLine()) != null)
+                string[] entry = Regex.Split(job.Args, "[0-9]{1,3}:\\\"");
+                if (entry.Length < 2 || entry[1].Length < 3)
+                    return;
+
+                string strLogFile = entry[1].Split('\"')[0];
+                strLogFile = FileUtil.AddToFileName(System.IO.Path.ChangeExtension(strLogFile, "txt"), " - Log");
+                if (!System.IO.File.Exists(strLogFile))
+                    return;
+
+                using (System.IO.StreamReader file = new System.IO.StreamReader(strLogFile))
                 {
-                    if (line.ToLowerInvariant().Contains("<error>"))
-                        stdoutLog.LogEvent(line, ImageType.Error);
+                    string line;
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        if (line.ToLowerInvariant().Contains("<error>"))
+                            stdoutLog.LogEvent(line, ImageType.Error);
+                    }
                 }
+            }
+            catch (Exception)
+            {
+                stdoutLog.LogEvent("Error parsing: " + job.Args, ImageType.Error);
             }
         }
 
