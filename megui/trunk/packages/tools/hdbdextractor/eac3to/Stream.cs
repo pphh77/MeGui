@@ -40,8 +40,7 @@ namespace eac3to
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
 
-            this.Type = type;
-
+            Type = type;
             Description = s.Substring(s.IndexOf(":") + 1);
             Number = int.Parse(s.Substring(0, s.IndexOf(":")));
 
@@ -56,6 +55,8 @@ namespace eac3to
 
             if (type == StreamType.Audio || type == StreamType.Subtitle || type == StreamType.Video)
                 setLanguage(s, _log);
+            else
+                Language = string.Empty;
         }
 
         private void setLanguage(string s, LogItem _log)
@@ -90,7 +91,7 @@ namespace eac3to
             {
                 if (!string.IsNullOrEmpty(language))
                     _log.LogEvent("The language information \"" + language + "\" is unknown and has been skipped.", ImageType.Warning);
-                this.Language = "";
+                this.Language = string.Empty;
             }
             else
             {
@@ -120,11 +121,13 @@ namespace eac3to
 
             Stream stream = null;
 
-            if (s.Contains("AVC") || s.Contains("MVC") || s.Contains("VC-1") || s.Contains("MPEG") || s.Contains("DIRAC") || s.Contains("THEORA"))
+            if ((s.Contains("AVC") || s.Contains("MVC") || s.Contains("VC-1") || s.Contains("MPEG") || 
+                s.Contains("DIRAC") || s.Contains("THEORA")) && !s.Contains("HEVC"))
                 stream = VideoStream.Parse(s, _log);
-            else if (s.Contains("AC3") || s.Contains("TrueHD") || s.Contains("DTS") || 
+            else if ((s.Contains("AC3") || s.Contains("TrueHD") || s.Contains("DTS") ||
                      s.Contains("RAW") || s.Contains("PCM") || s.Contains("MP") || s.Contains("AAC") ||
-                     s.Contains("FLAC") || s.Contains("WAVPACK") || s.Contains("TTA") || s.Contains("VORBIS"))
+                     s.Contains("FLAC") || s.Contains("WAVPACK") || s.Contains("TTA") 
+                     || s.Contains("VORBIS")) && !s.Contains("HEVC"))
                 stream = AudioStream.Parse(s, _log);
             else if (s.Contains("Subtitle"))
                 stream = SubtitleStream.Parse(s, _log);
@@ -132,6 +135,8 @@ namespace eac3to
                 stream = ChapterStream.Parse(s, _log);
             else if (s.Contains("Joined"))
                 stream = JoinStream.Parse(s, _log);
+            else
+                stream = new UnknownStream(s, _log);
 
             return stream;
         }
@@ -140,5 +145,15 @@ namespace eac3to
         {
             return string.Format("{0}: {1}", Number, Description);
         }
+    }
+
+    public class UnknownStream : Stream
+    {
+        public override object[] ExtractTypes
+        {
+            get { return new object[] { }; }
+        }
+
+        public UnknownStream(string s, LogItem _log) : base(StreamType.Unknown, s, _log) { }
     }
 }

@@ -28,10 +28,6 @@ namespace eac3to
     {
         public VStreamType VType { get; set; }
         public override string Language { get; set; }
-        public string Resolution { get; set; }
-        public bool IsProgerssive { get; set; }
-        public double Framerate { get; set; }
-        public double Ratio { get; set; }
 
         public override object[] ExtractTypes
         {

@@ -28,10 +28,6 @@ namespace eac3to
     {
         public AudioStreamType AudioType { get; set; }
         public override string Language { get; set; }
-        public string Channels { get; set; }
-        public string Bitrate { get; set; }
-        public string DialogNormalization { get; set; }
-        public string Delay { get; set; }
 
         public override object[] ExtractTypes
         {

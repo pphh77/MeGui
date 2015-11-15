@@ -34,6 +34,8 @@ namespace eac3to
         [StringValue("Audio")]
         Audio,
         [StringValue("Subtitle")]
-        Subtitle
+        Subtitle,
+        [StringValue("Unknown")]
+        Unknown
     }
 }

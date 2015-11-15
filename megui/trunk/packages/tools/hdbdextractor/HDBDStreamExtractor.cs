@@ -229,8 +229,12 @@ namespace MeGUI.packages.tools.hdbdextractor
             {
                 Stream s = row.DataBoundItem as Stream;
                 DataGridViewComboBoxCell comboBox = row.Cells["StreamExtractAsComboBox"] as DataGridViewComboBoxCell;
-                DataGridViewTextBoxCell tbLang = row.Cells["languageDataGridViewTextBoxColumn"] as DataGridViewTextBoxCell;
                 comboBox.Items.Clear();
+                if (s == null || s.Type == eac3to.StreamType.Unknown)
+                {
+                    row.ReadOnly = true;
+                    continue;
+                }
                 comboBox.Items.AddRange(s.ExtractTypes);
 
                 switch (s.Type)
@@ -329,8 +333,10 @@ namespace MeGUI.packages.tools.hdbdextractor
             foreach (DataGridViewRow row in StreamDataGridView.Rows)
             {
                 Stream stream = row.DataBoundItem as Stream;
-                DataGridViewCheckBoxCell extractStream = row.Cells["StreamExtractCheckBox"] as DataGridViewCheckBoxCell;
+                if (stream.Type == eac3to.StreamType.Unknown)
+                    continue;
 
+                DataGridViewCheckBoxCell extractStream = row.Cells["StreamExtractCheckBox"] as DataGridViewCheckBoxCell;
                 if (extractStream.Value == null || int.Parse(extractStream.Value.ToString()) != 1)
                     continue;
 
