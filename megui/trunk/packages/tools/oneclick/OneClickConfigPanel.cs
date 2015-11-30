@@ -123,7 +123,7 @@ namespace MeGUI.packages.tools.oneclick
                 foreach (string s in lbIndexerPriority.Items)
                     arrIndexerPriority.Add(s);
 
-                if (cbLanguageSelect.SelectedText.Equals("none"))
+                if (cbLanguageSelect.SelectedItem.Equals("none"))
                     val.UseNoLanguagesAsFallback = true;
                 else
                     val.UseNoLanguagesAsFallback = false;

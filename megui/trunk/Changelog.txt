@@ -1,3 +1,4 @@
+2621 [OneClick]             fixed the option "Languages to select if selection does not match". Bug #822
 2620 [HD Streams Extractor] improved handling of unsupported tracks
 2619 [OneClick]             fixed language detection (regression of 2617)
 2618 [HD Streams Extractor] fixed "+ Options" handling in case of an error (regression of 2486)
@@ -10,7 +11,7 @@
 2611 [AVS Script Creator]   fixed value range for cycleR in TDecimate()
 2610                        fixed not able to open AVS scripts in some use cases (regression of 2607)
 2609                        removed the DPI aware flag (requires Windows Vista+)
-                            The application will now look blurry when not using 100% DPI but all controls are visible
+                            The application will now look blurry when using 150+% DPI but all controls are visible
 2608 [QAAC]                 fixed a crash when the settings have to be recreated (regression of 2604)
 2607                        reduced number of required AviSynth script accesses
 2606 [MediaInfo]            reduced log messages if the language information is emtpy
