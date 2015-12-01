@@ -111,19 +111,12 @@ namespace MeGUI
                         subtitleLanguage.Text = value.Language;
                 }
                 else
-                    subtitleLanguage.Text = defaultLanguage;
+                    subtitleLanguage.Text = MainForm.Instance.Settings.DefaultLanguage1;
                 subName.Text = value.Name;
                 delay.Value = value.Delay;
                 chkDefaultStream.Checked = value.DefaultStream;
                 chkForceStream.Checked = value.ForcedStream;
             }
-        }
-
-        private string defaultLanguage;
-        public string DefaultLanguage
-        {
-            set { defaultLanguage = value; }
-            get { return defaultLanguage; }
         }
 
         private bool showDelay;
@@ -321,7 +314,7 @@ namespace MeGUI
                 }
             }
             if (!bFound && this.SelectedItem != null && this.SelectedStreamIndex > 0)
-                SetLanguage(defaultLanguage);
+                SetLanguage(MainForm.Instance.Settings.DefaultLanguage1);
 
             // get delay & track name
             delay.Value = 0;

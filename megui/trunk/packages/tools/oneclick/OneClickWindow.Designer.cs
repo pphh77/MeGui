@@ -300,7 +300,6 @@ namespace MeGUI
             // oneClickAudioStreamControl1
             // 
             this.oneClickAudioStreamControl1.CustomStreams = new object[0];
-            this.oneClickAudioStreamControl1.DefaultLanguage = null;
             this.oneClickAudioStreamControl1.Filter = "All files (*.*)|*.*";
             this.oneClickAudioStreamControl1.Location = new System.Drawing.Point(0, 0);
             this.oneClickAudioStreamControl1.Name = "oneClickAudioStreamControl1";
@@ -353,7 +352,6 @@ namespace MeGUI
             // oneClickSubtitleStreamControl1
             // 
             this.oneClickSubtitleStreamControl1.CustomStreams = new object[0];
-            this.oneClickSubtitleStreamControl1.DefaultLanguage = null;
             this.oneClickSubtitleStreamControl1.Filter = "All files (*.*)|*.*";
             this.oneClickSubtitleStreamControl1.Location = new System.Drawing.Point(0, 0);
             this.oneClickSubtitleStreamControl1.Name = "oneClickSubtitleStreamControl1";

@@ -82,8 +82,6 @@ namespace MeGUI.packages.tools.oneclick
             this.containerTypeList = new System.Windows.Forms.CheckedListBox();
             this.containerFormatLabel = new System.Windows.Forms.Label();
             this.tabPage4 = new System.Windows.Forms.TabPage();
-            this.cbUnknownLanguage = new System.Windows.Forms.ComboBox();
-            this.label4 = new System.Windows.Forms.Label();
             this.cbLanguageSelect = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -505,8 +503,6 @@ namespace MeGUI.packages.tools.oneclick
             // 
             // tabPage4
             // 
-            this.tabPage4.Controls.Add(this.cbUnknownLanguage);
-            this.tabPage4.Controls.Add(this.label4);
             this.tabPage4.Controls.Add(this.cbLanguageSelect);
             this.tabPage4.Controls.Add(this.label7);
             this.tabPage4.Controls.Add(this.groupBox2);
@@ -519,25 +515,6 @@ namespace MeGUI.packages.tools.oneclick
             this.tabPage4.Text = "Language";
             this.tabPage4.UseVisualStyleBackColor = true;
             // 
-            // cbUnknownLanguage
-            // 
-            this.cbUnknownLanguage.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbUnknownLanguage.FormattingEnabled = true;
-            this.cbUnknownLanguage.Location = new System.Drawing.Point(268, 201);
-            this.cbUnknownLanguage.Name = "cbUnknownLanguage";
-            this.cbUnknownLanguage.Size = new System.Drawing.Size(130, 21);
-            this.cbUnknownLanguage.Sorted = true;
-            this.cbUnknownLanguage.TabIndex = 49;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(16, 204);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(212, 13);
-            this.label4.TabIndex = 48;
-            this.label4.Text = "Language to set if it cannot be determined: ";
-            // 
             // cbLanguageSelect
             // 
             this.cbLanguageSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -545,7 +522,7 @@ namespace MeGUI.packages.tools.oneclick
             this.cbLanguageSelect.Items.AddRange(new object[] {
             "all",
             "none"});
-            this.cbLanguageSelect.Location = new System.Drawing.Point(268, 227);
+            this.cbLanguageSelect.Location = new System.Drawing.Point(268, 207);
             this.cbLanguageSelect.Name = "cbLanguageSelect";
             this.cbLanguageSelect.Size = new System.Drawing.Size(130, 21);
             this.cbLanguageSelect.TabIndex = 47;
@@ -553,7 +530,7 @@ namespace MeGUI.packages.tools.oneclick
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(16, 230);
+            this.label7.Location = new System.Drawing.Point(16, 210);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(238, 13);
             this.label7.TabIndex = 46;
@@ -922,20 +899,20 @@ namespace MeGUI.packages.tools.oneclick
             this.audioAddTrack,
             this.audioRemoveTrack});
             this.audioMenu.Name = "audioMenu";
-            this.audioMenu.Size = new System.Drawing.Size(150, 48);
+            this.audioMenu.Size = new System.Drawing.Size(149, 48);
             this.audioMenu.Opening += new System.ComponentModel.CancelEventHandler(this.audioMenu_Opening);
             // 
             // audioAddTrack
             // 
             this.audioAddTrack.Name = "audioAddTrack";
-            this.audioAddTrack.Size = new System.Drawing.Size(149, 22);
+            this.audioAddTrack.Size = new System.Drawing.Size(148, 22);
             this.audioAddTrack.Text = "Add Track";
             this.audioAddTrack.Click += new System.EventHandler(this.audioAddTrack_Click);
             // 
             // audioRemoveTrack
             // 
             this.audioRemoveTrack.Name = "audioRemoveTrack";
-            this.audioRemoveTrack.Size = new System.Drawing.Size(149, 22);
+            this.audioRemoveTrack.Size = new System.Drawing.Size(148, 22);
             this.audioRemoveTrack.Text = "Remove Track";
             this.audioRemoveTrack.Click += new System.EventHandler(this.audioRemoveTrack_Click);
             // 
@@ -1048,7 +1025,5 @@ namespace MeGUI.packages.tools.oneclick
         private System.Windows.Forms.Button deleteWorking;
         private System.Windows.Forms.Button deleteOutput;
         private System.Windows.Forms.CheckBox chkDisableIntermediateMKV;
-        private System.Windows.Forms.ComboBox cbUnknownLanguage;
-        private System.Windows.Forms.Label label4;
     }
 }
