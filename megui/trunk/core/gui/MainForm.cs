@@ -1353,9 +1353,9 @@ namespace MeGUI
             }
             catch (Exception)
             {
-                i.LogEvent("Haali Matroska Splitter not installed properly.", ImageType.Warning);
-                i.LogEvent("Therefore DSS2() and certain functions of FFVideoSource() and the HD Streams Extractor may also not work.", ImageType.Warning);
-                i.LogEvent("Please download and install it from http://haali.su/mkv/", ImageType.Warning);
+                i.LogEvent("Haali Matroska Splitter not installed properly.", ImageType.Information);
+                i.LogEvent("Therefore DSS2() will not and certain functions of FFVideoSource() and the HD Streams Extractor may not work.", ImageType.Information);
+                i.LogEvent("Please download and install it from http://haali.su/mkv/", ImageType.Information);
             }
 
             FileUtil.GetFileInformation("Haali DSS2", Path.Combine(MeGUISettings.HaaliMSPath, "avss.dll"), ref i);

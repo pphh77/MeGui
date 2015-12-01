@@ -1,3 +1,4 @@
+2624 [Log]                  do not print a warning when "Haali Matroska Splitter" is not found
 2623 [OneClick]             removed the deprecated option "Language to set if it cannot be determined"
 2622 [File Indexer]         choose by default in the file selector "All supported files"
 2621 [OneClick]             fixed the option "Languages to select if selection does not match". Bug #822
