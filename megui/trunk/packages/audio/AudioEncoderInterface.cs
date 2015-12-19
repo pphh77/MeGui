@@ -1371,7 +1371,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                     sb.Append(" --endian=little");
                 if (!oSettings.CustomEncoderOptions.Contains("--sign="))
                     sb.Append(" --sign=signed");
-                sb.Append(" -" + oSettings.Bitrate);
+                sb.Append(" -" + oSettings.CompressionLevel);
                 if (!String.IsNullOrEmpty(oSettings.CustomEncoderOptions))
                     sb.Append(" " + oSettings.CustomEncoderOptions.Trim());
                 sb.Append(" - -o \"{0}\"");
