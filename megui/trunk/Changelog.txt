@@ -1,3 +1,8 @@
+2627 [Main]                 detects during startup if AviSynth can be used
+                            automatic fallback to the portable AviSynth
+2626 [AvisynthWrapper]      updated to recent avisynth.h (requires AviSynth 2.6)
+                            improved error handling
+                            added x64 support
 2625 [Flac Encoder]         fixed always using compression level 0 (regression of 2536)
 
 

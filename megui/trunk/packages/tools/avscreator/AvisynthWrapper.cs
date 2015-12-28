@@ -19,7 +19,6 @@
 // ****************************************************************************
 
 using System;
-using System.Collections;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
@@ -129,8 +128,6 @@ namespace MeGUI
 			public long num_audio_samples;
 		}
 
-        [DllImport("AvisynthWrapper", ExactSpelling = true, SetLastError = false, CharSet = CharSet.Ansi)]
-        private static extern int dimzon_avs_init(ref IntPtr avs, string func, string arg, ref AVSDLLVideoInfo vi, ref AviSynthColorspace originalColorspace, ref AudioSampleType originalSampleType, string cs);
         [DllImport("AvisynthWrapper", ExactSpelling = true, SetLastError = false, CharSet = CharSet.Ansi)]
         private static extern int dimzon_avs_init_2(ref IntPtr avs, string func, string arg, ref AVSDLLVideoInfo vi, ref AviSynthColorspace originalColorspace, ref AudioSampleType originalSampleType, string cs);
         [DllImport("AvisynthWrapper", ExactSpelling = true, SetLastError = false, CharSet = CharSet.Ansi)]
@@ -427,6 +424,23 @@ namespace MeGUI
         {
             if (0 != dimzon_avs_getvframe(_avs, addr, stride, frame))
                 throw new AviSynthException(getLastError());
+        }
+
+
+        /// <summary>
+        /// Detects if the AviSynth version can be used
+        /// </summary>
+        /// <returns>0 if everything is fine, 3 if the version is outdated or a different value for other errors</param>
+        public static int CheckAvisynthInstallation()
+        {
+            IntPtr _avs = new IntPtr(0);
+            AVSDLLVideoInfo _vi = new AVSDLLVideoInfo();
+            AviSynthColorspace _colorSpace = AviSynthColorspace.Unknown;
+            AudioSampleType _sampleType = AudioSampleType.Unknown;
+            int iStartResult = dimzon_avs_init_2(ref _avs, "Eval", "Version()", ref _vi, ref _colorSpace, ref _sampleType, AviSynthColorspace.RGB24.ToString());
+            int iCloseResult = dimzon_avs_destroy(ref _avs);
+            _avs = new IntPtr(0);
+            return iStartResult;
         }
 
         public AviSynthClip(string func, string arg , AviSynthColorspace forceColorspace)

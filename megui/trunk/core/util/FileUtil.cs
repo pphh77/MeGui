@@ -441,42 +441,77 @@ namespace MeGUI.core.util
 
             if (bFoundInstalledAviSynth)
             {
-                if (fileProductName.Contains("+") && !MainForm.Instance.Settings.AlwaysUsePortableAviSynth)
-                    MainForm.Instance.Settings.AviSynthPlus = true;
+                // checks if the AviSynth build can be used
+                int iResult = AviSynthClip.CheckAvisynthInstallation();
+                if (iResult != 0)
+                {
+                    // no, it cannot be used
+                    bFoundInstalledAviSynth = false;
+                    if (oLog != null)
+                    {
+                        if (iResult == 3)
+                            oLog.LogValue("AviSynth",
+                                "Installed AviSynth build is out of date." + (MainForm.Instance.Settings.AlwaysUsePortableAviSynth ? String.Empty : " Switching to the portable build."),
+                                !MainForm.Instance.Settings.AlwaysUsePortableAviSynth ? ImageType.Warning : ImageType.Information);
+                        else
+                            oLog.LogValue("AviSynth",
+                                "Installed AviSynth build cannot be used." + (MainForm.Instance.Settings.AlwaysUsePortableAviSynth ? String.Empty : " Switching to the portable build."),
+                                !MainForm.Instance.Settings.AlwaysUsePortableAviSynth ? ImageType.Warning : ImageType.Information);
+                    }
+                }
+
                 if (oLog != null)
                     oLog.LogValue("AviSynth" + (fileProductName.Contains("+") ? "+" : String.Empty),
-                        fileVersion + " (" + fileDate + ")" + (!MainForm.Instance.Settings.AlwaysUsePortableAviSynth ? String.Empty : " (inactive)"));
-                if (!MainForm.Instance.Settings.AlwaysUsePortableAviSynth)
-                {
-                    if (!MainForm.Instance.Settings.AviSynthPlus)
-                        LSMASHFileActions(false);
-                    return;
-                }
+                        fileVersion + " (" + fileDate + ")" + ((!MainForm.Instance.Settings.AlwaysUsePortableAviSynth && bFoundInstalledAviSynth) ? String.Empty : " (inactive)"));
+
+                if (bFoundInstalledAviSynth && !MainForm.Instance.Settings.AlwaysUsePortableAviSynth && fileProductName.Contains("+"))
+                    MainForm.Instance.Settings.AviSynthPlus = true;
             }
 
             // detects included avisynth
             MainForm.Instance.Settings.PortableAviSynth = false;
+            UpdateCacher.CheckPackage("avs");
             if (GetFileInformation(MainForm.Instance.Settings.AviSynth.Path, out fileVersion, out fileDate, out fileProductName))
-            { 
+            {
                 if (oLog != null)
                     oLog.LogValue("AviSynth" + (fileProductName.Contains("+") ? "+" : String.Empty) + " portable",
                         fileVersion + " (" + fileDate + ")" + (!bFoundInstalledAviSynth ? String.Empty : " (active)"));
                 if (!bFoundInstalledAviSynth || MainForm.Instance.Settings.AlwaysUsePortableAviSynth)
                 {
-                    UpdateCacher.CheckPackage("avs");
-                    MainForm.Instance.Settings.PortableAviSynth = true;
                     PortableAviSynthActions(false);
                     if (fileProductName.Contains("+"))
                         MainForm.Instance.Settings.AviSynthPlus = true;
+
+                    // checks if the AviSynth build can be used
+                    int iResult = AviSynthClip.CheckAvisynthInstallation();
+                    if (iResult != 0)
+                    {
+                        // no, it cannot be used
+                        if (oLog != null)
+                        {
+                            if (iResult == 3)
+                                oLog.LogValue("AviSynth", "Portable AviSynth build is out of date.", ImageType.Warning);
+                            else
+                                oLog.LogValue("AviSynth", "Portable AviSynth build cannot be used.", ImageType.Warning);
+                        }
+                        // delete avisynth.dll so that it will be reinstalled
+                        try { File.Delete(MainForm.Instance.Settings.AviSynth.Path); }
+                        catch { }
+                    }
+                    else
+                    {
+                        bFoundInstalledAviSynth = true;
+                        MainForm.Instance.Settings.PortableAviSynth = true;
+                    }
                 }
             }
-            else if (!bFoundInstalledAviSynth)
+
+            if (!bFoundInstalledAviSynth)
             {
                 if (oLog != null)
                     oLog.LogValue("AviSynth", "not found", ImageType.Error);
             }
-
-            if (!MainForm.Instance.Settings.AviSynthPlus)
+            else if (!MainForm.Instance.Settings.AviSynthPlus)
                 LSMASHFileActions(false);
         }
 
