@@ -20,16 +20,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
-
-using MeGUI.core.details.video;
-using MeGUI.core.gui;
-using MeGUI.core.plugins.interfaces;
 
 namespace MeGUI.packages.video.x264
 {
