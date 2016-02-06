@@ -853,7 +853,7 @@ namespace MeGUI
                         {
                             iTextEac3toCount++;
                             string strLanguageEac3To = oTrack.Language;
-                            string strLanguageMediaInfo = getLanguage(oInfo.Text[iTextCount].Language, oInfo.Text[iTextCount].LanguageString, ref infoLog, infoLog == null, false);
+                            string strLanguageMediaInfo = getLanguage(oInfo.Text[iTextCount].Language, oInfo.Text[iTextCount].LanguageString, ref infoLog, true, false);
                             while (oInfo.Text.Count > iTextCount && !strLanguageMediaInfo.Equals(strLanguageEac3To))
                             {
                                 // this workaround works only if there are additional tracks in MediaInfo which are not available in eac3to (already seen in the wild)
@@ -869,7 +869,7 @@ namespace MeGUI
                         {
                             iAudioEac3toCount++;
                             string strLanguageEac3To = oTrack.Language;
-                            string strLanguageMediaInfo = getLanguage(oInfo.Audio[iAudioCount].Language, oInfo.Audio[iAudioCount].LanguageString, ref infoLog, infoLog == null, false);
+                            string strLanguageMediaInfo = getLanguage(oInfo.Audio[iAudioCount].Language, oInfo.Audio[iAudioCount].LanguageString, ref infoLog, true, false);
                             while (oInfo.Audio.Count > iAudioCount && !strLanguageMediaInfo.Equals(strLanguageEac3To))
                             {
                                 // this workaround works only if there are additional tracks in MediaInfo which are not available in eac3to (already seen in the wild)
