@@ -109,7 +109,6 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
         {
             foreach (string filePath in _tempFiles)
                 safeDelete(filePath);
-
         }
 
         private static void safeDelete(string filePath)
@@ -224,7 +223,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                         MediaInfoFile oInfo = new MediaInfoFile(audioJob.Output, ref _log);
                     }
                 }
-                else if (su.HasError && !bShowError && audioJob.Settings is QaacSettings && _encoderStdErr.ToLowerInvariant().Contains("coreaudiotoolbox.dll"))
+                else if (su.HasError && !bShowError && audioJob.Settings is QaacSettings && _encoderStdErr != null && _encoderStdErr.ToLowerInvariant().Contains("coreaudiotoolbox.dll"))
                 {
                     bShowError = true; 
                     _log.LogEvent("CoreAudioToolbox.dll is missing and must be installed. Please have a look at the install.txt in the qaac folder.", ImageType.Error);
@@ -517,6 +516,8 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             }
             catch (Exception e)
             {
+                if (t != null && t.IsAlive)
+                    t.Abort();
                 deleteOutputFile();
                 if (e is ThreadAbortException)
                 {
@@ -549,7 +550,8 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             }
             finally
             {
-                t.Abort();
+                if (t != null && t.IsAlive)
+                    t.Abort();
                 deleteTempFiles();
             }
             su.IsComplete = true;

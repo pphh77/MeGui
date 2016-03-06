@@ -329,7 +329,7 @@ namespace MeGUI
         {
             get
             {
-                return _vi.num_audio_samples != 0;
+                return _vi.num_audio_samples > 0;
             }
         }
 
@@ -545,7 +545,7 @@ namespace MeGUI
         {
             get
             {
-                return SamplesCount * ChannelsCount * BytesPerSample;
+                return (SamplesCount > 0 ? SamplesCount : 0) * ChannelsCount * BytesPerSample;
             }
         }
 

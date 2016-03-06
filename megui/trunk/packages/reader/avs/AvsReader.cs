@@ -108,8 +108,10 @@ namespace MeGUI
                                   ((double)clip.raten) / ((double)clip.rated),
                                   clip.raten, clip.rated);
                     }
-                    else
+                    else if (clip.HasAudio)
                         info = new VideoInformation(false, 0, 0, Dar.A1x1, (ulong)clip.SamplesCount, (double)clip.AudioSampleRate, 0, 0);
+                    else
+                        info = new VideoInformation(false, 0, 0, Dar.A1x1, 0, 0, 0, 0);
                 }
             }
             catch (Exception)
