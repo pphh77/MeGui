@@ -1,6 +1,6 @@
 ﻿// ****************************************************************************
 // 
-// Copyright (C) 2009-2015 Kurtnoise (kurtnoise@free.fr)
+// Copyright (C) 2005-2016 Kurtnoise (kurtnoise@free.fr)
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,12 +17,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // 
 // ****************************************************************************
-   
+
 
 using System;
 using System.Collections;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 
 namespace MeGUI.core.util

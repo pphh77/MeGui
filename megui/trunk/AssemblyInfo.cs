@@ -1,6 +1,6 @@
 // ****************************************************************************
 // 
-// Copyright (C) 2005-2009  Doom9 & al
+// Copyright (C) 2005-2015 Doom9 & al
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -46,8 +46,8 @@ using System.Runtime.CompilerServices;
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
 
-[assembly: AssemblyVersion("1.0.2566.0")]
-[assembly: AssemblyFileVersion("1.0.2566.0")]
+[assembly: AssemblyVersion("1.0.2631.0")]
+[assembly: AssemblyFileVersion("1.0.2631.0")]
 
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 
