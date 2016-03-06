@@ -1,3 +1,4 @@
+2931 [MediaInfo]            improved DVD audio track language detection
 2930 [Audio Encoder]        fixed a crash if a very large audio delay is used
 2629 [OneClick]             fixed Blu-Ray playlist processing if a track has no proper language tag (regression of 2572)
 2628 [x264]                 added 16:15 to the --sar values

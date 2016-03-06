@@ -358,6 +358,21 @@ namespace MeGUI
                 }
 
                 // get basic media information
+                if (Path.GetExtension(file.ToLowerInvariant()) == ".vob")
+                {
+                    string ifoFile;
+                    if (Path.GetFileName(file).ToUpperInvariant().Substring(0, 4) == "VTS_")
+                        ifoFile = file.Substring(0, file.LastIndexOf("_")) + "_0.IFO";
+                    else
+                        ifoFile = Path.ChangeExtension(file, ".IFO");
+
+                    if (File.Exists(ifoFile))
+                    {
+                        if (infoLog != null)
+                            infoLog.Info("DVD source detected. Using IFO file: " + ifoFile);
+                        file = ifoFile;
+                    }
+                }
                 MediaInfo info = new MediaInfo(file);
                 CorrectSourceInformation(ref info, file, infoLog, iPGCNumber);
                 if (infoLog != null)
@@ -776,57 +791,31 @@ namespace MeGUI
         {
             try
             {
-                if (oInfo.Video.Count > 0 && Path.GetExtension(strFile.ToLowerInvariant()) == ".vob")
+                if (oInfo.Video.Count > 0 && Path.GetExtension(strFile.ToLowerInvariant()) == ".ifo")
                 {
-                    string ifoFile;
-                    if (Path.GetFileName(strFile).ToUpperInvariant().Substring(0, 4) == "VTS_")
-                        ifoFile = strFile.Substring(0, strFile.LastIndexOf("_")) + "_0.IFO";
+                    // PGC handling
+                    int iPGCCount = (int)IFOparser.getPGCnb(strFile);
+                    _VideoInfo.PGCCount = iPGCCount;
+                    if (iPGCNumber < 1 || iPGCNumber > iPGCCount)
+                        _VideoInfo.PGCNumber = 1;
                     else
-                        ifoFile = Path.ChangeExtension(strFile, ".IFO");
+                        _VideoInfo.PGCNumber = iPGCNumber;
 
-                    if (File.Exists(ifoFile))
+                    // subtitle information is wrong in VOB/IFO (mediainfo), use IFO directly instead
+                    oInfo.Text.Clear();
+                    string[] arrSubtitle = IFOparser.GetSubtitlesStreamsInfos(strFile, _VideoInfo.PGCNumber, false);
+                    foreach (string strSubtitle in arrSubtitle)
                     {
-                        // DVD Input File
-                        if (infoLog != null)
-                            infoLog.Info("DVD source detected. Using IFO file: " + ifoFile);
-
-                        // PGC handling
-                        int iPGCCount = (int)IFOparser.getPGCnb(ifoFile);
-                        _VideoInfo.PGCCount = iPGCCount;
-                        if (iPGCNumber < 1 || iPGCNumber > iPGCCount)
-                            _VideoInfo.PGCNumber = 1;
-                        else
-                            _VideoInfo.PGCNumber = iPGCNumber;
-
-                        // AR information may be false in VOB, use IFO instead
-                        string strResult = IFOparser.GetVideoAR(ifoFile);
-                        if (!String.IsNullOrEmpty(strResult))
-                            oInfo.Video[0].AspectRatioString = strResult;
-
-                        // audio languages are not present in VOB, use IFO instead
-                        for (int counter = 0; counter < oInfo.Audio.Count; counter++)
-                        {
-                            MediaInfoWrapper.AudioTrack atrack = oInfo.Audio[counter];
-                            if (String.IsNullOrEmpty(atrack.LanguageString))
-                                atrack.LanguageString = IFOparser.getAudioLanguage(ifoFile, counter);
-                        }
-
-                        // subtitle information is wrong in VOB, use IFO instead
-                        oInfo.Text.Clear();
-                        string[] arrSubtitle = IFOparser.GetSubtitlesStreamsInfos(ifoFile, _VideoInfo.PGCNumber, false);      
-                        foreach (string strSubtitle in arrSubtitle)
-                        {
-                            TextTrack oTextTrack = new TextTrack();
-                            oTextTrack.StreamOrder = Int32.Parse(strSubtitle.Substring(1, 2)).ToString();
-                            string[] strLanguage = strSubtitle.Split('-');
-                            oTextTrack.LanguageString = strLanguage[1].Trim();
-                            if (strSubtitle.IndexOf('-', 7) > 0)
-                                oTextTrack.Title = strSubtitle.Substring(7);
-                            if (strSubtitle.ToLowerInvariant().Contains("force"))
-                                oTextTrack.ForcedString = "yes";
-                            oTextTrack.CodecString = SubtitleType.VOBSUB.ToString();
-                            oInfo.Text.Add(oTextTrack);
-                        }
+                        TextTrack oTextTrack = new TextTrack();
+                        oTextTrack.StreamOrder = Int32.Parse(strSubtitle.Substring(1, 2)).ToString();
+                        string[] strLanguage = strSubtitle.Split('-');
+                        oTextTrack.LanguageString = strLanguage[1].Trim();
+                        if (strSubtitle.IndexOf('-', 7) > 0)
+                            oTextTrack.Title = strSubtitle.Substring(7);
+                        if (strSubtitle.ToLowerInvariant().Contains("force"))
+                            oTextTrack.ForcedString = "yes";
+                        oTextTrack.CodecString = SubtitleType.VOBSUB.ToString();
+                        oInfo.Text.Add(oTextTrack);
                     }
                 }
                 else if (oInfo.General[0].FormatString.ToLowerInvariant().Equals("blu-ray playlist"))
@@ -1043,6 +1032,7 @@ namespace MeGUI
             if (!_strContainer.ToUpperInvariant().Equals("MATROSKA") &&
                 !_strContainer.ToUpperInvariant().Equals("MPEG-TS") &&
                 !_strContainer.ToUpperInvariant().Equals("MPEG-PS") &&
+                !_strContainer.ToUpperInvariant().Equals("DVD VIDEO") &&
                 !_strContainer.ToUpperInvariant().Equals("MPEG VIDEO") &&
                 !_strContainer.ToUpperInvariant().Equals("MPEG-4") &&
                 !_strContainer.ToUpperInvariant().Equals("VC-1") &&
@@ -1070,6 +1060,7 @@ namespace MeGUI
             // only the following container formats are supported
             if (!_strContainer.ToUpperInvariant().Equals("MPEG-TS") &&
                 !_strContainer.ToUpperInvariant().Equals("MPEG-PS") &&
+                !_strContainer.ToUpperInvariant().Equals("DVD VIDEO") &&
                 !_strContainer.ToUpperInvariant().Equals("MPEG VIDEO") &&
                 !_strContainer.ToUpperInvariant().Equals("BDAV"))
                 return false;
@@ -1099,6 +1090,7 @@ namespace MeGUI
             if (!_strContainer.ToUpperInvariant().Equals("MATROSKA") &&
                 !_strContainer.ToUpperInvariant().Equals("MPEG-TS") &&
                 !_strContainer.ToUpperInvariant().Equals("MPEG-PS") &&
+                !_strContainer.ToUpperInvariant().Equals("DVD VIDEO") &&
                 !_strContainer.ToUpperInvariant().Equals("MPEG VIDEO") &&
                 !_strContainer.ToUpperInvariant().Equals("MPEG-4") &&
                 !_strContainer.ToUpperInvariant().Equals("VC-1") &&

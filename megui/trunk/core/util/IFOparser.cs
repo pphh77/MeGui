@@ -168,31 +168,6 @@ namespace MeGUI.core.util
         }
 
         /// <summary>
-        /// get Audio Language from the IFO file
-        /// </summary>
-        /// <param name="fileName">name of the IFO file</param>
-        /// <param name="count">the audio stream number</param>
-        /// <returns>Language as String</returns>
-        public static string getAudioLanguage(string FileName, int count)
-        {
-            FileStream fs = new FileStream(FileName, FileMode.Open, FileAccess.Read);
-            BinaryReader br = new BinaryReader(fs);
-            Stream sr = br.BaseStream;
-
-            // go to audio stream number
-            sr.Seek(0x203, SeekOrigin.Begin);
-            byte a = br.ReadByte();
-            sr.Seek(2, SeekOrigin.Current);
-            if (count > 0) sr.Seek(8*count, SeekOrigin.Current);
-            byte[] buff = new byte[2];
-            br.Read(buff, 0, 2);
-            string ShortLangCode = String.Format("{0}{1}", (char)buff[0], (char)buff[1]);
-            string audioLang = LanguageSelectionContainer.LookupISOCode(ShortLangCode);
-            fs.Close();
-            return audioLang;
-        }
-
-        /// <summary>
         /// get several Subtitles Informations from the IFO file
         /// </summary>
         /// <param name="fileName">name of the IFO file</param>
@@ -356,35 +331,6 @@ namespace MeGUI.core.util
                 ((uint)br.ReadByte()) << 8 |
                 ((uint)br.ReadByte()));
             return val;
-        }
-
-        /// <summary>
-        /// get Aspect Ratio Video Information from the IFO file
-        /// </summary>
-        /// <param name="fileName">name of the IFO file</param>
-        /// <returns>aspect ratio info as String</returns>
-        public static string GetVideoAR(string FileName)
-        {
-            FileStream fs = new FileStream(FileName, FileMode.Open, FileAccess.Read);
-            BinaryReader br = new BinaryReader(fs);
-            Stream sr = br.BaseStream;
-
-            sr.Seek(0x200, SeekOrigin.Begin);
-            byte[] array = new byte[2];
-            fs.Read(array, 0, 2);
-            fs.Close();
-
-            byte b = (byte)((0x0C & array[0]) >> 2);
-            string ar = String.Empty;
-
-            switch (b)
-            {
-                case 0: ar = "4:3"; break;
-                case 1:
-                case 2: ar = String.Empty; break;
-                case 3: ar = "16:9"; break;
-            }
-            return ar;
         }
     }
 }
