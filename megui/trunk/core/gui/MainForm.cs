@@ -96,7 +96,7 @@ namespace MeGUI
         /// <param name="e"></param>
         private void mnuGuide_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start("http://mewiki.project357.com/wiki/Main_Page");
+            System.Diagnostics.Process.Start("https://en.wikibooks.org/wiki/MeGUI");
         }
 
         /// <summary>
@@ -1278,7 +1278,7 @@ namespace MeGUI
 
         private void mnuDoc_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start("http://mewiki.project357.com/wiki/Main_Page");
+            System.Diagnostics.Process.Start("https://en.wikibooks.org/wiki/MeGUI");
         }
 
         private void mnuOptionsSettings_Click(object sender, EventArgs e)
@@ -1401,7 +1401,7 @@ namespace MeGUI
 
         private void HelpButton_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start("http://mewiki.project357.com/wiki/Main_Page");
+            System.Diagnostics.Process.Start("https://en.wikibooks.org/wiki/MeGUI");
         }
 
         private void menuItem5_Click(object sender, EventArgs e)

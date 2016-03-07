@@ -1646,7 +1646,7 @@ namespace MeGUI.packages.video.x265
             // 
             this.helpButton1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.helpButton1.ArticleName = "Video Encoder Configuration/x265";
+            this.helpButton1.ArticleName = "Configuration/Video_Encoder_Configuration/x265";
             this.helpButton1.AutoSize = true;
             this.helpButton1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.helpButton1.Location = new System.Drawing.Point(455, 199);

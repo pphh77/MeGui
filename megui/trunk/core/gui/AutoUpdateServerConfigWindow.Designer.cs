@@ -129,7 +129,7 @@ namespace MeGUI.core.gui
             // 
             // helpButton1
             // 
-            this.helpButton1.ArticleName = "AutoUpdate";
+            this.helpButton1.ArticleName = "Presentation/AutoUpdate";
             this.helpButton1.AutoSize = true;
             this.helpButton1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.helpButton1.Location = new System.Drawing.Point(246, 3);

@@ -19,18 +19,13 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace MeGUI.core.gui
 {
     public partial class HelpButton : UserControl
     {
-        private static readonly string BaseURL = "http://mewiki.project357.com/wiki/MeGUI/";
+        private static readonly string BaseURL = "https://en.wikibooks.org/wiki/MeGUI/";
 
         public HelpButton()
         {

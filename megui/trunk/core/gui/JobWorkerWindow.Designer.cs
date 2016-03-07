@@ -114,7 +114,7 @@ namespace MeGUI.core.gui
             // 
             // helpButton1
             // 
-            helpButton1.ArticleName = "Parallel job execution";
+            helpButton1.ArticleName = "Presentation/Parallel_job_execution";
             helpButton1.AutoSize = true;
             helpButton1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             helpButton1.Location = new System.Drawing.Point(3, 3);
