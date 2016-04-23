@@ -1,3 +1,4 @@
+2934 [L-SMASH Indexer]      added support for MSVC 2015 runtimes
 2933                        updated the wiki links to point to https://en.wikibooks.org/wiki/MeGUI
 2931 [MediaInfo]            improved DVD audio track language detection
 2930 [Audio Encoder]        fixed a crash if a very large audio delay is used

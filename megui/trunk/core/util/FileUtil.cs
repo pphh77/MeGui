@@ -591,6 +591,12 @@ namespace MeGUI.core.util
                     try { f.Delete(); }
                     catch { }
                 }
+                files = fi.GetFiles("vc*.dll");
+                foreach (FileInfo f in files)
+                {
+                    try { f.Delete(); }
+                    catch { }
+                }
             }
         }
 
@@ -686,6 +692,9 @@ namespace MeGUI.core.util
             {
                 DirectoryInfo fi = new DirectoryInfo(lsmashPath);
                 FileInfo[] files = fi.GetFiles("msvc*.dll");
+                foreach (FileInfo f in files)
+                    sourceFiles.Add(f.Name);
+                files = fi.GetFiles("vc*.dll");
                 foreach (FileInfo f in files)
                     sourceFiles.Add(f.Name);
             }
