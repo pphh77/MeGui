@@ -18,12 +18,6 @@
 // 
 // ****************************************************************************
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 using MeGUI.core.details;
@@ -35,7 +29,8 @@ namespace MeGUI.core.gui
         public static readonly IDable<ReconfigureJob> Configurer = new IDable<ReconfigureJob>(
             "audio_reconfigure", delegate(Job j)
         {
-            if (!(j is AudioJob)) return null;
+            if (!(j is AudioJob))
+                return null;
 
             AudioEncodingWindow w = new AudioEncodingWindow();
             w.audioEncodingTab1.AudioJob = (AudioJob)j;

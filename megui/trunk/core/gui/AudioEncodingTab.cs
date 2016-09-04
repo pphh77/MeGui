@@ -19,16 +19,11 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Data;
 using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
-using MeGUI.core.details.video;
 using MeGUI.core.util;
 
 namespace MeGUI.core.gui
@@ -41,6 +36,7 @@ namespace MeGUI.core.gui
         /// This delegate is called when a job has been successfully configured and the queue button is pressed
         /// </summary>
         public Setter<AudioJob> QueueJob;
+        private bool bShowReset = true;
 
         public string QueueButtonText
         {
@@ -54,15 +50,27 @@ namespace MeGUI.core.gui
             set { audioContainer.Text = value; }
         }
 
+        public bool ShowReset
+        {
+            get { return bShowReset; }
+            set
+            {
+                bShowReset = value;
+                deleteAudioButton.Visible = value;
+            }
+        }
+
         public AudioEncoderProvider AudioEncoderProvider
         {
             get { return audioEncoderProvider; }
         }
+
         private string AudioInput
         {
             get { return audioInput.Filename; }
             set { audioInput.Filename = value; }
         }
+
         private string AudioOutput
         {
             get { return audioOutput.Filename; }

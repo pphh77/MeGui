@@ -1,8 +1,9 @@
-2935 [Profile]              Bug #842: fixed import & export of profiles (regression of 2590)
-2934 [L-SMASH Indexer]      added support for MSVC 2015 runtimes
-2933                        updated the wiki links to point to https://en.wikibooks.org/wiki/MeGUI
-2931 [MediaInfo]            improved DVD audio track language detection
-2930 [Audio Encoder]        fixed a crash if a very large audio delay is used
+2636 [Audio Encoder]        Bug #826: cosmetic change
+2635 [Profile]              Bug #842: fixed import & export of profiles (regression of 2590)
+2634 [L-SMASH Indexer]      added support for MSVC 2015 runtimes
+2633                        updated the wiki links to point to https://en.wikibooks.org/wiki/MeGUI
+2631 [MediaInfo]            improved DVD audio track language detection
+2630 [Audio Encoder]        fixed a crash if a very large audio delay is used
 2629 [OneClick]             fixed Blu-Ray playlist processing if a track has no proper language tag (regression of 2572)
 2628 [x264]                 added 16:15 to the --sar values
 2627 [Main]                 detects during startup if AviSynth can be used
