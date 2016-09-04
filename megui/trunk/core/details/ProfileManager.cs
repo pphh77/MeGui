@@ -25,7 +25,6 @@ using System.IO;
 using System.Reflection;
 using System.Xml.Serialization;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 using MeGUI.core.gui;
@@ -50,14 +49,14 @@ namespace MeGUI
     public class ProfileManager
     {
         public static readonly string ScratchPadName = "*scratchpad*";
-        private string path;
+        private string profileFolder;
         private List<ProfileType> profileTypes = new List<ProfileType>();
         private List<ProfileGroup> profileGroups = new List<ProfileGroup>();
 
         #region init
-        public ProfileManager(string path)
+        public ProfileManager(string profileFolder)
         {
-            this.path = path;
+            this.profileFolder = profileFolder;
             profileGroups.Add(new ProfileGroup(typeof(VideoCodecSettings), "Video"));
             SafeRegister<x264Settings, x264ConfigurationPanel>("Video");
             SafeRegister<x265Settings, x265ConfigurationPanel>("Video");
@@ -147,19 +146,17 @@ namespace MeGUI
         #region loading and saving
         private static string profilePath(string path, Profile prof)
         {
-            return Path.Combine(Path.Combine(GetSaveFolder(path), prof.BaseSettings.SettingsID), fixName(prof.FQName) + ".xml");
+            return Path.Combine(Path.Combine(path, prof.BaseSettings.SettingsID), fixName(prof.FQName) + ".xml");
         }
 
-        const string SaveFolderName = "allprofiles";
-
-        public static string GetSaveFolder(string path)
+        private static string GetDefaultProfilPath()
         {
-            return Path.Combine(path, SaveFolderName);
+            return Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "allprofiles");
         }
 
         public bool SaveProfiles()
         {
-            bool bOK = WriteProfiles(path, AllProfiles);
+            bool bOK = WriteProfiles(null, AllProfiles);
             if (!saveSelectedProfiles())
                 bOK = false;
             return bOK;
@@ -170,18 +167,19 @@ namespace MeGUI
         /// this is called when the program exists and ensures that all
         /// currently defined profiles are saved, overwriting currently existing ones
         /// </summary>
-        public static bool WriteProfiles(string path, IEnumerable<Profile> profiles)
+        public static bool WriteProfiles(string savePath, IEnumerable<Profile> profiles)
         {
-            string profilesFolder = GetSaveFolder(path);
+            if (string.IsNullOrEmpty(savePath))
+                savePath = GetDefaultProfilPath();
 
             // remove old backup files if available
-            if (!deleteFiles(profilesFolder, "*.backup"))
+            if (!deleteFiles(savePath, "*.backup"))
                 return false;
 
             // backup profiles
             try
             {
-                DirectoryInfo fi = new DirectoryInfo(profilesFolder);
+                DirectoryInfo fi = new DirectoryInfo(savePath);
                 FileInfo[] files = fi.GetFiles("*.xml", SearchOption.AllDirectories);
                 foreach (FileInfo f in files)
                 {
@@ -194,17 +192,17 @@ namespace MeGUI
                 _oLog.LogValue("Backup profile files could not be created", ex, ImageType.Error);
 
                 // remove backup files
-                deleteFiles(profilesFolder, "*.backup");
+                deleteFiles(savePath, "*.backup");
                 return false;
             }
 
             // remove profile files
-            if (!deleteFiles(profilesFolder, "*.xml"))
+            if (!deleteFiles(savePath, "*.xml"))
             {
                 // restore backup
                 try
                 {
-                    DirectoryInfo fi = new DirectoryInfo(profilesFolder);
+                    DirectoryInfo fi = new DirectoryInfo(savePath);
                     FileInfo[] files = fi.GetFiles("*.backup", SearchOption.AllDirectories);
                     foreach (FileInfo f in files)
                     {
@@ -224,16 +222,16 @@ namespace MeGUI
             {
                 foreach (Profile p in profiles)
                 {
-                    if (!Util.XmlSerialize(p, profilePath(path, p)))
+                    if (!Util.XmlSerialize(p, profilePath(savePath, p)))
                     {
-                        string backupFile = Path.ChangeExtension(profilePath(path, p), ".backup");
+                        string backupFile = Path.ChangeExtension(profilePath(savePath, p), ".backup");
                         if (File.Exists(backupFile))
-                            File.Copy(backupFile, profilePath(path, p), true);
+                            File.Copy(backupFile, profilePath(savePath, p), true);
                         bSuccess = false;
                     }
                 }
 
-                deleteFiles(profilesFolder, "*.backup");
+                deleteFiles(savePath, "*.backup");
             }
             catch (Exception ex)
             {
@@ -249,6 +247,9 @@ namespace MeGUI
         {
             try
             {
+                if (!Directory.Exists(path))
+                    return true;
+
                 Array.ForEach(Directory.GetFiles(path, files, SearchOption.AllDirectories), delegate (string filePath) { File.Delete(filePath); });
                 return true;
             }
@@ -262,7 +263,7 @@ namespace MeGUI
 
         private bool saveSelectedProfiles()
         {
-            string filename = Path.Combine(GetSaveFolder(path), "SelectedProfiles.xml");
+            string filename = Path.Combine(GetDefaultProfilPath(), "SelectedProfiles.xml");
             XmlSerializer ser = null;
             bool bOK = true;
             try
@@ -290,7 +291,7 @@ namespace MeGUI
 
         private void loadSelectedProfiles()
         {
-            string file = Path.Combine(GetSaveFolder(path), "SelectedProfiles.xml");
+            string file = Path.Combine(GetDefaultProfilPath(), "SelectedProfiles.xml");
             if (!File.Exists(file)) 
                 return;
 
@@ -401,7 +402,7 @@ namespace MeGUI
 
         private List<Profile> readAllProfiles(ProfileType type, bool bSilentError)
         {
-            string profilePath = Path.Combine(GetSaveFolder(path), type.ID);
+            string profilePath = Path.Combine(this.profileFolder, type.ID);
             DirectoryInfo di = FileUtil.ensureDirectoryExists(profilePath);
             FileInfo[] files = di.GetFiles("*.xml");
 

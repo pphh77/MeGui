@@ -38,7 +38,7 @@ namespace MeGUI.core.util
         {
             while (true)
             {
-                string file = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                string file = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), Path.GetRandomFileName());
 
                 if (!File.Exists(file) && !Directory.Exists(file))
                 {

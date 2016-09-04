@@ -1,3 +1,4 @@
+2935 [Profile]              Bug #842: fixed import & export of profiles (regression of 2590)
 2934 [L-SMASH Indexer]      added support for MSVC 2015 runtimes
 2933                        updated the wiki links to point to https://en.wikibooks.org/wiki/MeGUI
 2931 [MediaInfo]            improved DVD audio track language detection

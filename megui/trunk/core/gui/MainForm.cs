@@ -816,7 +816,7 @@ namespace MeGUI
             this.codecs = new CodecManager();
             this.path = System.Windows.Forms.Application.StartupPath;
             this.addPackages();
-            this.profileManager = new ProfileManager(this.path);
+            this.profileManager = new ProfileManager(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "allprofiles"));
             this.profileManager.LoadProfiles();
             this.mediaFileFactory = new MediaFileFactory(this);
             this.loadSettings();
