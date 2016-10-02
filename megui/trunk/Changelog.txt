@@ -1,3 +1,4 @@
+2638 [Profile]              added support to import old export files (regression of 2635)
 2637 [VobSubber]            each track will be demuxed into a dedicated file set to avoid missing tracks when muxing. Bug #845
      [VobSubber]+[OneClick] for multiple tracks the source will only be indexed once
 2636 [Audio Encoder]        cosmetic change. Bug #826

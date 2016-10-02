@@ -56,7 +56,10 @@ namespace MeGUI
         #region init
         public ProfileManager(string profileFolder)
         {
-            this.profileFolder = profileFolder;
+            if (Directory.Exists(Path.Combine(profileFolder, "allprofiles")))
+                this.profileFolder = Path.Combine(profileFolder, "allprofiles");
+            else
+                this.profileFolder = profileFolder;
             profileGroups.Add(new ProfileGroup(typeof(VideoCodecSettings), "Video"));
             SafeRegister<x264Settings, x264ConfigurationPanel>("Video");
             SafeRegister<x265Settings, x265ConfigurationPanel>("Video");
