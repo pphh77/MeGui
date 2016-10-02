@@ -19,8 +19,6 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -30,14 +28,15 @@ namespace MeGUI
 {
     public class VobSubIndexer : CommandlineJobProcessor<SubtitleIndexJob>
     {
-        public static readonly JobProcessorFactory Factory =
-       new JobProcessorFactory(new ProcessorFactory(init), "VobSubIndexer");
+        public static readonly JobProcessorFactory Factory = new JobProcessorFactory(new ProcessorFactory(init), "VobSubIndexer");
 
         private string configFile = null;
 
         private static IJobProcessor init(MainForm mf, Job j)
         {
-            if (j is SubtitleIndexJob) return new VobSubIndexer();
+            if (j is SubtitleIndexJob)
+                return new VobSubIndexer();
+
             return null;
         }
 
@@ -54,6 +53,7 @@ namespace MeGUI
             UpdateCacher.CheckPackage("vobsub");
             executable = Environment.GetFolderPath(Environment.SpecialFolder.System) + @"\rundll32.exe";
         }
+
         #region IJobProcessor Members
         protected override void checkJobIO()
         {
@@ -74,16 +74,7 @@ namespace MeGUI
                 sw.WriteLine(FileUtil.GetPathWithoutExtension(job.Output));
                 sw.WriteLine(job.PGC);
                 sw.WriteLine("0"); // we presume angle processing has been done before
-                if (job.IndexAllTracks)
-                    sw.WriteLine("ALL");
-                else
-                {
-                    foreach (int id in job.TrackIDs)
-                    {
-                        sw.Write(id + " ");
-                    }
-                    sw.Write(sw.NewLine);
-                }
+                sw.WriteLine("ALL"); //always process everything and strip down later
                 sw.WriteLine("CLOSE");
             }
 
@@ -100,6 +91,81 @@ namespace MeGUI
         protected override bool checkExitCode
         {
             get { return false; }
+        }
+
+        protected override void doExitConfig()
+        {
+            su.Status = "Generating files...";
+
+            string line;
+            bool bHeader = true;
+            bool bWait = false;
+            StringBuilder sbHeader = new StringBuilder();
+            StringBuilder sbIndex = new StringBuilder();
+            StringBuilder sbIndexTemp = new StringBuilder();
+            int index = 0;
+
+            using (System.IO.StreamReader file = new System.IO.StreamReader(job.Output))
+            {
+                while ((line = file.ReadLine()) != null)
+                {
+                    if (bHeader)
+                    {
+                        if (line.StartsWith("langidx:"))
+                        {
+                            bHeader = false;
+                            bWait = true;
+                        }
+                        else
+                            sbHeader.AppendLine(line);
+                    }
+                    else if (bWait)
+                    {
+                        sbIndexTemp.AppendLine(line);
+                        if (line.StartsWith("id: "))
+                        {
+                            index = Int32.Parse(line.Substring(line.LastIndexOf(' ')));
+
+                            sbIndex.Clear();
+                            sbIndex.Append(sbHeader.ToString());
+                            sbIndex.AppendLine("langidx: " + index);
+                            sbIndex.Append(sbIndexTemp.ToString());
+                            bWait = false;
+                        }
+                    }
+                    else
+                    {
+                        if (String.IsNullOrEmpty(line))
+                        {
+                            bWait = true;
+
+                            bool bFound = false;
+                            foreach (int id in job.TrackIDs)
+                            {
+                                if (index == id)
+                                    bFound = true;
+                            }
+
+                            if (bFound || job.IndexAllTracks)
+                            {
+                                string outputFile = Path.Combine(Path.GetDirectoryName(job.Output), Path.GetFileNameWithoutExtension(job.Output)) + "_" + job.PGC + "_" + index + ".idx";
+                                using (System.IO.StreamWriter output = new System.IO.StreamWriter(outputFile))
+                                    output.WriteLine(sbIndex.ToString());
+
+                                outputFile = Path.ChangeExtension(outputFile, ".sub");
+                                File.Copy(Path.ChangeExtension(job.Output, ".sub"), outputFile, true);
+                            }
+
+                            sbIndexTemp.Clear();
+                            sbIndexTemp.AppendLine(line);
+                        }
+                        else
+                            sbIndex.AppendLine(line);
+                    }
+                }
+            }
+            File.Delete(job.Output);
+            File.Delete(Path.ChangeExtension(job.Output, ".sub"));   
         }
     }
 }

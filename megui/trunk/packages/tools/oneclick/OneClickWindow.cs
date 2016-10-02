@@ -1121,6 +1121,8 @@ namespace MeGUI
 
 
             // subtitle handling
+            List<int> arrDVDSub = new List<int>();
+            string strInput = String.Empty;
             foreach (OneClickStreamControl oStream in subtitleTracks)
             {
                 if (oStream.SelectedStreamIndex <= 0) // not NONE
@@ -1131,7 +1133,7 @@ namespace MeGUI
                     string strExtension = Path.GetExtension(oStream.SelectedStream.TrackInfo.SourceFileName.ToLowerInvariant());
                     if (strExtension.Equals(".ifo") || strExtension.Equals(".vob"))
                     {
-                        string strInput = oStream.SelectedStream.TrackInfo.SourceFileName;
+                        strInput = oStream.SelectedStream.TrackInfo.SourceFileName;
                         if (strExtension.Equals(".vob"))
                         {
                             if (Path.GetFileName(strInput).ToUpperInvariant().Substring(0, 4) == "VTS_")
@@ -1139,9 +1141,8 @@ namespace MeGUI
                             else
                                 strInput = Path.ChangeExtension(strInput, ".IFO");
                         }
-                        string outputFile = Path.Combine(dpp.WorkingDirectory, Path.GetFileNameWithoutExtension(strInput)) + "_" + oStream.SelectedStream.TrackInfo.MMGTrackID + ".idx";
-                        SubtitleIndexJob oJob = new SubtitleIndexJob(strInput, outputFile, false, new List<int> { oStream.SelectedStream.TrackInfo.MMGTrackID }, _videoInputInfo.VideoInfo.PGCNumber);
-                        prepareJobs = new SequentialChain(new SequentialChain(prepareJobs), new SequentialChain(oJob));
+                        arrDVDSub.Add(oStream.SelectedStream.TrackInfo.MMGTrackID);
+                        string outputFile = Path.Combine(dpp.WorkingDirectory, Path.GetFileNameWithoutExtension(strInput)) + "_" + _videoInputInfo.VideoInfo.PGCNumber + "_" + oStream.SelectedStream.TrackInfo.MMGTrackID + ".idx";
                         oStream.SelectedStream.DemuxFilePath = outputFile;
                         dpp.FilesToDelete.Add(outputFile);
                         dpp.FilesToDelete.Add(Path.ChangeExtension(outputFile, ".sub"));
@@ -1156,6 +1157,12 @@ namespace MeGUI
                 }
                 else
                     dpp.SubtitleTracks.Add(oStream.SelectedStream);
+            }
+            if (arrDVDSub.Count > 0)
+            {
+                string outputFile = Path.Combine(dpp.WorkingDirectory, Path.GetFileNameWithoutExtension(strInput)) + ".idx";
+                SubtitleIndexJob oJob = new SubtitleIndexJob(strInput, outputFile, false, arrDVDSub, _videoInputInfo.VideoInfo.PGCNumber);
+                prepareJobs = new SequentialChain(new SequentialChain(prepareJobs), new SequentialChain(oJob));
             }
 
             if (muxVideo && dpp.Container != ContainerType.MKV && inputContainer == ContainerType.MKV 

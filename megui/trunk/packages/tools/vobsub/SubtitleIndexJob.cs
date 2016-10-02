@@ -18,9 +18,7 @@
 // 
 // ****************************************************************************
 
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace MeGUI
 {
@@ -29,16 +27,14 @@ namespace MeGUI
         private bool indexAllTracks;
         private List<int> trackIDs;
         private int pgc;
-        public SubtitleIndexJob()
-            : base()
+        public SubtitleIndexJob() : base()
 		{
             indexAllTracks = true;
             trackIDs = new List<int>();
             pgc = 1;
 		}
 
-        public SubtitleIndexJob(string input, string output,
-            bool indexAllTracks, List<int> trackIDs, int pgc)
+        public SubtitleIndexJob(string input, string output, bool indexAllTracks, List<int> trackIDs, int pgc)
         {
             Input = input;
             Output = output;

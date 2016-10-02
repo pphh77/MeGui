@@ -18,12 +18,6 @@
 // 
 // ****************************************************************************
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
-
 using MeGUI.core.details;
 using MeGUI.core.util;
 

@@ -21,10 +21,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 
 using MeGUI.core.plugins.interfaces;
@@ -38,6 +35,7 @@ namespace MeGUI
         private bool dialogMode = false;
         private bool configured = false;
         #endregion
+
         #region start / stop
         public VobSubIndexWindow(MainForm mainForm)
         {
@@ -49,6 +47,7 @@ namespace MeGUI
             base.OnClosing(e);
         }
         #endregion
+
         #region button handlers
         private void queueButton_Click(object sender, EventArgs e)
         {
@@ -79,6 +78,7 @@ namespace MeGUI
                                 ". Please select a propper output file.", "Configuration Incomplete", MessageBoxButtons.OK);
         }
         #endregion
+
         private void openVideo(string fileName)
         {
             input.Filename = fileName;
@@ -88,6 +88,7 @@ namespace MeGUI
             subtitleTracks.Items.AddRange(IFOparser.GetSubtitlesStreamsInfos(input.Filename, Convert.ToInt32(pgc.Value), chkShowAllStreams.Checked));
             demuxSelectedTracks.Checked = !keepAllTracks.Checked;
         }
+
         private void checkIndexIO()
         {
             configured = (!input.Filename.Equals("") && !output.Filename.Equals(""));
@@ -106,6 +107,7 @@ namespace MeGUI
             }
             return new SubtitleIndexJob(input.Filename, output.Filename, keepAllTracks.Checked, trackIDs, (int)pgc.Value);
         }
+
         public void setConfig(string input, string output, bool indexAllTracks, List<int> trackIDs, int pgc)
         {
             this.dialogMode = true;
@@ -135,6 +137,7 @@ namespace MeGUI
             }
             this.pgc.Value = pgc;
         }
+
         /// <summary>
         /// gets the index job created from the current configuration
         /// </summary>
@@ -159,6 +162,7 @@ namespace MeGUI
         {
             if (String.IsNullOrEmpty(input.Filename))
                 return;
+
             openVideo(input.Filename);
             checkIndexIO();
         }
@@ -167,6 +171,7 @@ namespace MeGUI
         {
             if (String.IsNullOrEmpty(input.Filename))
                 return;
+
             openVideo(input.Filename);
             checkIndexIO();
         }

@@ -107,7 +107,6 @@ namespace MeGUI
             set { addPrerenderJob.Checked = value; }
         }
         #endregion
-
         #region event handlers
         private void videoInput_FileSelected(FileBar sender, FileBarEventArgs args)
         {
@@ -476,7 +475,7 @@ namespace MeGUI
             }
 
             AviSynthJob job = new AviSynthJob(VideoInput);
-            MainForm.Instance.Jobs.addJobsToQueue(new AviSynthJob(VideoInput));
+            MainForm.Instance.Jobs.addJobsToQueue(job);
         }
 
         VideoEncoderType lastCodec = null;
