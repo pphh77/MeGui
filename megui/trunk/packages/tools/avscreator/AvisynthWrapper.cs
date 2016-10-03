@@ -140,14 +140,27 @@ namespace MeGUI
         private static extern int dimzon_avs_getvframe(IntPtr avs, IntPtr buf, int stride, int frm);
         [DllImport("AvisynthWrapper", ExactSpelling = true, SetLastError = false, CharSet = CharSet.Ansi)]
         private static extern int dimzon_avs_getintvariable(IntPtr avs, string name, ref int val);
+        [DllImport("kernel32", SetLastError = true)]
+        private static extern bool FreeLibrary(IntPtr hModule);
+        [DllImport("kernel32", SetLastError = true)]
+        private static extern bool LoadLibraryA(string hModule);
+        [DllImport("kernel32", SetLastError = true)]
+        private static extern bool GetModuleHandleExA(int dwFlags, string ModuleName, IntPtr phModule);
+        [DllImport("Kernel32")]
+        private extern static Boolean CloseHandle(IntPtr handle);
 
-		#endregion
+        #endregion
 
         private IntPtr _avs;
         private AVSDLLVideoInfo _vi;
         private AviSynthColorspace _colorSpace;
         private AudioSampleType _sampleType;
         private static object _locker = new object();
+#if DEBUG
+        private int _random;
+        private static object _lockerDLL = new object();
+        private static int _countDLL = 0;
+#endif
 
 #if dimzon
 
@@ -446,13 +459,18 @@ namespace MeGUI
         public AviSynthClip(string func, string arg , AviSynthColorspace forceColorspace)
 		{
 			_vi = new AVSDLLVideoInfo();
-            _avs =  new IntPtr(0);
+            _avs = IntPtr.Zero;
             _colorSpace = AviSynthColorspace.Unknown;
             _sampleType = AudioSampleType.Unknown;
             bool bOpenSuccess = false;
 
             lock (_locker)
             {
+#if DEBUG
+                Random rnd = new Random();
+                _random = rnd.Next(1, 1000000);
+                HandleAviSynthWrapperDLL(false, arg);
+#endif
                 if (MainForm.Instance.Settings.OpenAVSInThreadDuringSession)
                 {
                     Thread t = new Thread(new ThreadStart(delegate
@@ -497,13 +515,57 @@ namespace MeGUI
 
         protected virtual void Dispose(bool disposing)
         {
-            dimzon_avs_destroy(ref _avs);
-            _avs = new IntPtr(0);
-            if (disposing)
-                GC.SuppressFinalize(this);
+            if (_avs != IntPtr.Zero)
+            {
+                dimzon_avs_destroy(ref _avs);
+                if (_avs != IntPtr.Zero)
+                    CloseHandle(_avs);
+                _avs = IntPtr.Zero;
+                if (disposing)
+                    GC.SuppressFinalize(this);
+#if DEBUG
+                HandleAviSynthWrapperDLL(true, String.Empty);
+#endif
+            }
         }
 
-		public short BitsPerSample
+#if DEBUG
+        private void HandleAviSynthWrapperDLL(bool bUnload, string script)
+        {
+            lock (_lockerDLL)
+            {
+                if (MainForm.Instance.AviSynthWrapperLog == null)
+                    MainForm.Instance.AviSynthWrapperLog = MainForm.Instance.Log.Info("AviSynth");
+
+                if (bUnload)
+                {
+                    _countDLL--;
+                    if (_countDLL > 0)
+                    {
+                        MainForm.Instance.AviSynthWrapperLog.LogValue("sessions open: " + _countDLL + ", id: " + _random, script + Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.StackTrace);
+                        return;
+                    }
+
+                    bool bResult = false;
+                    string strFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), "avisynthwrapper.dll");
+                    foreach (System.Diagnostics.ProcessModule mod in System.Diagnostics.Process.GetCurrentProcess().Modules)
+                    {
+                        if (mod.FileName.ToLowerInvariant().Equals(strFile.ToLowerInvariant()))
+                            bResult = FreeLibrary(mod.BaseAddress);
+                    }
+                    MainForm.Instance.AviSynthWrapperLog.LogValue("sessions open: " + _countDLL + ", id: " + _random + ", close: " + bResult, script + Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.StackTrace);
+                }
+                else
+                {
+                    LoadLibraryA("avisynthwrapper.dll");
+                    _countDLL++;
+                    MainForm.Instance.AviSynthWrapperLog.LogValue("sessions open: " + _countDLL + ", id: " + _random, script + Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.StackTrace);
+                }
+            }
+        }
+#endif
+
+        public short BitsPerSample
 		{
 			get
 			{

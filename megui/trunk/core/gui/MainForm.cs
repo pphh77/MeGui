@@ -76,6 +76,10 @@ namespace MeGUI
         public LogItem AVSScriptCreatorLog { get { return _aVSScriptCreatorLog; } set { _aVSScriptCreatorLog = value; } }
         public LogItem FileIndexerLog { get { return _fileIndexerLog; } set { _fileIndexerLog = value; } }
         public LogItem Eac3toLog { get { return _eac3toLog; } set { _eac3toLog = value; } }
+#if DEBUG
+        private LogItem _avisynthWrapperLog;
+        public LogItem AviSynthWrapperLog { get { return _avisynthWrapperLog; } set { _avisynthWrapperLog = value; } }
+#endif
         public UpdateHandler UpdateHandler { get { return _updateHandler; } set { _updateHandler = value; } }
         public MuxProvider MuxProvider { get { return muxProvider; } }
         #endregion

@@ -19,9 +19,7 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 using MeGUI.core.util;
@@ -44,7 +42,7 @@ namespace MeGUI
 
         public int HandleLevel(string file)
         {
-            if (file.ToLower(System.Globalization.CultureInfo.InvariantCulture).EndsWith(".avs"))
+            if (file.ToLowerInvariant().EndsWith(".avs"))
                 return 10;
             return -1;
         }
@@ -123,7 +121,6 @@ namespace MeGUI
 
         private void cleanup()
         {
-            System.Threading.Thread.Sleep(100);
             if (this.clip != null)
             {
                 (this.clip as IDisposable).Dispose();
@@ -272,4 +269,3 @@ namespace MeGUI
         #endregion
     }
 }
-    
