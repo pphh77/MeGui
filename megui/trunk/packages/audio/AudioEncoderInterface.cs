@@ -1097,27 +1097,51 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             }
 
             // detect audio information
+            string strChannelCount = string.Empty;
             string strChannelPositions = string.Empty;
             int iChannelCount = 0;
             int iAVSChannelCount = 0;
+
+            // get real detected channel count from AVS 
+            using (AvsFile avi = AvsFile.ParseScript(script.ToString()))
+                iAVSChannelCount = avi.Clip.ChannelsCount;
+
+            // get the channel information from source file
             if (oInfo.ContainerFileTypeString.Equals("AVS"))
             {
-                iChannelCount = AudioUtil.getChannelCountFromAVSFile(audioJob.Input);
-                if (iChannelCount <= 0)
-                    int.TryParse(oInfo.AudioInfo.Tracks[0].NbChannels.Split(' ')[0], out iChannelCount);
+                strChannelCount = AudioUtil.getChannelCountFromAVSFile(audioJob.Input);
+                if (String.IsNullOrEmpty(strChannelCount))
+                    strChannelCount = oInfo.AudioInfo.Tracks[0].NbChannels;
                 strChannelPositions = AudioUtil.getChannelPositionsFromAVSFile(audioJob.Input);
-                script.AppendFormat(@"# detected channels: {0}{1}", oInfo.AudioInfo.Tracks[0].NbChannels, Environment.NewLine);
-                script.AppendFormat(@"# detected channel positions: {0}{1}", strChannelPositions, Environment.NewLine);
             }
             else
             {
-                int.TryParse(oInfo.AudioInfo.Tracks[0].NbChannels.Split(' ')[0], out iChannelCount);
-                strChannelPositions = oInfo.AudioInfo.Tracks[0].ChannelPositions;
-                script.AppendFormat(@"# detected channels: {0}{1}", oInfo.AudioInfo.Tracks[0].NbChannels, Environment.NewLine);
-                script.AppendFormat(@"# detected channel positions: {0}{1}", strChannelPositions, Environment.NewLine);
+                strChannelCount = oInfo.AudioInfo.Tracks[0].NbChannels;
+                strChannelPositions = oInfo.AudioInfo.Tracks[0].ChannelPositions; 
             }
-            using (AvsFile avi = AvsFile.ParseScript(script.ToString()))
-                iAVSChannelCount = avi.Clip.ChannelsCount;
+
+            int iCount = 0;
+            string[] x = strChannelCount.Split(new string[] { " / " }, StringSplitOptions.None);
+            for (int i = 0; i < x.Length; i++)
+            {
+                if (int.TryParse(x[i].Split(' ')[0].Trim(), out iChannelCount))
+                {
+                    iCount = i;
+                    if (iChannelCount == iAVSChannelCount)
+                        break;
+                }
+            }
+
+            if (!String.IsNullOrEmpty(strChannelPositions))
+            {
+                x = strChannelPositions.Split(new string[] { " / " }, StringSplitOptions.None);
+                if (iCount < x.Length)
+                    strChannelPositions = x[iCount].Trim();
+            }
+
+            script.AppendFormat(@"# detected channels: {0}{1}", iChannelCount, Environment.NewLine);
+            script.AppendFormat(@"# detected channel positions: {0}{1}", strChannelPositions, Environment.NewLine);
+
             if (iAVSChannelCount != iChannelCount)
                 _log.LogEvent("channel count mismatch! The input file is reporting " + iChannelCount + " channels and the AviSynth script is reporting " + iAVSChannelCount + " channels", ImageType.Warning);
 

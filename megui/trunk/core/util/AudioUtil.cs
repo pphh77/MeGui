@@ -108,16 +108,17 @@ namespace MeGUI
             try
             {
                 string line;
-                StreamReader file = new StreamReader(strAVSFile);
-                while ((line = file.ReadLine()) != null)
+                using (StreamReader file = new StreamReader(strAVSFile))
                 {
-                    if (line.IndexOf(@"# detected channel positions: ") == 0)
+                    while ((line = file.ReadLine()) != null)
                     {
-                        strChannelPositions = line.Substring(30);
-                        break;
+                        if (line.IndexOf(@"# detected channel positions: ") == 0)
+                        {
+                            strChannelPositions = line.Substring(30);
+                            break;
+                        }
                     }
                 }
-                file.Close();
                 return strChannelPositions;
             }
             catch
@@ -126,9 +127,9 @@ namespace MeGUI
             }
         }
 
-        public static int getChannelCountFromAVSFile(String strAVSFile)
+        public static string getChannelCountFromAVSFile(String strAVSFile)
         {
-            int iChannelCount = 0;
+            string strChannelCount = String.Empty;
 
             try
             {
@@ -139,16 +140,16 @@ namespace MeGUI
                     {
                         if (line.IndexOf(@"# detected channels: ") == 0)
                         {
-                            Int32.TryParse(line.Substring(21).Split(' ')[0], out iChannelCount);
+                            strChannelCount = line.Substring(21);
                             break;
                         }
                     }
                 }
-                return iChannelCount;
+                return strChannelCount;
             }
             catch
             {
-                return iChannelCount;
+                return strChannelCount;
             }
         }
     }
