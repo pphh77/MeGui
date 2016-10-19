@@ -119,21 +119,23 @@ namespace eac3to
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
 
+            string strIdentifier = s.Split(',')[0];
             Stream stream = null;
 
-            if ((s.Contains("AVC") || s.Contains("MVC") || s.Contains("VC-1") || s.Contains("MPEG") || 
-                s.Contains("DIRAC") || s.Contains("THEORA")) && !s.Contains("HEVC"))
-                stream = VideoStream.Parse(s, _log);
-            else if ((s.Contains("AC3") || s.Contains("TrueHD") || s.Contains("DTS") ||
-                     s.Contains("RAW") || s.Contains("PCM") || s.Contains("MP") || s.Contains("AAC") ||
-                     s.Contains("FLAC") || s.Contains("WAVPACK") || s.Contains("TTA") 
-                     || s.Contains("VORBIS")) && !s.Contains("HEVC"))
+            if (strIdentifier.Contains("HEVC") || strIdentifier.Contains("VobSub"))
+                stream = new UnknownStream(s, _log);
+            else if (strIdentifier.Contains("AVC") || strIdentifier.Contains("MVC") || strIdentifier.Contains("VC-1") || strIdentifier.Contains("MPEG") ||
+                        strIdentifier.Contains("DIRAC") || strIdentifier.Contains("THEORA"))
+                        stream = VideoStream.Parse(s, _log);
+            else if (strIdentifier.Contains("AC3") || strIdentifier.Contains("TrueHD") || strIdentifier.Contains("DTS") ||
+                        strIdentifier.Contains("RAW") || strIdentifier.Contains("PCM") || strIdentifier.Contains("MP") || strIdentifier.Contains("AAC") ||
+                        strIdentifier.Contains("FLAC") || strIdentifier.Contains("WAVPACK") || strIdentifier.Contains("TTA") || strIdentifier.Contains("VORBIS"))
                 stream = AudioStream.Parse(s, _log);
-            else if (s.Contains("Subtitle"))
+            else if (strIdentifier.Contains("Subtitle"))
                 stream = SubtitleStream.Parse(s, _log);
-            else if (s.Contains("Chapters"))
+            else if (strIdentifier.Contains("Chapters"))
                 stream = ChapterStream.Parse(s, _log);
-            else if (s.Contains("Joined"))
+            else if (strIdentifier.Contains("Joined"))
                 stream = JoinStream.Parse(s, _log);
             else
                 stream = new UnknownStream(s, _log);
