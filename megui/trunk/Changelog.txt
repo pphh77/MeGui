@@ -1,4 +1,5 @@
-2642 [L-SMASH Indexer]      blocked the VC-1 codec as it is not properly supported anymore
+2643 [x264]                 adjusted "--preset slow" settings (requires x264 2721+). Bug #855
+2642 [L-SMASH Indexer]      blocked the VC-1 codec as it is not properly supported anymore. Bug #851
 2641 [AudioEncoder]         fixed handling of MediaInfo information for HD audio tracks
 2640 [AviSynth]             improved debug handling
 2639 [Main]                 removed aspect ratio controls from the video preview control. Bug #843

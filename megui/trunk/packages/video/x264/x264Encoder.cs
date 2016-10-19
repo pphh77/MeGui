@@ -586,8 +586,8 @@ new JobProcessorFactory(new ProcessorFactory(init), "x264Encoder");
                     case x264Settings.x264PresetLevelModes.veryfast: 
                     case x264Settings.x264PresetLevelModes.faster:
                     case x264Settings.x264PresetLevelModes.fast:
-                    case x264Settings.x264PresetLevelModes.medium:      if (xs.METype != 1) display = true; break;
-                    case x264Settings.x264PresetLevelModes.slow: 
+                    case x264Settings.x264PresetLevelModes.medium:
+                    case x264Settings.x264PresetLevelModes.slow:        if (xs.METype != 1) display = true; break;
                     case x264Settings.x264PresetLevelModes.slower:
                     case x264Settings.x264PresetLevelModes.veryslow:    if (xs.METype != 2) display = true; break;
                     case x264Settings.x264PresetLevelModes.placebo:     if (xs.METype != 4) display = true; break;
@@ -729,8 +729,8 @@ new JobProcessorFactory(new ProcessorFactory(init), "x264Encoder");
                     case x264Settings.x264PresetLevelModes.veryfast:    if (xs.X264Trellis != 0) display = true; break;
                     case x264Settings.x264PresetLevelModes.faster: 
                     case x264Settings.x264PresetLevelModes.fast: 
-                    case x264Settings.x264PresetLevelModes.medium:
-                    case x264Settings.x264PresetLevelModes.slow:        if (xs.X264Trellis != 1) display = true; break;
+                    case x264Settings.x264PresetLevelModes.medium:      if (xs.X264Trellis != 1) display = true; break;
+                    case x264Settings.x264PresetLevelModes.slow:
                     case x264Settings.x264PresetLevelModes.slower: 
                     case x264Settings.x264PresetLevelModes.veryslow:
                     case x264Settings.x264PresetLevelModes.placebo:     if (xs.X264Trellis != 2) display = true; break;
