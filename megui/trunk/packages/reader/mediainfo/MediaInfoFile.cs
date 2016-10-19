@@ -1151,6 +1151,11 @@ namespace MeGUI
             if (bWriteableDirOnly && !FileUtil.IsDirWriteable(Path.GetDirectoryName(_file)))
                 return false;
 
+            // some codecs are not supported by LSMASH
+            // VC-1: https://github.com/VFR-maniac/L-SMASH-Works/issues/58
+            if (_VideoInfo.Track.Codec.ToUpperInvariant().Equals("VC-1"))
+                return false;
+
             // only the following container formats are supported
             if (_strContainer.ToUpperInvariant().Equals("MATROSKA") ||
                 _strContainer.ToUpperInvariant().Equals("MPEG-TS") ||
