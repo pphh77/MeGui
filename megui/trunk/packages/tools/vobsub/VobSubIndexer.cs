@@ -95,6 +95,9 @@ namespace MeGUI
 
         protected override void doExitConfig()
         {
+            if (job.SingleFileExport)
+                return;
+
             su.Status = "Generating files...";
 
             string line;

@@ -24,7 +24,7 @@ namespace MeGUI
 {
     public class SubtitleIndexJob : Job
     {
-        private bool indexAllTracks;
+        private bool indexAllTracks, singleFileExport;
         private List<int> trackIDs;
         private int pgc;
         public SubtitleIndexJob() : base()
@@ -34,13 +34,14 @@ namespace MeGUI
             pgc = 1;
 		}
 
-        public SubtitleIndexJob(string input, string output, bool indexAllTracks, List<int> trackIDs, int pgc)
+        public SubtitleIndexJob(string input, string output, bool indexAllTracks, List<int> trackIDs, int pgc, bool singleFileExport)
         {
             Input = input;
             Output = output;
             IndexAllTracks = indexAllTracks;
             TrackIDs = trackIDs;
             PGC = pgc;
+            SingleFileExport = singleFileExport;
         }
 
         
@@ -48,6 +49,12 @@ namespace MeGUI
         {
             get { return indexAllTracks; }
             set { indexAllTracks = value; }
+        }
+
+        public bool SingleFileExport
+        {
+            get { return singleFileExport; }
+            set { singleFileExport = value; }
         }
 
         public List<int> TrackIDs

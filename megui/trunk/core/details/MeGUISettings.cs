@@ -56,7 +56,7 @@ namespace MeGUI
                      overwriteStats, keep2of3passOutput, autoUpdate, deleteCompletedJobs, deleteIntermediateFiles,
                      deleteAbortedOutput, openProgressWindow, bEac3toAutoSelectStreams, bUseFDKAac,
                      alwaysOnTop, addTimePosition, alwaysbackupfiles, bUseITU, bEac3toLastUsedFileMode,
-                     bAutoLoadDG, bAutoStartQueueStartup, b64bitX264, bAlwayUsePortableAviSynth,
+                     bAutoLoadDG, bAutoStartQueueStartup, b64bitX264, bAlwayUsePortableAviSynth, bVobSubberSingleFileExport,
                      bEnsureCorrectPlaybackSpeed, bOpenAVSInThread, bExternalMuxerX264, bUseNeroAacEnc;
         private decimal forceFilmThreshold, acceptableFPSError;
         private int nbPasses, autoUpdateServerSubList, minComplexity, updateFormSplitter,
@@ -176,6 +176,7 @@ namespace MeGUI
             bUseNeroAacEnc = bUseFDKAac = bUseQAAC = bUseX265 = bUseDGIndexNV = bUseDGIndexIM = false;
             chapterCreatorMinimumLength = 900;
             bExternalMuxerX264 = true;
+            bVobSubberSingleFileExport = false;
         }
 
         #region properties
@@ -953,6 +954,12 @@ namespace MeGUI
         {
             get { return chapterCreatorMinimumLength; }
             set { chapterCreatorMinimumLength = value; }
+        }
+
+        public bool VobSubberSingleFileExport
+        {
+            get { return bVobSubberSingleFileExport; }
+            set { bVobSubberSingleFileExport = value; }
         }
 
         /// <summary>

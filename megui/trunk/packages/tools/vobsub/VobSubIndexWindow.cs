@@ -40,6 +40,7 @@ namespace MeGUI
         public VobSubIndexWindow(MainForm mainForm)
         {
             InitializeComponent();
+            this.chkSingleFileExport.Checked = MainForm.Instance.Settings.VobSubberSingleFileExport;
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -105,7 +106,7 @@ namespace MeGUI
             {
                 trackIDs.Add(Int32.Parse(s.Substring(1,2)));
             }
-            return new SubtitleIndexJob(input.Filename, output.Filename, keepAllTracks.Checked, trackIDs, (int)pgc.Value);
+            return new SubtitleIndexJob(input.Filename, output.Filename, keepAllTracks.Checked, trackIDs, (int)pgc.Value, chkSingleFileExport.Checked);
         }
 
         public void setConfig(string input, string output, bool indexAllTracks, List<int> trackIDs, int pgc)
@@ -174,6 +175,11 @@ namespace MeGUI
 
             openVideo(input.Filename);
             checkIndexIO();
+        }
+
+        private void chkSingleFileExport_CheckedChanged(object sender, EventArgs e)
+        {
+            MainForm.Instance.Settings.VobSubberSingleFileExport = this.chkSingleFileExport.Checked;
         }
     }
 

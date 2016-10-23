@@ -1161,7 +1161,7 @@ namespace MeGUI
             if (arrDVDSub.Count > 0)
             {
                 string outputFile = Path.Combine(dpp.WorkingDirectory, Path.GetFileNameWithoutExtension(strInput)) + ".idx";
-                SubtitleIndexJob oJob = new SubtitleIndexJob(strInput, outputFile, false, arrDVDSub, _videoInputInfo.VideoInfo.PGCNumber);
+                SubtitleIndexJob oJob = new SubtitleIndexJob(strInput, outputFile, false, arrDVDSub, _videoInputInfo.VideoInfo.PGCNumber, false);
                 prepareJobs = new SequentialChain(new SequentialChain(prepareJobs), new SequentialChain(oJob));
             }
 
