@@ -328,6 +328,67 @@ namespace MeGUI.core.util
         }
 
         /// <summary>
+        /// Gets the proper output path
+        /// </summary>
+        /// <param name"strInputFileorFolder">input file or folder name</param>
+        public static string GetOutputFolder(string strInputFileorFolder)
+        {
+            string outputPath = MainForm.Instance.Settings.DefaultOutputDir;
+
+            // checks if the default output dir does exist and is writable
+            if (string.IsNullOrEmpty(outputPath) || !Directory.Exists(outputPath) || !IsDirWriteable(outputPath))
+            {
+                if (Directory.Exists(strInputFileorFolder))
+                    outputPath = strInputFileorFolder;
+                else
+                    outputPath = Path.GetDirectoryName(strInputFileorFolder);
+            }
+                
+            return outputPath;
+        }
+
+        /// <summary>
+        /// Gets the file prefix based on the folder structure
+        /// </summary>
+        /// <param name"strInputFile">input file name</param>
+        public static string GetOutputFilePrefix(string strInputFile)
+        { 
+            string outputFilePrefix = string.Empty;
+
+            // checks if the input is a folder name
+            if (Directory.Exists(strInputFile))
+                return outputFilePrefix;
+
+            string strExtension = Path.GetExtension(strInputFile).ToUpperInvariant();
+            if (!strExtension.Equals(".IFO") && !strExtension.Equals(".MPLS"))
+                return outputFilePrefix;
+
+            // get the folder name only
+            string folderTemp = Path.GetDirectoryName(strInputFile);
+
+            // skip the DVD/Blu-ray directories
+            while (folderTemp.ToUpperInvariant().EndsWith("VIDEO_TS") ||
+                    folderTemp.ToUpperInvariant().EndsWith("PLAYLIST") ||
+                    folderTemp.ToUpperInvariant().EndsWith("STREAM") ||
+                    folderTemp.ToUpperInvariant().EndsWith("BDMV"))
+                folderTemp = Path.GetDirectoryName(folderTemp);
+
+            if (Path.GetPathRoot(folderTemp).Equals(folderTemp))
+            {
+                // root directory; get the volume label
+                DriveInfo di = new DriveInfo(folderTemp);
+                outputFilePrefix = di.VolumeLabel;
+            }
+            else
+            {
+                // get the folder name
+                outputFilePrefix = Path.GetFileName(folderTemp);
+            }
+
+            return outputFilePrefix + "_";
+        }
+
+        /// <summary>
         /// Attempts to delete all files and directories listed 
         /// in job.FilesToDelete if settings.DeleteIntermediateFiles is checked
         /// </summary>

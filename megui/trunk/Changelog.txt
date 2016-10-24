@@ -1,3 +1,5 @@
+2646 [VobSubber] +          use the default MeGUI output path if possible. Feature request #597
+     [ChapterCreator]       for DVD/Blu-ray sources a prefix is attached to the output file name. Feature request #597
 2645 [VobSubber]            added option to demux all tracks in a single file (as before 2637). Feature request #595
 2644 [HD Streams Extractor] added IDX/VobSub as unsupported format
 2643 [x264]                 adjusted "--preset slow" settings (requires x264 2721+). Bug #855

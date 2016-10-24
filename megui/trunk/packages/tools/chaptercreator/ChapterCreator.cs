@@ -422,13 +422,10 @@ namespace MeGUI
             else
                 bFPSKnown = false;
 
-            string path = String.Empty;
-            if (Directory.Exists(MainForm.Instance.Settings.DefaultOutputDir) && FileUtil.IsDirWriteable(MainForm.Instance.Settings.DefaultOutputDir))
-                path = MainForm.Instance.Settings.DefaultOutputDir;
-            else if (!String.IsNullOrEmpty(input.Text) && Directory.Exists(Path.GetDirectoryName(input.Text)) && FileUtil.IsDirWriteable(Path.GetDirectoryName(input.Text)))
-                path = Path.GetDirectoryName(input.Text);
-
+            string path = FileUtil.GetOutputFolder(input.Text);
+            string filePrefix = FileUtil.GetOutputFilePrefix(input.Text);
             string file = String.Empty;
+
             if (String.IsNullOrEmpty(Path.GetFileNameWithoutExtension(input.Text)))
                 file = "Chapter Information.txt";
             else
@@ -438,10 +435,7 @@ namespace MeGUI
             else if (rbQPF.Checked)
                 Path.ChangeExtension(file, "qpf");
 
-            if (String.IsNullOrEmpty(path))
-                output.Text = file;
-            else
-                output.Text = Path.Combine(path, file);
+            output.Text = Path.Combine(path, filePrefix + file);
         }
 
 		private void showVideoButton_Click(object sender, System.EventArgs e)

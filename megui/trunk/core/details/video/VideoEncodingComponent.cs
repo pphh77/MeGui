@@ -333,9 +333,7 @@ namespace MeGUI
             if (MainForm.Instance.Settings.AutoOpenScript)
                 openAvisynthScript(fileName);
 
-            string filePath;
-            if (string.IsNullOrEmpty(filePath = MainForm.Instance.Settings.DefaultOutputDir))
-                filePath = Path.GetDirectoryName(fileName);
+            string filePath = FileUtil.GetOutputFolder(fileName);
             string fileNameNoExtension = Path.GetFileNameWithoutExtension(fileName);
             this.VideoOutput = Path.Combine(filePath, fileNameNoExtension) + MainForm.Instance.Settings.VideoExtension + ".extension";
             this.VideoOutput = Path.ChangeExtension(this.VideoOutput, this.CurrentVideoOutputType.Extension);

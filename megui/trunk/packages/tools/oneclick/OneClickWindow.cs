@@ -298,15 +298,11 @@ namespace MeGUI
                         output.Filename = Path.Combine(_oSettings.DefaultOutputDirectory, workingName.Text + "." +
                             ((ContainerType)containerFormat.SelectedItem).Extension);
                     }
-                    else if (!String.IsNullOrEmpty(MainForm.Instance.Settings.DefaultOutputDir) && Directory.Exists(MainForm.Instance.Settings.DefaultOutputDir))
-                    {
-                        output.Filename = Path.Combine(MainForm.Instance.Settings.DefaultOutputDir, workingName.Text + "." +
-                            ((ContainerType)containerFormat.SelectedItem).Extension);
-                    }
                     else
                     {
-                        output.Filename = Path.Combine(Path.GetDirectoryName(strVideoInput), workingName.Text + "." +
-                            ((ContainerType)containerFormat.SelectedItem).Extension);
+                        string outputPath = FileUtil.GetOutputFolder(strVideoInput);
+                        output.Filename = Path.Combine(outputPath, workingName.Text + "." +
+                           ((ContainerType)containerFormat.SelectedItem).Extension);
                     }
                 }
                 else

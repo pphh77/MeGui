@@ -188,12 +188,7 @@ namespace MeGUI.packages.tools.hdbdextractor
                 return;
 
             if (String.IsNullOrEmpty(FolderOutputTextBox.Text))
-            {
-                if (!String.IsNullOrEmpty(MainForm.Instance.Settings.DefaultOutputDir))
-                    FolderOutputTextBox.Text = MainForm.Instance.Settings.DefaultOutputDir;
-                else
-                    FolderOutputTextBox.Text = outputFolder;
-            }
+                FolderOutputTextBox.Text = MeGUI.core.util.FileUtil.GetOutputFolder(outputFolder);
 
             FeatureDataGridView.DataSource = null;
             FeatureDataGridView.Rows.Clear();

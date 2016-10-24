@@ -82,6 +82,7 @@ namespace MeGUI
             // 
             // pgc
             // 
+            this.pgc.Enabled = false;
             this.pgc.Location = new System.Drawing.Point(120, 45);
             this.pgc.Maximum = new decimal(new int[] {
             99,

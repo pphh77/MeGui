@@ -232,9 +232,8 @@ namespace MeGUI.core.gui
                                               "Try to recreate it with the appropriate tools." + e.Message, e);
             }
 
-            string projectPath;
-            if (!string.IsNullOrEmpty(projectPath = MainForm.Instance.Settings.DefaultOutputDir))
-                AudioOutput = Path.Combine(projectPath, Path.GetFileName(AudioOutput));
+            string projectPath = FileUtil.GetOutputFolder(fileName);
+            AudioOutput = Path.Combine(projectPath, Path.GetFileName(AudioOutput));
             
             audioContainer_SelectedIndexChanged(null, null);         
         }

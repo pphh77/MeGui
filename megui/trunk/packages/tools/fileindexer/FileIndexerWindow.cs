@@ -371,10 +371,8 @@ namespace MeGUI
         {
             if (!String.IsNullOrEmpty(this.input.Filename))
             {
-                string projectPath = "";
+                string projectPath = FileUtil.GetOutputFolder(this.input.Filename);
                 string fileNameNoPath = Path.GetFileName(this.input.Filename);
-                if (string.IsNullOrEmpty(projectPath = MainForm.Instance.Settings.DefaultOutputDir))
-                    projectPath = Path.GetDirectoryName(this.input.Filename);
                 switch (IndexerUsed)
                 {
                     case IndexType.D2V: output.Text = Path.Combine(projectPath, Path.ChangeExtension(fileNameNoPath, ".d2v")); break;

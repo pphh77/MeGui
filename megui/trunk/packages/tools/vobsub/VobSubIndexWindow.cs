@@ -86,6 +86,7 @@ namespace MeGUI
             subtitleTracks.Items.Clear();
             uint nbPGC = IFOparser.getPGCnb(fileName);
             pgc.Maximum = nbPGC;
+            pgc.Enabled = (nbPGC > 1);
             subtitleTracks.Items.AddRange(IFOparser.GetSubtitlesStreamsInfos(input.Filename, Convert.ToInt32(pgc.Value), chkShowAllStreams.Checked));
             demuxSelectedTracks.Checked = !keepAllTracks.Checked;
         }
@@ -114,6 +115,7 @@ namespace MeGUI
             this.dialogMode = true;
             queueButton.Text = "Update";
             this.input.Filename = input;
+            this.pgc.Value = pgc;
             openVideo(input);
             this.output.Filename = output;
             checkIndexIO();
@@ -136,7 +138,6 @@ namespace MeGUI
                     subtitleTracks.SetItemChecked(idx, true);
                 }
             }
-            this.pgc.Value = pgc;
         }
 
         /// <summary>
@@ -149,8 +150,13 @@ namespace MeGUI
 
         private void input_FileSelected(FileBar sender, FileBarEventArgs args)
         {
+            this.pgc.Value = 1;
             openVideo(input.Filename);
-            output.Filename = Path.ChangeExtension(input.Filename, ".idx");
+
+            string filePath = FileUtil.GetOutputFolder(input.Filename);
+            string filePrefix = FileUtil.GetOutputFilePrefix(input.Filename);
+
+            output.Filename = Path.Combine(filePath, filePrefix + Path.GetFileName(Path.ChangeExtension(input.Filename, ".idx")));
             checkIndexIO();
         }
 

@@ -315,19 +315,16 @@ namespace MeGUI
             string ext, projectPath, fileNameNoPath;
 
             indexFile = indexFileTemp;
-            projectPath = mainForm.Settings.DefaultOutputDir;
             if (String.IsNullOrEmpty(indexFile))
             {
                 ext = Path.GetExtension(videoInput).ToLowerInvariant();
-                if (string.IsNullOrEmpty(projectPath))
-                    projectPath = Path.GetDirectoryName(videoInput);
+                projectPath = FileUtil.GetOutputFolder(videoInput);
                 fileNameNoPath = Path.GetFileName(videoInput);
             }
             else
             {
                 ext = Path.GetExtension(indexFile).ToLowerInvariant();
-                if (string.IsNullOrEmpty(projectPath))
-                    projectPath = Path.GetDirectoryName(indexFile);
+                projectPath = FileUtil.GetOutputFolder(indexFile);
                 fileNameNoPath = Path.GetFileName(indexFile);
             }           
             videoOutput.Filename = Path.Combine(projectPath, Path.ChangeExtension(fileNameNoPath, ".avs"));

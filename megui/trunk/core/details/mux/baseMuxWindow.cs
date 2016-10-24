@@ -241,10 +241,8 @@ namespace MeGUI
 
         private void chooseOutputFilename()
         {
-            string projectPath;
+            string projectPath = FileUtil.GetOutputFolder(vInput.Filename);
             string fileNameNoPath = Path.GetFileName(vInput.Filename);
-            if (string.IsNullOrEmpty(projectPath = mainForm.Settings.DefaultOutputDir))
-                projectPath = Path.GetDirectoryName(vInput.Filename);
             output.Filename = FileUtil.AddToFileName(Path.Combine(projectPath, fileNameNoPath), "-muxed");
             ChangeOutputExtension();
         }
