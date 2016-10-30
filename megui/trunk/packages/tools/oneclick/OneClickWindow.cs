@@ -175,12 +175,12 @@ namespace MeGUI
                     filter += "|All DGIndexNV supported files|*.264;*.h264;*.avc;*.m2v;*.mpv;*.vc1;*.mkv;*.vob;*.mp4;*.mpg;*.mpeg;*.m2t;*.m2ts;*.mts;*.tp;*.ts;*.trp";
                 if (MainForm.Instance.Settings.IsDGMIndexerAvailable())
                     filter += "|All DGIndexIM supported files|*.264;*.h264;*.avc;*.m2v;*.mpv;*.vc1;*.mkv;*.vob;*.mp4;*.mpg;*.mpeg;*.m2t;*.m2ts;*.mts;*.tp;*.ts;*.trp";
-                filter = "All supported files|*.avs;*.ifo;*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.264;*.h264;*.avc;*.m2t*;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.pva;*.vro;*.vc1|" + filter + "|All files|*.*";
+                filter = "All supported files|*.avs;*.ifo;*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.264;*.h264;*.avc;*.m2t*;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.pva;*.vro;*.vc1;*.mpls|" + filter + "|All files|*.*";
                 input.Filter = filter;
             }
             else
             {
-                filter = "All supported files|*.avs;*.ifo;*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.264;*.h264;*.avc;*.m2t*;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.pva;*.vro|" + filter + "|All files|*.*";
+                filter = "All supported files|*.avs;*.ifo;*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.264;*.h264;*.avc;*.m2t*;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.pva;*.vro;*.mpls|" + filter + "|All files|*.*";
                 input.Filter = filter;
             }
 
@@ -266,22 +266,25 @@ namespace MeGUI
             int iPGCNumber = 0;
             if (_videoInputInfo != null)
                 iPGCNumber = _videoInputInfo.VideoInfo.PGCNumber;
-            
-            if (iPGCNumber > 1)
+
+            string filePath = FileUtil.GetOutputFolder(strInputFile);
+            string filePrefix = FileUtil.GetOutputFilePrefix(strInputFile);
+            string fileName = Path.GetFileNameWithoutExtension(strInputFile);
+            string strTempName = strInputFile;
+
+            if (iPGCNumber > 0)
             {
-                String strTempName = Path.GetFileNameWithoutExtension(strInputFile);
-                if (strTempName.StartsWith("VTS_", StringComparison.InvariantCultureIgnoreCase) &&
-                    strTempName.EndsWith("1", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    strTempName = strTempName.Substring(0, strTempName.Length - 1) + iPGCNumber;
-                    strTempName = Path.Combine(Path.GetDirectoryName(strInputFile), strTempName + Path.GetExtension(strInputFile));
-                    workingName.Text = PrettyFormatting.ExtractWorkingName(strTempName, _oSettings.LeadingName, _oSettings.WorkingNameReplace, _oSettings.WorkingNameReplaceWith);
-                }
+                // DVD structure found, create the output file name
+                if (FileUtil.RegExMatch(fileName, @"_\d{1,2}\z", false))
+                    fileName = fileName.Substring(0, fileName.LastIndexOf('_') + 1);
                 else
-                    workingName.Text = PrettyFormatting.ExtractWorkingName(strInputFile, _oSettings.LeadingName, _oSettings.WorkingNameReplace, _oSettings.WorkingNameReplaceWith);
+                    fileName = fileName + "_";
+                strTempName = Path.Combine(filePath, filePrefix + fileName + iPGCNumber + Path.GetExtension(strInputFile)); 
             }
             else
-                workingName.Text = PrettyFormatting.ExtractWorkingName(strInputFile, _oSettings.LeadingName, _oSettings.WorkingNameReplace, _oSettings.WorkingNameReplaceWith);
+                strTempName = Path.Combine(filePath, filePrefix + fileName + Path.GetExtension(strInputFile));
+
+            workingName.Text = PrettyFormatting.ExtractWorkingName(strTempName, _oSettings.LeadingName, _oSettings.WorkingNameReplace, _oSettings.WorkingNameReplaceWith);
 
             this.updateFilename();
         }
@@ -744,11 +747,9 @@ namespace MeGUI
                 }
             }
 
-
             // prepare input file
             if (Path.GetExtension(_videoInputInfo.FileName.ToUpperInvariant()) == ".VOB")
             {
-                // create pgcdemux job if needed
                 string videoIFO;
                 // PGC numbers are not present in VOB, so we check the main IFO
                 if (Path.GetFileName(_videoInputInfo.FileName).ToUpperInvariant().Substring(0, 4) == "VTS_")
@@ -758,17 +759,13 @@ namespace MeGUI
 
                 if (File.Exists(videoIFO))
                 {
+                    // pgcdemux must be used as either multiple PGCs or a multi-angle disc can be the source
                     dpp.IFOInput = videoIFO;
-                    if (IFOparser.getPGCnb(videoIFO) > 1)
-                    {
-                        // more than one PGC - therefore pgcdemux must be used
-                        prepareJobs = new SequentialChain(new PgcDemuxJob(videoIFO, dpp.WorkingDirectory, _videoInputInfo.VideoInfo.PGCNumber));
-                        
-                        for (int i = 1; i < 10; i++)
-                            dpp.FilesToDelete.Add(Path.Combine(dpp.WorkingDirectory, "VTS_01_" + i + ".VOB"));
-                        dpp.VideoInput = Path.Combine(dpp.WorkingDirectory, "VTS_01_1.VOB");
-                        dpp.ApplyDelayCorrection = true;
-                    }
+                    prepareJobs = new SequentialChain(new PgcDemuxJob(videoIFO, Path.Combine(dpp.WorkingDirectory, "VTS_01_1.VOB"), _videoInputInfo.VideoInfo.PGCNumber));
+                    for (int i = 1; i < 10; i++)
+                        dpp.FilesToDelete.Add(Path.Combine(dpp.WorkingDirectory, "VTS_01_" + i + ".VOB"));
+                    dpp.VideoInput = Path.Combine(dpp.WorkingDirectory, "VTS_01_1.VOB");
+                    dpp.ApplyDelayCorrection = true;
                 }
             }
 
@@ -1138,7 +1135,7 @@ namespace MeGUI
                                 strInput = Path.ChangeExtension(strInput, ".IFO");
                         }
                         arrDVDSub.Add(oStream.SelectedStream.TrackInfo.MMGTrackID);
-                        string outputFile = Path.Combine(dpp.WorkingDirectory, Path.GetFileNameWithoutExtension(strInput)) + "_" + _videoInputInfo.VideoInfo.PGCNumber + "_" + oStream.SelectedStream.TrackInfo.MMGTrackID + ".idx";
+                        string outputFile = Path.Combine(dpp.WorkingDirectory, Path.GetFileNameWithoutExtension(strInput)) + "_" + oStream.SelectedStream.TrackInfo.MMGTrackID + ".idx";
                         oStream.SelectedStream.DemuxFilePath = outputFile;
                         dpp.FilesToDelete.Add(outputFile);
                         dpp.FilesToDelete.Add(Path.ChangeExtension(outputFile, ".sub"));

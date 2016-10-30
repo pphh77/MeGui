@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 using ICSharpCode.SharpZipLib.Zip;
@@ -330,18 +331,20 @@ namespace MeGUI.core.util
         /// <summary>
         /// Gets the proper output path
         /// </summary>
-        /// <param name"strInputFileorFolder">input file or folder name</param>
-        public static string GetOutputFolder(string strInputFileorFolder)
+        /// <param name"strInputFileOrFolder">input file or folder name</param>
+        /// <returns>either the default output path or a path based on the input file/folder</returns>
+        public static string GetOutputFolder(string strInputFileOrFolder)
         {
             string outputPath = MainForm.Instance.Settings.DefaultOutputDir;
 
             // checks if the default output dir does exist and is writable
             if (string.IsNullOrEmpty(outputPath) || !Directory.Exists(outputPath) || !IsDirWriteable(outputPath))
             {
-                if (Directory.Exists(strInputFileorFolder))
-                    outputPath = strInputFileorFolder;
+                // default output directory does not exist, use the input folder instead
+                if (Directory.Exists(strInputFileOrFolder))
+                    outputPath = strInputFileOrFolder;
                 else
-                    outputPath = Path.GetDirectoryName(strInputFileorFolder);
+                    outputPath = Path.GetDirectoryName(strInputFileOrFolder);
             }
                 
             return outputPath;
@@ -351,17 +354,61 @@ namespace MeGUI.core.util
         /// Gets the file prefix based on the folder structure
         /// </summary>
         /// <param name"strInputFile">input file name</param>
+        /// <returns>a file prefix if a DVD/Blu-ray structure is found or an emtpy string</returns>
         public static string GetOutputFilePrefix(string strInputFile)
         { 
             string outputFilePrefix = string.Empty;
 
-            // checks if the input is a folder name
+            // checks if the input is a folder name (only files are supported)
             if (Directory.Exists(strInputFile))
                 return outputFilePrefix;
 
+            // checks if the extension is supported
             string strExtension = Path.GetExtension(strInputFile).ToUpperInvariant();
-            if (!strExtension.Equals(".IFO") && !strExtension.Equals(".MPLS"))
+            if (!strExtension.Equals(".IFO") && !strExtension.Equals(".MPLS") 
+                && !strExtension.Equals(".VOB") && !strExtension.Equals(".M2TS"))
                 return outputFilePrefix;
+
+            if (strExtension.Equals(".VOB") || strExtension.Equals(".IFO"))
+            {
+                // check for DVD structure
+                string fileName = Path.GetFileNameWithoutExtension(strInputFile);
+                if (!RegExMatch(fileName, @"\AVTS_\d{2}_\d{1}\z", true))
+                    return outputFilePrefix;
+
+                // checks for corresponding VOB/IFO file
+                fileName = fileName.Substring(0, 7);
+                if (strExtension.Equals(".VOB"))
+                    fileName += "0.IFO";
+                else
+                    fileName += "1.VOB";
+
+                // checks if corresponding VOB/IFO does exist
+                if (!File.Exists(Path.Combine(Path.GetDirectoryName(strInputFile), fileName)))
+                    return outputFilePrefix;
+            }
+            else
+            {
+                // check for Blu-ray structure
+                if (RegExMatch(strInputFile, @"\\playlist\\\d{5}\.mpls\z", true))
+                {
+                    // mpls structure
+                    // checks if corresponding M2TS structure exists
+                    string checkFolder = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(strInputFile)), "STREAM");
+                    if (!Directory.Exists(checkFolder) || Directory.GetFiles(checkFolder, "*.m2ts").Length == 0)
+                        return outputFilePrefix;
+                }
+                else if (RegExMatch(strInputFile, @"\\stream\\\d{5}\.m2ts\z", true))
+                {
+                    // m2ts structure
+                    // checks if corresponding MPLS structure exists
+                    string checkFolder = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(strInputFile)), "PLAYLIST");
+                    if (!Directory.Exists(checkFolder) || Directory.GetFiles(checkFolder, "*.mpls").Length == 0)
+                        return outputFilePrefix;
+                }
+                else
+                    return outputFilePrefix;
+            }
 
             // get the folder name only
             string folderTemp = Path.GetDirectoryName(strInputFile);
@@ -385,7 +432,25 @@ namespace MeGUI.core.util
                 outputFilePrefix = Path.GetFileName(folderTemp);
             }
 
-            return outputFilePrefix + "_";
+            // remove any illegal characters from the prefix string
+            return string.Join("_", outputFilePrefix.Split(Path.GetInvalidFileNameChars())) + "_";
+        }
+
+        /// <summary>
+        /// Gets the file prefix based on the folder structure
+        /// </summary>
+        /// <param name"text">the text to search in</param>
+        /// <param name"pattern">RegEx search pattern</param>
+        /// <param name"bIgnoreCase">if the search should be not case sensitive</param>
+        /// <returns>true if the pattern does match the text</returns>
+        public static bool RegExMatch(string text, string pattern, bool bIgnoreCase)
+        {
+            // https://msdn.microsoft.com/en-us/library/az24scfc(v=vs.110).aspx
+            Regex regex = new Regex(pattern);
+            if (bIgnoreCase)
+                regex = new Regex(pattern, RegexOptions.IgnoreCase);
+            Match match = regex.Match(text);
+            return match.Success;
         }
 
         /// <summary>

@@ -172,6 +172,14 @@ namespace MeGUI.packages.tools.oneclick
         /// <returns>true if the files/folder can be processed as BluRay, false otherwise</returns>
         private bool getInputBluRayBased(OneClickSettings oSettings)
         {
+            if (FileUtil.RegExMatch(this.strInput, @"\\playlist\\\d{5}\.mpls\z", true))
+            {
+                // mpls file selected - if Blu-ray structure exists, the playlist will be directly openend
+                string checkFolder = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(this.strInput)), "STREAM");
+                if (Directory.Exists(checkFolder) && Directory.GetFiles(checkFolder, "*.m2ts").Length > 0)
+                    return false;
+            }
+
             string path = this.strInput;
             while (!Path.GetFullPath(path).Equals(Path.GetPathRoot(path)))
             {
