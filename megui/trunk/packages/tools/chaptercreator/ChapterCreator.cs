@@ -424,18 +424,20 @@ namespace MeGUI
 
             string path = FileUtil.GetOutputFolder(input.Text);
             string filePrefix = FileUtil.GetOutputFilePrefix(input.Text);
-            string file = String.Empty;
+            string fileName = Path.GetFileNameWithoutExtension(input.Text);
+            if (FileUtil.RegExMatch(fileName, @"_\d{1,2}\z", false))
+            {
+                // file ends with e.g. _1 as in VTS_01_1
+                fileName = fileName.Substring(0, fileName.LastIndexOf('_'));
+            }
 
-            if (String.IsNullOrEmpty(Path.GetFileNameWithoutExtension(input.Text)))
-                file = "Chapter Information.txt";
-            else
-                file = Path.GetFileNameWithoutExtension(input.Text) + " - Chapter Information.txt";
+            fileName = filePrefix + fileName + "_" + this.pgc.TitleNumber + " - Chapter Information.txt";
             if (rbXML.Checked)
-                Path.ChangeExtension(file, "xml");
+                fileName = Path.ChangeExtension(fileName, "xml");
             else if (rbQPF.Checked)
-                Path.ChangeExtension(file, "qpf");
+                fileName = Path.ChangeExtension(fileName, "qpf");
 
-            output.Text = Path.Combine(path, filePrefix + file);
+            output.Text = Path.Combine(path, fileName);
         }
 
 		private void showVideoButton_Click(object sender, System.EventArgs e)

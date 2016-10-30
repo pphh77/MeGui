@@ -1,3 +1,4 @@
+2649 [ChapterCreator]       added the PGC number to the output as suffix
 2648 [VobSubber]            added the PGC number to the output as suffix
                             preselect tracks based on the default language(s)
 							improved logging
