@@ -365,6 +365,7 @@ namespace MeGUI
             this.cbPGC.Name = "cbPGC";
             this.cbPGC.Size = new System.Drawing.Size(56, 21);
             this.cbPGC.TabIndex = 7;
+            this.cbPGC.SelectedIndexChanged += new System.EventHandler(this.cbPGC_SelectedIndexChanged);
             // 
             // lblPGC
             // 

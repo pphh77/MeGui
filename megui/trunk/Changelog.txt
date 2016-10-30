@@ -1,3 +1,8 @@
+2651 [FileIndexer]          added IFO as supported input files
+                            improved PGC handling
+2650 [OneClick] +           for DVD/Blu-ray sources a prefix and suffix is attached to the output file name. Feature request #597
+     [FileIndexer]          pgcdemux will be used in any case as a workaround for multi-angle DVDs
+	                        added MPLS as supported input files (OneClick)
 2649 [ChapterCreator]       added the PGC number to the output as suffix
 2648 [VobSubber]            added the PGC number to the output as suffix
                             preselect tracks based on the default language(s)

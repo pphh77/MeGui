@@ -101,16 +101,16 @@ namespace MeGUI
 
         private void CheckDGIIndexer()
         {
-            string filter = "All DGIndex supported files|*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.tp;*.ts;*.trp;*.m2t;*.m2ts;*.pva;*.vro";
-            filter += "|All FFMS Indexer supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.vob;*.mpg;*.m2ts;*.ts";
-            filter += "|All LSMASH Indexer supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.vob;*.mpg;*.m2ts;*.ts";
+            string filter = "All DGIndex supported files|*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.tp;*.ts;*.trp;*.m2t;*.m2ts;*.pva;*.vro;*.ifo";
+            filter += "|All FFMS Indexer supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.vob;*.mpg;*.m2ts;*.ts;*.ifo";
+            filter += "|All LSMASH Indexer supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.vob;*.mpg;*.m2ts;*.ts;*.ifo";
             if (MainForm.Instance.Settings.IsDGIIndexerAvailable() || MainForm.Instance.Settings.IsDGMIndexerAvailable())
             {
                 if (MainForm.Instance.Settings.IsDGIIndexerAvailable())
-                    filter += "|All DGIndexNV supported files|*.264;*.h264;*.avc;*.m2v;*.mpv;*.vc1;*.mkv;*.vob;*.mp4;*.mpg;*.mpeg;*.m2t;*.m2ts;*.mts;*.tp;*.ts;*.trp";
+                    filter += "|All DGIndexNV supported files|*.264;*.h264;*.avc;*.m2v;*.mpv;*.vc1;*.mkv;*.vob;*.mp4;*.mpg;*.mpeg;*.m2t;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.ifo";
                 if (MainForm.Instance.Settings.IsDGMIndexerAvailable())
-                    filter += "|All DGIndexIM supported files|*.264;*.h264;*.avc;*.m2v;*.mpv;*.vc1;*.mkv;*.vob;*.mp4;*.mpg;*.mpeg;*.m2t;*.m2ts;*.mts;*.tp;*.ts;*.trp";
-                filter += "|All supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.264;*.h264;*.avc;*.m2t*;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.pva;*.vro;*.vc1";
+                    filter += "|All DGIndexIM supported files|*.264;*.h264;*.avc;*.m2v;*.mpv;*.vc1;*.mkv;*.vob;*.mp4;*.mpg;*.mpeg;*.m2t;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.ifo";
+                filter += "|All supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.264;*.h264;*.avc;*.m2t*;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.pva;*.vro;*.vc1;*.ifo";
                 filter += "|All files|*.*";
                 input.Filter = filter;
                 if (MainForm.Instance.Settings.IsDGIIndexerAvailable() && MainForm.Instance.Settings.IsDGMIndexerAvailable())
@@ -120,7 +120,7 @@ namespace MeGUI
             }
             else
             {
-                filter += "|All supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.264;*.h264;*.avc;*.m2t*;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.pva;*.vro";
+                filter += "|All supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.264;*.h264;*.avc;*.m2t*;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.pva;*.vro;*.ifo";
                 filter += "|All files|*.*";
                 input.Filter = filter;
                 input.FilterIndex = 4;
@@ -241,6 +241,19 @@ namespace MeGUI
 
         private void input_FileSelected(FileBar sender, FileBarEventArgs args)
         {
+            if (Path.GetExtension(input.Filename.ToUpperInvariant()) == ".VOB")
+            {
+                // switch to IFO if possible as a VOB file is used
+                string videoIFO;
+                if (Path.GetFileName(input.Filename).ToUpperInvariant().Substring(0, 4) == "VTS_")
+                    videoIFO = input.Filename.Substring(0, input.Filename.LastIndexOf("_")) + "_0.IFO";
+                else
+                    videoIFO = Path.ChangeExtension(input.Filename, ".IFO");
+
+                if (File.Exists(videoIFO))
+                    input.Filename = videoIFO;
+            }
+
             openVideo(input.Filename);
             checkIndexIO();
         }
@@ -274,14 +287,13 @@ namespace MeGUI
 
             cbPGC.Items.Clear();
             if (iFile.VideoInfo.PGCCount <= 0)
-                cbPGC.Items.Add("none");
+                cbPGC.Items.Add("n/a");
             else if (iFile.VideoInfo.PGCCount == 1)
                 cbPGC.Items.Add("all");
             else
             {
-                cbPGC.Items.Add("all");
-                for (int i = 1; i < iFile.VideoInfo.PGCCount; i++)
-                    cbPGC.Items.Add(i.ToString());
+                for (int i = 0; i < iFile.VideoInfo.PGCCount; i++)
+                    cbPGC.Items.Add((i+1).ToString());
             }
             cbPGC.SelectedIndex = 0;
             cbPGC.Enabled = iFile.VideoInfo.PGCCount > 1;
@@ -369,18 +381,30 @@ namespace MeGUI
         /// </summary>
         private void setOutputFileName()
         {
-            if (!String.IsNullOrEmpty(this.input.Filename))
+            if (String.IsNullOrEmpty(this.input.Filename))
+                return;
+
+            string projectPath = FileUtil.GetOutputFolder(this.input.Filename);
+            string fileNamePrefix = FileUtil.GetOutputFilePrefix(this.input.Filename);
+            string fileNameNoPath = Path.GetFileName(this.input.Filename);
+
+            string fileName = Path.GetFileNameWithoutExtension(this.input.Filename);
+            if (Path.GetExtension(this.input.Filename).ToUpperInvariant().Equals(".IFO") 
+                && FileUtil.RegExMatch(fileName, @"_\d{1,2}\z", false))
             {
-                string projectPath = FileUtil.GetOutputFolder(this.input.Filename);
-                string fileNameNoPath = Path.GetFileName(this.input.Filename);
-                switch (IndexerUsed)
-                {
-                    case IndexType.D2V: output.Text = Path.Combine(projectPath, Path.ChangeExtension(fileNameNoPath, ".d2v")); break;
-                    case IndexType.DGM:
-                    case IndexType.DGI: output.Text = Path.Combine(projectPath, Path.ChangeExtension(fileNameNoPath, ".dgi")); break;
-                    case IndexType.FFMS: output.Text = Path.Combine(projectPath, fileNameNoPath + ".ffindex"); break;
-                    case IndexType.LSMASH: output.Text = Path.Combine(projectPath, fileNameNoPath + ".lwi"); break;
-                }
+                // DVD structure found &&
+                // file ends with e.g. _1 as in VTS_01_1
+                fileName = fileName.Substring(0, fileName.LastIndexOf('_') + 1) + (cbPGC.SelectedIndex + 1);
+            }
+            fileName = fileNamePrefix + fileName + Path.GetExtension(this.input.Filename);
+
+            switch (IndexerUsed)
+            {
+                case IndexType.D2V: output.Text = Path.Combine(projectPath, Path.ChangeExtension(fileName, ".d2v")); break;
+                case IndexType.DGM:
+                case IndexType.DGI: output.Text = Path.Combine(projectPath, Path.ChangeExtension(fileName, ".dgi")); break;
+                case IndexType.FFMS: output.Text = Path.Combine(projectPath, fileName + ".ffindex"); break;
+                case IndexType.LSMASH: output.Text = Path.Combine(projectPath, fileName + ".lwi"); break;
             }
         }
 
@@ -412,30 +436,28 @@ namespace MeGUI
             string videoInput = input.Filename;
 
             // create pgcdemux job if needed
-            if (cbPGC.SelectedIndex > 0 
-                && Path.GetExtension(input.Filename.ToUpperInvariant()) == ".VOB")
+            if (Path.GetExtension(input.Filename).ToUpperInvariant().Equals(".IFO"))
             {
-                string videoIFO;
-                // PGC numbers are not present in VOB, so we check the main IFO
-                if (Path.GetFileName(input.Filename).ToUpperInvariant().Substring(0, 4) == "VTS_")
-                    videoIFO = input.Filename.Substring(0, input.Filename.LastIndexOf("_")) + "_0.IFO";
-                else
-                    videoIFO = Path.ChangeExtension(input.Filename, ".IFO");
+                string tempFile = Path.Combine(Path.GetDirectoryName(output.Text), Path.GetFileNameWithoutExtension(output.Text) + "_1.VOB");
+                prepareJobs = new SequentialChain(new PgcDemuxJob(videoInput, tempFile, (cbPGC.SelectedIndex + 1)));
+                videoInput = tempFile;
 
-                if (File.Exists(videoIFO))
+                string filesToOverwrite = string.Empty;
+                for (int i = 1; i < 10; i++)
                 {
-                    prepareJobs = new SequentialChain(new PgcDemuxJob(videoIFO, Path.GetDirectoryName(output.Text), cbPGC.SelectedIndex));
-                    videoInput = Path.Combine(Path.GetDirectoryName(output.Text), "VTS_01_1.VOB");
-                    for (int i = 1; i < 10; i++)
+                    string file = Path.Combine(Path.GetDirectoryName(output.Text), Path.GetFileNameWithoutExtension(output.Text) + "_" + i + ".VOB");
+                    if (File.Exists(file))
                     {
-                        string file = Path.Combine(Path.GetDirectoryName(output.Text), "VTS_01_" + i + ".VOB");
-                        if (File.Exists(file))
-                        {
-                            MessageBox.Show("The pgc demux file already exists: \n" + file + "\n\n" +
-                                "Please select another output path to save your project.", "Configuration Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            return;
-                        }
+                        filesToOverwrite += file + "\n";
                     }
+                }
+                if (!String.IsNullOrEmpty(filesToOverwrite))
+                {
+                    DialogResult dr = MessageBox.Show("The pgc demux files already exist: \n" + filesToOverwrite + "\n" +
+                                                        "Do you want to overwrite these files?", "Configuration Incomplete", 
+                                                        MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    if (dr == DialogResult.No)
+                        return;
                 }
             }
 
@@ -646,6 +668,18 @@ namespace MeGUI
         private void btnLSMASH_Click(object sender, EventArgs e)
         {
             changeIndexer(IndexType.LSMASH);
+        }
+
+        private void cbPGC_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string fileName = Path.GetFileNameWithoutExtension(output.Text);
+            if (Path.GetExtension(input.Filename).ToUpperInvariant().Equals(".IFO")
+                && FileUtil.RegExMatch(fileName, @"_\d{1,2}\z", false))
+            {
+                // file ends with e.g. _1 as in VTS_01_1
+                fileName = fileName.Substring(0, fileName.LastIndexOf('_') + 1) + (cbPGC.SelectedIndex + 1);
+                output.Text = Path.Combine(FileUtil.GetOutputFolder(output.Text), fileName + Path.GetExtension(output.Text));
+            }
         }
     }
 
