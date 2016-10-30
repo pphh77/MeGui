@@ -729,7 +729,6 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             {
                 deleteTempFiles();
                 su.WasAborted = true;
-                raiseEvent();
             }
         }
 
