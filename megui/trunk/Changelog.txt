@@ -1,3 +1,5 @@
+2652 [HD Streams Extractor] for DVD/Blu-ray sources a prefix and suffix is attached to the output file name. Feature request #597
+                            added warning if "Haali Matroska Muxer" is required
 2651 [FileIndexer]          added IFO as supported input files
                             improved PGC handling
 2650 [OneClick] +           for DVD/Blu-ray sources a prefix and suffix is attached to the output file name. Feature request #597

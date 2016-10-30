@@ -323,8 +323,13 @@ namespace MeGUI.packages.tools.hdbdextractor
 
         private string GenerateArguments()
         {
-            StringBuilder sb = new StringBuilder();
+            string filePrefix = string.Empty;
+            if (FolderSelection.Checked)
+                filePrefix = MeGUI.core.util.FileUtil.GetOutputFilePrefix(dummyInput);
+            else
+                filePrefix = MeGUI.core.util.FileUtil.GetOutputFilePrefix(input[0]);
 
+            StringBuilder sb = new StringBuilder();
             foreach (DataGridViewRow row in StreamDataGridView.Rows)
             {
                 Stream stream = row.DataBoundItem as Stream;
@@ -340,11 +345,11 @@ namespace MeGUI.packages.tools.hdbdextractor
 
                 if (FolderSelection.Checked)
                     sb.Append(string.Format("{0}:\"{1}\" {2} ", stream.Number,
-                        System.IO.Path.Combine(FolderOutputTextBox.Text, string.Format("F{0}_T{1}_{2} - {3}.{4}", ((Feature)FeatureDataGridView.SelectedRows[0].DataBoundItem).Number, stream.Number, Extensions.GetStringValue(stream.Type), row.Cells["languageDataGridViewTextBoxColumn"].Value, (row.Cells["StreamExtractAsComboBox"].Value).ToString().ToLowerInvariant())),
+                        System.IO.Path.Combine(FolderOutputTextBox.Text, string.Format("{0}F{1}_T{2}_{3} - {4}.{5}", filePrefix, ((Feature)FeatureDataGridView.SelectedRows[0].DataBoundItem).Number, stream.Number, Extensions.GetStringValue(stream.Type), row.Cells["languageDataGridViewTextBoxColumn"].Value, (row.Cells["StreamExtractAsComboBox"].Value).ToString().ToLowerInvariant())),
                         row.Cells["StreamAddOptionsTextBox"].Value).Trim());
                 else
                     sb.Append(string.Format("{0}:\"{1}\" {2} ", stream.Number,
-                        System.IO.Path.Combine(FolderOutputTextBox.Text, string.Format("T{0}_{1} - {2}.{3}", stream.Number, Extensions.GetStringValue(stream.Type), row.Cells["languageDataGridViewTextBoxColumn"].Value, (row.Cells["StreamExtractAsComboBox"].Value).ToString().ToLowerInvariant())),
+                        System.IO.Path.Combine(FolderOutputTextBox.Text, string.Format("{0}T{1}_{2} - {3}.{4}", filePrefix, stream.Number, Extensions.GetStringValue(stream.Type), row.Cells["languageDataGridViewTextBoxColumn"].Value, (row.Cells["StreamExtractAsComboBox"].Value).ToString().ToLowerInvariant())),
                         row.Cells["StreamAddOptionsTextBox"].Value).Trim());
 
                 if (row.Cells["StreamExtractAsComboBox"].Value.Equals(AudioCodec.DTS.ID))
@@ -433,6 +438,12 @@ namespace MeGUI.packages.tools.hdbdextractor
             else if (feature.Description.Contains("(angle"))
             {   
                 dummyInput = getBDMVPath(FolderInputTextBox.Text, feature.Description.Substring(0, feature.Description.IndexOf(" (")));
+            }
+            else if (MeGUI.core.util.FileUtil.RegExMatch(feature.Description, @"\A\d{5}\.mpls", true))
+            {
+                // e.g. "00017.mpls, 00018.m2ts, 1:28:39" found
+                string des = feature.Description.Substring(0, feature.Description.IndexOf(","));
+                dummyInput = getBDMVPath(FolderInputTextBox.Text, des);
             }
             else if (feature.Description.Substring(feature.Description.LastIndexOf(".") + 1, 4) == "m2ts")
             {

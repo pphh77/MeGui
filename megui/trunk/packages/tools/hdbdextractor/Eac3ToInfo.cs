@@ -22,7 +22,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Text;
 using System.Text.RegularExpressions;
 
 using MeGUI.core.util;
@@ -304,6 +303,9 @@ namespace MeGUI.packages.tools.hdbdextractor
                     // 2) 00216.mpls, 0:50:19
                     if (Regex.IsMatch(data, @"^[0-99]+\).+$", RegexOptions.Compiled))
                     {
+                        if (_log != null)
+                            _log.LogEvent(data);
+
                         try
                         {
                             features.Add(eac3to.Feature.Parse(data));
@@ -320,6 +322,9 @@ namespace MeGUI.packages.tools.hdbdextractor
                     // "Feature Name"
                     else if (Regex.IsMatch(data, "^\".+\"$", RegexOptions.Compiled))
                     {
+                        if (_log != null)
+                            _log.LogEvent(data);
+
                         if (oMode == OperatingMode.FileBased)
                             features[0].Streams[features[0].Streams.Count - 1].Name = Extensions.CapitalizeAll(data.Trim("\" .".ToCharArray()));
                         else
@@ -330,14 +335,21 @@ namespace MeGUI.packages.tools.hdbdextractor
                     // Stream line on feature listing
                     // - h264/AVC, 1080p24 /1.001 (16:9)
                     else if (Regex.IsMatch(data, "^-.+$", RegexOptions.Compiled))
+                    {
+                        if (_log != null)
+                            _log.LogEvent(data);
                         return;
+                    }
 
                     // Playlist file listing
                     // [99+100+101+102+103+104+105+106+114].m2ts (blueray playlist *.mpls)
                     else if (Regex.IsMatch(data, @"^\[.+\].m2ts$", RegexOptions.Compiled))
                     {
+                        if (_log != null)
+                            _log.LogEvent(data);
+
                         foreach (string file in Regex.Match(data, @"\[.+\]").Value.Trim("[]".ToCharArray()).Split("+".ToCharArray()))
-                            features[features.Count - 1].Files.Add(new File(file + ".m2ts", features[features.Count - 1].Files.Count + 1));
+                            features[features.Count - 1].Files.Add(new File(file.PadLeft(5,'0') + ".m2ts", features[features.Count - 1].Files.Count + 1));
                         return;
                     }
 
@@ -363,6 +375,7 @@ namespace MeGUI.packages.tools.hdbdextractor
                     {
                         if (_log != null)
                             _log.LogEvent(data);
+
                         if (oMode == OperatingMode.FileBased)
                         {
                             try
@@ -422,21 +435,21 @@ namespace MeGUI.packages.tools.hdbdextractor
                     // [a03] Creating file "audio.ac3"...
                     else if (Regex.IsMatch(data, @"^\[.+\] .+\.{3}$", RegexOptions.Compiled))
                     {
-                        if (_log != null) 
+                        if (_log != null)
                             _log.LogEvent(data);
                         return;
                     }
 
                     else if (Regex.IsMatch(data, @"^\v .*...", RegexOptions.Compiled))
                     {
-                        if (_log != null) 
+                        if (_log != null)
                             _log.LogEvent(data);
                         return;
                     }
 
                     else if (Regex.IsMatch(data, @"(core: .*)", RegexOptions.Compiled))
                     {
-                        if (_log != null) 
+                        if (_log != null)
                             _log.LogEvent(data);
                         return;
                     }

@@ -105,6 +105,8 @@ namespace MeGUI
                     {
                         if (line.ToLowerInvariant().Contains("<error>"))
                             stdoutLog.LogEvent(line, ImageType.Error);
+                        if (line.Contains("Getting \"Haali Matroska Muxer\" instance failed"))
+                            log.LogEvent("Please (re)install the Haali Matroska Muxer to fix this error", ImageType.Error);
                     }
                 }
             }
