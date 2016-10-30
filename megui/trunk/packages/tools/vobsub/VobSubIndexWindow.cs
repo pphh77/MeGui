@@ -88,7 +88,44 @@ namespace MeGUI
             pgc.Maximum = nbPGC;
             pgc.Enabled = (nbPGC > 1);
             subtitleTracks.Items.AddRange(IFOparser.GetSubtitlesStreamsInfos(input.Filename, Convert.ToInt32(pgc.Value), chkShowAllStreams.Checked));
-            demuxSelectedTracks.Checked = !keepAllTracks.Checked;
+            PreselectItems();
+        }
+
+        /// <summary>
+        /// Selects the subtitles based on the language and options
+        /// </summary>
+        /// <returns></returns>
+        private void PreselectItems()
+        {
+            // (un)select all based on keepAllTracks
+            for (int i = 0; i < subtitleTracks.Items.Count; i++)
+            {
+                subtitleTracks.SetItemChecked(i, keepAllTracks.Checked);
+            }
+
+            // no need to check further if all tracks should be selected
+            if (keepAllTracks.Checked)
+                return;
+
+            // check if any of the tracks should be selected based on the default MeGUI language(s)
+            int x = -1;
+            List<int> checkedItems = new List<int>();
+            foreach (string item in subtitleTracks.Items)
+            {
+                x++;
+                string[] temp = item.Split(new string[] { " - " }, StringSplitOptions.None);
+                if (temp.Length < 2)
+                    continue;
+
+                if (temp[1].ToLowerInvariant().Trim().Equals(MainForm.Instance.Settings.DefaultLanguage1.ToLowerInvariant())
+                    || temp[1].ToLowerInvariant().Trim().Equals(MainForm.Instance.Settings.DefaultLanguage2.ToLowerInvariant()))
+                    checkedItems.Add(x);
+
+            }
+            foreach (int idx in checkedItems)
+            {
+                subtitleTracks.SetItemChecked(idx, true);
+            }
         }
 
         private void checkIndexIO()
@@ -153,10 +190,16 @@ namespace MeGUI
             this.pgc.Value = 1;
             openVideo(input.Filename);
 
+            // get proper pre- and postfix based on the input file
             string filePath = FileUtil.GetOutputFolder(input.Filename);
             string filePrefix = FileUtil.GetOutputFilePrefix(input.Filename);
+            string fileName = Path.GetFileNameWithoutExtension(input.Filename);
+            if (FileUtil.RegExMatch(fileName, @"_\d{1,2}\z", false))
+                fileName = fileName.Substring(0, fileName.LastIndexOf('_') + 1);
+            else
+                fileName = fileName + "_";
+            output.Filename = Path.Combine(filePath, filePrefix + fileName + this.pgc.Value + ".idx");
 
-            output.Filename = Path.Combine(filePath, filePrefix + Path.GetFileName(Path.ChangeExtension(input.Filename, ".idx")));
             checkIndexIO();
         }
 
@@ -172,6 +215,7 @@ namespace MeGUI
 
             openVideo(input.Filename);
             checkIndexIO();
+            keepAllTracks_CheckedChanged(null, null);
         }
 
         private void pgc_ValueChanged(object sender, EventArgs e)
@@ -180,12 +224,28 @@ namespace MeGUI
                 return;
 
             openVideo(input.Filename);
+            
+            // check if the PGC number has to be changed in the output file name
+            string fileName = Path.GetFileNameWithoutExtension(output.Filename);
+            if (FileUtil.RegExMatch(fileName, @"_\d{1,2}\z", false))
+            {
+                // file ends with e.g. _11 as in VTS_01_11
+                fileName = fileName.Substring(0, fileName.LastIndexOf('_') + 1) + this.pgc.Value + ".idx";
+                output.Filename = Path.Combine(FileUtil.GetOutputFolder(output.Filename), fileName);
+            }
+
             checkIndexIO();
         }
 
         private void chkSingleFileExport_CheckedChanged(object sender, EventArgs e)
         {
             MainForm.Instance.Settings.VobSubberSingleFileExport = this.chkSingleFileExport.Checked;
+        }
+
+        private void keepAllTracks_CheckedChanged(object sender, EventArgs e)
+        {
+            subtitleTracks.Enabled = !keepAllTracks.Checked;
+            PreselectItems();
         }
     }
 

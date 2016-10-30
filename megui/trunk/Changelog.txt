@@ -1,3 +1,7 @@
+2648 [VobSubber]            added the PGC number to the output as suffix
+                            preselect tracks based on the default language(s)
+							improved logging
+2647 [PGCDemux]             changed where the intermediate files are created
 2646 [VobSubber] +          use the default MeGUI output path if possible. Feature request #597
      [ChapterCreator]       for DVD/Blu-ray sources a prefix is attached to the output file name. Feature request #597
 2645 [VobSubber]            added option to demux all tracks in a single file (as before 2637). Feature request #595

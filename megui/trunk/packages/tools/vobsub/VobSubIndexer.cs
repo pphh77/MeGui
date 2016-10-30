@@ -65,18 +65,22 @@ namespace MeGUI
 
         private void generateScript()
         {
+            // create the configuration script
+            StringBuilder script = new StringBuilder();
+            script.AppendLine(job.Input);
+            script.AppendLine(FileUtil.GetPathWithoutExtension(job.Output));
+            script.AppendLine(job.PGC.ToString());
+            script.AppendLine("0"); // we presume angle processing has been done before
+            script.AppendLine("ALL"); //always process everything and strip down later
+            script.AppendLine("CLOSE");
+
+            // write the script to a temp file
             configFile = Path.ChangeExtension(job.Output, ".vobsub");
             FileUtil.ensureDirectoryExists(Path.GetDirectoryName(configFile));
+            using (StreamWriter output = new StreamWriter(configFile, false, Encoding.Default))
+                output.Write(script.ToString());
 
-            using (StreamWriter sw = new StreamWriter(configFile, false, Encoding.Default))
-            {
-                sw.WriteLine(job.Input);
-                sw.WriteLine(FileUtil.GetPathWithoutExtension(job.Output));
-                sw.WriteLine(job.PGC);
-                sw.WriteLine("0"); // we presume angle processing has been done before
-                sw.WriteLine("ALL"); //always process everything and strip down later
-                sw.WriteLine("CLOSE");
-            }
+            log.LogValue("VobSub configuration file", script);
 
             job.FilesToDelete.Add(configFile);
         }
@@ -95,13 +99,14 @@ namespace MeGUI
 
         protected override void doExitConfig()
         {
-            if (job.SingleFileExport)
+            if (job.SingleFileExport || !File.Exists(job.Output))
                 return;
 
+            // multiple output files have to be generated based on the single input file
             su.Status = "Generating files...";
 
             string line;
-            bool bHeader = true;
+            bool bHeader = true; // same header for all output files
             bool bWait = false;
             StringBuilder sbHeader = new StringBuilder();
             StringBuilder sbIndex = new StringBuilder();
@@ -116,6 +121,7 @@ namespace MeGUI
                     {
                         if (line.StartsWith("langidx:"))
                         {
+                            // first subtitle track detected
                             bHeader = false;
                             bWait = true;
                         }
@@ -127,8 +133,10 @@ namespace MeGUI
                         sbIndexTemp.AppendLine(line);
                         if (line.StartsWith("id: "))
                         {
+                            // new track detected
                             index = Int32.Parse(line.Substring(line.LastIndexOf(' ')));
 
+                            // create full output text
                             sbIndex.Clear();
                             sbIndex.Append(sbHeader.ToString());
                             sbIndex.AppendLine("langidx: " + index);
@@ -142,6 +150,7 @@ namespace MeGUI
                         {
                             bWait = true;
 
+                            // check if the track found in the input file is selected to be demuxed
                             bool bFound = false;
                             foreach (int id in job.TrackIDs)
                             {
@@ -149,14 +158,18 @@ namespace MeGUI
                                     bFound = true;
                             }
 
+                            // export if found or if all tracks should be demuxed
                             if (bFound || job.IndexAllTracks)
                             {
-                                string outputFile = Path.Combine(Path.GetDirectoryName(job.Output), Path.GetFileNameWithoutExtension(job.Output)) + "_" + job.PGC + "_" + index + ".idx";
+                                // create output file
+                                string outputFile = Path.Combine(Path.GetDirectoryName(job.Output), Path.GetFileNameWithoutExtension(job.Output)) + "_" + index + ".idx";
                                 using (System.IO.StreamWriter output = new System.IO.StreamWriter(outputFile))
                                     output.WriteLine(sbIndex.ToString());
 
                                 outputFile = Path.ChangeExtension(outputFile, ".sub");
                                 File.Copy(Path.ChangeExtension(job.Output, ".sub"), outputFile, true);
+
+                                log.LogEvent("Subtitle file created: " + Path.GetFileName(outputFile));
                             }
 
                             sbIndexTemp.Clear();
@@ -168,7 +181,7 @@ namespace MeGUI
                 }
             }
             File.Delete(job.Output);
-            File.Delete(Path.ChangeExtension(job.Output, ".sub"));   
+            File.Delete(Path.ChangeExtension(job.Output, ".sub"));
         }
     }
 }

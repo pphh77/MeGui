@@ -209,6 +209,7 @@ namespace MeGUI
             this.demuxSelectedTracks.TabIndex = 8;
             this.demuxSelectedTracks.TabStop = true;
             this.demuxSelectedTracks.Text = "Select subtitle streams";
+            this.demuxSelectedTracks.CheckedChanged += new System.EventHandler(this.keepAllTracks_CheckedChanged);
             // 
             // keepAllTracks
             // 
@@ -217,6 +218,7 @@ namespace MeGUI
             this.keepAllTracks.Size = new System.Drawing.Size(160, 24);
             this.keepAllTracks.TabIndex = 7;
             this.keepAllTracks.Text = "Keep all subtitle streams";
+            this.keepAllTracks.CheckedChanged += new System.EventHandler(this.keepAllTracks_CheckedChanged);
             // 
             // closeOnQueue
             // 
