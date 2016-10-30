@@ -95,21 +95,21 @@ namespace MeGUI
             if (su.HasError || su.WasAborted)
                 return;
 
-            if (!String.IsNullOrEmpty(job.Output))
+            if (String.IsNullOrEmpty(job.Output))
+                return;
+
+            if (File.Exists(job.Output))
             {
-                if (File.Exists(job.Output))
+                MediaInfoFile oInfo = new MediaInfoFile(job.Output, ref log);
+            }
+            else if (Path.GetExtension(job.Output).ToLower().Equals(".avi"))
+            {
+                string strFile = Path.GetFileNameWithoutExtension(job.Output) + " (1).avi";
+                strFile = Path.Combine(Path.GetDirectoryName(job.Output), strFile);
+                if (File.Exists(strFile))
                 {
-                    MediaInfoFile oInfo = new MediaInfoFile(job.Output, ref log);
+                    MediaInfoFile oInfo = new MediaInfoFile(strFile, ref log);
                 }
-                else if (Path.GetExtension(job.Output).ToLower().Equals(".avi"))
-                {
-                    string strFile = Path.GetFileNameWithoutExtension(job.Output) + " (1).avi";
-                    strFile = Path.Combine(Path.GetDirectoryName(job.Output), strFile);
-                    if (File.Exists(strFile))
-                    {
-                        MediaInfoFile oInfo = new MediaInfoFile(strFile, ref log);
-                    }
-                } 
             }
         }
 

@@ -19,9 +19,8 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
 
 using MeGUI.core.util;
 
@@ -48,8 +47,8 @@ namespace MeGUI
         {
             try
             {
-                if (!String.IsNullOrEmpty(job.OutputPath))
-                    FileUtil.ensureDirectoryExists(job.OutputPath);
+                if (!String.IsNullOrEmpty(job.TemporaryPath))
+                    FileUtil.ensureDirectoryExists(job.TemporaryPath);
                 su.Status = "Preparing VOB...";
             }
             finally
@@ -65,9 +64,33 @@ namespace MeGUI
                 StringBuilder sb = new StringBuilder();
 
                 // Input File
-                sb.Append("-pgc " + job.PGCNumber + " -noaud -nosub -customvob n,v,a,s,l \"" + job.Input + "\" \"" + job.OutputPath + "\"");
+                sb.Append("-pgc " + job.PGCNumber + " -noaud -nosub -customvob n,v,a,s,l \"" + job.Input + "\" \"" + job.TemporaryPath + "\"");
                 return sb.ToString();
             }
+        }
+
+        protected override void doExitConfig()
+        {
+            for (int i = 1; i < 10; i++)
+            {
+                // check first if the output file already exists and delete it
+                string output = job.OutputFileName.Substring(0, job.OutputFileName.Length - 5) + i + ".VOB";
+                if (File.Exists(output))
+                {
+                    File.Delete(output);
+                    log.LogEvent("Old VOB file deleted: " + output);
+                }
+
+                // move the new output file to the desired location if found
+                string input = Path.Combine(job.TemporaryPath, "VTS_01_" + i + ".VOB");
+                if (!File.Exists(input))
+                    continue;
+
+                File.Move(input, output);
+                log.LogEvent("VOB file created: " + output);
+            }
+
+            base.doExitConfig();
         }
     }
 }

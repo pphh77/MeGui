@@ -20,10 +20,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
-using System.Windows;
 using System.Windows.Forms;
 
 using Utils.MessageBoxExLib;
@@ -138,7 +134,7 @@ namespace MeGUI
             if (mainForm.Settings.DialogSettings.AskAboutOverwriteJobOutput)
             {
                 bool askAgain;
-                bool bResult = askAbout("The output file, '" + outputname + "' already exists. Would you like to overwrite?",
+                bool bResult = askAbout("The output file '" + outputname + "' already exists. Would you like to overwrite?",
                     "File Already Exists", MessageBoxIcon.Warning, out askAgain);
 
                 mainForm.Settings.DialogSettings.AskAboutOverwriteJobOutput = askAgain;

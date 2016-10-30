@@ -19,8 +19,7 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
+using System.IO;
 
 namespace MeGUI
 {
@@ -29,21 +28,33 @@ namespace MeGUI
     /// </summary>
     public class PgcDemuxJob : Job
     {
-        private string _strOutputPath;
+        private string _strOutputFileName;
+        private string _strTemporaryPath;
         private int _pgcNumber;
 
         public PgcDemuxJob() : this(null, null, 1) { }
 
-        public PgcDemuxJob(string strInput, string strOutputPath, int pgcNumber)
-            : base(strInput, null)
+        public PgcDemuxJob(string strInput, string strOutputFileName, int pgcNumber)
+            : base(strInput, strOutputFileName)
         {
-            this._strOutputPath = strOutputPath;
+            this._strOutputFileName = strOutputFileName;
             this._pgcNumber = pgcNumber;
-            if (!String.IsNullOrEmpty(strOutputPath))
-            {
-                FilesToDelete.Add(System.IO.Path.Combine(strOutputPath, "LogFile.txt"));
-                FilesToDelete.Add(System.IO.Path.Combine(strOutputPath, "Celltimes.txt"));
-            }
+            setTemporaryPath();
+        }
+
+        private void setTemporaryPath()
+        {
+            if (String.IsNullOrEmpty(this._strOutputFileName))
+                return;
+
+            this._strTemporaryPath = Path.Combine(Path.GetDirectoryName(_strOutputFileName),
+                Path.GetFileNameWithoutExtension(_strOutputFileName).Substring(0, Path.GetFileNameWithoutExtension(_strOutputFileName).Length - 2));
+
+            FilesToDelete.Add(Path.Combine(_strTemporaryPath, "LogFile.txt"));
+            FilesToDelete.Add(Path.Combine(_strTemporaryPath, "Celltimes.txt"));
+            for (int i = 1; i < 10; i++)
+                FilesToDelete.Add(Path.Combine(_strTemporaryPath, "VTS_01_" + i + ".VOB"));
+            FilesToDelete.Add(_strTemporaryPath);
         }
 
         public override string CodecString
@@ -56,10 +67,20 @@ namespace MeGUI
             get { return "ext"; }
         }
 
-        public string OutputPath
+        public string OutputFileName
         {
-            get { return _strOutputPath; }
-            set { _strOutputPath = value; }
+            get { return _strOutputFileName; }
+            set
+            {
+                _strOutputFileName = value;
+                setTemporaryPath();
+            }
+        }
+
+        public string TemporaryPath
+        {
+            get { return _strTemporaryPath; }
+            set { _strTemporaryPath = value; }
         }
 
         public int PGCNumber
