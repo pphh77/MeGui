@@ -1,3 +1,6 @@
+2655 [IFOParser]            fixed missing first subtitle track if it contains more than one subtitle type
+                            added type information (4:3/wide/letterbox/pan&scan) to the description of the subtitle track
+                            added multi-angle detection
 2653 [AudioEncoder]         fixed an error when aborting job during the initial steps
 2652 [HD Streams Extractor] for DVD/Blu-ray sources a prefix and suffix is attached to the output file name. Feature request #597
                             added warning if "Haali Matroska Muxer" is required

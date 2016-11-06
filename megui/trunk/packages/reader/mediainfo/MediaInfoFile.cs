@@ -672,6 +672,8 @@ namespace MeGUI
                         oTrack.Info("PGCCount: " + _VideoInfo.PGCCount);
                         oTrack.Info("PGCNumber: " + _VideoInfo.PGCNumber);
                     }
+                    if (_VideoInfo.AngleCount > 0)
+                        oTrack.Info("AngleCount: " + _VideoInfo.AngleCount);
 
                     infoLog.Add(oTrack);
                 }
@@ -794,12 +796,13 @@ namespace MeGUI
                 if (oInfo.Video.Count > 0 && Path.GetExtension(strFile.ToLowerInvariant()) == ".ifo")
                 {
                     // PGC handling
-                    int iPGCCount = (int)IFOparser.getPGCnb(strFile);
+                    int iPGCCount = IFOparser.GetPGCCount(strFile);
                     _VideoInfo.PGCCount = iPGCCount;
                     if (iPGCNumber < 1 || iPGCNumber > iPGCCount)
                         _VideoInfo.PGCNumber = 1;
                     else
                         _VideoInfo.PGCNumber = iPGCNumber;
+                    _VideoInfo.AngleCount = IFOparser.GetAngleCount(strFile, _VideoInfo.PGCNumber);
 
                     // subtitle information is wrong in VOB/IFO (mediainfo), use IFO directly instead
                     oInfo.Text.Clear();
@@ -808,17 +811,22 @@ namespace MeGUI
                     {
                         TextTrack oTextTrack = new TextTrack();
                         oTextTrack.StreamOrder = Int32.Parse(strSubtitle.Substring(1, 2)).ToString();
-                        string[] strLanguage = strSubtitle.Split('-');
-                        oTextTrack.LanguageString = strLanguage[1].Trim();
-                        if (strSubtitle.IndexOf('-', 7) > 0)
-                            oTextTrack.Title = strSubtitle.Substring(7);
-                        if (strSubtitle.ToLowerInvariant().Contains("force"))
+                        string[] strLanguage = strSubtitle.Split(new string[] { " - " }, StringSplitOptions.None);
+                        if (strLanguage.Length == 3)
+                        {
+                            oTextTrack.LanguageString = strLanguage[1].Trim();
+                            oTextTrack.Title = strLanguage[2].Trim();
+                        }
+                        else
+                            oTextTrack.Title = strSubtitle;
+
+                        if (strSubtitle.ToLowerInvariant().Contains("forced"))
                             oTextTrack.ForcedString = "yes";
                         oTextTrack.CodecString = SubtitleType.VOBSUB.ToString();
                         oInfo.Text.Add(oTextTrack);
                     }
                 }
-                else if (oInfo.General[0].FormatString.ToLowerInvariant().Equals("blu-ray playlist"))
+                else if (oInfo.General.Count > 0 && oInfo.General[0].FormatString.ToLowerInvariant().Equals("blu-ray playlist"))
                 {
                     // Blu-ray Input File
                     if (infoLog != null)
@@ -1538,6 +1546,7 @@ namespace MeGUI
         public int PGCNumber;
         public int PGCCount;
         public int BitDepth;
+        public int AngleCount;
 
         private string _strVideoScanType;
         private VideoCodec _vCodec;
@@ -1561,6 +1570,7 @@ namespace MeGUI
             PGCCount = 0;
             PGCNumber = 0;
             BitDepth = 8;
+            AngleCount = 0;
         }
 
         public VideoTrackInfo Track

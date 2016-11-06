@@ -84,7 +84,7 @@ namespace MeGUI
         {
             input.Filename = fileName;
             subtitleTracks.Items.Clear();
-            uint nbPGC = IFOparser.getPGCnb(fileName);
+            int nbPGC = IFOparser.GetPGCCount(fileName);
             pgc.Maximum = nbPGC;
             pgc.Enabled = (nbPGC > 1);
             subtitleTracks.Items.AddRange(IFOparser.GetSubtitlesStreamsInfos(input.Filename, Convert.ToInt32(pgc.Value), chkShowAllStreams.Checked));

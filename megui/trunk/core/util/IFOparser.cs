@@ -1,6 +1,6 @@
 ﻿// ****************************************************************************
 // 
-// Copyright (C) 2005-2016 Kurtnoise (kurtnoise@free.fr)
+// Copyright (C) 2005-2016 Doom9 & al
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,62 +18,35 @@
 // 
 // ****************************************************************************
 
-
 using System;
 using System.Collections;
 using System.IO;
-using System.Windows.Forms;
 
 namespace MeGUI.core.util
 {
     public sealed class IFOparser
     {
-        /// <summary>
-        /// Determine the IFO file that contains the menu: although it often is the largest
-        /// IFO, this is not always the case, especially with elaborate DVDs with many extras.
-        /// Therefore, look for the largest VOBs, and determine the IFO based on that.
-        /// </summary>
-        /// <param name="inputPath">Path that contains the DVD</param>
-        /// <returns>Filename of the IFO that contains the movie</returns>
-        public static string DetermineMovieIFO(string inputPath)
+        private static uint ToInt32(byte[] bytes)
         {
-            // The first 7 characters are the same for each VOB set, e.g.
-            // VTS_24_0.VOB, VTS_24_1.VOB etc.
-            string[] vobFiles = Directory.GetFiles(inputPath, "vts*.vob");
-            if (vobFiles.Length == 0) return null;            
-
-            // Look for the largest VOB set
-            string vtsNameCurrent;
-            string vtsNamePrevious = Path.GetFileName(vobFiles[0]).Substring(0, 7);
-            long vtsSizeLargest = 0;
-            long vtsSize = 0;
-            string vtsNumber = "01";
-            foreach (string file in vobFiles)
-            {
-                vtsNameCurrent = Path.GetFileName(file).Substring(0, 7);
-                if (vtsNameCurrent.Equals(vtsNamePrevious))
-                    vtsSize += new FileInfo(file).Length;
-                else
-                {
-                    if (vtsSize > vtsSizeLargest)
-                    {
-                        vtsSizeLargest = vtsSize;
-                        vtsNumber = vtsNamePrevious.Substring(4, 2);
-                    }
-                    vtsNamePrevious = vtsNameCurrent;
-                    vtsSize = new FileInfo(file).Length;
-                }
-            }
-            // Check whether the last one isn't the largest
-            if (vtsSize > vtsSizeLargest)
-                vtsNumber = vtsNamePrevious.Substring(4, 2);
-
-            string ifoFile = inputPath + Path.DirectorySeparatorChar + "VTS_" + vtsNumber + "_0.IFO";
-            // Name of largest VOB set is the name of the IFO, so we can now create the IFO file
-            return ifoFile;
+            return (uint)((bytes[0] << 24) + (bytes[1] << 16) + (bytes[2] << 8) + bytes[3]);
         }
 
-        internal static byte[] GetFileBlock(string strFile, long pos, int count)
+        private static short ToShort(byte[] bytes)
+        {
+            return ToInt16(bytes);
+        }
+
+        public static short ToInt16(byte[] bytes)
+        {
+            return (short)((bytes[0] << 8) + bytes[1]);
+        }
+
+        public static long ToFilePosition(byte[] bytes)
+        {
+            return ToInt32(bytes) * 0x800L;
+        }
+
+        public static byte[] GetFileBlock(string strFile, long pos, int count)
         {
             using (FileStream stream = new FileStream(strFile, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
@@ -84,18 +57,6 @@ namespace MeGUI.core.util
                 return buf;
             }
         }
-
-        internal static short ToInt16(byte[] bytes) { return (short)((bytes[0] << 8) + bytes[1]); }
-        private static uint ToInt32(byte[] bytes) { return (uint)((bytes[0] << 24) + (bytes[1] << 16) + (bytes[2] << 8) + bytes[3]); }
-        private static short ToShort(byte[] bytes) { return ToInt16(bytes); }
-        internal static long ToFilePosition(byte[] bytes) { return ToInt32(bytes) * 0x800L; }
-
-        private static long GetTotalFrames(TimeSpan time, int fps)
-        {
-            return (long)Math.Round(fps * time.TotalSeconds);
-        }
-
-        private static string TwoLong(int val) { return string.Format("{0:D2}", val); }
 
         private static int AsHex(int val)
         {
@@ -115,37 +76,49 @@ namespace MeGUI.core.util
             return (short)(((byte0_high - 4) * 10) + byte0_low);
         }
 
-        private static int GetFrames(TimeSpan time, int fps)
-        {
-            return (int)Math.Round(fps * time.Milliseconds / 1000.0);
-        }
-
-        internal static long GetPCGIP_Position(string ifoFile)
+        public static long GetPCGIP_Position(string ifoFile)
         {
             return ToFilePosition(GetFileBlock(ifoFile, 0xCC, 4));
         }
 
-        internal static int GetProgramChains(string ifoFile, long pcgitPosition)
+        /// <summary>
+        /// get number of PGCs
+        /// </summary>
+        /// <param name="ifoFile">name of the IFO file</param>
+        /// <returns>number of PGS as integer</returns>
+        public static int GetPGCCount(string ifoFile)
         {
-            return ToInt16(GetFileBlock(ifoFile, pcgitPosition, 2));
+            // get the PGC count in VTS_PGCI
+            return GetPGCCount(ifoFile, GetPCGIP_Position(ifoFile));
         }
 
-        internal static uint GetChainOffset(string ifoFile, long pcgitPosition, int programChain)
+        /// <summary>
+        /// get number of PGCs
+        /// </summary>
+        /// <param name="ifoFile">name of the IFO file</param>
+        /// <param name="VTS_PGCI_Position">address of VTS_PGCI</param>
+        /// <returns>number of PGS as integer</returns>
+        public static int GetPGCCount(string ifoFile, long VTS_PGCI_Position)
+        {
+            return ToInt16(GetFileBlock(ifoFile, VTS_PGCI_Position, 2));
+        }
+
+        public static uint GetPGCOffset(string ifoFile, long pcgitPosition, int programChain)
         {
             return ToInt32(GetFileBlock(ifoFile, (pcgitPosition + (8 * programChain)) + 4, 4));
         }
 
-        internal static int GetNumberOfPrograms(string ifoFile, long pcgitPosition, uint chainOffset)
+        public static int GetNumberOfPrograms(string ifoFile, long pcgitPosition, uint chainOffset)
         {
             return GetFileBlock(ifoFile, (pcgitPosition + chainOffset) + 2, 1)[0];
         }
 
-        internal static TimeSpan? ReadTimeSpan(string ifoFile, long pcgitPosition, uint chainOffset, out double fps)
+        public static TimeSpan? ReadTimeSpan(string ifoFile, long pcgitPosition, uint chainOffset, out double fps)
         {
             return ReadTimeSpan(GetFileBlock(ifoFile, (pcgitPosition + chainOffset) + 4, 4), out fps);
         }
 
-        internal static TimeSpan? ReadTimeSpan(byte[] playbackBytes, out double fps)
+        public static TimeSpan? ReadTimeSpan(byte[] playbackBytes, out double fps)
         {
             short? frames = GetFrames(playbackBytes[3]);
             int fpsMask = playbackBytes[3] >> 6;
@@ -174,42 +147,37 @@ namespace MeGUI.core.util
         public static string[] GetSubtitlesStreamsInfos(string FileName, int iPGC, bool bGetAllStreams)
         {
             byte[] buff = new byte[4];
-            byte s = 0;
-            string[] subdesc = new string[s];
-            string[] substreams = new string[s];
+            string[] subdesc = new string[0];
+            string[] substreams = new string[0];
 
             try
             {
+                // get the number of subpicture streams in VTS_VOBS
+                int iSubtitleCount = ToInt16(GetFileBlock(FileName, 0x254, 2));
+                if (iSubtitleCount > 32 || bGetAllStreams)
+                    iSubtitleCount = 32; // force the max #. According to the specs 32 is the max value for subtitles streams.
+                subdesc = new string[iSubtitleCount];
+
                 FileStream fs = new FileStream(FileName, FileMode.Open, FileAccess.Read);
                 BinaryReader br = new BinaryReader(fs);
                 Stream sr = br.BaseStream;
 
-                // go to the substream #1
-                sr.Seek(0x255, SeekOrigin.Begin);
-
-                s = br.ReadByte();
-                if (s > 32 || bGetAllStreams)
-                    s = 32; // force the max #. According to the specs 32 is the max value for subtitles streams.
-
-                subdesc = new string[s];
-
-                // go to the Language Code
-                sr.Seek(2, SeekOrigin.Current);
-
-                for (int i = 0; i < s; i++)
+                // go to the subpicture attributes of VTS_VOBS
+                sr.Seek(0x256, SeekOrigin.Begin);
+                for (int i = 0; i < iSubtitleCount; i++)
                 {
                     // Presence (1 bit), Coding Mode (1bit), Short Language Code (2bits), Language Extension (1bit), Sub Picture Caption Type (1bit)
+
+                    // ignore presence & coding mode and go to short language code
+                    sr.Seek(0x2, SeekOrigin.Current);
+
+                    // read short language code
                     br.Read(buff, 0, 2);
 
-                    if (buff[0] == 0 && buff[1] == 0)
-                    {
+                    string ShortLangCode = String.Format("{0}{1}", (char)buff[0], (char)buff[1]);
+                    subdesc[i] = LanguageSelectionContainer.LookupISOCode(ShortLangCode);
+                    if (String.IsNullOrEmpty(subdesc[i]))
                         subdesc[i] = "unknown";
-                    }
-                    else
-                    {
-                        string ShortLangCode = String.Format("{0}{1}", (char)buff[0], (char)buff[1]);
-                        subdesc[i] = LanguageSelectionContainer.LookupISOCode(ShortLangCode);
-                    }
 
                     // Go to Code Extension
                     sr.Seek(1, SeekOrigin.Current);
@@ -217,62 +185,108 @@ namespace MeGUI.core.util
 
                     switch (buff[0] & 0x0F)
                     {
-                        // from http://dvd.sourceforge.net/dvdinfo/sprm.html
-                        case 1: subdesc[i] += " - (Caption/Normal Size Char)"; break;
-                        case 2: subdesc[i] += " - (Caption/Large Size Char)"; break;
-                        case 3: subdesc[i] += " - (Caption For Children)"; break;
-                        case 5: subdesc[i] += " - (Closed Caption/Normal Size Char)"; break;
-                        case 6: subdesc[i] += " - (Closed Caption/Large Size Char)"; break;
-                        case 7: subdesc[i] += " - (Closed Caption For Children)"; break;
-                        case 9: subdesc[i] += " - (Forced Caption)"; break;
-                        case 13: subdesc[i] += " - (Director Comments/Normal Size Char)"; break;
-                        case 14: subdesc[i] += " - (Director Comments/Large Size Char)"; break;
-                        case 15: subdesc[i] += " - (Director Comments for Children)"; break;
+                        // from http://dvd.sourceforge.net/dvdinfo/sprm.html 
+                        case 1: subdesc[i] += " - Caption"; break;
+                        case 2: subdesc[i] += " - Caption (Large)"; break;
+                        case 3: subdesc[i] += " - Caption for Children"; break;
+                        case 5: subdesc[i] += " - Closed Caption"; break;
+                        case 6: subdesc[i] += " - Closed Caption (Large)"; break;
+                        case 7: subdesc[i] += " - Closed Caption for Children"; break;
+                        case 9: subdesc[i] += " - Forced Caption"; break;
+                        case 13: subdesc[i] += " - Director Comments"; break;
+                        case 14: subdesc[i] += " - Director Comments (Large)"; break;
+                        case 15: subdesc[i] += " - Director Comments for Children"; break;
                     }
-
-                    if (buff[0] == 0) buff[0] = 1;
-
-                    // go to the next sub stream
-                    sr.Seek(2, SeekOrigin.Current);
                 }
 
-                // find the PGC starting address of the requested PGC number
-                sr.Seek(0x1000 + 0x0C + (iPGC - 1) * 0x08, SeekOrigin.Begin);
-                br.Read(buff, 0, 4);
+                // get VTS_PGCI
+                long VTS_PGCI = GetPCGIP_Position(FileName);
 
-                // go to the starting address of the requested PGC number
-                sr.Seek(0x1000 + buff[3] + buff[2] * 256 + buff[1] * 256 ^ 2 + buff[0] * 256 ^ 3, SeekOrigin.Begin);
+                // find the VTS_PGC starting address of the requested PGC number in VTS_PGCI
+                long VTS_PGC = VTS_PGCI + GetPGCOffset(FileName, VTS_PGCI, iPGC);
 
-                // go to the subtitle starting address
-                sr.Seek(0x1B, SeekOrigin.Current);
+                // go to the Subpicture Stream Control in VTS_PGC of the requested PGC number
+                sr.Seek(VTS_PGC + 0x1C, SeekOrigin.Begin);
 
-                substreams = new string[32];
+                byte[] iCountType = new byte[4];
                 for (int i = 0; i < 32; i++)
                 {
-                    if (i >= subdesc.Length)
-                        break;
-
+                    // read subtitle info of stream i
                     br.Read(buff, 0, 4);
 
-                    if (buff[0] == 0)
+                    if (buff[0] < 128)
                         continue;
+
                     buff[0] -= 128;
 
                     if (buff[0] > 0)
-                        if (String.IsNullOrEmpty(substreams[buff[0]]))
-                            substreams[buff[0]] = "[" + String.Format("{0:00}", buff[0]) + "] - " + subdesc[i];
+                        iCountType[0]++;
                     if (buff[1] > 0)
-                        if (String.IsNullOrEmpty(substreams[buff[1]]))
-                            substreams[buff[1]] = "[" + String.Format("{0:00}", buff[1]) + "] - " + subdesc[i];
+                        iCountType[1]++;
                     if (buff[2] > 0)
-                        if (String.IsNullOrEmpty(substreams[buff[2]]))
-                            substreams[buff[2]] = "[" + String.Format("{0:00}", buff[2]) + "] - " + subdesc[i];
+                        iCountType[2]++;
                     if (buff[3] > 0)
-                        if (String.IsNullOrEmpty(substreams[buff[3]]))
-                            substreams[buff[3]] = "[" + String.Format("{0:00}", buff[3]) + "] - " + subdesc[i];
-                    if (buff[0] == 0 && buff[1] == 0 && buff[2] == 0 && buff[3] == 0)
-                        if (String.IsNullOrEmpty(substreams[buff[0]]))
-                            substreams[buff[0]] = "[" + String.Format("{0:00}", buff[0]) + "] - " + subdesc[i];
+                        iCountType[3]++;
+                }
+
+                // check how many different types are there & if therefore the type description has to be added
+                int iDifferentTypes = 0;
+                if (iCountType[0] > 0)
+                    iDifferentTypes++;
+                if (iCountType[1] > 0)
+                    iDifferentTypes++;
+                if (iCountType[2] > 0)
+                    iDifferentTypes++;
+                if (iCountType[3] > 0)
+                    iDifferentTypes++;
+                bool bAddTypes = iDifferentTypes > 0;
+                if (bAddTypes)
+                    for (int i = 0; i < subdesc.Length; i++)
+                        if (!String.IsNullOrEmpty(subdesc[i]))
+                            subdesc[i] += " (";
+
+                // go to the Subpicture Stream Control in VTS_PGC of the requested PGC number
+                sr.Seek(VTS_PGC + 0x1C, SeekOrigin.Begin);
+
+                bool bStream0TypeAdded = false;
+                substreams = new string[32];
+                for (int i = 0; i < 32; i++)
+                {
+                    // read subtitle info of stream i
+                    br.Read(buff, 0, 4);
+
+                    if (buff[0] < 128)
+                        continue;
+
+                    buff[0] -= 128;
+
+                    if (buff[0] > 0)
+                        substreams[buff[0]] = "[" + String.Format("{0:00}", buff[0]) + "] - " + subdesc[i] + (bAddTypes ? "4:3)" : "");
+                    if (buff[1] > 0)
+                        substreams[buff[1]] = "[" + String.Format("{0:00}", buff[1]) + "] - " + subdesc[i] + (bAddTypes ? "Wide)" : "");
+                    if (buff[2] > 0)
+                        substreams[buff[2]] = "[" + String.Format("{0:00}", buff[2]) + "] - " + subdesc[i] + (bAddTypes ? "Letterbox)" : "");
+                    if (buff[3] > 0)
+                        substreams[buff[3]] = "[" + String.Format("{0:00}", buff[3]) + "] - " + subdesc[i] + (bAddTypes ? "Pan&Scan)" : "");
+
+                    // as stream ID 0 is impossible to detect, we have to guess here
+                    if (String.IsNullOrEmpty(substreams[0]))
+                    {
+                        if (buff[0] == 0 || buff[1] == 0 || buff[2] == 0 || buff[3] == 0)
+                            substreams[0] = "[" + String.Format("{0:00}", buff[0]) + "] - " + subdesc[i];
+                    }
+                    else if (bAddTypes && !bStream0TypeAdded)
+                    {
+                        if (buff[0] > 0)
+                            substreams[0] += "4:3)";
+                        else if (buff[1] > 0)
+                            substreams[0] += "Wide)";
+                        else if (buff[2] > 0)
+                            substreams[0] += "Letterbox)";
+                        else if (buff[3] > 0)
+                            substreams[0] += "Pan&Scan)";
+                        bStream0TypeAdded = true;
+                    }
                 }
 
                 if (bGetAllStreams)
@@ -296,40 +310,87 @@ namespace MeGUI.core.util
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                LogItem _oLog = MainForm.Instance.Log.Info("IFOparser");
+                _oLog.LogValue("Error parsing ifo file " + FileName, ex.Message, ImageType.Error);
             }
             return substreams;
         }
 
         /// <summary>
-        /// get number of PGCs
+        /// get number of angles
         /// </summary>
         /// <param name="fileName">name of the IFO file</param>
-        /// <returns>number of PGS as unsigned integer</returns>
-        public static uint getPGCnb(string FileName)
+        /// <param name="iPGCNumber">PGC number</param>
+        /// <returns>number of angles</returns>
+        public static int GetAngleCount(string FileName, int iPGCNumber)
         {
-            FileStream fs = new FileStream(FileName, FileMode.Open, FileAccess.Read);
-            BinaryReader br = new BinaryReader(fs);
-            Stream sr = br.BaseStream;
+            byte[] buff = new byte[4];
+            byte s = 0;
+            int iAngleCount = 0;
 
-            sr.Seek(0xCC, SeekOrigin.Begin);
-            uint buf = ReadUInt32(br);									// Read PGC offset
-            sr.Seek(2048 * buf + 0x1, SeekOrigin.Begin);			// Move to beginning of PGC
-            long VTS_PGCITI_start_position = sr.Position - 1;
-            byte nPGCs = br.ReadByte();									// Number of PGCs
-            fs.Close();
+            // find the VTS_PGC starting address of the requested PGC number in VTS_PGCI
+            long VTS_PGCI = GetPCGIP_Position(FileName);
+            long VTS_PGC = VTS_PGCI + GetPGCOffset(FileName, VTS_PGCI, iPGCNumber);
 
-            return nPGCs;
-        }
+            try
+            {
+                FileStream fs = new FileStream(FileName, FileMode.Open, FileAccess.Read);
+                BinaryReader br = new BinaryReader(fs);
+                Stream sr = br.BaseStream;
 
-        private static uint ReadUInt32(BinaryReader br)
-        {
-            uint val = (
-                ((uint)br.ReadByte()) << 24 |
-                ((uint)br.ReadByte()) << 16 |
-                ((uint)br.ReadByte()) << 8 |
-                ((uint)br.ReadByte()));
-            return val;
+                // go to the cell count in VTS_PGC of the requested PGC number
+                sr.Seek(VTS_PGC + 0x03, SeekOrigin.Begin);
+                int iCellCount = br.ReadByte();
+
+                //find the cell playback information table start in VTS_PGC of the requested PGC number
+                long VTS_PGC_CELL_START = VTS_PGC + ToInt16(GetFileBlock(FileName, VTS_PGC + 0xE8, 2));
+
+                int iAngleCountTemp = 0;
+                // cycle through all cell informations
+                for (int i = 1; i <= iCellCount; i++)
+                {
+                    // go to the start of the table
+                    sr.Seek(VTS_PGC_CELL_START + (i -1) * 0x18, SeekOrigin.Begin);
+                    s = br.ReadByte();
+
+                    var seamless = (s >> 0) & 1;
+                    var stc = (s >> 1) & 1;
+                    var interleaved = (s >> 2) & 1;
+                    var seamless_playback = (s >> 3) & 1;
+                    var block_type = (s >> 4) & 3;
+                    var cell_type = (s >> 6) & 3;
+
+                    // angle block found?
+                    if (block_type != 1)
+                        continue;
+
+                    // bits: 00 = normal, 01 = first of angle block, 10 = middle of angle block, 11 = last of angle block
+                    if (cell_type == 1)
+                    {
+                        //  first angle block
+                        iAngleCountTemp = 1;
+                    }
+                    else if (cell_type == 2)
+                    {
+                        // middle of angle block
+                        iAngleCountTemp++;
+                    }
+                    else if (cell_type == 3)
+                    {
+                        // last of angle block
+                        iAngleCountTemp++;
+                        if (iAngleCount == 0 || iAngleCount > iAngleCountTemp)
+                            iAngleCount = iAngleCountTemp;
+                    }
+                }
+                fs.Close();
+            }
+            catch (Exception ex)
+            {
+                LogItem _oLog = MainForm.Instance.Log.Info("IFOparser");
+                _oLog.LogValue("Error parsing ifo file " + FileName, ex.Message, ImageType.Error);
+            }
+            return iAngleCount;
         }
     }
 }
