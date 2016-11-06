@@ -1,3 +1,4 @@
+2660 [Presets]              fixed not changing the selected preset if no change has been made in the configuration window. Bug #844
 2659 [VobSubber]            fixed subtitle export for multi-angle discs
 2658 [OneClick]+[FileIndexer] only use pgcdemux if it is a multi-pgc or multi-angle DVD source
 2657 [IFOParser]            add subtitle type only if there are multiple types
@@ -5,7 +6,7 @@
 2655 [IFOParser]            fixed missing first subtitle track if it contains more than one subtitle type
                             added type information (4:3/wide/letterbox/pan&scan) to the description of the subtitle track
                             added multi-angle detection
-2653 [AudioEncoder]         fixed an error when aborting job during the initial steps
+2653 [AudioEncoder]         fixed an error when aborting the job during the initial steps
 2652 [HD Streams Extractor] for DVD/Blu-ray sources a prefix and suffix is attached to the output file name. Feature request #597
                             added warning if "Haali Matroska Muxer" is required
 2651 [FileIndexer]          added IFO as supported input files
