@@ -175,9 +175,9 @@ namespace MeGUI.core.util
                     br.Read(buff, 0, 2);
 
                     string ShortLangCode = String.Format("{0}{1}", (char)buff[0], (char)buff[1]);
-                    subdesc[i] = LanguageSelectionContainer.LookupISOCode(ShortLangCode);
+                    subdesc[i] = LanguageSelectionContainer.LookupISOCode(ShortLangCode) + " - ";
                     if (String.IsNullOrEmpty(subdesc[i]))
-                        subdesc[i] = "unknown";
+                        subdesc[i] = "unknown - ";
 
                     // Go to Code Extension
                     sr.Seek(1, SeekOrigin.Current);
@@ -186,16 +186,16 @@ namespace MeGUI.core.util
                     switch (buff[0] & 0x0F)
                     {
                         // from http://dvd.sourceforge.net/dvdinfo/sprm.html 
-                        case 1: subdesc[i] += " - Caption"; break;
-                        case 2: subdesc[i] += " - Caption (Large)"; break;
-                        case 3: subdesc[i] += " - Caption for Children"; break;
-                        case 5: subdesc[i] += " - Closed Caption"; break;
-                        case 6: subdesc[i] += " - Closed Caption (Large)"; break;
-                        case 7: subdesc[i] += " - Closed Caption for Children"; break;
-                        case 9: subdesc[i] += " - Forced Caption"; break;
-                        case 13: subdesc[i] += " - Director Comments"; break;
-                        case 14: subdesc[i] += " - Director Comments (Large)"; break;
-                        case 15: subdesc[i] += " - Director Comments for Children"; break;
+                        case 1: subdesc[i] += "Caption"; break;
+                        case 2: subdesc[i] += "Caption (Large)"; break;
+                        case 3: subdesc[i] += "Caption for Children"; break;
+                        case 5: subdesc[i] += "Closed Caption"; break;
+                        case 6: subdesc[i] += "Closed Caption (Large)"; break;
+                        case 7: subdesc[i] += "Closed Caption for Children"; break;
+                        case 9: subdesc[i] += "Forced Caption"; break;
+                        case 13: subdesc[i] += "Director Comments"; break;
+                        case 14: subdesc[i] += "Director Comments (Large)"; break;
+                        case 15: subdesc[i] += "Director Comments for Children"; break;
                     }
                 }
 
@@ -243,7 +243,7 @@ namespace MeGUI.core.util
                 if (bAddTypes)
                     for (int i = 0; i < subdesc.Length; i++)
                         if (!String.IsNullOrEmpty(subdesc[i]))
-                            subdesc[i] += " (";
+                            subdesc[i] += (subdesc[i].Substring(subdesc[i].Length - 1).Equals(" ") ? "(" : " (");
 
                 // go to the Subpicture Stream Control in VTS_PGC of the requested PGC number
                 sr.Seek(VTS_PGC + 0x1C, SeekOrigin.Begin);
