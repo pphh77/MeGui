@@ -70,8 +70,15 @@ namespace MeGUI
             script.AppendLine(job.Input);
             script.AppendLine(FileUtil.GetPathWithoutExtension(job.Output));
             script.AppendLine(job.PGC.ToString());
-            script.AppendLine("0"); // we presume angle processing has been done before
-            script.AppendLine("ALL"); //always process everything and strip down later
+            script.AppendLine("1"); // we presume angle processing has been done before
+            if (!job.IndexAllTracks)
+            {
+                foreach (int id in job.TrackIDs)
+                    script.Append(id + " ");
+                script.AppendLine();
+            }
+            else
+                script.AppendLine("ALL"); //process everything and strip down later
             script.AppendLine("CLOSE");
 
             // write the script to a temp file
@@ -81,8 +88,6 @@ namespace MeGUI
                 output.Write(script.ToString());
 
             log.LogValue("VobSub configuration file", script);
-
-            job.FilesToDelete.Add(configFile);
         }
 
         public override bool canPause
@@ -99,8 +104,23 @@ namespace MeGUI
 
         protected override void doExitConfig()
         {
+            // delete temporary config file
+            if (File.Exists(Path.ChangeExtension(job.Output, ".vobsub")))
+                File.Delete(Path.ChangeExtension(job.Output, ".vobsub"));
+
+            if (su.HasError || su.WasAborted)
+            {
+                if (File.Exists(job.Output))
+                    File.Delete(job.Output);
+                if (File.Exists(Path.ChangeExtension(job.Output, ".sub")))
+                    File.Delete(Path.ChangeExtension(job.Output, ".sub"));
+                return;
+            }
+
             if (job.SingleFileExport || !File.Exists(job.Output))
                 return;
+
+
 
             // multiple output files have to be generated based on the single input file
             su.Status = "Generating files...";

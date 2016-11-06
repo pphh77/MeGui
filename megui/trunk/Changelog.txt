@@ -1,3 +1,4 @@
+2659 [VobSubber]            fixed subtitle export for multi-angle discs
 2658 [OneClick]+[FileIndexer] only use pgcdemux if it is a multi-pgc or multi-angle DVD source
 2657 [IFOParser]            add subtitle type only if there are multiple types
 2656 [OneClick]+[ChapterCreator] improved DVD/Blu-ray structure detection
