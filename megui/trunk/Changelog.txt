@@ -1,3 +1,4 @@
+2656 [OneClick]+[ChapterCreator] improved DVD/Blu-ray structure detection
 2655 [IFOParser]            fixed missing first subtitle track if it contains more than one subtitle type
                             added type information (4:3/wide/letterbox/pan&scan) to the description of the subtitle track
                             added multi-angle detection

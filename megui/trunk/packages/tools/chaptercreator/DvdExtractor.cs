@@ -18,10 +18,7 @@
 // 
 // ****************************************************************************
 
-using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Linq;
 using System.IO;
 using System.Diagnostics;
 
@@ -38,34 +35,17 @@ namespace MeGUI
 
         public override List<ChapterInfo> GetStreams(string location)
         {
-            string videoIFO;
-            string path;
-
-            if (File.Exists(location) && Path.GetExtension(location).ToLower(System.Globalization.CultureInfo.InvariantCulture).Equals(".ifo"))
-            {
-                path = Path.GetDirectoryName(location);
-                videoIFO = location;
-            }
-            else if (Directory.Exists(location) && Directory.GetFiles(location, "*.IFO").Length > 0)
-            {
-                path = location;
-                videoIFO = Path.Combine(path, "VIDEO_TS.IFO");
-            }
-            else if (Directory.Exists(Path.Combine(location, "VIDEO_TS")) && Directory.GetFiles(Path.Combine(location, "VIDEO_TS"), "*.IFO").Length > 0)
-            {
-                path = Path.Combine(location, "VIDEO_TS");
-                videoIFO = Path.Combine(path, "VIDEO_TS.IFO");
-            }
-            else
-                throw new FileNotFoundException("No DVD IFO data found in " + location);
-
             List<ChapterInfo> streams = new List<ChapterInfo>();
 
+            string videoIFO = FileUtil.GetDVDPath(location);
+            if (string.IsNullOrEmpty(videoIFO))
+                return streams;
+            
             IfoExtractor ex = new IfoExtractor();
             ex.StreamDetected += (sender, args) => OnStreamDetected(args.ProgramChain);
             ex.ChaptersLoaded += (sender, args) => OnChaptersLoaded(args.ProgramChain);
 
-            if (File.Exists(videoIFO) && Path.GetFileName(videoIFO).ToUpper(System.Globalization.CultureInfo.InvariantCulture).Equals("VIDEO_TS.IFO"))
+            if (File.Exists(videoIFO) && Path.GetFileName(videoIFO).ToUpperInvariant().Equals("VIDEO_TS.IFO"))
             {
                 byte[] bytRead = new byte[4];
                 long VMG_PTT_STPT_Position = IFOparser.ToFilePosition(IFOparser.GetFileBlock(videoIFO, 0xC4, 4));
@@ -73,13 +53,13 @@ namespace MeGUI
 
                 // get PGC count from all ifo files
                 int pgcCount = 0;
-                foreach (string file in Directory.GetFiles(path, "VTS_*_0.IFO"))
-                    pgcCount += (int)IFOparser.getPGCnb(file);
+                foreach (string file in Directory.GetFiles(Path.GetDirectoryName(videoIFO), "VTS_*_0.IFO"))
+                    pgcCount += (int)IFOparser.GetPGCCount(file);
 
                 if (pgcCount > titlePlayMaps)
                 {
                     // process all the ifo files as there are more PGCs than in the VIDEO_TS.IFO
-                    foreach (string file in Directory.GetFiles(path, "VTS_*_0.IFO"))
+                    foreach (string file in Directory.GetFiles(Path.GetDirectoryName(videoIFO), "VTS_*_0.IFO"))
                         streams.AddRange(ex.GetStreams(file));
                 }
                 else
@@ -89,7 +69,7 @@ namespace MeGUI
                         long titleInfoStart = 8 + ((currentTitle - 1) * 12);
                         int titleSetNumber = IFOparser.GetFileBlock(videoIFO, (VMG_PTT_STPT_Position + titleInfoStart) + 6L, 1)[0];
                         int titleSetTitleNumber = IFOparser.GetFileBlock(videoIFO, (VMG_PTT_STPT_Position + titleInfoStart) + 7L, 1)[0];
-                        string vtsIFO = Path.Combine(path, string.Format("VTS_{0:D2}_0.IFO", titleSetNumber));
+                        string vtsIFO = Path.Combine(Path.GetDirectoryName(videoIFO), string.Format("VTS_{0:D2}_0.IFO", titleSetNumber));
                         if (!File.Exists(vtsIFO))
                         {
                             Trace.WriteLine(string.Format("VTS IFO file missing: {0}", Path.GetFileName(vtsIFO)));
@@ -107,7 +87,7 @@ namespace MeGUI
             else
             {
                 // read all the ifo files
-                foreach (string file in Directory.GetFiles(path, "VTS_*_0.IFO"))
+                foreach (string file in Directory.GetFiles(Path.GetDirectoryName(videoIFO), "VTS_*_0.IFO"))
                     streams.AddRange(ex.GetStreams(file));
             }
 

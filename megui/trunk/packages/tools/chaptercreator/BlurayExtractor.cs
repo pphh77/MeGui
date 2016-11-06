@@ -6,11 +6,11 @@
 // 
 // ****************************************************************************
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.IO;
+
+using MeGUI.core.util;
 
 namespace MeGUI
 {
@@ -24,9 +24,10 @@ namespace MeGUI
         public override List<ChapterInfo> GetStreams(string location)
         {
             List<ChapterInfo> mpls = new List<ChapterInfo>();
-            string path = Path.Combine(Path.Combine(location, "BDMV"), "PLAYLIST");
+
+            string path = FileUtil.GetBlurayPath(location);
             if (!Directory.Exists(path))
-                throw new FileNotFoundException("Could not find PLAYLIST folder on BluRay disc.");
+                return mpls;
 
             ChapterExtractor ex = new BDInfoExtractor();
             ex.StreamDetected += (sender, args) => OnStreamDetected(args.ProgramChain);
@@ -37,7 +38,9 @@ namespace MeGUI
                 ChapterInfo pl = ex.GetStreams(file)[0];
                 if (pl == null)
                     continue;
+
                 pl.SourceName = Path.GetFileName(file);
+                pl.SourcePath = Path.GetDirectoryName(file);
                 mpls.Add(pl);
             }
 

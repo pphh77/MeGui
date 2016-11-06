@@ -12,7 +12,6 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Xml;
-using System.Windows.Forms;
 
 namespace MeGUI
 {
@@ -21,6 +20,7 @@ namespace MeGUI
         public string Title { get; set; }
         public string LangCode { get; set; }
         public string SourceName { get; set; }
+        public string SourcePath { get; set; }
         public int TitleNumber { get; set; }
         public string SourceType { get; set; }
         public string SourceHash { get; set; }

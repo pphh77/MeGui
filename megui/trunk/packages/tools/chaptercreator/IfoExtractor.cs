@@ -34,7 +34,7 @@ namespace MeGUI
             List<ChapterInfo> oList = new List<ChapterInfo>();
             ChapterInfo oChapterInfo;
 
-            int pgcCount = (int)IFOparser.getPGCnb(ifoFile);
+            int pgcCount = IFOparser.GetPGCCount(ifoFile);
             for (int i = 1; i <= pgcCount; i++)
             {
                 oChapterInfo = GetChapterInfo(ifoFile, i);
@@ -48,7 +48,7 @@ namespace MeGUI
             if (location.StartsWith("VTS_"))
             {
                 titleSetNum = int.Parse(Path.GetFileNameWithoutExtension(location)
-                .ToUpper(System.Globalization.CultureInfo.InvariantCulture)
+                .ToUpperInvariant()
                 .Replace("VTS_", string.Empty)
                 .Replace("_0.IFO", string.Empty));
             }
@@ -56,6 +56,7 @@ namespace MeGUI
             ChapterInfo pgc = new ChapterInfo();
             pgc.SourceType = "DVD";
             pgc.SourceName = "PGC " + titleSetNum.ToString("D2");
+            pgc.SourcePath = Path.GetDirectoryName(location);
             pgc.TitleNumber = titleSetNum;
             pgc.SourceHash = ChapterExtractor.ComputeMD5Sum(location);
             pgc.Title = Path.GetFileNameWithoutExtension(location);
@@ -88,17 +89,17 @@ namespace MeGUI
             if (programChain >= 0)
             {
                 double FPS;
-                uint chainOffset = IFOparser.GetChainOffset(ifoFile, pcgITPosition, programChain);
+                uint chainOffset = IFOparser.GetPGCOffset(ifoFile, pcgITPosition, programChain);
                 programTime = IFOparser.ReadTimeSpan(ifoFile, pcgITPosition, chainOffset, out FPS) ?? TimeSpan.Zero;
                 programChainPrograms = IFOparser.GetNumberOfPrograms(ifoFile, pcgITPosition, chainOffset);
             }
             else
             {
-                int programChains = IFOparser.GetProgramChains(ifoFile, pcgITPosition);
+                int programChains = IFOparser.GetPGCCount(ifoFile, pcgITPosition);
                 for (int curChain = 1; curChain <= programChains; curChain++)
                 {
                     double FPS;
-                    uint chainOffset = IFOparser.GetChainOffset(ifoFile, pcgITPosition, curChain);
+                    uint chainOffset = IFOparser.GetPGCOffset(ifoFile, pcgITPosition, curChain);
                     TimeSpan? time = IFOparser.ReadTimeSpan(ifoFile, pcgITPosition, chainOffset, out FPS);
                     if (time == null)
                         break;
@@ -116,7 +117,7 @@ namespace MeGUI
 
             chapters.Add(new Chapter() { Name = "Chapter 01" });
 
-            uint longestChainOffset = IFOparser.GetChainOffset(ifoFile, pcgITPosition, programChain);
+            uint longestChainOffset = IFOparser.GetPGCOffset(ifoFile, pcgITPosition, programChain);
             int programMapOffset = IFOparser.ToInt16(IFOparser.GetFileBlock(ifoFile, (pcgITPosition + longestChainOffset) + 230, 2));
             int cellTableOffset = IFOparser.ToInt16(IFOparser.GetFileBlock(ifoFile, (pcgITPosition + longestChainOffset) + 0xE8, 2));
             for (int currentProgram = 0; currentProgram < programChainPrograms; ++currentProgram)

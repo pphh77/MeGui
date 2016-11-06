@@ -433,7 +433,10 @@ namespace MeGUI.core.util
             }
 
             // remove any illegal characters from the prefix string
-            return string.Join("_", outputFilePrefix.Split(Path.GetInvalidFileNameChars())) + "_";
+            if (string.Join(" ", outputFilePrefix.Split(Path.GetInvalidFileNameChars())).Trim().Length == 0)
+                return string.Empty;
+            else
+                return string.Join("_", outputFilePrefix.Split(Path.GetInvalidFileNameChars())) + "_";
         }
 
         /// <summary>
@@ -451,6 +454,79 @@ namespace MeGUI.core.util
                 regex = new Regex(pattern, RegexOptions.IgnoreCase);
             Match match = regex.Match(text);
             return match.Success;
+        }
+
+        /// <summary>
+        /// Gets the Blu-ray source path (if possible)
+        /// </summary>
+        /// <param name"strInputFileOrFolder">the source file or folder name</param>
+        /// <returns>empty if the source is not a Blu-ray structure, otherwise a path pointing to the PLAYLIST dir</returns>
+        public static string GetBlurayPath(string strInputFileOrFolder)
+        {
+            string path = strInputFileOrFolder;
+            if (!Directory.Exists(path))
+            {
+                if (File.Exists(path))
+                    path = Path.GetDirectoryName(path);
+                else
+                    return string.Empty;
+            }
+
+            while (!path.Equals(Path.GetPathRoot(path)))
+            {
+                if (Directory.Exists(Path.Combine(Path.Combine(path, "BDMV"), "PLAYLIST")))
+                    break;
+
+                path = Path.GetDirectoryName(path);
+            }
+
+            path = Path.Combine(Path.Combine(path, "BDMV"), "PLAYLIST");
+            if (!Directory.Exists(path) || Directory.GetFiles(path, "*.mpls").Length == 0)
+                return string.Empty;
+
+            return path;
+        }
+
+        /// <summary>
+        /// Gets the DVD source path (if possible)
+        /// </summary>
+        /// <param name"strInputFileOrFolder">the source file or folder name</param>
+        /// <returns>empty if the source is not a DVD structure, otherwise the full path of an IFO file</returns>
+        public static string GetDVDPath(string strInputFileOrFolder)
+        {
+            if (File.Exists(strInputFileOrFolder))
+            {
+                if (FileUtil.RegExMatch(strInputFileOrFolder, @"\\VTS_\d{2}_\d{1}\.VOB", true))
+                {
+                    // input file is a proper VOB file e.g. VTS_01_1.VOB
+                    string temp = Path.Combine(Path.GetDirectoryName(strInputFileOrFolder), Path.GetFileNameWithoutExtension(strInputFileOrFolder).Substring(0, 7) + "0.IFO");
+                    if (File.Exists(temp))
+                        strInputFileOrFolder = temp;
+                }
+
+                if (Path.GetFileName(strInputFileOrFolder).ToUpperInvariant().Equals("VIDEO_TS.IFO") 
+                    || FileUtil.RegExMatch(strInputFileOrFolder, @"\\VTS_\d{2}_0\.IFO", true))
+                {
+                    // input file is a proper IFO file e.g. VTS_01_0.IFO or VIDEO_TS.IFO
+                    return strInputFileOrFolder;
+                }
+                else
+                    strInputFileOrFolder = Path.GetDirectoryName(strInputFileOrFolder);
+            }
+
+            if (Directory.Exists(strInputFileOrFolder)
+                && Directory.GetFiles(strInputFileOrFolder, "VTS_*_0.IFO").Length > 0)
+            {
+                return Path.Combine(strInputFileOrFolder, "VIDEO_TS.IFO");
+            }
+            else if (Directory.Exists(Path.Combine(strInputFileOrFolder, "VIDEO_TS"))
+                && Directory.GetFiles(Path.Combine(strInputFileOrFolder, "VIDEO_TS"), "VTS_*_0.IFO").Length > 0)
+            {
+                return Path.Combine(Path.Combine(strInputFileOrFolder, "VIDEO_TS"), "VIDEO_TS.IFO");
+            }
+
+            // No DVD IFO data found
+            return string.Empty;
         }
 
         /// <summary>
