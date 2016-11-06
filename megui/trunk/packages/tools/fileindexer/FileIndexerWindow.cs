@@ -463,6 +463,16 @@ namespace MeGUI
                             return;
                     }
                 }
+                else
+                {
+                    // change from _0.IFO to _1.VOB for the indexer
+                    videoInput = input.Filename.Substring(0, input.Filename.Length - 5) + "1.VOB";
+                    if (!File.Exists(videoInput))
+                    {
+                        MessageBox.Show("The file following file cannot be found: \n" + videoInput , "Configuration Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                }
             }
 
             switch (IndexerUsed)
