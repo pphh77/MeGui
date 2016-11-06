@@ -239,7 +239,7 @@ namespace MeGUI.core.util
                     iDifferentTypes++;
                 if (iCountType[3] > 0)
                     iDifferentTypes++;
-                bool bAddTypes = iDifferentTypes > 0;
+                bool bAddTypes = iDifferentTypes > 1;
                 if (bAddTypes)
                     for (int i = 0; i < subdesc.Length; i++)
                         if (!String.IsNullOrEmpty(subdesc[i]))

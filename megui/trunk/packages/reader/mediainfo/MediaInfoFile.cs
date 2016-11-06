@@ -817,6 +817,8 @@ namespace MeGUI
                             oTextTrack.LanguageString = strLanguage[1].Trim();
                             oTextTrack.Title = strLanguage[2].Trim();
                         }
+                        else if (strLanguage.Length == 2)
+                            oTextTrack.LanguageString = strLanguage[1].Trim();
                         else
                             oTextTrack.Title = strSubtitle;
 
