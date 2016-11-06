@@ -134,7 +134,7 @@ namespace MeGUI
                 player.Close();
             player = new VideoPlayer();
             info.DAR = null; // to be sure to initialize DAR values
-            bool videoLoaded = player.loadVideo(MainForm.Instance, fileName, PREVIEWTYPE.CREDITS, false);
+            bool videoLoaded = player.loadVideo(MainForm.Instance, fileName, PREVIEWTYPE.CREDITS, true);
             if (videoLoaded)
             {
                 info.DAR = info.DAR ?? player.File.VideoInfo.DAR;

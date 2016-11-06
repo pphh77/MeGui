@@ -1,3 +1,4 @@
+2661 [Main]                 reverted 2639. Bug #843
 2660 [Presets]              fixed not changing the selected preset if no change has been made in the configuration window. Bug #844
 2659 [VobSubber]            fixed subtitle export for multi-angle discs
 2658 [OneClick]+[FileIndexer] only use pgcdemux if it is a multi-pgc or multi-angle DVD source
