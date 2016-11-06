@@ -394,10 +394,11 @@ namespace MeGUI
             OneClickProcessing oProcessor = new OneClickProcessing(this, fileName, _oSettings, _oLog);
         }
 
-        public void setOpenFailure()
+        public void setOpenFailure(bool bSilent)
         {
             this.Cursor = System.Windows.Forms.Cursors.Default;
-            MessageBox.Show("This file or folder cannot be used in OneClick mode.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            if (!bSilent)
+                MessageBox.Show("This file or folder cannot be used in OneClick mode.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         public void setBatchProcessing(List<OneClickFilesToProcess> arrFilesToProcess, OneClickSettings oSettings)
@@ -759,13 +760,17 @@ namespace MeGUI
 
                 if (File.Exists(videoIFO))
                 {
-                    // pgcdemux must be used as either multiple PGCs or a multi-angle disc can be the source
                     dpp.IFOInput = videoIFO;
-                    prepareJobs = new SequentialChain(new PgcDemuxJob(videoIFO, Path.Combine(dpp.WorkingDirectory, "VTS_01_1.VOB"), _videoInputInfo.VideoInfo.PGCNumber));
-                    for (int i = 1; i < 10; i++)
-                        dpp.FilesToDelete.Add(Path.Combine(dpp.WorkingDirectory, "VTS_01_" + i + ".VOB"));
-                    dpp.VideoInput = Path.Combine(dpp.WorkingDirectory, "VTS_01_1.VOB");
-                    dpp.ApplyDelayCorrection = true;
+                    if (_videoInputInfo.VideoInfo.PGCCount > 1 
+                        || IFOparser.GetAngleCount(videoIFO, _videoInputInfo.VideoInfo.PGCNumber) > 0)
+                    {
+                        // pgcdemux must be used as either multiple PGCs or a multi-angle disc are found
+                        prepareJobs = new SequentialChain(new PgcDemuxJob(videoIFO, Path.Combine(dpp.WorkingDirectory, "VTS_01_1.VOB"), _videoInputInfo.VideoInfo.PGCNumber));
+                        for (int i = 1; i < 10; i++)
+                            dpp.FilesToDelete.Add(Path.Combine(dpp.WorkingDirectory, "VTS_01_" + i + ".VOB"));
+                        dpp.VideoInput = Path.Combine(dpp.WorkingDirectory, "VTS_01_1.VOB");
+                        dpp.ApplyDelayCorrection = true;
+                    }
                 }
             }
 

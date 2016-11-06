@@ -438,26 +438,30 @@ namespace MeGUI
             // create pgcdemux job if needed
             if (Path.GetExtension(input.Filename).ToUpperInvariant().Equals(".IFO"))
             {
-                string tempFile = Path.Combine(Path.GetDirectoryName(output.Text), Path.GetFileNameWithoutExtension(output.Text) + "_1.VOB");
-                prepareJobs = new SequentialChain(new PgcDemuxJob(videoInput, tempFile, (cbPGC.SelectedIndex + 1)));
-                videoInput = tempFile;
+                if (cbPGC.Items.Count > 1 || IFOparser.GetAngleCount(input.Filename, (cbPGC.SelectedIndex + 1)) > 0)
+                {
+                    // pgcdemux must be used as either multiple PGCs or a multi-angle disc are found
+                    string tempFile = Path.Combine(Path.GetDirectoryName(output.Text), Path.GetFileNameWithoutExtension(output.Text) + "_1.VOB");
+                    prepareJobs = new SequentialChain(new PgcDemuxJob(videoInput, tempFile, (cbPGC.SelectedIndex + 1)));
+                    videoInput = tempFile;
 
-                string filesToOverwrite = string.Empty;
-                for (int i = 1; i < 10; i++)
-                {
-                    string file = Path.Combine(Path.GetDirectoryName(output.Text), Path.GetFileNameWithoutExtension(output.Text) + "_" + i + ".VOB");
-                    if (File.Exists(file))
+                    string filesToOverwrite = string.Empty;
+                    for (int i = 1; i < 10; i++)
                     {
-                        filesToOverwrite += file + "\n";
+                        string file = Path.Combine(Path.GetDirectoryName(output.Text), Path.GetFileNameWithoutExtension(output.Text) + "_" + i + ".VOB");
+                        if (File.Exists(file))
+                        {
+                            filesToOverwrite += file + "\n";
+                        }
                     }
-                }
-                if (!String.IsNullOrEmpty(filesToOverwrite))
-                {
-                    DialogResult dr = MessageBox.Show("The pgc demux files already exist: \n" + filesToOverwrite + "\n" +
-                                                        "Do you want to overwrite these files?", "Configuration Incomplete", 
-                                                        MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                    if (dr == DialogResult.No)
-                        return;
+                    if (!String.IsNullOrEmpty(filesToOverwrite))
+                    {
+                        DialogResult dr = MessageBox.Show("The pgc demux files already exist: \n" + filesToOverwrite + "\n" +
+                                                            "Do you want to overwrite these files?", "Configuration Incomplete",
+                                                            MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                        if (dr == DialogResult.No)
+                            return;
+                    }
                 }
             }
 
