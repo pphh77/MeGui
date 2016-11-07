@@ -147,8 +147,7 @@ namespace MeGUI.core.util
         public static string[] GetSubtitlesStreamsInfos(string FileName, int iPGC, bool bGetAllStreams)
         {
             byte[] buff = new byte[4];
-            string[] subdesc = new string[0];
-            string[] substreams = new string[0];
+            string[] substreams = new string[32];
 
             try
             {
@@ -156,7 +155,7 @@ namespace MeGUI.core.util
                 int iSubtitleCount = ToInt16(GetFileBlock(FileName, 0x254, 2));
                 if (iSubtitleCount > 32 || bGetAllStreams)
                     iSubtitleCount = 32; // force the max #. According to the specs 32 is the max value for subtitles streams.
-                subdesc = new string[iSubtitleCount];
+                string[] subdesc = new string[iSubtitleCount];
 
                 FileStream fs = new FileStream(FileName, FileMode.Open, FileAccess.Read);
                 BinaryReader br = new BinaryReader(fs);
@@ -186,16 +185,16 @@ namespace MeGUI.core.util
                     switch (buff[0] & 0x0F)
                     {
                         // from http://dvd.sourceforge.net/dvdinfo/sprm.html 
-                        case 1: subdesc[i] += "Caption"; break;
-                        case 2: subdesc[i] += "Caption (Large)"; break;
-                        case 3: subdesc[i] += "Caption for Children"; break;
-                        case 5: subdesc[i] += "Closed Caption"; break;
-                        case 6: subdesc[i] += "Closed Caption (Large)"; break;
-                        case 7: subdesc[i] += "Closed Caption for Children"; break;
-                        case 9: subdesc[i] += "Forced Caption"; break;
-                        case 13: subdesc[i] += "Director Comments"; break;
-                        case 14: subdesc[i] += "Director Comments (Large)"; break;
-                        case 15: subdesc[i] += "Director Comments for Children"; break;
+                        case 1: subdesc[i] += "Caption "; break;
+                        case 2: subdesc[i] += "Caption (Large) "; break;
+                        case 3: subdesc[i] += "Caption for Children "; break;
+                        case 5: subdesc[i] += "Closed Caption "; break;
+                        case 6: subdesc[i] += "Closed Caption (Large) "; break;
+                        case 7: subdesc[i] += "Closed Caption for Children "; break;
+                        case 9: subdesc[i] += "Forced Caption "; break;
+                        case 13: subdesc[i] += "Director Comments "; break;
+                        case 14: subdesc[i] += "Director Comments (Large) "; break;
+                        case 15: subdesc[i] += "Director Comments for Children "; break;
                     }
                 }
 
@@ -220,13 +219,32 @@ namespace MeGUI.core.util
                     buff[0] -= 128;
 
                     if (buff[0] > 0)
+                    {
+                        substreams[buff[0]] = "[" + String.Format("{0:00}", buff[0]) + "] - " + subdesc[i];
                         iCountType[0]++;
+                    }
                     if (buff[1] > 0)
+                    {
+                        substreams[buff[1]] = "[" + String.Format("{0:00}", buff[1]) + "] - " + subdesc[i];
                         iCountType[1]++;
+                    }
                     if (buff[2] > 0)
+                    {
+                        substreams[buff[2]] = "[" + String.Format("{0:00}", buff[2]) + "] - " + subdesc[i];
                         iCountType[2]++;
+                    }
                     if (buff[3] > 0)
+                    {
+                        substreams[buff[3]] = "[" + String.Format("{0:00}", buff[3]) + "] - " + subdesc[i];
                         iCountType[3]++;
+                    }
+
+                    // as stream ID 0 is impossible to detect, we have to guess here
+                    if (String.IsNullOrEmpty(substreams[0]))
+                    {
+                        if (buff[0] == 0 || buff[1] == 0 || buff[2] == 0 || buff[3] == 0)
+                            substreams[0] = "[" + String.Format("{0:00}", 0) + "] - " + subdesc[i];
+                    }
                 }
 
                 // check how many different types are there & if therefore the type description has to be added
@@ -241,51 +259,95 @@ namespace MeGUI.core.util
                     iDifferentTypes++;
                 bool bAddTypes = iDifferentTypes > 1;
                 if (bAddTypes)
+                {
                     for (int i = 0; i < subdesc.Length; i++)
+                    {
                         if (!String.IsNullOrEmpty(subdesc[i]))
                             subdesc[i] += (subdesc[i].Substring(subdesc[i].Length - 1).Equals(" ") ? "(" : " (");
-
-                // go to the Subpicture Stream Control in VTS_PGC of the requested PGC number
-                sr.Seek(VTS_PGC + 0x1C, SeekOrigin.Begin);
-
-                bool bStream0TypeAdded = false;
-                substreams = new string[32];
-                for (int i = 0; i < 32; i++)
-                {
-                    // read subtitle info of stream i
-                    br.Read(buff, 0, 4);
-
-                    if (buff[0] < 128)
-                        continue;
-
-                    buff[0] -= 128;
-
-                    if (buff[0] > 0)
-                        substreams[buff[0]] = "[" + String.Format("{0:00}", buff[0]) + "] - " + subdesc[i] + (bAddTypes ? "4:3)" : "");
-                    if (buff[1] > 0)
-                        substreams[buff[1]] = "[" + String.Format("{0:00}", buff[1]) + "] - " + subdesc[i] + (bAddTypes ? "Wide)" : "");
-                    if (buff[2] > 0)
-                        substreams[buff[2]] = "[" + String.Format("{0:00}", buff[2]) + "] - " + subdesc[i] + (bAddTypes ? "Letterbox)" : "");
-                    if (buff[3] > 0)
-                        substreams[buff[3]] = "[" + String.Format("{0:00}", buff[3]) + "] - " + subdesc[i] + (bAddTypes ? "Pan&Scan)" : "");
-
-                    // as stream ID 0 is impossible to detect, we have to guess here
-                    if (String.IsNullOrEmpty(substreams[0]))
-                    {
-                        if (buff[0] == 0 || buff[1] == 0 || buff[2] == 0 || buff[3] == 0)
-                            substreams[0] = "[" + String.Format("{0:00}", buff[0]) + "] - " + subdesc[i];
                     }
-                    else if (bAddTypes && !bStream0TypeAdded)
+
+                    // go to the Subpicture Stream Control in VTS_PGC of the requested PGC number
+                    sr.Seek(VTS_PGC + 0x1C, SeekOrigin.Begin);
+
+                    int iCountStream = 0;
+                    for (int i = 0; i < 32; i++)
                     {
+                        // read subtitle info of stream i
+                        br.Read(buff, 0, 4);
+
+                        if (buff[0] < 128)
+                            continue;
+
+                        iCountStream++;
+                        buff[0] -= 128;
+
                         if (buff[0] > 0)
-                            substreams[0] += "4:3)";
-                        else if (buff[1] > 0)
-                            substreams[0] += "Wide)";
-                        else if (buff[2] > 0)
-                            substreams[0] += "Letterbox)";
-                        else if (buff[3] > 0)
-                            substreams[0] += "Pan&Scan)";
-                        bStream0TypeAdded = true;
+                        {
+                            if (substreams[buff[0]].Substring(substreams[buff[0]].Length - 1).Equals(")"))
+                                substreams[buff[0]] = substreams[buff[0]].Substring(0, substreams[buff[0]].Length - 1) + "/4:3)";
+                            else
+                                substreams[buff[0]] +=  "(4:3)";
+                        }
+                        if (buff[1] > 0)
+                        {
+                            if (substreams[buff[1]].Substring(substreams[buff[1]].Length - 1).Equals(")"))
+                                substreams[buff[1]] = substreams[buff[1]].Substring(0, substreams[buff[1]].Length - 1) + "/Wide)";
+                            else
+                                substreams[buff[1]] += "(Wide)";
+                        }
+                        if (buff[2] > 0)
+                        {
+                            if (substreams[buff[2]].Substring(substreams[buff[2]].Length - 1).Equals(")"))
+                                substreams[buff[2]] = substreams[buff[2]].Substring(0, substreams[buff[2]].Length - 1) + "/Letterbox)";
+                            else
+                                substreams[buff[2]] += "(Letterbox)";
+                        }
+                        if (buff[3] > 0)
+                        {
+                            if (substreams[buff[3]].Substring(substreams[buff[3]].Length - 1).Equals(")"))
+                                substreams[buff[3]] = substreams[buff[3]].Substring(0, substreams[buff[3]].Length - 1) + "/Pan&Scan)";
+                            else
+                                substreams[buff[3]] += "(Pan&Scan)";
+                        }
+
+                        if (bAddTypes && iCountStream == 2)
+                        {
+                            // only when the types should be added and the second track is in process
+                            // first one is ignored because of the 0 stream ID which cannot be detected
+                            int iID = 0;
+                            if (buff[0] > 0)
+                            {
+                                iID = buff[0];
+                                if (substreams[0].Substring(substreams[0].Length - 1).Equals(")"))
+                                    substreams[0] = substreams[0].Substring(0, substreams[0].Length - 1) + "/4:3)";
+                                else
+                                    substreams[0] += "(4:3)";
+                            }
+                            if (buff[1] > 0 && (iID == 0 || iID == buff[1]))
+                            {
+                                iID = buff[1];
+                                if (substreams[0].Substring(substreams[0].Length - 1).Equals(")"))
+                                    substreams[0] = substreams[0].Substring(0, substreams[0].Length - 1) + "/Wide)";
+                                else
+                                    substreams[0] += "(Wide)";
+                            }
+                            if (buff[2] > 0 && (iID == 0 || iID == buff[2]))
+                            {
+                                iID = buff[2];
+                                if (substreams[0].Substring(substreams[0].Length - 1).Equals(")"))
+                                    substreams[0] = substreams[0].Substring(0, substreams[0].Length - 1) + "/Letterbox)";
+                                else
+                                    substreams[0] += "(Letterbox)";
+                            }
+                            if (buff[3] > 0 && (iID == 0 || iID == buff[3]))
+                            {
+                                iID = buff[3];
+                                if (substreams[0].Substring(substreams[0].Length - 1).Equals(")"))
+                                    substreams[0] = substreams[0].Substring(0, substreams[0].Length - 1) + "/Pan&Scan)";
+                                else
+                                    substreams[0] += "(Pan&Scan)";
+                            }
+                        }
                     }
                 }
 
@@ -299,8 +361,16 @@ namespace MeGUI.core.util
                 {
                     ArrayList arrList = new ArrayList();
                     foreach (string strItem in substreams)
+                    {
                         if (!String.IsNullOrEmpty(strItem))
-                            arrList.Add(strItem);
+                        {
+                            // remove trailing " - " if it exists
+                            if (strItem.Substring(strItem.Length - 3).Equals(" - "))
+                                arrList.Add(strItem.Substring(0, strItem.Length - 3).Trim());
+                            else
+                                arrList.Add(strItem.Trim());
+                        }
+                    }
                     substreams = new string[arrList.Count];
                     for (int i = 0; i < arrList.Count; i++)
                         substreams[i] = arrList[i].ToString();

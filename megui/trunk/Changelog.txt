@@ -1,5 +1,6 @@
-2663 [FileIndexer]          fixed processing of DVDs with only one PGC
-2662 [IFOParser]            fixed sometimes not able to get the language information
+2664 [IFOParser]            improved type detection
+2663 [FileIndexer]          fixed processing of DVDs with only one PGC (regression of 2658)
+2662 [IFOParser]            fixed sometimes not able to get the language information (regression of 2657)
 2661 [Main]                 reverted 2639. Bug #843
 2660 [Presets]              fixed not changing the selected preset if no change has been made in the configuration window. Bug #844
 2659 [VobSubber]            fixed subtitle export for multi-angle discs
