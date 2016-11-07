@@ -369,17 +369,42 @@ namespace MeGUI
         public void setInput(string[] strFileorFolderName)
         {
             List<OneClickFilesToProcess> arrFilesToProcess = new List<OneClickFilesToProcess>();
+            List<string> arrFoldersToProcess = new List<string>();
+
             foreach (string strFile in strFileorFolderName)
+            {
                 if (File.Exists(strFile))
                     arrFilesToProcess.Add(new OneClickFilesToProcess(strFile, 1));
+                else if (Directory.Exists(strFile))
+                    arrFoldersToProcess.Add(strFile);
+            }
+
+            foreach (string strFolder in arrFoldersToProcess)
+            {
+                if (!String.IsNullOrEmpty(FileUtil.GetBlurayPath(strFolder))
+                    || !String.IsNullOrEmpty(FileUtil.GetDVDPath(strFolder)))
+                {
+                    // DVD or Blu-ray structure found
+                    this.Cursor = Cursors.WaitCursor;
+                    goButton.Enabled = false;
+                    OneClickProcessing oProcessorFolder = new OneClickProcessing(this, strFolder, _oSettings, _oLog);
+                    return;
+                }
+
+                foreach (string strFile in Directory.GetFiles(strFolder))
+                {
+                    arrFilesToProcess.Add(new OneClickFilesToProcess(strFile, 1));
+                }
+            }
+
             if (arrFilesToProcess.Count == 0)
             {
                 MessageBox.Show("These files or folders cannot be used in OneClick mode.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            this.Cursor = System.Windows.Forms.Cursors.WaitCursor;
+            this.Cursor = Cursors.WaitCursor;
             goButton.Enabled = false;
-            OneClickProcessing oProcessor = new OneClickProcessing(this, arrFilesToProcess, _oSettings, _oLog);
+            OneClickProcessing oProcessor = new OneClickProcessing(this, arrFilesToProcess, _oSettings, _oLog); 
         }
         
         private void openInput(string fileName)

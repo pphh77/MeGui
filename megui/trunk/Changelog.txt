@@ -1,3 +1,4 @@
+2665 [OneClick]             added support for folders as drag&drop source of the input control
 2664 [IFOParser]            improved type detection
 2663 [FileIndexer]          fixed processing of DVDs with only one PGC (regression of 2658)
 2662 [IFOParser]            fixed sometimes not able to get the language information (regression of 2657)
