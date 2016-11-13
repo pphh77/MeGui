@@ -31,14 +31,16 @@ namespace MeGUI
         private string _strOutputFileName;
         private string _strTemporaryPath;
         private int _pgcNumber;
+        private int _angleNumber;
 
-        public PgcDemuxJob() : this(null, null, 1) { }
+        public PgcDemuxJob() : this(null, null, 1, 0) { }
 
-        public PgcDemuxJob(string strInput, string strOutputFileName, int pgcNumber)
+        public PgcDemuxJob(string strInput, string strOutputFileName, int pgcNumber, int angleNumber)
             : base(strInput, strOutputFileName)
         {
             this._strOutputFileName = strOutputFileName;
             this._pgcNumber = pgcNumber;
+            this._angleNumber = angleNumber;
             setTemporaryPath();
         }
 
@@ -87,6 +89,12 @@ namespace MeGUI
         {
             get { return _pgcNumber; }
             set { _pgcNumber = value; }
+        }
+
+        public int AngleNumber
+        {
+            get { return _angleNumber; }
+            set { _angleNumber = value; }
         }
     }
 }

@@ -94,6 +94,7 @@ namespace MeGUI
                     pgc = ex.GetChapterInfo(ifoFile, iPGCNumber);
                     if (pgc == null)
                         return null;
+
                     if (Drives.ableToWriteOnThisDrive(Path.GetPathRoot(outputDirectory)))
                     {
                         if (qpfile)

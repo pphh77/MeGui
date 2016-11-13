@@ -392,19 +392,19 @@ namespace MeGUI.core.util
         /// <param name="fileName">name of the IFO file</param>
         /// <param name="iPGCNumber">PGC number</param>
         /// <returns>number of angles</returns>
-        public static int GetAngleCount(string FileName, int iPGCNumber)
+        public static int GetAngleCount(string strIFOFile, int iPGCNumber)
         {
             byte[] buff = new byte[4];
             byte s = 0;
             int iAngleCount = 0;
 
             // find the VTS_PGC starting address of the requested PGC number in VTS_PGCI
-            long VTS_PGCI = GetPCGIP_Position(FileName);
-            long VTS_PGC = VTS_PGCI + GetPGCOffset(FileName, VTS_PGCI, iPGCNumber);
+            long VTS_PGCI = GetPCGIP_Position(strIFOFile);
+            long VTS_PGC = VTS_PGCI + GetPGCOffset(strIFOFile, VTS_PGCI, iPGCNumber);
 
             try
             {
-                FileStream fs = new FileStream(FileName, FileMode.Open, FileAccess.Read);
+                FileStream fs = new FileStream(strIFOFile, FileMode.Open, FileAccess.Read);
                 BinaryReader br = new BinaryReader(fs);
                 Stream sr = br.BaseStream;
 
@@ -413,7 +413,7 @@ namespace MeGUI.core.util
                 int iCellCount = br.ReadByte();
 
                 //find the cell playback information table start in VTS_PGC of the requested PGC number
-                long VTS_PGC_CELL_START = VTS_PGC + ToInt16(GetFileBlock(FileName, VTS_PGC + 0xE8, 2));
+                long VTS_PGC_CELL_START = VTS_PGC + ToInt16(GetFileBlock(strIFOFile, VTS_PGC + 0xE8, 2));
 
                 int iAngleCountTemp = 0;
                 // cycle through all cell informations
@@ -458,7 +458,7 @@ namespace MeGUI.core.util
             catch (Exception ex)
             {
                 LogItem _oLog = MainForm.Instance.Log.Info("IFOparser");
-                _oLog.LogValue("Error parsing ifo file " + FileName, ex.Message, ImageType.Error);
+                _oLog.LogValue("Error parsing ifo file " + strIFOFile, ex.Message, ImageType.Error);
             }
             return iAngleCount;
         }

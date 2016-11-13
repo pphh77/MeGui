@@ -241,22 +241,22 @@ namespace MeGUI
         }
         #endregion
 
-        public MediaInfoFile(string file, ref LogItem oLog) : this(file, ref oLog, 1)
+        public MediaInfoFile(string file, ref LogItem oLog) : this(file, ref oLog, 1, 0)
         {
         }
 
-        public MediaInfoFile(string file, ref LogItem oLog, int iPGCNumber)
+        public MediaInfoFile(string file, ref LogItem oLog, int iPGCNumber, int iAngleNumber)
         {
-            GetSourceInformation(file, oLog, iPGCNumber);
+            GetSourceInformation(file, oLog, iPGCNumber, iAngleNumber);
         }
 
-        public MediaInfoFile(string file) : this(file, 1)
+        public MediaInfoFile(string file) : this(file, 1, 0)
         {
         }
 
-        public MediaInfoFile(string file, int iPGCNumber)
+        public MediaInfoFile(string file, int iPGCNumber, int iAngleNumber)
         {
-            GetSourceInformation(file, null, iPGCNumber);
+            GetSourceInformation(file, null, iPGCNumber, iAngleNumber);
         }
 
         /// <summary>
@@ -264,7 +264,7 @@ namespace MeGUI
         /// </summary>
         /// <param name="file">the file to be analyzed</param>
         /// <param name="oLog">the log item</param>
-        private void GetSourceInformation(string file, LogItem oLog, int iPGCNumber)
+        private void GetSourceInformation(string file, LogItem oLog, int iPGCNumber, int iAngleNumber)
         {
             if (file.Contains("|"))
                 file = file.Split('|')[0];
@@ -374,7 +374,7 @@ namespace MeGUI
                     }
                 }
                 MediaInfo info = new MediaInfo(file);
-                CorrectSourceInformation(ref info, file, infoLog, iPGCNumber);
+                CorrectSourceInformation(ref info, file, infoLog, iPGCNumber, iAngleNumber);
                 if (infoLog != null)
                     WriteSourceInformation(info, file, infoLog);
 
@@ -673,7 +673,10 @@ namespace MeGUI
                         oTrack.Info("PGCNumber: " + _VideoInfo.PGCNumber);
                     }
                     if (_VideoInfo.AngleCount > 0)
+                    {
                         oTrack.Info("AngleCount: " + _VideoInfo.AngleCount);
+                        oTrack.Info("AngleNumber: " + _VideoInfo.AngleNumber);
+                    }
 
                     infoLog.Add(oTrack);
                 }
@@ -789,7 +792,7 @@ namespace MeGUI
             }
         }
 
-        private void CorrectSourceInformation(ref MediaInfo oInfo, String strFile, LogItem infoLog, int iPGCNumber)
+        private void CorrectSourceInformation(ref MediaInfo oInfo, String strFile, LogItem infoLog, int iPGCNumber, int iAngleNumber)
         {
             try
             {
@@ -802,7 +805,15 @@ namespace MeGUI
                         _VideoInfo.PGCNumber = 1;
                     else
                         _VideoInfo.PGCNumber = iPGCNumber;
+
+                    // Angle handling
                     _VideoInfo.AngleCount = IFOparser.GetAngleCount(strFile, _VideoInfo.PGCNumber);
+                    if (_VideoInfo.AngleCount > 0 && (iAngleNumber < 1 || iAngleNumber > _VideoInfo.AngleCount))
+                        _VideoInfo.AngleNumber = 1;
+                    else if (iAngleNumber < 0 || iAngleNumber > _VideoInfo.AngleCount)
+                        _VideoInfo.AngleNumber = 0;
+                    else
+                        _VideoInfo.AngleNumber = iAngleNumber;
 
                     // subtitle information is wrong in VOB/IFO (mediainfo), use IFO directly instead
                     oInfo.Text.Clear();
@@ -1548,6 +1559,7 @@ namespace MeGUI
         public int PGCNumber;
         public int PGCCount;
         public int BitDepth;
+        public int AngleNumber;
         public int AngleCount;
 
         private string _strVideoScanType;
@@ -1573,6 +1585,7 @@ namespace MeGUI
             PGCNumber = 0;
             BitDepth = 8;
             AngleCount = 0;
+            AngleNumber = 0;
         }
 
         public VideoTrackInfo Track

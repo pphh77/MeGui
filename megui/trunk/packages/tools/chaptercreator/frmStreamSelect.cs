@@ -196,7 +196,7 @@ namespace MeGUI
                 return;
 
             if (btnSortName.Checked)
-                list = list.OrderBy(p => (p.Title + p.PGCNumber)).ToList();
+                list = list.OrderBy(p => (p.Title + p.PGCNumber + p.AngleNumber)).ToList();
             else if (btnSortDuration.Checked)
                 list = list.OrderByDescending(p => p.Duration).ToList();
             else

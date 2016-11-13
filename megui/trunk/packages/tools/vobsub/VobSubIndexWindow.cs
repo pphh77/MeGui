@@ -144,7 +144,7 @@ namespace MeGUI
             {
                 trackIDs.Add(Int32.Parse(s.Substring(1,2)));
             }
-            return new SubtitleIndexJob(input.Filename, output.Filename, keepAllTracks.Checked, trackIDs, (int)pgc.Value, chkSingleFileExport.Checked);
+            return new SubtitleIndexJob(input.Filename, output.Filename, keepAllTracks.Checked, trackIDs, (int)pgc.Value, 0, chkSingleFileExport.Checked);
         }
 
         public void setConfig(string input, string output, bool indexAllTracks, List<int> trackIDs, int pgc)

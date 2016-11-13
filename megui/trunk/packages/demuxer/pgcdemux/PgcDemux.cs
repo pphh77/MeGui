@@ -64,7 +64,10 @@ namespace MeGUI
                 StringBuilder sb = new StringBuilder();
 
                 // Input File
-                sb.Append("-pgc " + job.PGCNumber + " -noaud -nosub -customvob n,v,a,s,l \"" + job.Input + "\" \"" + job.TemporaryPath + "\"");
+                sb.Append("-pgc " + job.PGCNumber);
+                if (job.AngleNumber > 0)
+                    sb.Append(" -ang " + job.AngleNumber);
+                sb.Append(" -noaud -nosub -customvob n,v,a,s,l \"" + job.Input + "\" \"" + job.TemporaryPath + "\"");
                 return sb.ToString();
             }
         }

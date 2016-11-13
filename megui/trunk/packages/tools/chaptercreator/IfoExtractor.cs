@@ -29,38 +29,44 @@ namespace MeGUI
         public override List<ChapterInfo> GetStreams(string ifoFile)
         {
             List<ChapterInfo> oList = new List<ChapterInfo>();
-            ChapterInfo oChapterInfo;
 
             int pgcCount = IFOparser.GetPGCCount(ifoFile);
             for (int i = 1; i <= pgcCount; i++)
-            {
-                oChapterInfo = GetChapterInfo(ifoFile, i);
-                oList.Add(oChapterInfo);
+            { 
+                int iAngleCount = IFOparser.GetAngleCount(ifoFile, i);
+                for (int a = 0; a <= iAngleCount; a++)
+                {
+                    if (a == 0 && iAngleCount > 0)
+                        continue;
+                    ChapterInfo oChapterInfo = GetChapterInfo(ifoFile, i);
+                    oChapterInfo.AngleNumber = a;
+                    oList.Add(oChapterInfo);
+                } 
             }
             return oList;
         }
 
-        public ChapterInfo GetChapterInfo(string location, int iPGC)
+        public ChapterInfo GetChapterInfo(string strIFOFile, int iPGC)
         {
+            TimeSpan duration;
+            double fps;
+
             int iTitle = 0;
-            string strFileName = Path.GetFileNameWithoutExtension(location);
+            string strFileName = Path.GetFileNameWithoutExtension(strIFOFile);
             if (FileUtil.RegExMatch(strFileName, @"\AVTS_\d{2}_\d{1}\z", true))
                 iTitle = int.Parse(strFileName.Split('_')[1]);
 
             ChapterInfo pgc = new ChapterInfo();
             pgc.SourceType = "DVD";
             pgc.SourceName = "PGC " + iPGC.ToString("D2");
-            pgc.SourcePath = Path.GetDirectoryName(location);
+            pgc.SourcePath = Path.GetDirectoryName(strIFOFile);
             pgc.TitleNumber = iTitle;
             pgc.PGCNumber = iPGC;
-            pgc.SourceHash = ChapterExtractor.ComputeMD5Sum(location);
-            pgc.Title = Path.GetFileNameWithoutExtension(location);
+            pgc.SourceHash = ChapterExtractor.ComputeMD5Sum(strIFOFile);
+            pgc.Title = Path.GetFileNameWithoutExtension(strIFOFile);
             if (iTitle > 0)
                 pgc.Title = "VTS_" + iTitle.ToString("D2");
-
-            TimeSpan duration;
-            double fps;
-            pgc.Chapters = GetChapters(location, iPGC, out duration, out fps);
+            pgc.Chapters = GetChapters(strIFOFile, iPGC, out duration, out fps);
             pgc.Duration = duration;
             pgc.FramesPerSecond = fps;
 

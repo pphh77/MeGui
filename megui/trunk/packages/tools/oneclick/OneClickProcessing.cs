@@ -63,7 +63,7 @@ namespace MeGUI.packages.tools.oneclick
             {
                 if (iFile == null)
                 {
-                    MediaInfoFile iFileTemp = new MediaInfoFile(oFileToProcess.FilePath, ref _log, oFileToProcess.TrackNumber);
+                    MediaInfoFile iFileTemp = new MediaInfoFile(oFileToProcess.FilePath, ref _log, oFileToProcess.PGCNumber, oFileToProcess.AngleNumber);
                     if (iFileTemp.recommendIndexer(oSettings.IndexerPriority, true))
                         iFile = iFileTemp;
                     else if (iFileTemp.ContainerFileTypeString.Equals("AVS"))
@@ -143,14 +143,16 @@ namespace MeGUI.packages.tools.oneclick
 
                     if (iFile == null)
                     {
-                        MediaInfoFile iFileTemp = new MediaInfoFile(strSourceFile, ref _log, frm.IsDVDSource ? oChapterInfo.PGCNumber : 1);
+                        MediaInfoFile iFileTemp = new MediaInfoFile(strSourceFile, ref _log, frm.IsDVDSource ? oChapterInfo.PGCNumber : 1,
+                            frm.IsDVDSource ? oChapterInfo.AngleNumber : 0);
                         if (iFileTemp.recommendIndexer(oSettings.IndexerPriority, false))
                             iFile = iFileTemp;
                         else
                             _log.LogEvent(strSourceFile + " cannot be processed as no indexer can be used. skipping...");
                     }
                     else
-                        arrFilesToProcess.Add(new OneClickFilesToProcess(strSourceFile, frm.IsDVDSource ? oChapterInfo.PGCNumber : 1));
+                        arrFilesToProcess.Add(new OneClickFilesToProcess(strSourceFile, frm.IsDVDSource ? oChapterInfo.PGCNumber : 1,
+                            frm.IsDVDSource ? oChapterInfo.AngleNumber : 0));
                 }
 
                 if (iFile != null)
@@ -191,7 +193,7 @@ namespace MeGUI.packages.tools.oneclick
                         _log.LogEvent(strFileName + " cannot be processed as no indexer can be used. skipping...");
                 }
                 else
-                    arrFilesToProcess.Add(new OneClickFilesToProcess(strFileName, 1));
+                    arrFilesToProcess.Add(new OneClickFilesToProcess(strFileName, 1, 0));
             }
             if (iFile != null)
             {

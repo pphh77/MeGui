@@ -27,13 +27,19 @@ namespace MeGUI
         public List<Chapter> Chapters { get; set; }
         public int TitleNumber { get; set; }
         public int PGCNumber { get; set; }
+        public int AngleNumber { get; set; }
 
         public override string ToString()
         {
+            string strResult = string.Empty;
+
             if (Chapters.Count != 1)
-                return string.Format("{0} - {1}  -  {2}  -  [{3} Chapters]", Title, SourceName, string.Format("{0:00}:{1:00}:{2:00}.{3:000}", System.Math.Floor(Duration.TotalHours), Duration.Minutes, Duration.Seconds, Duration.Milliseconds), Chapters.Count);
+                strResult = string.Format("{0}  -  {1}  -  {2}  -  [{3} Chapters]", Title, SourceName, string.Format("{0:00}:{1:00}:{2:00}.{3:000}", System.Math.Floor(Duration.TotalHours), Duration.Minutes, Duration.Seconds, Duration.Milliseconds), Chapters.Count);
             else
-                return string.Format("{0} - {1}  -  {2}  -  [{3} Chapter]", Title, SourceName, string.Format("{0:00}:{1:00}:{2:00}.{3:000}", System.Math.Floor(Duration.TotalHours), Duration.Minutes, Duration.Seconds, Duration.Milliseconds), Chapters.Count);
+                strResult = string.Format("{0}  -  {1}  -  {2}  -  [{3} Chapter]", Title, SourceName, string.Format("{0:00}:{1:00}:{2:00}.{3:000}", System.Math.Floor(Duration.TotalHours), Duration.Minutes, Duration.Seconds, Duration.Milliseconds), Chapters.Count);
+            if (AngleNumber > 0)
+                strResult += "  -  Angle " + AngleNumber;
+            return strResult;
         }
 
         public void ChangeFps(double fps)

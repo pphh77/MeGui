@@ -496,7 +496,7 @@ namespace MeGUI.core.util
         {
             if (File.Exists(strInputFileOrFolder))
             {
-                if (FileUtil.RegExMatch(strInputFileOrFolder, @"\\VTS_\d{2}_\d{1}\.VOB", true))
+                if (FileUtil.RegExMatch(strInputFileOrFolder, @"\\VTS_\d{2}_\d{1}\.VOB\z", true))
                 {
                     // input file is a proper VOB file e.g. VTS_01_1.VOB
                     string temp = Path.Combine(Path.GetDirectoryName(strInputFileOrFolder), Path.GetFileNameWithoutExtension(strInputFileOrFolder).Substring(0, 7) + "0.IFO");
@@ -505,7 +505,7 @@ namespace MeGUI.core.util
                 }
 
                 if (Path.GetFileName(strInputFileOrFolder).ToUpperInvariant().Equals("VIDEO_TS.IFO") 
-                    || FileUtil.RegExMatch(strInputFileOrFolder, @"\\VTS_\d{2}_0\.IFO", true))
+                    || FileUtil.RegExMatch(strInputFileOrFolder, @"\\VTS_\d{2}_0\.IFO\z", true))
                 {
                     // input file is a proper IFO file e.g. VTS_01_0.IFO or VIDEO_TS.IFO
                     return strInputFileOrFolder;

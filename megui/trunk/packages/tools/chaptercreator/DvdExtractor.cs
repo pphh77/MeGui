@@ -54,7 +54,7 @@ namespace MeGUI
                 // get PGC count from all ifo files
                 int pgcCount = 0;
                 foreach (string file in Directory.GetFiles(Path.GetDirectoryName(videoIFO), "VTS_*_0.IFO"))
-                    pgcCount += (int)IFOparser.GetPGCCount(file);
+                    pgcCount += IFOparser.GetPGCCount(file);
 
                 if (pgcCount > titlePlayMaps)
                 {
@@ -75,7 +75,15 @@ namespace MeGUI
                             Trace.WriteLine(string.Format("VTS IFO file missing: {0}", Path.GetFileName(vtsIFO)));
                             continue;
                         }
-                        streams.Add(ex.GetChapterInfo(vtsIFO, titleSetTitleNumber));
+                        int iAngleCount = IFOparser.GetAngleCount(vtsIFO, titleSetTitleNumber);
+                        for (int i = 0; i <= iAngleCount; i++)
+                        {
+                            if (i == 0 && iAngleCount > 0)
+                                continue;
+                            ChapterInfo oChapterInfo = ex.GetChapterInfo(vtsIFO, titleSetTitleNumber);
+                            oChapterInfo.AngleNumber = i;
+                            streams.Add(oChapterInfo);
+                        }
                     }
                 }
             }

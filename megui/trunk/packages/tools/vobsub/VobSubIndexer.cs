@@ -70,7 +70,10 @@ namespace MeGUI
             script.AppendLine(job.Input);
             script.AppendLine(FileUtil.GetPathWithoutExtension(job.Output));
             script.AppendLine(job.PGC.ToString());
-            script.AppendLine("1"); // we presume angle processing has been done before
+            if (job.Angle > 1)
+                script.AppendLine(job.Angle.ToString());
+            else
+                script.AppendLine("1");
             if (!job.IndexAllTracks)
             {
                 foreach (int id in job.TrackIDs)

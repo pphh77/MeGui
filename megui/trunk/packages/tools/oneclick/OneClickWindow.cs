@@ -279,7 +279,10 @@ namespace MeGUI
                     fileName = fileName.Substring(0, fileName.LastIndexOf('_') + 1);
                 else
                     fileName = fileName + "_";
-                strTempName = Path.Combine(filePath, filePrefix + fileName + iPGCNumber + Path.GetExtension(strInputFile)); 
+                fileName = filePrefix + fileName + iPGCNumber;
+                if (_videoInputInfo.VideoInfo.AngleNumber > 0)
+                    fileName += "_" + _videoInputInfo.VideoInfo.AngleNumber;
+                strTempName = Path.Combine(filePath, fileName + Path.GetExtension(strInputFile)); 
             }
             else
                 strTempName = Path.Combine(filePath, filePrefix + fileName + Path.GetExtension(strInputFile));
@@ -374,7 +377,7 @@ namespace MeGUI
             foreach (string strFile in strFileorFolderName)
             {
                 if (File.Exists(strFile))
-                    arrFilesToProcess.Add(new OneClickFilesToProcess(strFile, 1));
+                    arrFilesToProcess.Add(new OneClickFilesToProcess(strFile, 1, 0));
                 else if (Directory.Exists(strFile))
                     arrFoldersToProcess.Add(strFile);
             }
@@ -393,7 +396,7 @@ namespace MeGUI
 
                 foreach (string strFile in Directory.GetFiles(strFolder))
                 {
-                    arrFilesToProcess.Add(new OneClickFilesToProcess(strFile, 1));
+                    arrFilesToProcess.Add(new OneClickFilesToProcess(strFile, 1, 0));
                 }
             }
 
@@ -790,7 +793,7 @@ namespace MeGUI
                         || IFOparser.GetAngleCount(videoIFO, _videoInputInfo.VideoInfo.PGCNumber) > 0)
                     {
                         // pgcdemux must be used as either multiple PGCs or a multi-angle disc are found
-                        prepareJobs = new SequentialChain(new PgcDemuxJob(videoIFO, Path.Combine(dpp.WorkingDirectory, "VTS_01_1.VOB"), _videoInputInfo.VideoInfo.PGCNumber));
+                        prepareJobs = new SequentialChain(new PgcDemuxJob(videoIFO, Path.Combine(dpp.WorkingDirectory, "VTS_01_1.VOB"), _videoInputInfo.VideoInfo.PGCNumber, _videoInputInfo.VideoInfo.AngleNumber));
                         for (int i = 1; i < 10; i++)
                             dpp.FilesToDelete.Add(Path.Combine(dpp.WorkingDirectory, "VTS_01_" + i + ".VOB"));
                         dpp.VideoInput = Path.Combine(dpp.WorkingDirectory, "VTS_01_1.VOB");
@@ -1184,7 +1187,7 @@ namespace MeGUI
             if (arrDVDSub.Count > 0)
             {
                 string outputFile = Path.Combine(dpp.WorkingDirectory, Path.GetFileNameWithoutExtension(strInput)) + ".idx";
-                SubtitleIndexJob oJob = new SubtitleIndexJob(strInput, outputFile, false, arrDVDSub, _videoInputInfo.VideoInfo.PGCNumber, false);
+                SubtitleIndexJob oJob = new SubtitleIndexJob(strInput, outputFile, false, arrDVDSub, _videoInputInfo.VideoInfo.PGCNumber, _videoInputInfo.VideoInfo.AngleNumber, false);
                 prepareJobs = new SequentialChain(new SequentialChain(prepareJobs), new SequentialChain(oJob));
             }
 
@@ -1995,17 +1998,19 @@ namespace MeGUI
     public class OneClickFilesToProcess
     {
         public string FilePath;
-        public int TrackNumber;
+        public int PGCNumber;
+        public int AngleNumber;
 
-        public OneClickFilesToProcess() : this(string.Empty, 1)
+        public OneClickFilesToProcess() : this(string.Empty, 1, 0)
         {
 
         }
 
-        public OneClickFilesToProcess(string strPath, int iNumber)
+        public OneClickFilesToProcess(string strPath, int iPGCNumber, int iAngleNumber)
         {
             FilePath = strPath;
-            TrackNumber = iNumber;
+            PGCNumber = iPGCNumber;
+            AngleNumber = iAngleNumber;
         }
     }
 

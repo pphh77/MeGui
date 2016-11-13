@@ -27,24 +27,26 @@ namespace MeGUI
         private bool indexAllTracks, singleFileExport;
         private List<int> trackIDs;
         private int pgc;
+        private int angle;
         public SubtitleIndexJob() : base()
 		{
             indexAllTracks = true;
             trackIDs = new List<int>();
             pgc = 1;
+            angle = 0;
 		}
 
-        public SubtitleIndexJob(string input, string output, bool indexAllTracks, List<int> trackIDs, int pgc, bool singleFileExport)
+        public SubtitleIndexJob(string input, string output, bool indexAllTracks, List<int> trackIDs, int iPGC, int iAngle, bool singleFileExport)
         {
             Input = input;
             Output = output;
             IndexAllTracks = indexAllTracks;
             TrackIDs = trackIDs;
-            PGC = pgc;
+            PGC = iPGC;
+            Angle = iAngle;
             SingleFileExport = singleFileExport;
         }
 
-        
         public bool IndexAllTracks
         {
             get { return indexAllTracks; }
@@ -67,6 +69,12 @@ namespace MeGUI
         {
             get { return pgc; }
             set { pgc = value; }
+        }
+
+        public int Angle
+        {
+            get { return angle; }
+            set { angle = value; }
         }
 
         public override string CodecString

@@ -442,7 +442,7 @@ namespace MeGUI
                 {
                     // pgcdemux must be used as either multiple PGCs or a multi-angle disc are found
                     string tempFile = Path.Combine(Path.GetDirectoryName(output.Text), Path.GetFileNameWithoutExtension(output.Text) + "_1.VOB");
-                    prepareJobs = new SequentialChain(new PgcDemuxJob(videoInput, tempFile, (cbPGC.SelectedIndex + 1)));
+                    prepareJobs = new SequentialChain(new PgcDemuxJob(videoInput, tempFile, (cbPGC.SelectedIndex + 1), 0));
                     videoInput = tempFile;
 
                     string filesToOverwrite = string.Empty;
