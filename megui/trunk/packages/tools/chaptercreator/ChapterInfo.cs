@@ -8,7 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.IO;
 using System.Xml;
@@ -21,12 +20,13 @@ namespace MeGUI
         public string LangCode { get; set; }
         public string SourceName { get; set; }
         public string SourcePath { get; set; }
-        public int TitleNumber { get; set; }
         public string SourceType { get; set; }
         public string SourceHash { get; set; }
         public double FramesPerSecond { get; set; }
         public TimeSpan Duration { get; set; }
         public List<Chapter> Chapters { get; set; }
+        public int TitleNumber { get; set; }
+        public int PGCNumber { get; set; }
 
         public override string ToString()
         {

@@ -51,7 +51,7 @@ namespace MeGUI
                        defaultLanguage1, defaultLanguage2, afterEncodingCommand, videoExtension, audioExtension,
                        strEac3toLastFolderPath, strEac3toLastDestinationPath, tempDirMP4, neroAacEncPath,
                        fdkAacPath, httpproxyaddress, httpproxyport, httpproxyuid, httpproxypwd, defaultOutputDir,
-                       appendToForcedStreams, lastUsedOneClickFolder, lastUpdateServer;
+                       appendToForcedStreams, lastUsedOneClickFolder, lastUpdateServer, chapterCreatorSortString;
         private bool autoForceFilm, autoStartQueue, autoOpenScript, bUseQAAC, bUseX265, bUseDGIndexNV, bUseDGIndexIM,
                      overwriteStats, keep2of3passOutput, autoUpdate, deleteCompletedJobs, deleteIntermediateFiles,
                      deleteAbortedOutput, openProgressWindow, bEac3toAutoSelectStreams, bUseFDKAac,
@@ -177,6 +177,7 @@ namespace MeGUI
             chapterCreatorMinimumLength = 900;
             bExternalMuxerX264 = true;
             bVobSubberSingleFileExport = false;
+            chapterCreatorSortString = "duration";
         }
 
         #region properties
@@ -954,6 +955,12 @@ namespace MeGUI
         {
             get { return chapterCreatorMinimumLength; }
             set { chapterCreatorMinimumLength = value; }
+        }
+
+        public string ChapterCreatorSortString
+        {
+            get { return chapterCreatorSortString; }
+            set { chapterCreatorSortString = value; }
         }
 
         public bool VobSubberSingleFileExport

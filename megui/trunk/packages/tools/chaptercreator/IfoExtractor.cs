@@ -8,10 +8,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Runtime.InteropServices;
 using System.IO;
-using System.Diagnostics;
 
 using MeGUI.core.util;
 
@@ -43,37 +40,33 @@ namespace MeGUI
             return oList;
         }
 
-        public ChapterInfo GetChapterInfo(string location, int titleSetNum)
+        public ChapterInfo GetChapterInfo(string location, int iPGC)
         {
-            if (location.StartsWith("VTS_"))
-            {
-                titleSetNum = int.Parse(Path.GetFileNameWithoutExtension(location)
-                .ToUpperInvariant()
-                .Replace("VTS_", string.Empty)
-                .Replace("_0.IFO", string.Empty));
-            }
+            int iTitle = 0;
+            string strFileName = Path.GetFileNameWithoutExtension(location);
+            if (FileUtil.RegExMatch(strFileName, @"\AVTS_\d{2}_\d{1}\z", true))
+                iTitle = int.Parse(strFileName.Split('_')[1]);
 
             ChapterInfo pgc = new ChapterInfo();
             pgc.SourceType = "DVD";
-            pgc.SourceName = "PGC " + titleSetNum.ToString("D2");
+            pgc.SourceName = "PGC " + iPGC.ToString("D2");
             pgc.SourcePath = Path.GetDirectoryName(location);
-            pgc.TitleNumber = titleSetNum;
+            pgc.TitleNumber = iTitle;
+            pgc.PGCNumber = iPGC;
             pgc.SourceHash = ChapterExtractor.ComputeMD5Sum(location);
             pgc.Title = Path.GetFileNameWithoutExtension(location);
-            if (pgc.Title.Split('_').Length == 3)
-                pgc.Title = pgc.Title.Split('_')[0] + "_" + pgc.Title.Split('_')[1];
-            
+            if (iTitle > 0)
+                pgc.Title = "VTS_" + iTitle.ToString("D2");
+
             TimeSpan duration;
             double fps;
-            pgc.Chapters = GetChapters(location, titleSetNum, out duration, out fps);
+            pgc.Chapters = GetChapters(location, iPGC, out duration, out fps);
             pgc.Duration = duration;
             pgc.FramesPerSecond = fps;
 
-            if (pgc.Duration.TotalSeconds > MainForm.Instance.Settings.ChapterCreatorMinimumLength)
-                OnStreamDetected(pgc);
-            else
-                pgc = null;
+            OnStreamDetected(pgc);
             OnExtractionComplete();
+
             return pgc;
         }
 

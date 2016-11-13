@@ -19,10 +19,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
-using System.Diagnostics;
 using BDInfo;
 
 namespace MeGUI
@@ -39,8 +36,7 @@ namespace MeGUI
             get { return false; }
         }
 
-        private DirectoryInfo GetDirectoryBDMV(
-    string path)
+        private DirectoryInfo GetDirectoryBDMV(string path)
         {
             DirectoryInfo dir = new DirectoryInfo(path);
 
@@ -56,30 +52,27 @@ namespace MeGUI
             return GetDirectory("BDMV", new DirectoryInfo(path), 0);
         }
 
-        private DirectoryInfo GetDirectory(
-            string name,
-            DirectoryInfo dir,
-            int searchDepth)
+        private DirectoryInfo GetDirectory(string name, DirectoryInfo dir, int searchDepth)
         {
-            if (dir != null)
+            if (dir == null)
+                return null;
+
+            DirectoryInfo[] children = dir.GetDirectories();
+            foreach (DirectoryInfo child in children)
             {
-                DirectoryInfo[] children = dir.GetDirectories();
-                foreach (DirectoryInfo child in children)
+                if (child.Name == name)
                 {
-                    if (child.Name == name)
-                    {
-                        return child;
-                    }
-                }
-                if (searchDepth > 0)
-                {
-                    foreach (DirectoryInfo child in children)
-                    {
-                        GetDirectory(
-                            name, child, searchDepth - 1);
-                    }
+                    return child;
                 }
             }
+            if (searchDepth > 0)
+            {
+                foreach (DirectoryInfo child in children)
+                {
+                    GetDirectory(name, child, searchDepth - 1);
+                }
+            }
+
             return null;
         }
 
@@ -95,7 +88,9 @@ namespace MeGUI
             DirectoryInfo DirectoryBDMV = GetDirectoryBDMV(location);
             if (DirectoryBDMV == null)
             {
-                throw new Exception("Unable to locate BD structure.");
+                // Unable to locate BD structure
+                OnExtractionComplete();
+                return new List<ChapterInfo>();
             }
 
             DirectoryInfo DirectoryRoot =
@@ -173,14 +168,10 @@ namespace MeGUI
                     break;
             }
 
-            if (pgc.Duration.TotalSeconds > MainForm.Instance.Settings.ChapterCreatorMinimumLength)
-            {
-                OnStreamDetected(pgc);
-                OnChaptersLoaded(pgc);
-            }
-            else
-                pgc = null;
+            OnStreamDetected(pgc);
+            OnChaptersLoaded(pgc);
             OnExtractionComplete();
+
             return new List<ChapterInfo>() { pgc };
         }
     }

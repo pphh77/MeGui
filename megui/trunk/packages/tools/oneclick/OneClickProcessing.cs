@@ -43,11 +43,10 @@ namespace MeGUI.packages.tools.oneclick
             this._oSettings = oSettings;
             this._bAbort = false;
 
-            if (!getInputDVDBased(oSettings))
-                if (!getInputBluRayBased(oSettings))
-                    if (!getInputFolderBased(oSettings))
-                        if (!getInputFileBased(oSettings))
-                            this.oOneClickWindow.setOpenFailure(this._bAbort);   
+            if (!getInputDVDorBlurayBased(oSettings))
+                if (this._bAbort || !getInputFolderBased(oSettings))
+                    if (this._bAbort || !getInputFileBased(oSettings))
+                        this.oOneClickWindow.setOpenFailure(this._bAbort);   
         }
 
         // batch processing
@@ -85,80 +84,11 @@ namespace MeGUI.packages.tools.oneclick
         }
 
         /// <summary>
-        /// checks if the files/folders can be processed as DVD
+        /// checks if the files/folders can be processed as DVD/Blu-ray
         /// </summary>
-        /// <returns>true if the files/folder can be processed as DVD, false otherwise</returns>
-        private bool getInputDVDBased(OneClickSettings oSettings)
+        /// <returns>true if the files/folder can be processed as DVD or Blu-ray, false otherwise</returns>
+        private bool getInputDVDorBlurayBased(OneClickSettings oSettings)
         {
-            if (this._bAbort)
-                return false;
-
-            ChapterExtractor ex = new DvdExtractor();
-            using (frmStreamSelect frm = new frmStreamSelect(ex, SelectionMode.MultiExtended))
-            {
-                frm.Text = "Select your Titles";
-                ex.GetStreams(this.strInput);
-                if (frm.ChapterCount == 0)
-                    return false;
-
-                DialogResult dr = DialogResult.OK;
-                if (frm.ChapterCount > 1)
-                    dr = frm.ShowDialog();
-
-                if (dr != DialogResult.OK)
-                {
-                    this._bAbort = true;
-                    return false;
-                }
-
-                List<ChapterInfo> oChapterList = frm.SelectedMultipleChapterInfo;
-                if (oChapterList.Count > 0)
-                {
-                    List<OneClickFilesToProcess> arrFilesToProcess = new List<OneClickFilesToProcess>();
-                    MediaInfoFile iFile = null;
-                    int iTitleNumber = 1;
-
-                    foreach (ChapterInfo oChapterInfo in oChapterList)
-                    {
-                        string strVOBFile = Path.Combine(oChapterInfo.SourcePath, oChapterInfo.Title + "_1.VOB");
-
-                        if (iFile == null && File.Exists(strVOBFile))
-                        {
-                            MediaInfoFile iFileTemp = new MediaInfoFile(strVOBFile, ref _log, oChapterInfo.TitleNumber);
-                            if (iFileTemp.recommendIndexer(oSettings.IndexerPriority, false))
-                            {
-                                iFile = iFileTemp;
-                                iTitleNumber = oChapterInfo.TitleNumber;
-                            }
-                            else
-                                _log.LogEvent(strVOBFile + " cannot be processed as no indexer can be used. skipping...");
-                        }
-                        else
-                            arrFilesToProcess.Add(new OneClickFilesToProcess(strVOBFile, oChapterInfo.TitleNumber));
-                    }
-                    if (iFile != null)
-                    {
-                        oOneClickWindow.setInputData(iFile, arrFilesToProcess);
-                        return true;
-                    }
-                    else
-                        return false;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// checks if the files/folders can be processed as BluRay
-        /// </summary>
-        /// <returns>true if the files/folder can be processed as BluRay, false otherwise</returns>
-        private bool getInputBluRayBased(OneClickSettings oSettings)
-        {
-            // directly abort if needed
-            if (this._bAbort)
-                return false;
-
             if (FileUtil.RegExMatch(this.strInput, @"\\playlist\\\d{5}\.mpls\z", true))
             {
                 // mpls file selected - if Blu-ray structure exists, the playlist will be directly openend
@@ -167,54 +97,70 @@ namespace MeGUI.packages.tools.oneclick
                     return false;
             }
 
-            ChapterExtractor ex = new BlurayExtractor();
-            using (frmStreamSelect frm = new frmStreamSelect(ex, SelectionMode.MultiExtended))
+            using (frmStreamSelect frm = new frmStreamSelect(this.strInput, SelectionMode.MultiExtended))
             {
-                frm.Text = "Select your Titles";
-                ex.GetStreams(this.strInput);
-                if (frm.ChapterCount == 0)
+                // check if playlists have been found
+                if (frm.TitleCount == 0)
                     return false;
 
+                // only continue if a DVD or Blu-ray structure is found
+                if (!frm.IsDVDOrBluraySource)
+                    return false;
+
+                // open the selection window if not exactly one title set with the desired minimum length is found
                 DialogResult dr = DialogResult.OK;
-                if (frm.ChapterCount > 1)
+                if (frm.TitleCountWithRequiredLength != 1)
                     dr = frm.ShowDialog();
 
                 if (dr != DialogResult.OK)
                 {
+                    // abort as the user clicked not on OK
                     this._bAbort = true;
                     return false;
                 }
 
+                // check how many playlists have been selected
                 List<ChapterInfo> oChapterList = frm.SelectedMultipleChapterInfo;
-                if (oChapterList.Count > 0)
+                if (oChapterList.Count == 0)
+                    return false;
+                
+                List<OneClickFilesToProcess> arrFilesToProcess = new List<OneClickFilesToProcess>();
+                MediaInfoFile iFile = null;
+
+                foreach (ChapterInfo oChapterInfo in oChapterList)
                 {
+                    string strSourceFile = string.Empty;
+                    if (frm.IsDVDSource)
+                        strSourceFile = Path.Combine(oChapterInfo.SourcePath, oChapterInfo.Title + "_1.VOB");
+                    else
+                        strSourceFile = Path.Combine(oChapterInfo.SourcePath, oChapterInfo.SourceName);
+
+                    if (!File.Exists(strSourceFile))
                     {
-                        List<OneClickFilesToProcess> arrFilesToProcess = new List<OneClickFilesToProcess>();
-                        MediaInfoFile iFile = null;
-
-                        foreach (ChapterInfo oChapterInfo in oChapterList)
-                        {
-                            string strFile = Path.Combine(oChapterInfo.SourcePath, oChapterInfo.SourceName);
-                            if (iFile == null && File.Exists(strFile))
-                            {
-                                iFile = new MediaInfoFile(strFile, ref _log);
-                                iFile.recommendIndexer(oSettings.IndexerPriority, false);
-                            }
-                            else
-                                arrFilesToProcess.Add(new OneClickFilesToProcess(strFile, 1));
-                        }
-                        if (iFile != null)
-                        {
-                            oOneClickWindow.setInputData(iFile, arrFilesToProcess);
-                            return true;
-                        }
-                        else
-                            return false;
+                        _log.LogEvent(strSourceFile + " cannot be found. skipping...");
+                        continue;
                     }
-                }
-            }
 
-            return false;
+                    if (iFile == null)
+                    {
+                        MediaInfoFile iFileTemp = new MediaInfoFile(strSourceFile, ref _log, frm.IsDVDSource ? oChapterInfo.PGCNumber : 1);
+                        if (iFileTemp.recommendIndexer(oSettings.IndexerPriority, false))
+                            iFile = iFileTemp;
+                        else
+                            _log.LogEvent(strSourceFile + " cannot be processed as no indexer can be used. skipping...");
+                    }
+                    else
+                        arrFilesToProcess.Add(new OneClickFilesToProcess(strSourceFile, frm.IsDVDSource ? oChapterInfo.PGCNumber : 1));
+                }
+
+                if (iFile != null)
+                {
+                    oOneClickWindow.setInputData(iFile, arrFilesToProcess);
+                    return true;
+                }
+                else
+                    return false;
+            }
         }
 
         /// <summary>
@@ -223,9 +169,6 @@ namespace MeGUI.packages.tools.oneclick
         /// <returns>true if the folder can be processed, false otherwise</returns>
         private bool getInputFolderBased(OneClickSettings oSettings)
         {
-            if (this._bAbort)
-                return false;
-
             List<OneClickFilesToProcess> arrFilesToProcess = new List<OneClickFilesToProcess>();
             MediaInfoFile iFile = null;
 
@@ -265,21 +208,17 @@ namespace MeGUI.packages.tools.oneclick
         /// <returns>true if the file can be processed, false otherwise</returns>
         private bool getInputFileBased(OneClickSettings oSettings)
         {
-            if (this._bAbort)
+            if (!File.Exists(this.strInput))
                 return false;
 
-            if (File.Exists(this.strInput))
+            MediaInfoFile iFile = new MediaInfoFile(this.strInput, ref this._log);
+            if (iFile.recommendIndexer(oSettings.IndexerPriority, true))
+                return getInputIndexerBased(iFile, oSettings);
+            else if (iFile.ContainerFileTypeString.Equals("AVS"))
             {
-                MediaInfoFile iFile = new MediaInfoFile(this.strInput, ref this._log);
-                if (iFile.recommendIndexer(oSettings.IndexerPriority, true))
-                    return getInputIndexerBased(iFile, oSettings);
-                else if (iFile.ContainerFileTypeString.Equals("AVS"))
-                {
-                    iFile.IndexerToUse = FileIndexerWindow.IndexType.NONE;
-                    return getInputIndexerBased(iFile, oSettings);
-                }
+                iFile.IndexerToUse = FileIndexerWindow.IndexType.NONE;
+                return getInputIndexerBased(iFile, oSettings);
             }
-
             return false;
         }
 

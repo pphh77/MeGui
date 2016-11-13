@@ -439,7 +439,7 @@ namespace MeGUI.packages.tools.hdbdextractor
             {   
                 dummyInput = getBDMVPath(FolderInputTextBox.Text, feature.Description.Substring(0, feature.Description.IndexOf(" (")));
             }
-            else if (MeGUI.core.util.FileUtil.RegExMatch(feature.Description, @"\A\d{5}\.mpls", true))
+            else if (MeGUI.core.util.FileUtil.RegExMatch(feature.Description, @"\A\d{5}\.mpls,", true))
             {
                 // e.g. "00017.mpls, 00018.m2ts, 1:28:39" found
                 string des = feature.Description.Substring(0, feature.Description.IndexOf(","));

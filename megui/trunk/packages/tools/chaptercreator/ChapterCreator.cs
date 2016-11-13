@@ -64,16 +64,10 @@ namespace MeGUI
         {
             if (VistaStuff.IsVistaOrNot)
                 VistaStuff.SetWindowTheme(chapterListView.Handle, "explorer", null);
-            if (minimumTitleLength.Maximum >= MainForm.Instance.Settings.ChapterCreatorMinimumLength &&
-                minimumTitleLength.Minimum <= MainForm.Instance.Settings.ChapterCreatorMinimumLength)
-                minimumTitleLength.Value = MainForm.Instance.Settings.ChapterCreatorMinimumLength;
-            else
-                minimumTitleLength.Value = 900;
         }
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            MainForm.Instance.Settings.ChapterCreatorMinimumLength = (int)minimumTitleLength.Value;
             if (player != null)
                 player.Close();
             base.OnClosing(e);
@@ -272,147 +266,57 @@ namespace MeGUI
                 openFileDialog.Filter = "IFO files (*.ifo)|*.ifo|MKV files (*.mkv)|*.mkv|MPLS files (*.mpls)|*.mpls|Text files (*.txt)|*.txt|All supported files (*.ifo,*.mkv,*.mpls,*.txt)|*.ifo;*.mkv;*.mpls;*.txt";
                 openFileDialog.FilterIndex = 5;
 
-                if (this.openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    input.Text = openFileDialog.FileName;
-
-                    if (input.Text.ToLowerInvariant().EndsWith("ifo"))
-                    {
-                        ChapterExtractor ex = new DvdExtractor();
-                        using (frmStreamSelect frm = new frmStreamSelect(ex))
-                        {
-                            if (ex is DvdExtractor)
-                                frm.Text = "Select your PGC";
-                            else
-                                frm.Text = "Select your Playlist";
-                            ex.GetStreams(input.Text);
-                            if (frm.ChapterCount <= 1 || frm.ShowDialog(this) == DialogResult.OK)
-                            {
-                                if (frm.ChapterCount == 0)
-                                {
-                                    if (MainForm.Instance.Settings.ChapterCreatorMinimumLength > 0)
-                                        MessageBox.Show("No titles found. Please try to reduce the \"Minimum title length\"");
-                                    else
-                                        MessageBox.Show("No titles found.");
-                                    return;
-                                }
-                                else
-                                {
-                                    pgc = frm.SelectedSingleChapterInfo;
-                                    if (pgc.FramesPerSecond == 0)
-                                    {
-                                        MediaInfoFile oInfo = new MediaInfoFile(input.Text);
-                                        pgc.FramesPerSecond = oInfo.VideoInfo.FPS;
-                                    }
-                                    if (String.IsNullOrEmpty(pgc.LangCode))
-                                        pgc.LangCode = "und";
-                                }
-                            }
-                        }
-                        FreshChapterView();
-                        updateTimeLine();
-                    }
-                    else if (input.Text.ToLowerInvariant().EndsWith("mpls"))
-                    {
-                        ChapterExtractor ex = new MplsExtractor();
-                        pgc = ex.GetStreams(input.Text)[0];
-                        FreshChapterView();
-                        updateTimeLine();
-                    }
-                    else if (input.Text.ToLowerInvariant().EndsWith("txt"))
-                    {
-                        ChapterExtractor ex = new TextExtractor();
-                        pgc = ex.GetStreams(input.Text)[0];
-                        FreshChapterView();
-                        updateTimeLine();
-                    }
-                    else if (input.Text.ToLowerInvariant().EndsWith("mkv"))
-                    {
-                        ChapterExtractor ex = new MkvExtractor();
-                        pgc = ex.GetStreams(input.Text)[0];
-                        FreshChapterView();
-                        updateTimeLine();
-                    }
-                    else
-                    {
-                        MessageBox.Show("The input file is not supported.");
-                        return;
-                    }
-                }
-                else
+                if (this.openFileDialog.ShowDialog() != DialogResult.OK)
                     return;
+
+                input.Text = openFileDialog.FileName;
             }
             else
             {
                 using (FolderBrowserDialog d = new FolderBrowserDialog())
                 {
                     d.ShowNewFolderButton = false;
-                    d.Description = "Select DVD, BluRay disc or folder.";
-                    if (d.ShowDialog() == DialogResult.OK)
-                    {
-                        input.Text = d.SelectedPath;
-                        try
-                        {
-                            ChapterExtractor ex =
-                              Directory.Exists(Path.Combine(input.Text, "VIDEO_TS")) ?
-                              new DvdExtractor() as ChapterExtractor :
-                              File.Exists(Path.Combine(input.Text, "VIDEO_TS.IFO")) ?
-                              new DvdExtractor() as ChapterExtractor :
-                              Directory.Exists(Path.Combine(Path.Combine(input.Text, "BDMV"), "PLAYLIST")) ?
-                              new BlurayExtractor() as ChapterExtractor :
-                              null;
-
-                            if (ex == null)
-                            {
-                                MessageBox.Show("The input folder is not supported.");
-                                return;
-                            }
-
-                            using (frmStreamSelect frm = new frmStreamSelect(ex))
-                            {
-                                if (ex is DvdExtractor)
-                                    frm.Text = "Select your Title";
-                                else
-                                    frm.Text = "Select your Playlist";
-                                ex.GetStreams(input.Text);
-                                if (frm.ChapterCount <= 1 || frm.ShowDialog(this) == DialogResult.OK)
-                                {
-                                    if (frm.ChapterCount == 0)
-                                    {
-                                        if (MainForm.Instance.Settings.ChapterCreatorMinimumLength > 0)
-                                            MessageBox.Show("No titles found. Please try to reduce the \"Minimum title length\"");
-                                        else
-                                            MessageBox.Show("No titles found.");
-                                        return;
-                                    }
-                                    else
-                                    {
-                                        pgc = frm.SelectedSingleChapterInfo;
-                                        if (pgc.FramesPerSecond == 0)
-                                        {
-                                            MediaInfoFile oInfo = new MediaInfoFile(input.Text);
-                                            pgc.FramesPerSecond = oInfo.VideoInfo.FPS;
-                                        }
-                                        if (String.IsNullOrEmpty(pgc.LangCode))
-                                            pgc.LangCode = "und";
-                                    }
-                                }
-                            }
-                            FreshChapterView();
-                            updateTimeLine();
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(ex.Message);
-                        }
-                    }
-                    else
+                    d.Description = "Select DVD/BluRay disc or folder";
+                    if (d.ShowDialog() != DialogResult.OK)
                         return;
+
+                    input.Text = d.SelectedPath;
                 }
             }
 
+            using (frmStreamSelect frm = new frmStreamSelect(input.Text))
+            {
+                if (frm.TitleCount == 0)
+                {
+                    MessageBox.Show("No chapters found");
+                    return;
+                }
+
+                DialogResult dr = DialogResult.OK;
+                if (frm.TitleCountWithRequiredLength != 1)
+                    dr = frm.ShowDialog();
+
+                if (dr != DialogResult.OK)
+                    return;
+
+                pgc = frm.SelectedSingleChapterInfo;
+                if (pgc.FramesPerSecond == 0 && File.Exists(input.Text))
+                {
+                    MediaInfoFile oInfo = new MediaInfoFile(input.Text);
+                    pgc.FramesPerSecond = oInfo.VideoInfo.FPS;
+                }
+                if (String.IsNullOrEmpty(pgc.LangCode))
+                    pgc.LangCode = "und";
+            }
+
+            FreshChapterView();
+            updateTimeLine();
+
+            chaptersGroupbox.Text = " Chapters ";
             if (chapterListView.Items.Count != 0)
                 chapterListView.Items[0].Selected = true;
+            else
+                return;
 
             if (pgc.FramesPerSecond > 0)
             {
@@ -425,13 +329,18 @@ namespace MeGUI
             string path = FileUtil.GetOutputFolder(input.Text);
             string filePrefix = FileUtil.GetOutputFilePrefix(input.Text);
             string fileName = Path.GetFileNameWithoutExtension(input.Text);
-            if (FileUtil.RegExMatch(fileName, @"_\d{1,2}\z", false))
+            if (this.pgc.PGCNumber > 0)
             {
-                // file ends with e.g. _1 as in VTS_01_1
-                fileName = fileName.Substring(0, fileName.LastIndexOf('_'));
+                chaptersGroupbox.Text += "- VTS " + pgc.TitleNumber.ToString("D2") + " - PGC " + pgc.PGCNumber.ToString("D2") + " ";
+                if (FileUtil.RegExMatch(fileName, @"_\d{1,2}\z", false))
+                {
+                    // file ends with e.g. _1 as in VTS_01_1
+                    fileName = fileName.Substring(0, fileName.LastIndexOf('_'));
+                    fileName += "_" + this.pgc.PGCNumber;
+                }
             }
 
-            fileName = filePrefix + fileName + "_" + this.pgc.TitleNumber + " - Chapter Information.txt";
+            fileName = filePrefix + fileName + " - Chapter Information.txt";
             if (rbXML.Checked)
                 fileName = Path.ChangeExtension(fileName, "xml");
             else if (rbQPF.Checked)
@@ -578,11 +487,6 @@ namespace MeGUI
         {
             fpsChooser.Visible = lblFPS.Visible = true;
             output.Text = Path.ChangeExtension(output.Text, "xml");
-        }
-
-        private void minimumTitleLength_ValueChanged(object sender, EventArgs e)
-        {
-            MainForm.Instance.Settings.ChapterCreatorMinimumLength = (int)minimumTitleLength.Value;
         }
 	}
 	public struct Chapter

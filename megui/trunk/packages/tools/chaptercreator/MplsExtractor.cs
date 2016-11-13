@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using System.Diagnostics;
 
 namespace MeGUI
 {
@@ -44,9 +43,9 @@ namespace MeGUI
             if ((fileType != "MPLS0100" && fileType != "MPLS0200")
             /*|| data[45] != 1*/)
             {
-                throw new Exception(string.Format(
-                "Playlist {0} has an unknown file type {1}.",
-                fileInfo.Name, fileType));
+                // playlist has an unknown file type
+                OnExtractionComplete();
+                return new List<ChapterInfo>();
             }
 
             List<Clip> chapterClips = GetClips(data);

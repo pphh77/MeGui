@@ -63,8 +63,6 @@ namespace MeGUI
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.gbInput = new System.Windows.Forms.GroupBox();
-            this.lblMinimumTitleLength = new System.Windows.Forms.Label();
-            this.minimumTitleLength = new System.Windows.Forms.NumericUpDown();
             this.btInput = new System.Windows.Forms.Button();
             this.input = new System.Windows.Forms.TextBox();
             this.rbFromFile = new System.Windows.Forms.RadioButton();
@@ -73,16 +71,15 @@ namespace MeGUI
             this.closeOnQueue = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lblFPS = new System.Windows.Forms.Label();
+            this.fpsChooser = new MeGUI.core.gui.FPSChooser();
             this.rbXML = new System.Windows.Forms.RadioButton();
             this.rbQPF = new System.Windows.Forms.RadioButton();
             this.rbTXT = new System.Windows.Forms.RadioButton();
             this.btOutput = new System.Windows.Forms.Button();
             this.output = new System.Windows.Forms.TextBox();
-            this.fpsChooser = new MeGUI.core.gui.FPSChooser();
             this.helpButton1 = new MeGUI.core.gui.HelpButton();
             this.chaptersGroupbox.SuspendLayout();
             this.gbInput.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.minimumTitleLength)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -218,8 +215,6 @@ namespace MeGUI
             // 
             // gbInput
             // 
-            this.gbInput.Controls.Add(this.lblMinimumTitleLength);
-            this.gbInput.Controls.Add(this.minimumTitleLength);
             this.gbInput.Controls.Add(this.btInput);
             this.gbInput.Controls.Add(this.input);
             this.gbInput.Controls.Add(this.rbFromFile);
@@ -230,34 +225,6 @@ namespace MeGUI
             this.gbInput.TabIndex = 24;
             this.gbInput.TabStop = false;
             this.gbInput.Text = " Input ";
-            // 
-            // lblMinimumTitleLength
-            // 
-            this.lblMinimumTitleLength.AutoSize = true;
-            this.lblMinimumTitleLength.Location = new System.Drawing.Point(219, 51);
-            this.lblMinimumTitleLength.Name = "lblMinimumTitleLength";
-            this.lblMinimumTitleLength.Size = new System.Drawing.Size(162, 13);
-            this.lblMinimumTitleLength.TabIndex = 12;
-            this.lblMinimumTitleLength.Text = "Minimum title length (in seconds)";
-            // 
-            // minimumTitleLength
-            // 
-            this.minimumTitleLength.Location = new System.Drawing.Point(393, 49);
-            this.minimumTitleLength.Maximum = new decimal(new int[] {
-            9999,
-            0,
-            0,
-            0});
-            this.minimumTitleLength.Name = "minimumTitleLength";
-            this.minimumTitleLength.Size = new System.Drawing.Size(54, 21);
-            this.minimumTitleLength.TabIndex = 11;
-            this.minimumTitleLength.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.minimumTitleLength.Value = new decimal(new int[] {
-            900,
-            0,
-            0,
-            0});
-            this.minimumTitleLength.ValueChanged += new System.EventHandler(this.minimumTitleLength_ValueChanged);
             // 
             // btInput
             // 
@@ -281,7 +248,7 @@ namespace MeGUI
             // 
             this.rbFromFile.AutoSize = true;
             this.rbFromFile.Checked = true;
-            this.rbFromFile.Location = new System.Drawing.Point(16, 49);
+            this.rbFromFile.Location = new System.Drawing.Point(18, 47);
             this.rbFromFile.Name = "rbFromFile";
             this.rbFromFile.Size = new System.Drawing.Size(68, 17);
             this.rbFromFile.TabIndex = 8;
@@ -292,11 +259,11 @@ namespace MeGUI
             // rbFromDisk
             // 
             this.rbFromDisk.AutoSize = true;
-            this.rbFromDisk.Location = new System.Drawing.Point(117, 49);
+            this.rbFromDisk.Location = new System.Drawing.Point(131, 47);
             this.rbFromDisk.Name = "rbFromDisk";
-            this.rbFromDisk.Size = new System.Drawing.Size(71, 17);
+            this.rbFromDisk.Size = new System.Drawing.Size(82, 17);
             this.rbFromDisk.TabIndex = 7;
-            this.rbFromDisk.Text = "From Disk";
+            this.rbFromDisk.Text = "From Folder";
             this.rbFromDisk.UseVisualStyleBackColor = true;
             // 
             // saveButton
@@ -343,6 +310,18 @@ namespace MeGUI
             this.lblFPS.TabIndex = 15;
             this.lblFPS.Text = "FPS";
             this.lblFPS.Visible = false;
+            // 
+            // fpsChooser
+            // 
+            this.fpsChooser.Location = new System.Drawing.Point(284, 14);
+            this.fpsChooser.MaximumSize = new System.Drawing.Size(1000, 29);
+            this.fpsChooser.MinimumSize = new System.Drawing.Size(64, 29);
+            this.fpsChooser.Name = "fpsChooser";
+            this.fpsChooser.NullString = null;
+            this.fpsChooser.SelectedIndex = 0;
+            this.fpsChooser.Size = new System.Drawing.Size(98, 29);
+            this.fpsChooser.TabIndex = 14;
+            this.fpsChooser.Visible = false;
             // 
             // rbXML
             // 
@@ -397,18 +376,6 @@ namespace MeGUI
             this.output.Size = new System.Drawing.Size(365, 21);
             this.output.TabIndex = 9;
             // 
-            // fpsChooser
-            // 
-            this.fpsChooser.Location = new System.Drawing.Point(284, 14);
-            this.fpsChooser.MaximumSize = new System.Drawing.Size(1000, 29);
-            this.fpsChooser.MinimumSize = new System.Drawing.Size(64, 29);
-            this.fpsChooser.Name = "fpsChooser";
-            this.fpsChooser.NullString = null;
-            this.fpsChooser.SelectedIndex = 0;
-            this.fpsChooser.Size = new System.Drawing.Size(98, 29);
-            this.fpsChooser.TabIndex = 14;
-            this.fpsChooser.Visible = false;
-            // 
             // helpButton1
             // 
             this.helpButton1.ArticleName = "Chapter Creator";
@@ -441,7 +408,6 @@ namespace MeGUI
             this.chaptersGroupbox.PerformLayout();
             this.gbInput.ResumeLayout(false);
             this.gbInput.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.minimumTitleLength)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
@@ -472,8 +438,6 @@ namespace MeGUI
         private System.Windows.Forms.TextBox input;
         private MeGUI.core.gui.HelpButton helpButton1;
         private System.Windows.Forms.CheckBox closeOnQueue;
-        private System.Windows.Forms.Label lblMinimumTitleLength;
-        private System.Windows.Forms.NumericUpDown minimumTitleLength;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button btOutput;
         private System.Windows.Forms.TextBox output;

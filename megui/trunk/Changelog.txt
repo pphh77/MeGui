@@ -1,3 +1,4 @@
+2666 [OneClick]+[ChapterCreator] improved title selector for DVD/Blu-ray sources
 2665 [OneClick]             added support for folders as drag&drop source of the input control
 2664 [IFOParser]            improved type detection
 2663 [FileIndexer]          fixed processing of DVDs with only one PGC (regression of 2658)
