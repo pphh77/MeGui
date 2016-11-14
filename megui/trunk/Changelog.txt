@@ -1,3 +1,4 @@
+2668 [FileIndexer]          added title selector for DVD sources incl. multi-angle support
 2667 [TitleSelector]        added support for multi-angle DVD sources
      [OneClick]             added support for multi-angle DVD sources
 2666 [TitleSelector]        improved title selector for DVD/Blu-ray sources

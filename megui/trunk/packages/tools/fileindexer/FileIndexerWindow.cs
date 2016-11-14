@@ -48,6 +48,7 @@ namespace MeGUI
         private List<AudioTrackInfo> audioTracks = new List<AudioTrackInfo>();
         private bool dialogMode = false; // $%£%$^>*"%$%%$#{"!!! Affects the public behaviour!
         private bool configured = false;
+        private MediaInfoFile iFile;
         #endregion
 
         #region start / stop
@@ -257,6 +258,7 @@ namespace MeGUI
             openVideo(input.Filename);
             checkIndexIO();
         }
+
         private void openVideo(string fileName)
         {
             this._oLog = MainForm.Instance.FileIndexerLog;
@@ -265,12 +267,24 @@ namespace MeGUI
                 _oLog = MainForm.Instance.Log.Info("FileIndexer");
                 MainForm.Instance.FileIndexerLog = _oLog;
             }
-            MediaInfoFile iFile = new MediaInfoFile(fileName, ref _oLog);
 
-            strVideoCodec = iFile.VideoInfo.Track.Codec;
-            strVideoScanType = iFile.VideoInfo.ScanType;
-            strContainerFormat = iFile.ContainerFileTypeString;
-            audioTracks = iFile.AudioInfo.Tracks;
+            iFile = null;
+            if (GetDVDSource(fileName, ref iFile))
+            {
+                if (iFile != null)
+                    fileName = iFile.FileName;
+            }
+            else
+                iFile = new MediaInfoFile(fileName, ref _oLog);
+
+            if (iFile != null && iFile.HasVideo)
+            {
+                strVideoCodec = iFile.VideoInfo.Track.Codec;
+                strVideoScanType = iFile.VideoInfo.ScanType;
+                strContainerFormat = iFile.ContainerFileTypeString;
+            }
+            else
+                strVideoCodec = strVideoScanType = strContainerFormat = string.Empty;
 
             if (String.IsNullOrEmpty(strVideoCodec))
                 txtCodecInformation.Text = " unknown";
@@ -285,47 +299,82 @@ namespace MeGUI
             else
                 txtScanTypeInformation.Text = " " + strVideoScanType;
 
-            cbPGC.Items.Clear();
-            if (iFile.VideoInfo.PGCCount <= 0)
-                cbPGC.Items.Add("n/a");
-            else if (iFile.VideoInfo.PGCCount == 1)
-                cbPGC.Items.Add("all");
+            if (iFile != null && iFile.HasAudio)
+                audioTracks = iFile.AudioInfo.Tracks;
             else
-            {
-                for (int i = 0; i < iFile.VideoInfo.PGCCount; i++)
-                    cbPGC.Items.Add((i+1).ToString());
-            }
-            cbPGC.SelectedIndex = 0;
-            cbPGC.Enabled = iFile.VideoInfo.PGCCount > 1;
+                audioTracks = new List<AudioTrackInfo>();
 
             if (input.Filename != fileName)
                 input.Filename = fileName;
 
             generateAudioList();
 
-            btnD2V.Enabled = iFile.isD2VIndexable();
-            btnDGM.Enabled = iFile.isDGMIndexable();
-            btnDGI.Enabled = iFile.isDGIIndexable();
-            btnFFMS.Enabled = iFile.isFFMSIndexable();
-            btnLSMASH.Enabled = iFile.isLSMASHIndexable(true);
+            if (iFile != null)
+            {
+                IndexType newType = IndexType.NONE;
+                iFile.recommendIndexer(out newType, true);
+                if (newType == IndexType.D2V || newType == IndexType.DGM ||
+                    newType == IndexType.DGI || newType == IndexType.FFMS ||
+                    newType == IndexType.LSMASH)
+                {
+                    btnD2V.Enabled = iFile.isD2VIndexable();
+                    btnDGM.Enabled = iFile.isDGMIndexable();
+                    btnDGI.Enabled = iFile.isDGIIndexable();
+                    btnFFMS.Enabled = iFile.isFFMSIndexable();
+                    btnLSMASH.Enabled = iFile.isLSMASHIndexable(true);
 
-            IndexType newType = IndexType.NONE;
-            iFile.recommendIndexer(out newType, true);
-            if (newType == IndexType.D2V || newType == IndexType.DGM ||
-                newType == IndexType.DGI || newType == IndexType.FFMS ||
-                newType == IndexType.LSMASH)
-            {
-                gbIndexer.Enabled = gbAudio.Enabled = gbOutput.Enabled = true;
-                changeIndexer(newType);
+                    gbIndexer.Enabled = gbAudio.Enabled = gbOutput.Enabled = true;
+                    changeIndexer(newType);
+                    return;
+                }
             }
-            else
+
+            // source file not supported
+            btnD2V.Enabled = btnDGM.Enabled = btnDGI.Enabled = btnFFMS.Enabled = btnLSMASH.Enabled = false;
+            gbIndexer.Enabled = gbAudio.Enabled = gbOutput.Enabled = false;
+            btnFFMS.Checked = btnD2V.Checked = btnDGM.Checked = btnDGI.Checked = btnLSMASH.Checked = false;
+            output.Text = "";
+            demuxNoAudiotracks.Checked = true;
+            MessageBox.Show("No indexer for this file found!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+
+        /// <summary>
+        /// Checks if the source file if from a DVD stucture & asks for title list if needed
+        /// </summary>
+        /// <param name="fileName">input file name</param>
+        /// <param name="iFileTemp">reference to the mediainfofile object</param>
+        /// <returns>true if DVD source is found, false if no DVD source is available</returns>
+        private bool GetDVDSource(string fileName, ref MediaInfoFile iFileTemp)
+        {
+            iFileTemp = null;
+            using (frmStreamSelect frm = new frmStreamSelect(fileName, SelectionMode.One))
             {
-                gbIndexer.Enabled = gbAudio.Enabled = gbOutput.Enabled = false;
-                btnFFMS.Checked = btnD2V.Checked = btnDGM.Checked = btnDGI.Checked = btnLSMASH.Checked = false;
-                output.Text = "";
-                demuxNoAudiotracks.Checked = true;
-                MessageBox.Show("No indexer for this file found. Please try open it directly in the AVS Script Creator", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                // check if playlists have been found
+                if (frm.TitleCount == 0)
+                    return false;
+
+                // only continue if a DVD or Blu-ray structure is found
+                if (!frm.IsDVDSource)
+                    return false;
+
+                // open the selection window if not exactly one title set with the desired minimum length is found
+                DialogResult dr = DialogResult.OK;
+                if (frm.TitleCountWithRequiredLength != 1)
+                    dr = frm.ShowDialog();
+
+                if (dr != DialogResult.OK)
+                    return true;
+
+                ChapterInfo oChapterInfo = frm.SelectedSingleChapterInfo;
+                string strSourceFile = Path.Combine(oChapterInfo.SourcePath, oChapterInfo.Title + "_0.IFO");
+                if (!File.Exists(strSourceFile))
+                {
+                    _oLog.LogEvent(strSourceFile + " cannot be found. skipping...");
+                    return true;
+                }
+                iFileTemp = new MediaInfoFile(strSourceFile, ref _oLog, oChapterInfo.PGCNumber, oChapterInfo.AngleNumber);
             }
+            return true;
         }
 
         private void generateAudioList()
@@ -394,7 +443,10 @@ namespace MeGUI
             {
                 // DVD structure found &&
                 // file ends with e.g. _1 as in VTS_01_1
-                fileName = fileName.Substring(0, fileName.LastIndexOf('_') + 1) + (cbPGC.SelectedIndex + 1);
+                fileName = fileName.Substring(0, fileName.LastIndexOf('_') + 1) + iFile.VideoInfo.PGCNumber;
+                if (iFile.VideoInfo.AngleNumber > 0)
+                    fileName += "_" + iFile.VideoInfo.AngleNumber;
+
             }
             fileName = fileNamePrefix + fileName + Path.GetExtension(this.input.Filename);
 
@@ -438,11 +490,11 @@ namespace MeGUI
             // create pgcdemux job if needed
             if (Path.GetExtension(input.Filename).ToUpperInvariant().Equals(".IFO"))
             {
-                if (cbPGC.Items.Count > 1 || IFOparser.GetAngleCount(input.Filename, (cbPGC.SelectedIndex + 1)) > 0)
+                if (iFile.VideoInfo.PGCCount > 0 || iFile.VideoInfo.AngleCount > 0)
                 {
                     // pgcdemux must be used as either multiple PGCs or a multi-angle disc are found
                     string tempFile = Path.Combine(Path.GetDirectoryName(output.Text), Path.GetFileNameWithoutExtension(output.Text) + "_1.VOB");
-                    prepareJobs = new SequentialChain(new PgcDemuxJob(videoInput, tempFile, (cbPGC.SelectedIndex + 1), 0));
+                    prepareJobs = new SequentialChain(new PgcDemuxJob(videoInput, tempFile, iFile.VideoInfo.PGCNumber, iFile.VideoInfo.AngleNumber));
                     videoInput = tempFile;
 
                     string filesToOverwrite = string.Empty;
@@ -682,18 +734,6 @@ namespace MeGUI
         private void btnLSMASH_Click(object sender, EventArgs e)
         {
             changeIndexer(IndexType.LSMASH);
-        }
-
-        private void cbPGC_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            string fileName = Path.GetFileNameWithoutExtension(output.Text);
-            if (Path.GetExtension(input.Filename).ToUpperInvariant().Equals(".IFO")
-                && FileUtil.RegExMatch(fileName, @"_\d{1,2}\z", false))
-            {
-                // file ends with e.g. _1 as in VTS_01_1
-                fileName = fileName.Substring(0, fileName.LastIndexOf('_') + 1) + (cbPGC.SelectedIndex + 1);
-                output.Text = Path.Combine(FileUtil.GetOutputFolder(output.Text), fileName + Path.GetExtension(output.Text));
-            }
         }
     }
 

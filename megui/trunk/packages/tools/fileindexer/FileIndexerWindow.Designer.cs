@@ -72,8 +72,6 @@ namespace MeGUI
             this.btnD2V = new System.Windows.Forms.RadioButton();
             this.btnDGI = new System.Windows.Forms.RadioButton();
             this.gbFileInformation = new System.Windows.Forms.GroupBox();
-            this.cbPGC = new System.Windows.Forms.ComboBox();
-            this.lblPGC = new System.Windows.Forms.Label();
             this.txtContainerInformation = new System.Windows.Forms.TextBox();
             this.txtScanTypeInformation = new System.Windows.Forms.TextBox();
             this.txtCodecInformation = new System.Windows.Forms.TextBox();
@@ -341,8 +339,6 @@ namespace MeGUI
             // 
             // gbFileInformation
             // 
-            this.gbFileInformation.Controls.Add(this.cbPGC);
-            this.gbFileInformation.Controls.Add(this.lblPGC);
             this.gbFileInformation.Controls.Add(this.txtContainerInformation);
             this.gbFileInformation.Controls.Add(this.txtScanTypeInformation);
             this.gbFileInformation.Controls.Add(this.txtCodecInformation);
@@ -356,40 +352,20 @@ namespace MeGUI
             this.gbFileInformation.TabStop = false;
             this.gbFileInformation.Text = " File Information ";
             // 
-            // cbPGC
-            // 
-            this.cbPGC.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbPGC.Enabled = false;
-            this.cbPGC.FormattingEnabled = true;
-            this.cbPGC.Location = new System.Drawing.Point(375, 34);
-            this.cbPGC.Name = "cbPGC";
-            this.cbPGC.Size = new System.Drawing.Size(56, 21);
-            this.cbPGC.TabIndex = 7;
-            this.cbPGC.SelectedIndexChanged += new System.EventHandler(this.cbPGC_SelectedIndexChanged);
-            // 
-            // lblPGC
-            // 
-            this.lblPGC.AutoSize = true;
-            this.lblPGC.Location = new System.Drawing.Point(372, 18);
-            this.lblPGC.Name = "lblPGC";
-            this.lblPGC.Size = new System.Drawing.Size(27, 13);
-            this.lblPGC.TabIndex = 6;
-            this.lblPGC.Text = "PGC";
-            // 
             // txtContainerInformation
             // 
             this.txtContainerInformation.Enabled = false;
-            this.txtContainerInformation.Location = new System.Drawing.Point(253, 34);
+            this.txtContainerInformation.Location = new System.Drawing.Point(298, 34);
             this.txtContainerInformation.Name = "txtContainerInformation";
-            this.txtContainerInformation.Size = new System.Drawing.Size(115, 21);
+            this.txtContainerInformation.Size = new System.Drawing.Size(133, 21);
             this.txtContainerInformation.TabIndex = 5;
             // 
             // txtScanTypeInformation
             // 
             this.txtScanTypeInformation.Enabled = false;
-            this.txtScanTypeInformation.Location = new System.Drawing.Point(132, 34);
+            this.txtScanTypeInformation.Location = new System.Drawing.Point(160, 34);
             this.txtScanTypeInformation.Name = "txtScanTypeInformation";
-            this.txtScanTypeInformation.Size = new System.Drawing.Size(115, 21);
+            this.txtScanTypeInformation.Size = new System.Drawing.Size(133, 21);
             this.txtScanTypeInformation.TabIndex = 4;
             // 
             // txtCodecInformation
@@ -397,13 +373,13 @@ namespace MeGUI
             this.txtCodecInformation.Enabled = false;
             this.txtCodecInformation.Location = new System.Drawing.Point(12, 34);
             this.txtCodecInformation.Name = "txtCodecInformation";
-            this.txtCodecInformation.Size = new System.Drawing.Size(114, 21);
+            this.txtCodecInformation.Size = new System.Drawing.Size(141, 21);
             this.txtCodecInformation.TabIndex = 3;
             // 
             // lblScanType
             // 
             this.lblScanType.AutoSize = true;
-            this.lblScanType.Location = new System.Drawing.Point(129, 18);
+            this.lblScanType.Location = new System.Drawing.Point(157, 18);
             this.lblScanType.Name = "lblScanType";
             this.lblScanType.Size = new System.Drawing.Size(57, 13);
             this.lblScanType.TabIndex = 2;
@@ -422,7 +398,7 @@ namespace MeGUI
             // lblContainer
             // 
             this.lblContainer.AutoSize = true;
-            this.lblContainer.Location = new System.Drawing.Point(253, 18);
+            this.lblContainer.Location = new System.Drawing.Point(295, 18);
             this.lblContainer.Name = "lblContainer";
             this.lblContainer.Size = new System.Drawing.Size(54, 13);
             this.lblContainer.TabIndex = 0;
@@ -503,8 +479,6 @@ namespace MeGUI
         private System.Windows.Forms.TextBox txtCodecInformation;
         private System.Windows.Forms.TextBox txtContainerInformation;
         private System.Windows.Forms.TextBox txtScanTypeInformation;
-        private System.Windows.Forms.Label lblPGC;
-        private System.Windows.Forms.ComboBox cbPGC;
         private System.Windows.Forms.RadioButton btnLSMASH;
     }
 }

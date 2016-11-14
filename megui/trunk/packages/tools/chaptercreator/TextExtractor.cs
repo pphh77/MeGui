@@ -26,33 +26,40 @@ namespace MeGUI
 
         public override List<ChapterInfo> GetStreams(string location)
         {
+            List<Chapter> list = new List<Chapter>();
             List<ChapterInfo> pgcs = new List<ChapterInfo>();
 
-            List<Chapter> list = new List<Chapter>();
-
-            int num = 0;
-            TimeSpan ts = new TimeSpan(0);
-            string time = String.Empty;
-            string name = String.Empty;
-            bool onTime = true;
-            string[] lines = File.ReadAllLines(location);
-            foreach (string line in lines)
+            try
             {
-                if (onTime)
+                int num = 0;
+                TimeSpan ts = new TimeSpan(0);
+                string time = String.Empty;
+                string name = String.Empty;
+                bool onTime = true;
+                string[] lines = File.ReadAllLines(location);
+                foreach (string line in lines)
                 {
-                    num++;
-                    //read time
-                    time = line.Replace("CHAPTER" + num.ToString("00") + "=", "");
-                    ts = TimeSpan.Parse(time);
+                    if (onTime)
+                    {
+                        num++;
+                        //read time
+                        time = line.Replace("CHAPTER" + num.ToString("00") + "=", "");
+                        ts = TimeSpan.Parse(time);
+                    }
+                    else
+                    {
+                        //read name
+                        name = line.Replace("CHAPTER" + num.ToString("00") + "NAME=", "");
+                        //add it to list
+                        list.Add(new Chapter() { Name = name, Time = ts });
+                    }
+                    onTime = !onTime;
                 }
-                else
-                {
-                    //read name
-                    name = line.Replace("CHAPTER" + num.ToString("00") + "NAME=", "");
-                    //add it to list
-                    list.Add(new Chapter() { Name = name, Time = ts });
-                }
-                onTime = !onTime;
+            }
+            catch (Exception)
+            {
+                OnExtractionComplete();
+                return new List<ChapterInfo>();
             }
 
             pgcs.Add(new ChapterInfo()

@@ -356,6 +356,13 @@ namespace MeGUI
                     if (infoLog != null)
                         infoLog.Info("Indexed File: " + _file);
                 }
+                else if (Path.GetExtension(file).ToLowerInvariant().Equals(".bup"))
+                {
+                    // ignore .BUP (DVD) files
+                    if (oLog != null)
+                        infoLog.LogEvent("The file is not supported", ImageType.Warning);
+                    return;
+                }
 
                 // get basic media information
                 if (Path.GetExtension(file.ToLowerInvariant()) == ".vob")
@@ -1238,9 +1245,8 @@ namespace MeGUI
                 oType = FileIndexerWindow.IndexType.FFMS;
             else
             {
-                oType = FileIndexerWindow.IndexType.FFMS;
-                if (_indexerToUse == FileIndexerWindow.IndexType.NONE)
-                    _indexerToUse = oType;
+                oType = FileIndexerWindow.IndexType.NONE;
+                _indexerToUse = FileIndexerWindow.IndexType.NONE;
                 return false;
             }
             if (_indexerToUse == FileIndexerWindow.IndexType.NONE)
