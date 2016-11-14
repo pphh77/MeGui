@@ -268,11 +268,15 @@ namespace MeGUI
                 MainForm.Instance.FileIndexerLog = _oLog;
             }
 
+            gbFileInformation.Text = " File Information ";
             iFile = null;
             if (GetDVDSource(fileName, ref iFile))
             {
                 if (iFile != null)
+                {
                     fileName = iFile.FileName;
+                    gbFileInformation.Text += " - PGC " + iFile.VideoInfo.PGCNumber.ToString("D2") + (iFile.VideoInfo.AngleNumber > 0 ? " - Angle " + iFile.VideoInfo.AngleNumber + " " : " ");
+                }
             }
             else
                 iFile = new MediaInfoFile(fileName, ref _oLog);

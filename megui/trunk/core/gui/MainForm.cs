@@ -994,8 +994,11 @@ namespace MeGUI
             PackageSystem.JobPostProcessors.Register(ffmsIndexJobPostProcessor.PostProcessor);
             PackageSystem.JobPostProcessors.Register(lsmashIndexJobPostProcessor.PostProcessor);
             PackageSystem.JobPostProcessors.Register(CleanupJobRunner.DeleteIntermediateFilesPostProcessor);
+
+            // edit job
             PackageSystem.JobConfigurers.Register(MuxWindow.Configurer);
             PackageSystem.JobConfigurers.Register(AudioEncodingWindow.Configurer);
+            //PackageSystem.JobConfigurers.Register(VobSubIndexWindow.Configurer);
         }
 
         /// <summary>

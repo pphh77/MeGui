@@ -26,6 +26,7 @@ using System.Windows.Forms;
 
 using MeGUI.core.plugins.interfaces;
 using MeGUI.core.util;
+using MeGUI.core.details;
 
 namespace MeGUI
 {
@@ -34,9 +35,29 @@ namespace MeGUI
         #region variables
         private bool dialogMode = false;
         private bool configured = false;
+        private int iPGC = 1;
+        private int iAngle = 0;
         #endregion
 
         #region start / stop
+
+        public static readonly IDable<ReconfigureJob> Configurer = new IDable<ReconfigureJob>("vobsubber_reconfigure", new ReconfigureJob(ReconfigureJob));
+
+        private static Job ReconfigureJob(Job j)
+        {
+            if (!(j is SubtitleIndexJob))
+                return null;
+
+            SubtitleIndexJob m = (SubtitleIndexJob)j;
+            VobSubIndexWindow w = new VobSubIndexWindow(MainForm.Instance);
+
+            w.Job = m;
+            if (w.ShowDialog() == DialogResult.OK)
+                return w.Job;
+            else
+                return m;
+        }
+
         public VobSubIndexWindow(MainForm mainForm)
         {
             InitializeComponent();
@@ -80,15 +101,90 @@ namespace MeGUI
         }
         #endregion
 
-        private void openVideo(string fileName)
+        /// <summary>
+        /// Even handler fired when a new input file is selected
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private void input_FileSelected(FileBar sender, FileBarEventArgs args)
         {
-            input.Filename = fileName;
+            subtitleGroupbox.Text = " Subtitles ";
             subtitleTracks.Items.Clear();
-            int nbPGC = IFOparser.GetPGCCount(fileName);
-            pgc.Maximum = nbPGC;
-            pgc.Enabled = (nbPGC > 1);
-            subtitleTracks.Items.AddRange(IFOparser.GetSubtitlesStreamsInfos(input.Filename, Convert.ToInt32(pgc.Value), chkShowAllStreams.Checked));
+            output.Filename = string.Empty;
+
+            string strIFOFile = input.Filename;
+            // check if the input file can be processed
+            if (!GetDVDSource(ref strIFOFile))
+            {
+                MessageBox.Show("No DVD structure found!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            subtitleGroupbox.Text += "- PGC " + iPGC + (iAngle > 0 ? " - Angle " + iAngle + " " : " "); 
+
+            if (!input.Filename.Equals(strIFOFile))
+                input.Filename = strIFOFile;
+
+            SetSubtitles();
+            checkIndexIO();
+        }
+
+        private void SetSubtitles()
+        {
+            subtitleTracks.Items.Clear();
+            subtitleTracks.Items.AddRange(IFOparser.GetSubtitlesStreamsInfos(input.Filename, iPGC, chkShowAllStreams.Checked));
             PreselectItems();
+
+            // get proper pre- and postfix based on the input file
+            string filePath = FileUtil.GetOutputFolder(input.Filename);
+            string filePrefix = FileUtil.GetOutputFilePrefix(input.Filename);
+            string fileName = Path.GetFileNameWithoutExtension(input.Filename);
+            if (FileUtil.RegExMatch(fileName, @"_\d{1,2}\z", false))
+                fileName = fileName.Substring(0, fileName.LastIndexOf('_') + 1);
+            else
+                fileName = fileName + "_";
+            output.Filename = Path.Combine(filePath, filePrefix + fileName + iPGC + (iAngle > 0 ? "_" + iAngle : "") + ".idx");
+        }
+
+        /// <summary>
+        /// Checks if the source file if from a DVD stucture & asks for title list if needed
+        /// </summary>
+        /// <param name="fileName">input file name</param>
+        /// <returns>true if DVD source is found, false if no DVD source is available</returns>
+        private bool GetDVDSource(ref string fileName)
+        {
+            iPGC = 1;
+            iAngle = 0;
+            using (frmStreamSelect frm = new frmStreamSelect(fileName, SelectionMode.One))
+            {
+                // check if playlists have been found
+                if (frm.TitleCount == 0)
+                    return false;
+
+                // only continue if a DVD or Blu-ray structure is found
+                if (!frm.IsDVDSource)
+                    return false;
+
+                // open the selection window if not exactly one title set with the desired minimum length is found
+                DialogResult dr = DialogResult.OK;
+                if (frm.TitleCountWithRequiredLength != 1)
+                    dr = frm.ShowDialog();
+
+                if (dr != DialogResult.OK)
+                    return false;
+
+                ChapterInfo oChapterInfo = frm.SelectedSingleChapterInfo;
+                string strSourceFile = Path.Combine(oChapterInfo.SourcePath, oChapterInfo.Title + "_0.IFO");
+                if (!File.Exists(strSourceFile))
+                {
+                    // cannot be found. skipping...;
+                    return false;
+                }
+                iPGC = oChapterInfo.PGCNumber;
+                iAngle = oChapterInfo.AngleNumber;
+                fileName = strSourceFile;
+            }
+            return true;
         }
 
         /// <summary>
@@ -141,40 +237,8 @@ namespace MeGUI
         {
             List<int> trackIDs = new List<int>();
             foreach (string s in subtitleTracks.CheckedItems)
-            {
                 trackIDs.Add(Int32.Parse(s.Substring(1,2)));
-            }
-            return new SubtitleIndexJob(input.Filename, output.Filename, keepAllTracks.Checked, trackIDs, (int)pgc.Value, 0, chkSingleFileExport.Checked);
-        }
-
-        public void setConfig(string input, string output, bool indexAllTracks, List<int> trackIDs, int pgc)
-        {
-            this.dialogMode = true;
-            queueButton.Text = "Update";
-            this.input.Filename = input;
-            this.pgc.Value = pgc;
-            openVideo(input);
-            this.output.Filename = output;
-            checkIndexIO();
-            if (indexAllTracks)
-                keepAllTracks.Checked = true;
-            else
-            {
-                demuxSelectedTracks.Checked = true;
-                int index = 0;
-                List<int> checkedItems = new List<int>();
-                foreach (object item in subtitleTracks.Items)
-                {
-                    SubtitleInfo si = (SubtitleInfo)item;
-                    if (trackIDs.Contains(si.Index))
-                        checkedItems.Add(index);
-                    index++;
-                }
-                foreach (int idx in checkedItems)
-                {
-                    subtitleTracks.SetItemChecked(idx, true);
-                }
-            }
+            return new SubtitleIndexJob(input.Filename, output.Filename, keepAllTracks.Checked, trackIDs, iPGC, iAngle, chkSingleFileExport.Checked);
         }
 
         /// <summary>
@@ -183,24 +247,39 @@ namespace MeGUI
         public SubtitleIndexJob Job
         {
             get { return generateJob(); }
+            set { setConfig(value.Input, value.Output, value.IndexAllTracks, value.TrackIDs, value.PGC, value.Angle); }
         }
 
-        private void input_FileSelected(FileBar sender, FileBarEventArgs args)
+        public void setConfig(string input, string output, bool indexAllTracks, List<int> trackIDs, int pgc, int angle)
         {
-            this.pgc.Value = 1;
-            openVideo(input.Filename);
-
-            // get proper pre- and postfix based on the input file
-            string filePath = FileUtil.GetOutputFolder(input.Filename);
-            string filePrefix = FileUtil.GetOutputFilePrefix(input.Filename);
-            string fileName = Path.GetFileNameWithoutExtension(input.Filename);
-            if (FileUtil.RegExMatch(fileName, @"_\d{1,2}\z", false))
-                fileName = fileName.Substring(0, fileName.LastIndexOf('_') + 1);
-            else
-                fileName = fileName + "_";
-            output.Filename = Path.Combine(filePath, filePrefix + fileName + this.pgc.Value + ".idx");
-
+            this.dialogMode = true;
+            queueButton.Text = "Update";
+            this.input.Filename = input;
+            iPGC = pgc;
+            iAngle = angle;
+            SetSubtitles();
+            this.output.Filename = output;
             checkIndexIO();
+            if (indexAllTracks)
+            {
+                keepAllTracks.Checked = true;
+            }
+            else
+            {
+                demuxSelectedTracks.Checked = true;
+                int index = 0;
+                List<int> checkedItems = new List<int>();
+                foreach (string item in subtitleTracks.Items)
+                {
+                    if (trackIDs.Contains(int.Parse(item.Substring(1,2))))
+                        checkedItems.Add(index);
+                    index++;
+                }
+                foreach (int idx in checkedItems)
+                {
+                    subtitleTracks.SetItemChecked(idx, true);
+                }
+            }
         }
 
         private void output_FileSelected(FileBar sender, FileBarEventArgs args)
@@ -213,28 +292,9 @@ namespace MeGUI
             if (String.IsNullOrEmpty(input.Filename))
                 return;
 
-            openVideo(input.Filename);
+            SetSubtitles();
             checkIndexIO();
             keepAllTracks_CheckedChanged(null, null);
-        }
-
-        private void pgc_ValueChanged(object sender, EventArgs e)
-        {
-            if (String.IsNullOrEmpty(input.Filename))
-                return;
-
-            openVideo(input.Filename);
-            
-            // check if the PGC number has to be changed in the output file name
-            string fileName = Path.GetFileNameWithoutExtension(output.Filename);
-            if (FileUtil.RegExMatch(fileName, @"_\d{1,2}\z", false))
-            {
-                // file ends with e.g. _11 as in VTS_01_11
-                fileName = fileName.Substring(0, fileName.LastIndexOf('_') + 1) + this.pgc.Value + ".idx";
-                output.Filename = Path.Combine(FileUtil.GetOutputFolder(output.Filename), fileName);
-            }
-
-            checkIndexIO();
         }
 
         private void chkSingleFileExport_CheckedChanged(object sender, EventArgs e)

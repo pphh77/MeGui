@@ -31,8 +31,6 @@ namespace MeGUI
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(VobSubIndexWindow));
             this.inputGroupbox = new System.Windows.Forms.GroupBox();
             this.input = new MeGUI.FileBar();
-            this.pgc = new System.Windows.Forms.NumericUpDown();
-            this.pgcLabel = new System.Windows.Forms.Label();
             this.inputLabel = new System.Windows.Forms.Label();
             this.outputGroupbox = new System.Windows.Forms.GroupBox();
             this.output = new MeGUI.FileBar();
@@ -47,7 +45,6 @@ namespace MeGUI
             this.queueButton = new System.Windows.Forms.Button();
             this.helpButton1 = new MeGUI.core.gui.HelpButton();
             this.inputGroupbox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pgc)).BeginInit();
             this.outputGroupbox.SuspendLayout();
             this.subtitleGroupbox.SuspendLayout();
             this.SuspendLayout();
@@ -55,12 +52,10 @@ namespace MeGUI
             // inputGroupbox
             // 
             this.inputGroupbox.Controls.Add(this.input);
-            this.inputGroupbox.Controls.Add(this.pgc);
-            this.inputGroupbox.Controls.Add(this.pgcLabel);
             this.inputGroupbox.Controls.Add(this.inputLabel);
             this.inputGroupbox.Location = new System.Drawing.Point(2, 2);
             this.inputGroupbox.Name = "inputGroupbox";
-            this.inputGroupbox.Size = new System.Drawing.Size(424, 70);
+            this.inputGroupbox.Size = new System.Drawing.Size(424, 48);
             this.inputGroupbox.TabIndex = 1;
             this.inputGroupbox.TabStop = false;
             this.inputGroupbox.Text = "Input";
@@ -79,39 +74,6 @@ namespace MeGUI
             this.input.TabIndex = 5;
             this.input.Title = null;
             this.input.FileSelected += new MeGUI.FileBarEventHandler(this.input_FileSelected);
-            // 
-            // pgc
-            // 
-            this.pgc.Enabled = false;
-            this.pgc.Location = new System.Drawing.Point(120, 45);
-            this.pgc.Maximum = new decimal(new int[] {
-            99,
-            0,
-            0,
-            0});
-            this.pgc.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.pgc.Name = "pgc";
-            this.pgc.Size = new System.Drawing.Size(50, 21);
-            this.pgc.TabIndex = 4;
-            this.pgc.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.pgc.ValueChanged += new System.EventHandler(this.pgc_ValueChanged);
-            // 
-            // pgcLabel
-            // 
-            this.pgcLabel.AutoSize = true;
-            this.pgcLabel.Location = new System.Drawing.Point(16, 47);
-            this.pgcLabel.Name = "pgcLabel";
-            this.pgcLabel.Size = new System.Drawing.Size(27, 13);
-            this.pgcLabel.TabIndex = 3;
-            this.pgcLabel.Text = "PGC";
             // 
             // inputLabel
             // 
@@ -162,9 +124,9 @@ namespace MeGUI
             this.subtitleGroupbox.Controls.Add(this.subtitleTracks);
             this.subtitleGroupbox.Controls.Add(this.demuxSelectedTracks);
             this.subtitleGroupbox.Controls.Add(this.keepAllTracks);
-            this.subtitleGroupbox.Location = new System.Drawing.Point(2, 78);
+            this.subtitleGroupbox.Location = new System.Drawing.Point(2, 56);
             this.subtitleGroupbox.Name = "subtitleGroupbox";
-            this.subtitleGroupbox.Size = new System.Drawing.Size(424, 225);
+            this.subtitleGroupbox.Size = new System.Drawing.Size(424, 247);
             this.subtitleGroupbox.TabIndex = 14;
             this.subtitleGroupbox.TabStop = false;
             this.subtitleGroupbox.Text = "Subtitles";
@@ -197,7 +159,7 @@ namespace MeGUI
             this.subtitleTracks.FormattingEnabled = true;
             this.subtitleTracks.Location = new System.Drawing.Point(50, 72);
             this.subtitleTracks.Name = "subtitleTracks";
-            this.subtitleTracks.Size = new System.Drawing.Size(356, 148);
+            this.subtitleTracks.Size = new System.Drawing.Size(356, 164);
             this.subtitleTracks.TabIndex = 9;
             // 
             // demuxSelectedTracks
@@ -267,8 +229,6 @@ namespace MeGUI
             this.Name = "VobSubIndexWindow";
             this.Text = "MeGUI - VobSub Indexer";
             this.inputGroupbox.ResumeLayout(false);
-            this.inputGroupbox.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pgc)).EndInit();
             this.outputGroupbox.ResumeLayout(false);
             this.subtitleGroupbox.ResumeLayout(false);
             this.subtitleGroupbox.PerformLayout();
@@ -287,8 +247,6 @@ namespace MeGUI
         private System.Windows.Forms.RadioButton keepAllTracks;
         private System.Windows.Forms.CheckBox closeOnQueue;
         private System.Windows.Forms.Button queueButton;
-        private System.Windows.Forms.Label pgcLabel;
-        private System.Windows.Forms.NumericUpDown pgc;
         private System.Windows.Forms.CheckedListBox subtitleTracks;
         private MeGUI.core.gui.HelpButton helpButton1;
         private FileBar input;
