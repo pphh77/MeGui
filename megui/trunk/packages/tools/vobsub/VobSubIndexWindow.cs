@@ -62,6 +62,7 @@ namespace MeGUI
         {
             InitializeComponent();
             this.chkSingleFileExport.Checked = MainForm.Instance.Settings.VobSubberSingleFileExport;
+            this.keepAllTracks.Checked = MainForm.Instance.Settings.VobSubberKeepAll;
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -304,6 +305,7 @@ namespace MeGUI
 
         private void keepAllTracks_CheckedChanged(object sender, EventArgs e)
         {
+            MainForm.Instance.Settings.VobSubberKeepAll = this.keepAllTracks.Checked;
             subtitleTracks.Enabled = !keepAllTracks.Checked;
             PreselectItems();
         }
