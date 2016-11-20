@@ -1,3 +1,6 @@
+2670 [Haali Media Splitter] added "Haali Media Splitter" as update package
+                            improved detection if it is installed
+                            if it is needed by the HD Streams Extractor it will be installed (administrative permissions are required)
 2669 [VobSubber]            added title selector for DVD sources incl. multi-angle support
 2668 [FileIndexer]          added title selector for DVD sources incl. multi-angle support
 2667 [TitleSelector]        added support for multi-angle DVD sources

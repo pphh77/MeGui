@@ -360,7 +360,6 @@ namespace MeGUI.core.gui
             // dss2
             // 
             this.dss2.AutoSize = true;
-            this.dss2.Enabled = false;
             this.dss2.Location = new System.Drawing.Point(6, 21);
             this.dss2.Name = "dss2";
             this.dss2.Size = new System.Drawing.Size(201, 17);

@@ -79,9 +79,9 @@ namespace MeGUI
         private AfterEncoding afterEncoding;
         private ProxyMode httpProxyMode;
         private ProgramSettings avimuxgui, avisynth, avisynthplugins, besplit, dgindexim, dgindex, dgindexnv,
-                                eac3to, fdkaac, ffmpeg, ffms, flac, lame, lsmash, mediainfo, megui_core, megui_help, 
-                                megui_libs, megui_updater, mkvmerge, mp4box, neroaacenc, oggenc,
-                                opus, pgcdemux, qaac, tsmuxer, vobsub, x264, x264_10b, x265, xvid;
+                                eac3to, fdkaac, ffmpeg, ffms, flac, haali, lame, lsmash, mediainfo,
+                                megui_core, megui_help, megui_libs, megui_updater, mkvmerge, mp4box, neroaacenc,
+                                oggenc, opus, pgcdemux, qaac, tsmuxer, vobsub, x264, x264_10b, x265, xvid;
         #endregion
         public MeGUISettings()
 		{
@@ -550,41 +550,6 @@ namespace MeGUI
         {
             get { return alwaysbackupfiles; }
             set { alwaysbackupfiles = value; }
-        }
-
-        /// <summary>
-        /// Haali Media Splitter Path
-        /// </summary>
-        public static string HaaliMSPath
-        {
-            get
-            {
-                try
-                {
-                    Microsoft.Win32.RegistryKey key = null;
-#if x86
-                    key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\HaaliMkx");
-                    if (key == null)
-#endif
-                        key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\HaaliMkx");
-
-                    if (key == null)
-                        return String.Empty;
-
-                    string value = (string)key.GetValue("Install_Dir");
-                    if (value == null)
-                        return String.Empty;
-
-                    if (!Directory.Exists(value))
-                        return String.Empty;
-
-                    return value;
-                }
-                catch
-                {
-                    return String.Empty;
-                }
-            }
         }
 
         /// <summary>
@@ -1129,6 +1094,12 @@ namespace MeGUI
             set { flac = value; }
         }
 
+        public ProgramSettings Haali
+        {
+            get { return haali; }
+            set { haali = value; }
+        }
+
         public ProgramSettings Lame
         {
             get { return lame; }
@@ -1348,6 +1319,8 @@ namespace MeGUI
                 ffms = new ProgramSettings("ffms");
             if (flac == null)
                 flac = new ProgramSettings("flac");
+            if (haali == null)
+                haali = new ProgramSettings("haali");
             if (lame == null)
                 lame = new ProgramSettings("lame");
             if (lsmash == null)
@@ -1447,6 +1420,9 @@ namespace MeGUI
             ffms.UpdateInformation("ffms", "FFMS", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\ffms\ffmsindex.exe"));
             ffms.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\ffms\ffms2.dll"));
             flac.UpdateInformation("flac", "FLAC", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\flac\flac.exe"));
+            haali.UpdateInformation("haali", "Haali Media Splitter", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\haali\splitter.ax"));
+            haali.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\haali\avss.dll"));
+            haali.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\haali\install.cmd"));
             lame.UpdateInformation("lame", "LAME", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\lame\lame.exe"));
             lsmash.UpdateInformation("lsmash", "L-SMASH Works", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\lsmash\LSMASHSource.dll"));
             mediainfo.UpdateInformation("mediainfo", "MediaInfo", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"MediaInfo.dll"));

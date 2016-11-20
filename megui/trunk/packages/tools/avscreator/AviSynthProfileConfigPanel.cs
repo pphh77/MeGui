@@ -32,9 +32,6 @@ namespace MeGUI.core.gui
             this.resizeFilterType.BindingContext = new BindingContext();
             this.noiseFilterType.DataSource = ScriptServer.ListOfDenoiseFilterType;
             this.noiseFilterType.BindingContext = new BindingContext();
-            if (!string.IsNullOrEmpty(MeGUISettings.HaaliMSPath) 
-                && System.IO.File.Exists(System.IO.Path.Combine(MeGUISettings.HaaliMSPath, "avss.dll")))
-                dss2.Enabled = true;
         }
 
         #region Gettable<AviSynthSettings> Members

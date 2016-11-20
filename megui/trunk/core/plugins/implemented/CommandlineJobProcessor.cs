@@ -158,6 +158,7 @@ namespace MeGUI
 
             if (bRunSecondTime)
             {
+                su.HasError = false;
                 bRunSecondTime = false;
                 start();
             }

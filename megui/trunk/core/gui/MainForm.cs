@@ -1341,31 +1341,9 @@ namespace MeGUI
 
             FileUtil.CheckAviSynth(i);
             FileUtil.GetFileInformation("AvisynthWrapper", Path.GetDirectoryName(Application.ExecutablePath) + @"\AvisynthWrapper.dll", ref i);
-
-            // check if Haali Matroska Splitter is properly installed
-            try
-            {
-                // A28F324B-DDC5-4999-AA25-D3A7E25EF7A8 = Haali Matroska Splitter x86
-                // 55DA30FC-F16B-49FC-BAA5-AE59FC65F82D = Haali Matroska Splitter x64
-#if x86
-                Type comtype = Type.GetTypeFromCLSID(new Guid("A28F324B-DDC5-4999-AA25-D3A7E25EF7A8"));
-                string fileName = "splitter.ax";
-#endif
-#if x64
-                Type comtype = Type.GetTypeFromCLSID(new Guid("55DA30FC-F16B-49FC-BAA5-AE59FC65F82D"));
-                string fileName = "splitter.x64.ax";
-#endif
-                object comobj = Activator.CreateInstance(comtype);
-                FileUtil.GetFileInformation("Haali Matroska Splitter", Path.Combine(MeGUISettings.HaaliMSPath, fileName), ref i);
-            }
-            catch (Exception)
-            {
-                i.LogEvent("Haali Matroska Splitter not installed properly.", ImageType.Information);
-                i.LogEvent("Therefore DSS2() will not and certain functions of FFVideoSource() and the HD Streams Extractor may not work.", ImageType.Information);
-                i.LogEvent("Please download and install it from http://haali.su/mkv/", ImageType.Information);
-            }
-
-            FileUtil.GetFileInformation("Haali DSS2", Path.Combine(MeGUISettings.HaaliMSPath, "avss.dll"), ref i);
+            string haaliPath = FileUtil.GetHaaliInstalledPath();
+            FileUtil.GetFileInformation("Haali Media Splitter", Path.Combine(haaliPath, "splitter.ax"), ref i);
+            FileUtil.GetFileInformation("Haali DSS2", Path.Combine(haaliPath, "avss.dll"), ref i);
             FileUtil.GetFileInformation("ICSharpCode.SharpZipLib", Path.GetDirectoryName(Application.ExecutablePath) + @"\ICSharpCode.SharpZipLib.dll", ref i);
             FileUtil.GetFileInformation("MediaInfo", Path.GetDirectoryName(Application.ExecutablePath) + @"\MediaInfo.dll", ref i);
             FileUtil.GetFileInformation("MediaInfoWrapper", Path.GetDirectoryName(Application.ExecutablePath) + @"\MediaInfoWrapper.dll", ref i);

@@ -24,7 +24,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using System.Windows.Forms;
 
 namespace MeGUI
 {
@@ -199,15 +198,21 @@ namespace MeGUI
                     inputLine = "AVISource(\"" + input + "\", audio=false)" + VideoUtil.getAssumeFPS(fps, input);
                     break;
                 case PossibleSources.directShow:
-                    if (input.ToLower(System.Globalization.CultureInfo.InvariantCulture).EndsWith(".avi"))
+                    if (input.ToLowerInvariant().EndsWith(".avi"))
                     {
                         inputLine = "AVISource(\"" + input + "\", audio=false)" + VideoUtil.getAssumeFPS(fps, input);
                     }
                     else
                     {
-                        if (dss2 && File.Exists(Path.Combine(MeGUISettings.HaaliMSPath, "avss.dll")))
+                        if (dss2)
                         {
-                            inputLine = "LoadPlugin(\"" + MeGUISettings.HaaliMSPath + "\\avss.dll" + "\")\r\ndss2(\"" + input + "\"" + ((fps > 0) ? ", fps=" + fps.ToString("F3", new CultureInfo("en-us")) : string.Empty) + ")" + VideoUtil.getAssumeFPS(fps, input);
+                            string path = MeGUI.core.util.FileUtil.GetHaaliInstalledPath();
+                            if (!File.Exists(Path.Combine(path, "avss.dll")))
+                            {
+                                UpdateCacher.CheckPackage("haali");
+                                path = Path.GetDirectoryName(MainForm.Instance.Settings.Haali.Path);
+                            }
+                            inputLine = "LoadPlugin(\"" + path + "\\avss.dll" + "\")\r\ndss2(\"" + input + "\"" + ((fps > 0) ? ", fps=" + fps.ToString("F3", new CultureInfo("en-us")) : string.Empty) + ")" + VideoUtil.getAssumeFPS(fps, input);
                         }
                         else
                         {
@@ -295,11 +300,11 @@ namespace MeGUI
                 EnumProxy p = EnumProxy.Create(type);
                 if (p.Tag != null)
                 {
-                    if (p.Tag.ToString().ToLower(System.Globalization.CultureInfo.InvariantCulture).Contains("undot"))
+                    if (p.Tag.ToString().ToLowerInvariant().Contains("undot"))
                         strPath = "LoadPlugin(\"" + Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "UnDot.dll") + "\")\r\n";
-                    else if (p.Tag.ToString().ToLower(System.Globalization.CultureInfo.InvariantCulture).Contains("fluxsmoothst"))
+                    else if (p.Tag.ToString().ToLowerInvariant().Contains("fluxsmoothst"))
                         strPath = "LoadPlugin(\"" + Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "FluxSmooth.dll") + "\")\r\n";
-                    else if (p.Tag.ToString().ToLower(System.Globalization.CultureInfo.InvariantCulture).Contains("convolution3d"))
+                    else if (p.Tag.ToString().ToLowerInvariant().Contains("convolution3d"))
                         strPath = "LoadPlugin(\"" + Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "Convolution3DYV12.dll") + "\")\r\n";
                     denoiseLines = string.Format(strPath + p.Tag + " # " + p);
                 }
@@ -734,6 +739,5 @@ SelectRangeEvery({3},{4},0)
                 }
             }
         }
-
     }
 }
