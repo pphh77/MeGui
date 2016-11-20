@@ -572,7 +572,7 @@ namespace MeGUI
                         if (_VideoInfo.Codec == null)
                             _VideoInfo.Codec = getVideoCodec(track.Format); // sometimes codec info is not available, check the format then...
 #if DEBUG
-                        if (_VideoInfo.Codec == null)
+                        if (_VideoInfo.Codec == null && !track.Format.Equals("AVS"))
                         {
                             if (_Log == null)
                                 _Log = MainForm.Instance.Log.Info("MediaInfo");

@@ -819,6 +819,7 @@
     <Compile Include="packages\video\x264\x264SettingsHandler.cs" />
     <Compile Include="packages\video\x264\x264Encoder.cs" />
     <Compile Include="packages\video\x264\x264Settings.cs" />
+    <Compile Include="packages\video\x265\x265SettingsHandler.cs" />
     <Compile Include="packages\video\x265\x265ConfigurationPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>

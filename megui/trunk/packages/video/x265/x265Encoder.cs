@@ -81,6 +81,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "x265Encoder");
             StringBuilder sb = new StringBuilder();
             CultureInfo ci = new CultureInfo("en-us");
             x265Settings xs = (x265Settings)_xs.Clone();
+            MeGUI.packages.video.x265.x265SettingsHandler oSettingsHandler = new packages.video.x265.x265SettingsHandler(xs, log);
 
             // log
             if (log != null)
@@ -184,6 +185,34 @@ new JobProcessorFactory(new ProcessorFactory(init), "x265Encoder");
             if (!String.IsNullOrEmpty(xs.CustomEncoderOptions)) // add custom encoder options
                 sb.Append(xs.CustomEncoderOptions + " ");
 
+            #endregion
+
+            string CustomSarValue;
+            xs.SampleAR = oSettingsHandler.getSar(d, hres, vres, out CustomSarValue, String.Empty);
+
+            xs.CustomEncoderOptions = oSettingsHandler.getCustomCommandLine();
+            if (!String.IsNullOrEmpty(xs.CustomEncoderOptions)) // add custom encoder options
+                sb.Append(xs.CustomEncoderOptions + " ");
+
+            switch (xs.SampleAR)
+            {
+                case 0:
+                    {
+                        if (!String.IsNullOrEmpty(CustomSarValue))
+                            sb.Append("--sar " + CustomSarValue + " ");
+                        break;
+                    }
+                case 1: sb.Append("--sar 1:1 "); break;
+                case 2: sb.Append("--sar 4:3 "); break;
+                case 3: sb.Append("--sar 8:9 "); break;
+                case 4: sb.Append("--sar 10:11 "); break;
+                case 5: sb.Append("--sar 12:11 "); break;
+                case 6: sb.Append("--sar 16:11 "); break;
+                case 7: sb.Append("--sar 32:27 "); break;
+                case 8: sb.Append("--sar 40:33 "); break;
+                case 9: sb.Append("--sar 64:45 "); break;
+            }
+
             if (xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.twopass1
                 || xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.threepass1)
                 sb.Append("--output NUL ");
@@ -193,7 +222,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "x265Encoder");
             if (!String.IsNullOrEmpty(input))
                 sb.Append("\"" + input + "\"");
 
-            #endregion
+            
 
             return sb.ToString();
         }
