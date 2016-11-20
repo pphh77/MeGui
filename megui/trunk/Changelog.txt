@@ -1,3 +1,4 @@
+2675                        improved portable runtime handling
 2674 [Audio Cutter]         preselect output file. Feature request #597
 2673 [x265]                 added --sar detection. Feature request #601
 2672 [Title Selector]       added option to change the minimum title length also in the global settings

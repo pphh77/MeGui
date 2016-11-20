@@ -827,6 +827,9 @@ namespace MeGUI.core.util
                 FileInfo[] files = fi.GetFiles("msvc*.dll");
                 foreach (FileInfo f in files)
                     sourceFiles.Add(f.Name);
+                files = fi.GetFiles("vc*.dll");
+                foreach (FileInfo f in files)
+                    sourceFiles.Add(f.Name);
             }
             else if (!bRemove)
                 return;
