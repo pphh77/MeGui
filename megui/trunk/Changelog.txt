@@ -1,3 +1,4 @@
+2672 [Title Selector]       added option to change the minimum title length also in the global settings
 2671 [VobSubber]            remember the "keep all..." setting. Feature request #600
 2670 [Haali Media Splitter] added "Haali Media Splitter" as update package
                             improved detection if it is installed

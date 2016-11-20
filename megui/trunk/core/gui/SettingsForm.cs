@@ -19,9 +19,7 @@
 // ****************************************************************************
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Xml;
@@ -278,6 +276,7 @@ namespace MeGUI
 
                 settings.UseExternalMuxerX264 = chx264ExternalMuxer.Checked;
                 settings.AlwaysUsePortableAviSynth = cbUseIncludedAviSynth.Checked;
+                settings.ChapterCreatorMinimumLength = (int)minimumTitleLength.Value;
 				return settings;
 			}
 			set
@@ -348,6 +347,7 @@ namespace MeGUI
                 useX265.Checked = settings.UseX265;
                 chx264ExternalMuxer.Checked = settings.UseExternalMuxerX264;
                 cbUseIncludedAviSynth.Checked = settings.AlwaysUsePortableAviSynth;
+                minimumTitleLength.Value = settings.ChapterCreatorMinimumLength;
 			}
 		}
 		#endregion
