@@ -19,12 +19,7 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 
 using MeGUI.core.details;
@@ -64,7 +59,7 @@ namespace MeGUI.packages.tools.besplitter
                 return;
             }
 
-            if (!output.Filename.ToLower(System.Globalization.CultureInfo.InvariantCulture).EndsWith(Path.GetExtension(input.Filename).ToLower(System.Globalization.CultureInfo.InvariantCulture)))
+            if (!output.Filename.ToLowerInvariant().EndsWith(Path.GetExtension(input.Filename).ToLowerInvariant()))
             {
                 MessageBox.Show("Can't create job: input and output have different types.", "Can't create job", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -137,19 +132,25 @@ namespace MeGUI.packages.tools.besplitter
             }
         }
 
+        /// <summary>
+        /// Fires if a input file is selected
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private void input_FileSelected(FileBar sender, FileBarEventArgs args)
         {
             foreach (OutputFileType type in filters)
             {
-                if (sender.Filename.ToLower(System.Globalization.CultureInfo.InvariantCulture).EndsWith(type.Extension))
+                if (sender.Filename.ToLowerInvariant().EndsWith(type.Extension))
                 {
                     output.Filter = type.OutputFilterString;
                     break;
                 }
             }
+
+            output.Filename = Path.Combine(FileUtil.GetOutputFolder(input.Filename), 
+                Path.GetFileNameWithoutExtension(input.Filename) + "_new" + Path.GetExtension(input.Filename));
         }
-
-
     }
 
     public class BesplitterTool : ITool
