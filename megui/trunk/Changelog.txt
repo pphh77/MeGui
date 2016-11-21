@@ -1,4 +1,5 @@
-2675                        improved portable runtime handling
+2676 [x265]                 fixed duplicated custom command line values (regression of 2673)
+2675                        improved portable AviSynth runtime handling
 2674 [Audio Cutter]         preselect output file. Feature request #597
 2673 [x265]                 added --sar detection. Feature request #601
 2672 [Title Selector]       added option to change the minimum title length also in the global settings

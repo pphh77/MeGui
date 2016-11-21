@@ -19,11 +19,9 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Globalization;
 using System.Text;
-using System.Windows.Forms; // used for the MethodInvoker
 
 using MeGUI.core.util;
 
@@ -181,10 +179,6 @@ new JobProcessorFactory(new ProcessorFactory(init), "x265Encoder");
             if (!xs.CustomEncoderOptions.Contains("--frame-threads "))
                 if (xs.NbThreads > 0)
                     sb.Append("--frame-threads " + xs.NbThreads + " ");
-
-            if (!String.IsNullOrEmpty(xs.CustomEncoderOptions)) // add custom encoder options
-                sb.Append(xs.CustomEncoderOptions + " ");
-
             #endregion
 
             string CustomSarValue;
