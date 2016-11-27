@@ -737,7 +737,7 @@ namespace MeGUI
             // set initial oneclick job settings
             OneClickPostprocessingProperties dpp = new OneClickPostprocessingProperties();
             dpp.DAR = ar.Value;
-            dpp.AvsSettings = (AviSynthSettings)avsProfile.SelectedProfile.BaseSettings;
+            dpp.AvsSettings = (AviSynthSettings)avsProfile.SelectedProfile.BaseSettings.Clone();
             dpp.Container = (ContainerType)containerFormat.SelectedItem;
             dpp.FinalOutput = output.Filename;
             dpp.DeviceOutputType = devicetype.Text;
@@ -749,7 +749,7 @@ namespace MeGUI
             if (arrFilesToProcess != null)
             {
                 dpp.FilesToProcess = arrFilesToProcess;
-                dpp.OneClickSetting = _oSettings;
+                dpp.OneClickSetting = _oSettings.Clone();
             }
             dpp.WorkingDirectory = strWorkingDirectory;
             dpp.FilesToDelete.Add(dpp.WorkingDirectory);
@@ -851,12 +851,13 @@ namespace MeGUI
                         }
                     }
 
-                    sb.Append(string.Format("{0}:\"{1}\" ", oStreamControl.SelectedStream.TrackInfo.TrackID,
-                        Path.Combine(dpp.WorkingDirectory, oStreamControl.SelectedStream.TrackInfo.DemuxFileName)));
+                    OneClickStream oStream = oStreamControl.SelectedStream.Clone();
+                    sb.Append(string.Format("{0}:\"{1}\" ", oStream.TrackInfo.TrackID,
+                        Path.Combine(dpp.WorkingDirectory, oStream.TrackInfo.DemuxFileName)));
                     if (bCoreOnly)
                         sb.Append("-core ");
 
-                    dpp.FilesToDelete.Add(Path.Combine(dpp.WorkingDirectory, oStreamControl.SelectedStream.TrackInfo.DemuxFileName));
+                    dpp.FilesToDelete.Add(Path.Combine(dpp.WorkingDirectory, oStream.TrackInfo.DemuxFileName));
                 }
 
                 foreach (OneClickStreamControl oStreamControl in subtitleTracks)
@@ -871,7 +872,7 @@ namespace MeGUI
                     sb.Append(string.Format("{0}:\"{1}\" ", oStreamControl.SelectedStream.TrackInfo.MMGTrackID, strDemuxFilePath));
                     oStreamControl.SelectedStream.DemuxFilePath = strDemuxFilePath;
                     dpp.FilesToDelete.Add(strDemuxFilePath);
-                    dpp.SubtitleTracks.Add(oStreamControl.SelectedStream);
+                    dpp.SubtitleTracks.Add(oStreamControl.SelectedStream.Clone());
                 }
                 
                 if (sb.Length != 0)
@@ -1008,10 +1009,12 @@ namespace MeGUI
                 string strAudioCodec = null;
                 bool bExtractMKVTrack = false;
                 AudioTrackInfo oAudioTrackInfo = null;
-                int delay = oStreamControl.SelectedStream.Delay;
+                OneClickStream oStream = oStreamControl.SelectedStream.Clone();
+
+                int delay = oStream.Delay;
                 if (oStreamControl.SelectedItem.IsStandard)
                 {
-                    oAudioTrackInfo = (AudioTrackInfo)oStreamControl.SelectedStream.TrackInfo;
+                    oAudioTrackInfo = (AudioTrackInfo)oStream.TrackInfo;
                     if (dpp.IndexType == FileIndexerWindow.IndexType.AVISOURCE && inputContainer != ContainerType.MKV)
                     {
                         _oLog.LogEvent("Internal audio track " + oAudioTrackInfo.TrackID + " will be skipped as AVISOURCE is going to be used", ImageType.Warning);
@@ -1030,7 +1033,7 @@ namespace MeGUI
                     {
                         if (!strAudioCodec.Equals("PCM", StringComparison.InvariantCultureIgnoreCase)) // some PCM tracks cannot be extracted by mkvextract
                         {
-                            oExtractMKVTrack.Add(oStreamControl.SelectedStream.TrackInfo);
+                            oExtractMKVTrack.Add(oStream.TrackInfo);
                             bExtractMKVTrack = true;
                         }
                     }
@@ -1041,24 +1044,24 @@ namespace MeGUI
                     MediaInfoFile oInfo = new MediaInfoFile(aInput, ref _oLog);
                     if (oInfo.AudioInfo.Tracks.Count > 0)
                         strAudioCodec = oInfo.AudioInfo.Tracks[0].Codec;
-                    strName = oStreamControl.SelectedStream.Name;
-                    strLanguage = oStreamControl.SelectedStream.Language;
+                    strName = oStream.Name;
+                    strLanguage = oStream.Language;
                 }
 
                 bool bIsDontEncodeAudioPossible = isDontEncodeAudioPossible(_videoInputInfo, oStreamControl.SelectedItem.IsStandard, inputContainer);
                 if (bIsDontEncodeAudioPossible &&
-                    (oStreamControl.SelectedStream.EncodingMode == AudioEncodingMode.Never ||
-                    (oStreamControl.SelectedStream.EncodingMode == AudioEncodingMode.NeverOnlyCore && dpp.Eac3toDemux) ||
-                    (oStreamControl.SelectedStream.EncodingMode == AudioEncodingMode.IfCodecDoesNotMatch &&
-                    oStreamControl.SelectedStream.EncoderSettings.EncoderType.ACodec.ID.Equals(strAudioCodec, StringComparison.InvariantCultureIgnoreCase))))
+                    (oStream.EncodingMode == AudioEncodingMode.Never ||
+                    (oStream.EncodingMode == AudioEncodingMode.NeverOnlyCore && dpp.Eac3toDemux) ||
+                    (oStream.EncodingMode == AudioEncodingMode.IfCodecDoesNotMatch &&
+                    oStream.EncoderSettings.EncoderType.ACodec.ID.Equals(strAudioCodec, StringComparison.InvariantCultureIgnoreCase))))
                 {
                     if (oStreamControl.SelectedItem.IsStandard && inputContainer == ContainerType.MKV 
                         && strAudioCodec.Equals("PCM", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        int trackID = oStreamControl.SelectedStream.TrackInfo.TrackID;
+                        int trackID = oStream.TrackInfo.TrackID;
                         if (_videoInputInfo.ContainerFileType != ContainerType.MKV)
                             trackID++;
-                        aInput = Path.Combine(strWorkingDirectory, oStreamControl.SelectedStream.TrackInfo.DemuxFileName);
+                        aInput = Path.Combine(strWorkingDirectory, oStream.TrackInfo.DemuxFileName);
                         HDStreamsExJob oJob = new HDStreamsExJob(new List<string>() { dpp.VideoInput }, aInput, null, trackID + ":\"" + aInput + "\"", 2);
                         audioJobs = new SequentialChain(audioJobs, new SequentialChain(oJob));
                         dpp.FilesToDelete.Add(FileUtil.AddToFileName(Path.ChangeExtension(aInput, "txt"), " - Log"));
@@ -1069,11 +1072,11 @@ namespace MeGUI
                 else
                 {
                     if (!bIsDontEncodeAudioPossible &&
-                    (oStreamControl.SelectedStream.EncodingMode == AudioEncodingMode.Never ||
-                    (oStreamControl.SelectedStream.EncodingMode == AudioEncodingMode.NeverOnlyCore && dpp.Eac3toDemux) ||
-                    (oStreamControl.SelectedStream.EncodingMode == AudioEncodingMode.IfCodecDoesNotMatch &&
-                    oStreamControl.SelectedStream.EncoderSettings.EncoderType.ACodec.ID.Equals(strAudioCodec, StringComparison.InvariantCultureIgnoreCase))))
-                        _oLog.LogEvent("Audio " + oStreamControl.SelectedStream + " cannot be processed with encoding mode \"" + oStreamControl.SelectedStream.EncodingMode + "\" as it must be encoded");
+                    (oStream.EncodingMode == AudioEncodingMode.Never ||
+                    (oStream.EncodingMode == AudioEncodingMode.NeverOnlyCore && dpp.Eac3toDemux) ||
+                    (oStream.EncodingMode == AudioEncodingMode.IfCodecDoesNotMatch &&
+                     oStream.EncoderSettings.EncoderType.ACodec.ID.Equals(strAudioCodec, StringComparison.InvariantCultureIgnoreCase))))
+                        _oLog.LogEvent("Audio " + oStream + " cannot be processed with encoding mode \"" + oStream.EncodingMode + "\" as it must be encoded");
 
                     // audio track will be encoded
                     string strFileName = string.Empty;
@@ -1084,7 +1087,7 @@ namespace MeGUI
                             strAudioCodec = "AC-3";
                             if (oStreamControl.SelectedItem.IsStandard)
                             {
-                                strFileName = Path.Combine(strWorkingDirectory, oStreamControl.SelectedStream.TrackInfo.DemuxFileName);
+                                strFileName = Path.Combine(strWorkingDirectory, oStream.TrackInfo.DemuxFileName);
                                 strFileName = Path.ChangeExtension(strFileName, "ac3");
                                 oAudioTrackInfo.Codec = strAudioCodec;
                                 aInput = FileUtil.AddToFileName(strFileName, "_core");
@@ -1106,7 +1109,7 @@ namespace MeGUI
                             strAudioCodec = "DTS";
                             if (oStreamControl.SelectedItem.IsStandard)
                             {
-                                strFileName = Path.Combine(strWorkingDirectory, oStreamControl.SelectedStream.TrackInfo.DemuxFileName);
+                                strFileName = Path.Combine(strWorkingDirectory, oStream.TrackInfo.DemuxFileName);
                                 oAudioTrackInfo.Codec = strAudioCodec;
                                 aInput = FileUtil.AddToFileName(Path.ChangeExtension(strFileName, "dts"), "_core");
                             }
@@ -1126,10 +1129,10 @@ namespace MeGUI
                         {
                             if (inputContainer == ContainerType.MKV)
                             {
-                                int trackID = oStreamControl.SelectedStream.TrackInfo.TrackID;
+                                int trackID = oStream.TrackInfo.TrackID;
                                 if (_videoInputInfo.ContainerFileType != ContainerType.MKV)
                                     trackID++;
-                                aInput = Path.Combine(strWorkingDirectory, oStreamControl.SelectedStream.TrackInfo.DemuxFileName);
+                                aInput = Path.Combine(strWorkingDirectory, oStream.TrackInfo.DemuxFileName);
                                 HDStreamsExJob oJob = new HDStreamsExJob(new List<string>() { dpp.VideoInput }, aInput, null, trackID + ":\"" + aInput + "\"", 2);
                                 audioJobs = new SequentialChain(audioJobs, new SequentialChain(oJob));
                                 dpp.FilesToDelete.Add(FileUtil.AddToFileName(Path.ChangeExtension(aInput, "txt"), " - Log"));
@@ -1138,10 +1141,10 @@ namespace MeGUI
                         }
                     }
 
-                    if (oStreamControl.SelectedStream.EncodingMode == AudioEncodingMode.NeverOnlyCore)
+                    if (oStream.EncodingMode == AudioEncodingMode.NeverOnlyCore)
                         dpp.AudioTracks.Add(new OneClickAudioTrack(null, new MuxStream(aInput, strLanguage, strName, delay, false, false, null), oAudioTrackInfo, bExtractMKVTrack));
                     else
-                        dpp.AudioTracks.Add(new OneClickAudioTrack(new AudioJob(aInput, null, null, oStreamControl.SelectedStream.EncoderSettings, delay, strLanguage, strName), null, oAudioTrackInfo, bExtractMKVTrack));
+                        dpp.AudioTracks.Add(new OneClickAudioTrack(new AudioJob(aInput, null, null, oStream.EncoderSettings, delay, strLanguage, strName), null, oAudioTrackInfo, bExtractMKVTrack));
                 }
             }
 
@@ -1149,17 +1152,19 @@ namespace MeGUI
             // subtitle handling
             List<int> arrDVDSub = new List<int>();
             string strInput = String.Empty;
-            foreach (OneClickStreamControl oStream in subtitleTracks)
+            foreach (OneClickStreamControl oStreamControl in subtitleTracks)
             {
-                if (oStream.SelectedStreamIndex <= 0) // not NONE
+                if (oStreamControl.SelectedStreamIndex <= 0) // not NONE
                     continue;
 
-                if (oStream.SelectedItem.IsStandard)
+                OneClickStream oStream = oStreamControl.SelectedStream.Clone();
+
+                if (oStreamControl.SelectedItem.IsStandard)
                 {
-                    string strExtension = Path.GetExtension(oStream.SelectedStream.TrackInfo.SourceFileName.ToLowerInvariant());
+                    string strExtension = Path.GetExtension(oStream.TrackInfo.SourceFileName.ToLowerInvariant());
                     if (strExtension.Equals(".ifo") || strExtension.Equals(".vob"))
                     {
-                        strInput = oStream.SelectedStream.TrackInfo.SourceFileName;
+                        strInput = oStream.TrackInfo.SourceFileName;
                         if (strExtension.Equals(".vob"))
                         {
                             if (Path.GetFileName(strInput).ToUpperInvariant().Substring(0, 4) == "VTS_")
@@ -1167,22 +1172,22 @@ namespace MeGUI
                             else
                                 strInput = Path.ChangeExtension(strInput, ".IFO");
                         }
-                        arrDVDSub.Add(oStream.SelectedStream.TrackInfo.MMGTrackID);
-                        string outputFile = Path.Combine(dpp.WorkingDirectory, Path.GetFileNameWithoutExtension(strInput)) + "_" + oStream.SelectedStream.TrackInfo.MMGTrackID + ".idx";
-                        oStream.SelectedStream.DemuxFilePath = outputFile;
+                        arrDVDSub.Add(oStream.TrackInfo.MMGTrackID);
+                        string outputFile = Path.Combine(dpp.WorkingDirectory, Path.GetFileNameWithoutExtension(strInput)) + "_" + oStream.TrackInfo.MMGTrackID + ".idx";
+                        oStream.DemuxFilePath = outputFile;
                         dpp.FilesToDelete.Add(outputFile);
                         dpp.FilesToDelete.Add(Path.ChangeExtension(outputFile, ".sub"));
-                        dpp.SubtitleTracks.Add(oStream.SelectedStream);
+                        dpp.SubtitleTracks.Add(oStream);
                     }
                     else if (inputContainer == ContainerType.MKV && !dpp.Eac3toDemux) // only if container MKV and no demux with eac3to
                     {
-                        oStream.SelectedStream.TrackInfo.ExtractMKVTrack = true;
-                        oExtractMKVTrack.Add(oStream.SelectedStream.TrackInfo);
-                        dpp.SubtitleTracks.Add(oStream.SelectedStream);
+                        oStream.TrackInfo.ExtractMKVTrack = true;
+                        oExtractMKVTrack.Add(oStream.TrackInfo);
+                        dpp.SubtitleTracks.Add(oStream);
                     }
                 }
                 else
-                    dpp.SubtitleTracks.Add(oStream.SelectedStream);
+                    dpp.SubtitleTracks.Add(oStream);
             }
             if (arrDVDSub.Count > 0)
             {
@@ -1995,6 +2000,7 @@ namespace MeGUI
         }
     }
 
+    [Serializable]
     public class OneClickFilesToProcess
     {
         public string FilePath;

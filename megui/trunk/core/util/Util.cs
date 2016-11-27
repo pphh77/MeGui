@@ -93,6 +93,30 @@ namespace MeGUI.core.util
                 m();
         }
 
+        /// <summary>
+        /// Deep-Copy if an object (must be serializable!)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static T DeepCopy1<T>(T obj)
+        {
+            try
+            {
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    System.Runtime.Serialization.Formatters.Binary.BinaryFormatter formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    formatter.Serialize(stream, obj);
+                    stream.Position = 0;
+                    return (T)formatter.Deserialize(stream);
+                }
+            }
+            catch (Exception)
+            {
+                return obj;
+            }
+        }
+
         public static bool XmlSerialize(object o, string path)
         {
             FileUtil.ensureDirectoryExists(Path.GetDirectoryName(path));

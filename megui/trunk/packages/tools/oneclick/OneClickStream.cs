@@ -19,15 +19,10 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Serialization;
-
-using MeGUI.core.util;
 
 namespace MeGUI
 {
-    public class OneClickStream
+    public class OneClickStream : ICloneable
     {
         private string _inputFilePath;
         private string _demuxFilePath;
@@ -68,6 +63,23 @@ namespace MeGUI
         }
 
         public OneClickStream() : this(null, TrackType.Unknown, null, null, 0, null, null, 0, false, false, null, AudioEncodingMode.IfCodecDoesNotMatch) { }
+
+        /// <summary>
+        /// generates a copy of this object
+        /// </summary>
+        /// <returns>the codec specific settings of this object</returns>
+        object ICloneable.Clone()
+        {
+            return Clone();
+        }
+
+        public OneClickStream Clone()
+        {
+            OneClickStream newStream = (OneClickStream)this.MemberwiseClone();
+            newStream.EncoderSettings = _encoderSettings.Clone();
+            newStream.TrackInfo = _trackInfo.Clone();
+            return newStream;
+        }
 
         // Stream Type
         public TrackType Type
@@ -165,7 +177,7 @@ namespace MeGUI
             }
 
             string fullString = "[";
-            if (_trackInfo.TrackType == TrackType.Audio)
+            if (_trackInfo is AudioTrackInfo)
                 fullString += ((AudioTrackInfo)_trackInfo).TrackIDx + "] - " + strCodec;
             else
                 fullString += _trackInfo.MMGTrackID + "] - " + strCodec;
@@ -179,4 +191,3 @@ namespace MeGUI
         }
     }
 }
-

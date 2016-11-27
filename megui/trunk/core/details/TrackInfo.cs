@@ -19,8 +19,6 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Xml.Serialization;
 
 namespace MeGUI
@@ -34,7 +32,7 @@ namespace MeGUI
     }
 
     [XmlInclude(typeof(SubtitleTrackInfo)), XmlInclude(typeof(AudioTrackInfo)), XmlInclude(typeof(VideoTrackInfo))]
-    public class TrackInfo
+    public class TrackInfo : ICloneable
     {
         private string _codec, _containerType, _language, _name, _sourceFileName;
         private int _trackID, _mmgTrackID, _delay, _trackIndex;
@@ -57,6 +55,21 @@ namespace MeGUI
             this._trackIndex = 0;
             this._codec = _containerType = String.Empty;
             this._bMKVTrack = false;
+        }
+
+        /// <summary>
+        /// generates a copy of this object
+        /// </summary>
+        /// <returns>the codec specific settings of this object</returns>
+        object ICloneable.Clone()
+        {
+            return Clone();
+        }
+
+        public TrackInfo Clone()
+        {
+            TrackInfo oTrackInfo = (TrackInfo)this.MemberwiseClone();
+            return oTrackInfo;
         }
 
         /// <summary>

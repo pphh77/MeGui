@@ -18,9 +18,6 @@
 // 
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Serialization;
 
 namespace MeGUI
 {
@@ -56,6 +53,8 @@ namespace MeGUI
             string fullString = "[" + TrackID + "] - " + this.Codec;
             if (!string.IsNullOrEmpty(Language))
                 fullString += " / " + Language;
+            if (!string.IsNullOrEmpty(Name))
+                fullString += " / " + Name;
             return fullString.Trim();
         }
     }
