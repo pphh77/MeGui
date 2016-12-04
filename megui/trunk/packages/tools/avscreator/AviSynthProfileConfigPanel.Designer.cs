@@ -50,7 +50,6 @@ namespace MeGUI.core.gui
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.templatePage = new System.Windows.Forms.TabPage();
-            this.dllBar = new MeGUI.FileBar();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.insertInput = new System.Windows.Forms.Button();
             this.insertDeinterlace = new System.Windows.Forms.Button();
@@ -78,6 +77,8 @@ namespace MeGUI.core.gui
             this.resize = new System.Windows.Forms.CheckBox();
             this.noiseFilter = new System.Windows.Forms.CheckBox();
             this.resizeFilterType = new System.Windows.Forms.ComboBox();
+            this.cbPreferAnimeDeinterlacing = new System.Windows.Forms.CheckBox();
+            this.dllBar = new MeGUI.FileBar();
             this.tabControl1.SuspendLayout();
             this.templatePage.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
@@ -111,23 +112,6 @@ namespace MeGUI.core.gui
             this.templatePage.Size = new System.Drawing.Size(412, 379);
             this.templatePage.TabIndex = 0;
             this.templatePage.Text = "Template";
-            // 
-            // dllBar
-            // 
-            this.dllBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dllBar.Filename = "";
-            this.dllBar.Filter = "DLL Files (*.dll)|*.dll";
-            this.dllBar.FilterIndex = 0;
-            this.dllBar.FolderMode = false;
-            this.dllBar.Location = new System.Drawing.Point(63, 350);
-            this.dllBar.Name = "dllBar";
-            this.dllBar.ReadOnly = true;
-            this.dllBar.SaveMode = false;
-            this.dllBar.Size = new System.Drawing.Size(328, 26);
-            this.dllBar.TabIndex = 46;
-            this.dllBar.Title = "Select AviSynth Plugin DLL to open";
-            this.dllBar.FileSelected += new MeGUI.FileBarEventHandler(this.dllBar_FileSelected);
             // 
             // flowLayoutPanel1
             // 
@@ -349,6 +333,7 @@ namespace MeGUI.core.gui
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.cbPreferAnimeDeinterlacing);
             this.groupBox1.Controls.Add(this.dss2);
             this.groupBox1.Location = new System.Drawing.Point(3, 98);
             this.groupBox1.Name = "groupBox1";
@@ -450,6 +435,33 @@ namespace MeGUI.core.gui
             this.resizeFilterType.Size = new System.Drawing.Size(121, 21);
             this.resizeFilterType.TabIndex = 1;
             // 
+            // cbPreferAnimeDeinterlacing
+            // 
+            this.cbPreferAnimeDeinterlacing.AutoSize = true;
+            this.cbPreferAnimeDeinterlacing.Location = new System.Drawing.Point(6, 45);
+            this.cbPreferAnimeDeinterlacing.Name = "cbPreferAnimeDeinterlacing";
+            this.cbPreferAnimeDeinterlacing.Size = new System.Drawing.Size(132, 17);
+            this.cbPreferAnimeDeinterlacing.TabIndex = 23;
+            this.cbPreferAnimeDeinterlacing.Text = "Treat source as Anime";
+            this.cbPreferAnimeDeinterlacing.UseVisualStyleBackColor = true;
+            // 
+            // dllBar
+            // 
+            this.dllBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dllBar.Filename = "";
+            this.dllBar.Filter = "DLL Files (*.dll)|*.dll";
+            this.dllBar.FilterIndex = 0;
+            this.dllBar.FolderMode = false;
+            this.dllBar.Location = new System.Drawing.Point(63, 350);
+            this.dllBar.Name = "dllBar";
+            this.dllBar.ReadOnly = true;
+            this.dllBar.SaveMode = false;
+            this.dllBar.Size = new System.Drawing.Size(328, 26);
+            this.dllBar.TabIndex = 46;
+            this.dllBar.Title = "Select AviSynth Plugin DLL to open";
+            this.dllBar.FileSelected += new MeGUI.FileBarEventHandler(this.dllBar_FileSelected);
+            // 
             // AviSynthProfileConfigPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -507,6 +519,6 @@ namespace MeGUI.core.gui
         private System.Windows.Forms.ComboBox modValueBox;
         private System.Windows.Forms.Label acceptableAspectErrorLabel;
         private System.Windows.Forms.NumericUpDown acceptableAspectError;
-
+        private System.Windows.Forms.CheckBox cbPreferAnimeDeinterlacing;
     }
 }

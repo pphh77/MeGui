@@ -942,7 +942,7 @@ namespace MeGUI
                 this.noiseFilterType.SelectedItem = EnumProxy.Create(value.DenoiseMethod);
 				this.mpeg2Deblocking.Checked = value.MPEG2Deblock;
 				this.colourCorrect.Checked = value.ColourCorrect;
-				this.deinterlace.Checked = value.Deinterlace;
+				this.deintIsAnime.Checked = value.PreferAnimeDeinterlace;
 				this.noiseFilter.Checked = value.Denoise;
                 this.resize.Checked = value.Resize;
                 this.mod16Box.SelectedIndex = (int)value.Mod16Method;

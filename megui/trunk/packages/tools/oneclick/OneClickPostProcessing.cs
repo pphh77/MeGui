@@ -673,7 +673,7 @@ namespace MeGUI
             {
                 raiseEvent("Automatic deinterlacing...   ***PLEASE WAIT***");
                 string d2vPath = indexFile;
-                _sourceDetector = new SourceDetector(inputLine, d2vPath, false, inputFrameCount,
+                _sourceDetector = new SourceDetector(inputLine, d2vPath, avsSettings.PreferAnimeDeinterlace, inputFrameCount,
                     MainForm.Instance.Settings.SourceDetectorSettings,
                     new UpdateSourceDetectionStatus(analyseUpdate),
                     new FinishedAnalysis(finishedAnalysis));
@@ -772,8 +772,7 @@ namespace MeGUI
             {
                 LogItem oSourceLog = _log.LogEvent("Source detection");
                 oSourceLog.LogValue("Source detection failed", errorMessage, ImageType.Warning);
-                filters = new DeinterlaceFilter[] {
-                new DeinterlaceFilter("Error", "#An error occurred in source detection. Doing no processing")};
+                filters = new DeinterlaceFilter[] { new DeinterlaceFilter("Error", "#An error occurred in source detection. Doing no processing")};
                 interlaced = false;
             }
             else
@@ -781,9 +780,8 @@ namespace MeGUI
                 LogItem oSourceLog = _log.LogValue("Source detection", info.analysisResult);
                 if (info.sourceType == SourceType.NOT_ENOUGH_SECTIONS)
                 {
-                    oSourceLog.LogEvent("Source detection failed: Could not find enough useful sections to determine source type for " + job.Input, ImageType.Error);
-                    filters = new DeinterlaceFilter[] {
-                new DeinterlaceFilter("Error", "#Not enough useful sections for source detection. Doing no processing")};
+                    oSourceLog.LogEvent("Source detection failed: Could not find enough useful sections to determine source type for " + job.Input, ImageType.Warning);
+                    filters = new DeinterlaceFilter[] { new DeinterlaceFilter("Error", "#Not enough useful sections for source detection. Doing no processing") };
                 }
                 else
                     this.filters = ScriptServer.GetDeinterlacers(info).ToArray();

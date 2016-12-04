@@ -38,7 +38,7 @@ namespace MeGUI
         private DenoiseFilterType denoiseMethod;
         private mod16Method mod16Method;
         private modValue modValueUsed;
-        private bool deinterlace, denoise, ivtc, mpeg2deblock, colourCorrect, dss2, resize, upsize;
+        private bool preferAnimeDeinterlace, denoise, mpeg2deblock, colourCorrect, dss2, resize, upsize;
         private decimal acceptableAspectError;
 
         public void FixFileNames(System.Collections.Generic.Dictionary<string, string> _) { }
@@ -46,38 +46,18 @@ namespace MeGUI
         public AviSynthSettings()
         {
             this.Template = "<input>\r\n<deinterlace>\r\n<crop>\r\n<resize>\r\n<denoise>\r\n"; // Default -- will act as it did before avs profiles
-            this.ResizeMethod = ResizeFilterType.Lanczos; // Lanczos
-            this.DenoiseMethod = 0; // UnDot
-            this.Deinterlace = false;
-            this.Denoise = false;
-            this.Resize = true;
-            this.IVTC = false;
-            this.MPEG2Deblock = false;
-            this.ColourCorrect = true;
-            this.Mod16Method = mod16Method.none;
-            this.DSS2 = false;
-            this.Upsize = false;
-            this.ModValue = modValue.mod8;
+            this.resize = true;
+            this.resizeMethod = ResizeFilterType.Lanczos; // Lanczos
+            this.preferAnimeDeinterlace = false;
+            this.denoise = false;
+            this.denoiseMethod = 0; // UnDot
+            this.mpeg2deblock = false;
+            this.colourCorrect = true;
+            this.mod16Method = mod16Method.none;
+            this.modValueUsed = modValue.mod8;
+            this.dss2 = false;
+            this.upsize = false;
             this.acceptableAspectError = 1;
-        }
-
-        public AviSynthSettings(string template, ResizeFilterType resizeMethod, bool resize, bool upsize, DenoiseFilterType denoiseMethod,
-            bool denoise, bool mpeg2deblock, bool colourCorrect, mod16Method method, bool dss2, modValue modValueUsed, decimal acceptableAspectError)
-        {
-            this.Template = template;
-            this.Resize = resize;
-            this.ResizeMethod = resizeMethod;
-            this.DenoiseMethod = denoiseMethod;
-            this.Deinterlace = deinterlace;
-            this.Denoise = denoise;
-            this.IVTC = ivtc;
-            this.MPEG2Deblock = mpeg2deblock;
-            this.ColourCorrect = colourCorrect;
-            this.Mod16Method = method;
-            this.DSS2 = dss2;
-            this.Upsize = upsize;
-            this.ModValue = modValueUsed;
-            this.acceptableAspectError = acceptableAspectError;
         }
 
         public override bool Equals(object obj)
@@ -137,7 +117,8 @@ namespace MeGUI
 		public string Template
 		{
 			get {return template;}
-			set {
+			set
+            {
 				string[] lines = value.Split('\r', '\n');
 				StringBuilder script = new StringBuilder();
 				script.EnsureCapacity(value.Length);
@@ -164,22 +145,19 @@ namespace MeGUI
 			set { denoiseMethod = value; }
 		}
 
-		public bool Deinterlace
-		{
-			get { return deinterlace; }
-			set { deinterlace = value; }
-		}
+        /// <summary>
+        /// If a source should be treated by default as anime for deinterlacing
+        /// </summary>
+        public bool PreferAnimeDeinterlace
+        {
+            get { return preferAnimeDeinterlace; }
+            set { preferAnimeDeinterlace = value; }
+        }
 
-		public bool Denoise
+        public bool Denoise
 		{
 			get { return denoise; }
 			set { denoise = value; }
-		}
-
-		public bool IVTC
-		{
-			get { return ivtc; }
-			set { ivtc = value; }
 		}
 
 		public bool MPEG2Deblock

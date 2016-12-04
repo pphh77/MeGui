@@ -40,24 +40,21 @@ namespace MeGUI.core.gui
         {
             get
             {
-                mod16Method method = (mod16Method)mod16Box.SelectedIndex;
-                modValue mValue = (modValue)modValueBox.SelectedIndex;
-
-                if (!signalAR.Checked)
-                    method = mod16Method.none;
-                return new AviSynthSettings(avisynthScript.Text,
-                    (ResizeFilterType)(resizeFilterType.SelectedItem as EnumProxy).RealValue,
-                    resize.Checked,
-                    upsize.Checked,
-                    (DenoiseFilterType)(noiseFilterType.SelectedItem as EnumProxy).RealValue,
-                    noiseFilter.Checked,
-                    mpeg2Deblocking.Checked,
-                    colourCorrect.Checked,
-                    method,
-                    dss2.Checked,
-                    mValue,
-                    acceptableAspectError.Value
-                    );
+                AviSynthSettings oSettings = new AviSynthSettings();
+                oSettings.Template = avisynthScript.Text;
+                oSettings.Resize = resize.Checked;
+                oSettings.ResizeMethod = (ResizeFilterType)(resizeFilterType.SelectedItem as EnumProxy).RealValue;
+                oSettings.PreferAnimeDeinterlace = cbPreferAnimeDeinterlacing.Checked;
+                oSettings.Denoise = noiseFilter.Checked;
+                oSettings.DenoiseMethod = (DenoiseFilterType)(noiseFilterType.SelectedItem as EnumProxy).RealValue;
+                oSettings.MPEG2Deblock = mpeg2Deblocking.Checked;
+                oSettings.ColourCorrect = colourCorrect.Checked;
+                oSettings.Mod16Method = (!signalAR.Checked ? mod16Method.none : (mod16Method)mod16Box.SelectedIndex);
+                oSettings.ModValue = (modValue)modValueBox.SelectedIndex;
+                oSettings.DSS2 = dss2.Checked;
+                oSettings.Upsize = upsize.Checked;
+                oSettings.AcceptableAspectError = acceptableAspectError.Value;
+                return oSettings;
             }
             set
             {
@@ -75,6 +72,7 @@ namespace MeGUI.core.gui
                 dss2.Checked = value.DSS2;
                 modValueBox.SelectedIndex = (int)value.ModValue;
                 acceptableAspectError.Value = value.AcceptableAspectError;
+                cbPreferAnimeDeinterlacing.Checked = value.PreferAnimeDeinterlace;
             }
         }
 

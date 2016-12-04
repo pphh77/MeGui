@@ -90,7 +90,7 @@ namespace MeGUI
         }
 
         #region local info
-        bool isAnime;
+        private bool isAnime;
         bool error = false, continueWorking = true;
         string errorMessage = "";
         SourceDetectorSettings settings;
@@ -707,6 +707,7 @@ namespace MeGUI
             info.fieldOrder = fieldOrder;
             info.majorityFilm = majorityFilm;
             info.analysisResult = analysis;
+            info.isAnime = isAnime;
 
             finishedAnalysis(info, false, null);
 
