@@ -63,6 +63,7 @@ namespace MeGUI
             this.colName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colExistingVersion = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colLatestVersion = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colArchitecture = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colExistingDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colLatestDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colLastUsed = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -75,9 +76,11 @@ namespace MeGUI
             this.btnUpdate = new System.Windows.Forms.Button();
             this.btnAbort = new System.Windows.Forms.Button();
             this.statusToolStrip.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
@@ -167,6 +170,7 @@ namespace MeGUI
             this.colName,
             this.colExistingVersion,
             this.colLatestVersion,
+            this.colArchitecture,
             this.colExistingDate,
             this.colLatestDate,
             this.colLastUsed,
@@ -204,6 +208,11 @@ namespace MeGUI
             // 
             this.colLatestVersion.Text = "Server Version";
             this.colLatestVersion.Width = 117;
+            // 
+            // colArchitecture
+            // 
+            this.colArchitecture.Text = "Build";
+            this.colArchitecture.Width = 50;
             // 
             // colExistingDate
             // 
@@ -326,10 +335,12 @@ namespace MeGUI
             this.statusToolStrip.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.splitContainer2.Panel1.ResumeLayout(false);
             this.splitContainer2.Panel2.ResumeLayout(false);
             this.splitContainer2.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
@@ -361,5 +372,6 @@ namespace MeGUI
         private System.Windows.Forms.Button btnUpdate;
         private System.Windows.Forms.Button btnAbort;
         private System.Windows.Forms.ToolStripMenuItem enableToolStripMenuItem;
+        private System.Windows.Forms.ColumnHeader colArchitecture;
     }
 }

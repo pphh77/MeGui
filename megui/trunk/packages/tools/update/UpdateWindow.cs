@@ -20,11 +20,8 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Net;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
@@ -172,6 +169,7 @@ namespace MeGUI
                 ListViewItem.ListViewSubItem name = new ListViewItem.ListViewSubItem();
                 ListViewItem.ListViewSubItem existingVersion = new ListViewItem.ListViewSubItem();
                 ListViewItem.ListViewSubItem latestVersion = new ListViewItem.ListViewSubItem();
+                ListViewItem.ListViewSubItem serverArchitecture = new ListViewItem.ListViewSubItem();
                 ListViewItem.ListViewSubItem existingDate = new ListViewItem.ListViewSubItem();
                 ListViewItem.ListViewSubItem latestDate = new ListViewItem.ListViewSubItem();
                 ListViewItem.ListViewSubItem lastUsed = new ListViewItem.ListViewSubItem();
@@ -182,6 +180,7 @@ namespace MeGUI
                 name.Name = "Name";
                 existingVersion.Name = "Existing Version";
                 latestVersion.Name = "Latest Version";
+                serverArchitecture.Name = "Build";
                 existingDate.Name = "Existing Date";
                 latestDate.Name = "Latest Date";
                 lastUsed.Name = "Last Used";
@@ -214,6 +213,12 @@ namespace MeGUI
                     existingVersion.Text = "N/A";
                     existingDate.Text = "N/A";
                 }
+
+                serverArchitecture.Text = "N/A";
+                if (this.AvailableVersion.Architecture.Equals("64"))
+                    serverArchitecture.Text = "x64";
+                else if (this.AvailableVersion.Architecture.Equals("32"))
+                    serverArchitecture.Text = "x86";
 
                 ProgramSettings pSettings = UpdateCacher.GetPackage(this.name);
                 if (pSettings != null && !pSettings.UpdateAllowed())
@@ -261,6 +266,7 @@ namespace MeGUI
                 myitem.SubItems.Add(name);
                 myitem.SubItems.Add(existingVersion);
                 myitem.SubItems.Add(latestVersion);
+                myitem.SubItems.Add(serverArchitecture);
                 myitem.SubItems.Add(existingDate);
                 myitem.SubItems.Add(latestDate);
                 myitem.SubItems.Add(lastUsed);
@@ -529,10 +535,11 @@ namespace MeGUI
         {
             public Version() { }
 
-            public Version(string version, string url)
+            private string architecture = string.Empty;
+            public string Architecture
             {
-                this.fileVersion = version;
-                this.url = url;
+                get { return architecture; }
+                set { architecture = value; }
             }
 
             private string fileVersion = string.Empty;
@@ -540,6 +547,13 @@ namespace MeGUI
             {
                 get { return fileVersion; }
                 set { fileVersion = value; }
+            }
+
+            private string osbuild = string.Empty;
+            public string OSBuild
+            {
+                get { return osbuild; }
+                set { osbuild = value; }
             }
 
             private string url = string.Empty;
@@ -564,11 +578,11 @@ namespace MeGUI
             }
 
             /// <summary>
-            /// Helper method to check if a newer upload date is available
+            /// Helper method to check if a update package is different
             /// </summary>
             /// <param name="version1">The first version to compare</param>
             /// <param name="version2">The second version to compare</param>
-            /// <returns>1 if version1 has a newer upload date</returns>
+            /// <returns>0 if the versions are the same, different from 0 if they are not the same</returns>
             private int CompareUploadDate(Version version1, Version version2)
             {
                 if (version1 == null && version2 == null)
@@ -576,6 +590,8 @@ namespace MeGUI
                 else if (version1 == null)
                     return -1;
                 else if (version2 == null)
+                    return 1;
+                else if (!version1.OSBuild.Equals(version2.OSBuild))
                     return 1;
                 else if (version1.uploadDate != new DateTime() && version2.uploadDate != new DateTime())
                 {
@@ -700,6 +716,7 @@ namespace MeGUI
             colName.Width = MainForm.Instance.Settings.UpdateFormNameColumnWidth;
             colExistingVersion.Width = MainForm.Instance.Settings.UpdateFormLocalVersionColumnWidth;
             colLatestVersion.Width = MainForm.Instance.Settings.UpdateFormServerVersionColumnWidth;
+            colArchitecture.Width = MainForm.Instance.Settings.UpdateFormServerArchitectureColumnWidth;
             colExistingDate.Width = MainForm.Instance.Settings.UpdateFormLocalDateColumnWidth;
             colLatestDate.Width = MainForm.Instance.Settings.UpdateFormServerDateColumnWidth;
             colLastUsed.Width = MainForm.Instance.Settings.UpdateFormLastUsedColumnWidth;
@@ -712,6 +729,7 @@ namespace MeGUI
             MainForm.Instance.Settings.UpdateFormNameColumnWidth = colName.Width;
             MainForm.Instance.Settings.UpdateFormLocalVersionColumnWidth = colExistingVersion.Width;
             MainForm.Instance.Settings.UpdateFormServerVersionColumnWidth = colLatestVersion.Width;
+            MainForm.Instance.Settings.UpdateFormServerArchitectureColumnWidth = colArchitecture.Width;
             MainForm.Instance.Settings.UpdateFormLocalDateColumnWidth = colExistingDate.Width;
             MainForm.Instance.Settings.UpdateFormServerDateColumnWidth = colLatestDate.Width;
             MainForm.Instance.Settings.UpdateFormLastUsedColumnWidth = colLastUsed.Width;

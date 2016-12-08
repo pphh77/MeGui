@@ -64,8 +64,8 @@ namespace MeGUI
                     modeColumnWidth, statusColumnWidth, ownerColumnWidth, startColumnWidth, endColumnWidth, fpsColumnWidth,
                     updateFormUpdateColumnWidth, updateFormNameColumnWidth, updateFormLocalVersionColumnWidth, 
                     updateFormServerVersionColumnWidth, updateFormLocalDateColumnWidth, updateFormServerDateColumnWidth, 
-                    updateFormLastUsedColumnWidth, updateFormStatusColumnWidth, ffmsThreads, chapterCreatorMinimumLength,
-                    updateCheckInterval, disablePackageInterval;
+                    updateFormLastUsedColumnWidth, updateFormStatusColumnWidth, updateFormServerArchitectureColumnWidth, 
+                    ffmsThreads, chapterCreatorMinimumLength, updateCheckInterval, disablePackageInterval;
         private SourceDetectorSettings sdSettings;
         private AutoEncodeDefaultsSettings aedSettings;
         private DialogSettings dialogSettings;
@@ -146,12 +146,13 @@ namespace MeGUI
             mainFormLocation = new Point(0, 0);
             mainFormSize = new Size(713, 478);
             updateFormLocation = new Point(0, 0);
-            updateFormSize = new Size(730, 313);
+            updateFormSize = new Size(780, 313);
             updateFormSplitter = 180;
             updateFormUpdateColumnWidth = 47;
             updateFormNameColumnWidth = 105;
             updateFormLocalVersionColumnWidth = 117; 
             updateFormServerVersionColumnWidth = 117;
+            updateFormServerArchitectureColumnWidth = 50;
             updateFormLocalDateColumnWidth = 70;
             updateFormServerDateColumnWidth = 70;
             updateFormLastUsedColumnWidth = 70;
@@ -235,6 +236,12 @@ namespace MeGUI
         {
             get { return updateFormServerVersionColumnWidth; }
             set { updateFormServerVersionColumnWidth = value; }
+        }
+
+        public int UpdateFormServerArchitectureColumnWidth
+        {
+            get { return updateFormServerArchitectureColumnWidth; }
+            set { updateFormServerArchitectureColumnWidth = value; }
         }
 
         public int UpdateFormLocalDateColumnWidth

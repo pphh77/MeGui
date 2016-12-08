@@ -800,18 +800,18 @@ namespace MeGUI
                 else
                 {
                     // update data not available
-                    if (UpdateCacher.VerifyLocalCacheFile(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "upgrade.xml"), ref result))
+                    if (UpdateCacher.VerifyLocalCacheFile(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update.xml"), ref result))
                     {
                         // local xml file can be used
                         AddTextToLog("Using cached update config and server: " + _updateServerURL, ImageType.Information, false);
                         _updateXML = new XmlDocument();
-                        _updateXML.Load(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "upgrade.xml"));
+                        _updateXML.Load(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update.xml"));
                         return UpdateWindow.ErrorState.Successful;
                     }
                 }
             }
 
-            // new upgrade.xml must be downloaded
+            // new update.xml must be downloaded
             // get the current list of update servers to try
             List<string> _updateServerList = GetUpdateServerList();
             if (_updateServerList.Count == 0)
@@ -821,7 +821,7 @@ namespace MeGUI
                 return UpdateWindow.ErrorState.ServerNotAvailable;
             }
 
-            // get the upgrade.xml from the update server
+            // get the update.xml from the update server
             result = UpdateWindow.ErrorState.ServerNotAvailable;
             if (_updateMode != UpdateMode.Disabled)
             {
@@ -844,24 +844,24 @@ namespace MeGUI
             if (result != UpdateWindow.ErrorState.Successful)
             {
                 // update server not available
-                if (UpdateCacher.VerifyLocalCacheFile(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "upgrade.xml"), ref result))
+                if (UpdateCacher.VerifyLocalCacheFile(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update.xml"), ref result))
                 {
                     // local xml file can be used
                     AddTextToLog("Using cached update config and server: " + _updateServerURL, ImageType.Information, false);
                     _updateXML = new XmlDocument();
-                    _updateXML.Load(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "upgrade.xml"));
+                    _updateXML.Load(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update.xml"));
                     return UpdateWindow.ErrorState.Successful;
                 }
                 else
                     _updateXML = null;
             }
-            else if (File.Exists(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "upgrade_new.xml")))
+            else if (File.Exists(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update_new.xml")))
             {
                 // delete old file if available
-                File.Delete(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "upgrade.xml"));
-                File.Move(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "upgrade_new.xml"), Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "upgrade.xml"));
+                File.Delete(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update.xml"));
+                File.Move(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update_new.xml"), Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update.xml"));
                 _updateXML = new XmlDocument();
-                _updateXML.Load(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "upgrade.xml"));
+                _updateXML.Load(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update.xml"));
                 return UpdateWindow.ErrorState.Successful;
             }
             else
@@ -878,13 +878,10 @@ namespace MeGUI
             if (String.IsNullOrEmpty(strServerAddress))
                 return UpdateWindow.ErrorState.ServerNotAvailable;
 
-            string xmlFile = "upgrade.xml";
-#if x64
-            xmlFile = "upgrade_x64.xml";
-#endif
-            string targetFile = "upgrade_new.xml";
+            string xmlFile = "update.xml";
+            string targetFile = "update_new.xml";
             if (bCheckOnly)
-                targetFile = "upgrade_temp.xml";
+                targetFile = "update_temp.xml";
 
             UpdateCacher.DeleteCacheFile(targetFile);
             UpdateWindow.ErrorState result = DownloadFile(xmlFile, targetFile, "update definition");
@@ -954,7 +951,7 @@ namespace MeGUI
         }
 
         /// <summary>
-        /// Parses the upgrade XML file to get the update server configuration. 
+        /// Parses the update XML file to get the update server configuration. 
         /// </summary>
         /// <param name="currentNode">The node that the function should work on</param>
         private void ParseUpdateXmlServerData(XmlNode currentNode)
@@ -996,9 +993,9 @@ namespace MeGUI
         }
 
         /// <summary>
-        /// Parses the upgrade XML file to populate the upgradeData array. 
+        /// Parses the update XML file to populate the upgradeData array. 
         /// It's a recursive algorithm, so it needs to be passed the root node
-        /// off the upgrade XML to start off, and it will then recurse
+        /// off the update XML to start off, and it will then recurse
         /// through all the nodes in the file.
         /// </summary>
         /// <param name="currentNode">The node that the function should work on</param>
@@ -1021,11 +1018,12 @@ namespace MeGUI
         }
 
         /// <summary>
-        /// Once a "file" is found in the upgrade XML file, the files node is passed
-        /// to this function which generates the correct iUpgradeable filetype (i.e. MeGUIFile
-        /// or AviSynthFile) and then fills in all the relevant data.
+        /// Once a "file" is found in the update XML file, the files node is passed
+        /// to this function which generates the correct iUpgradeable filetype 
+        /// and then fills in all the relevant data.
         /// </summary>
         /// <param name="node"></param>
+        /// <param name="groupNode"></param>
         private void ParseFileData(XmlNode node, XmlNode groupNode)
         {
             UpdateWindow.iUpgradeable file = null;
@@ -1054,15 +1052,78 @@ namespace MeGUI
             }
             else
             {
-                file.AvailableVersion = new UpdateWindow.Version();
-                file.DownloadChecked = false;
                 fileAlreadyAdded = true;
                 if (file is UpdateWindow.ProfilesFile)
                     (file as UpdateWindow.ProfilesFile).MainForm = MainForm.Instance;
             }
 
+            // possible attributes:
+            // needsrestart: if the package needs a restart of MeGUI after update
+            // requiredbuild: minimum MeGUI build in ordet to install this package
+            // name: display name of the package
+            // net: minimum .NET version needed for this package
+            // os: 32 or 64 operating system 
+            // build: 32 or 64 MeGUI build
+            // minos: minimum OS
+            // maxos: maximum OS
+
+            string strOSBuild = string.Empty;
+            string strArchitecture = "32";
+            bool bOS64 = OSInfo.isWow64();
+            bool bMeGUI64 = false;
+#if x64
+            bMeGUI64 = true;
+#endif
+
+            var nameAttribute = node.Attributes["os"];
+            if (nameAttribute != null)
+            {
+                strOSBuild += nameAttribute.Value;
+                if ((nameAttribute.Value.Equals("32") && bOS64) || (nameAttribute.Value.Equals("64") && !bOS64))
+                    return;
+
+                if (nameAttribute.Value.Equals("64"))
+                    strArchitecture = "64";
+            }
+
+            nameAttribute = node.Attributes["build"];
+            if (nameAttribute != null)
+            {
+                strOSBuild += nameAttribute.Value;
+                if ((nameAttribute.Value.Equals("32") && bMeGUI64) || (nameAttribute.Value.Equals("64") && !bMeGUI64))
+                    return;
+
+                if (nameAttribute.Value.Equals("64"))
+                    strArchitecture = "64";
+            }
+
+            nameAttribute = node.Attributes["minos"];
+            if (nameAttribute != null)
+            {
+                strOSBuild += "min" + nameAttribute.Value;
+                decimal osbuild = Convert.ToDecimal(nameAttribute.Value, new System.Globalization.CultureInfo("en-US"));
+                if (OSInfo.GetOSBuild() < osbuild)
+                    return;
+            }
+
+            nameAttribute = node.Attributes["maxos"];
+            if (nameAttribute != null)
+            {
+                strOSBuild += "max" + nameAttribute.Value;
+                decimal osbuild = Convert.ToDecimal(nameAttribute.Value, new System.Globalization.CultureInfo("en-US"));
+                if (OSInfo.GetOSBuild() > osbuild)
+                    return;
+            }
+
+            // as the package is not blocked because of OS/BUILD, reset the update information as it will be refreshed below
+            if (fileAlreadyAdded)
+            {
+                file.AvailableVersion = new UpdateWindow.Version();
+                file.DownloadChecked = false;
+            }
+
             file.NeedsRestartedCopying = false;
-            var nameAttribute = node.Attributes["needsrestart"];
+            nameAttribute = node.Attributes["needsrestart"];
             if (nameAttribute != null)
             {
                 if (nameAttribute.Value.Equals("true"))
@@ -1102,6 +1163,8 @@ namespace MeGUI
             {
                 availableFile = new UpdateWindow.Version();
                 availableFile.Url = filenode.FirstChild.Value;
+                availableFile.OSBuild = strOSBuild;
+                availableFile.Architecture = (file is UpdateWindow.ProfilesFile ? string.Empty : strArchitecture);
 
                 foreach (XmlAttribute oAttribute in filenode.Attributes)
                 {
@@ -1128,9 +1191,9 @@ namespace MeGUI
                 _updateData.Add(file);
         }
 
-        #endregion
+#endregion
 
-        #region load and save
+#region load and save
         private void LoadSettings()
         {
             string path = Path.Combine(Application.StartupPath, "AutoUpdate.xml");
@@ -1184,6 +1247,6 @@ namespace MeGUI
                 AddTextToLog("Could not save update package settings", ImageType.Error, true);
             }
         }
-        #endregion
+#endregion
     }
 }

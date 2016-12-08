@@ -1,3 +1,4 @@
+2679 [Update]               improved updater to download appropriate architecture packages
 2678 [AviSynthProfile]      added option to treat sources as anime for deinterlacing
 2677 [OneClick]             fixed wrong track information in some use cases
 2676 [x265]                 fixed duplicated custom command line values (regression of 2673)

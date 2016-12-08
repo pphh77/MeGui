@@ -410,6 +410,18 @@ namespace MeGUI
             return osName;
         }
 
+        public static decimal GetOSBuild()
+        {
+            OperatingSystem osInfo = Environment.OSVersion;
+            if (osInfo.Platform == PlatformID.Win32Windows)
+                return 0;
+
+            if (osInfo.Platform != PlatformID.Win32NT)
+                return 0;
+
+            return osInfo.Version.Major + osInfo.Version.Minor / 10;
+        }
+
         /// <summary>
         /// Returns the name of the highest .NET Framework running on this computer.
         /// </summary>
