@@ -1,6 +1,6 @@
 // ****************************************************************************
 // 
-// Copyright (C) 2005-2015 Doom9 & al
+// Copyright (C) 2005-2016 Doom9 & al
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -51,11 +51,25 @@ namespace Update
             this.url = url;
         }
 
+        private string architecture = string.Empty;
+        public string Architecture
+        {
+            get { return architecture; }
+            set { architecture = value; }
+        }
+
         private string fileVersion = string.Empty;
         public string FileVersion
         {
             get { return fileVersion; }
             set { fileVersion = value; }
+        }
+
+        private string osbuild = string.Empty;
+        public string OSBuild
+        {
+            get { return osbuild; }
+            set { osbuild = value; }
         }
 
         private string url = string.Empty;
@@ -117,6 +131,8 @@ namespace Update
                     errorsEncountered.Add("MeGUI is still running. Update aborted.");
                     exit(false);
                 }
+
+                System.Threading.Thread.Sleep(1000);
 
                 // checks if the main application is available
                 string file = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "megui.exe");
