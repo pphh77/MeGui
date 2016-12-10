@@ -1481,7 +1481,6 @@ namespace MeGUI
         private System.Windows.Forms.CheckBox cbAutoStartQueueStartup;
         private System.Windows.Forms.ComboBox cbAutoUpdateServerSubList;
         private System.Windows.Forms.ToolTip toolTipHelp;
-        private System.Windows.Forms.CheckBox chkEnable64bitX264;
         private System.Windows.Forms.CheckBox chkEnsureCorrectPlaybackSpeed;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.ComboBox defaultLanguage2;

@@ -718,23 +718,25 @@ namespace MeGUI
             ProfileConfigurationWindow<TSettings, TPanel> w = new ProfileConfigurationWindow<TSettings, TPanel>(t, ID);
             w.Profiles = SProfiles;
             if (w.ShowDialog() == DialogResult.Cancel)
-            {
-                // either no changes or canceled, but set if possible the selected profile
-                foreach (GenericProfile<TSettings> p in SProfiles.Item1)
-                {
-                    if (p.FQName.Equals(w.SelectedProfile.FQName))
-                    {
-                        // profile exist - set it
-                        SelectedProfile = w.SelectedProfile;
-                        raiseChangedEvent();
-                        return;
-                    }
-                }
                 return;
+
+            // set if possible the selected profile
+            foreach (GenericProfile<TSettings> p in SProfiles.Item1)
+            {
+                if (p.FQName.Equals(w.SelectedProfile.FQName))
+                {
+                    // profile exist - set it
+                    SelectedProfile = w.SelectedProfile;
+                    raiseChangedEvent();
+                    break;
+                }
             }
 
-            SProfiles = w.Profiles;
-            MainForm.Instance.Profiles.SaveProfiles();
+            if (w.SavePresets())
+            {
+                SProfiles = w.Profiles;
+                MainForm.Instance.Profiles.SaveProfiles();
+            }
         }
 
         public SpecificProfileType(string name)

@@ -41,9 +41,9 @@ namespace MeGUI.core.gui
         }
 
         private TPanel s;
-        private bool bCloseFormWithoutSaving = false;
         private bool bSaveSettings = false;
-        private bool bSettingsChanged = false;
+        private bool bSettingsChanged = false;  // will be true if something has been changed
+        private GenericProfile<TSettings> oldSelectedPreset;
 
         private TSettings Settings
         {
@@ -161,7 +161,25 @@ namespace MeGUI.core.gui
 
         private void videoProfile_SelectedIndexChanged(object sender, EventArgs e)
         {
+            GenericProfile<TSettings> prof = oldSelectedPreset;
+            if (prof != null && !s.Settings.Equals(prof.BaseSettings))
+            {
+                switch (MessageBox.Show("The formerly selected preset has been modified. Do you want to save the changes?", "Preset update", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
+                {
+                    case DialogResult.Yes:
+                        prof.Settings = s.Settings;
+                        bSettingsChanged = true;
+                        break;
+
+                    case DialogResult.No:
+                        break;
+                }
+            }
+
             this.Settings = SelectedProfile.Settings;
+            this.oldSelectedPreset = SelectedProfile;
+
+            deleteVideoProfileButton.Enabled = (SelectedProfile.Name != ProfileManager.ScratchPadName ? true : false);
         }
 
         private void deleteVideoProfileButton_Click(object sender, EventArgs e)
@@ -176,12 +194,6 @@ namespace MeGUI.core.gui
             videoProfile.Items.Remove(prof);
             videoProfile.SelectedIndex = iIndex > 0 ? (iIndex - 1) : 0;
             bSettingsChanged = true;
-        }
-
-        private void okButton_Click(object sender, EventArgs e)
-        {
-            bSaveSettings = true;
-            this.Close();
         }
 
         private void putSettingsInScratchpad()
@@ -201,16 +213,18 @@ namespace MeGUI.core.gui
 
         private void ProfileConfigurationWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
-            this.DialogResult = DialogResult.Cancel;
-
-            if (bCloseFormWithoutSaving == true)
+            bSaveSettings = false;
+            if (this.DialogResult == DialogResult.Cancel)
+            {
+                // cancel selected, do not save
                 return;
+            }
 
             Profile prof = SelectedProfile;
             if (Settings.Equals(prof.BaseSettings))
             {
                 if (bSettingsChanged)
-                    this.DialogResult = DialogResult.OK;
+                    bSaveSettings = true;
                 return;
             }
 
@@ -218,8 +232,8 @@ namespace MeGUI.core.gui
                 prof.BaseSettings = Settings;
             else
             {
-                switch (MessageBox.Show("The selected profile has been modified. Update the selected profile? (Pressing No will save your changes to the scratchpad)",
-                    "Profile update", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question))
+                switch (MessageBox.Show("The selected preset has been modified. Update the selected preset? (Pressing \"No\" will save your changes to the scratchpad)",
+                    "Preset update", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question))
                 {
                     case DialogResult.Yes:
                         prof.BaseSettings = Settings;
@@ -230,21 +244,28 @@ namespace MeGUI.core.gui
                         break;
 
                     case DialogResult.Cancel:
-                        if (bSaveSettings == true)
-                        {
-                            bSaveSettings = false;
-                            e.Cancel = true;
-                        }
+                        e.Cancel = true;
                         return;
                 }
             }
+            bSaveSettings = true;
+        }
+
+        private void okButton_Click(object sender, EventArgs e)
+        {
             this.DialogResult = DialogResult.OK;
+            this.Close();
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
         {
-            bCloseFormWithoutSaving = true;
+            this.DialogResult = DialogResult.Cancel;
             this.Close();
+        }
+
+        public bool SavePresets()
+        {
+            return bSaveSettings;
         }
     }
 }
