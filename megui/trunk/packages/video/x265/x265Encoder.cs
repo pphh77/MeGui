@@ -36,21 +36,24 @@ new JobProcessorFactory(new ProcessorFactory(init), "x265Encoder");
         {
             if (j is VideoJob && (j as VideoJob).Settings is x265Settings)
             {
-                x265Settings xs = (x265Settings)((j as VideoJob).Settings);
-                    return new x265Encoder(mf.Settings.X265.Path);
+                UpdateCacher.CheckPackage("x265");
+
+                string encoderPath = mf.Settings.X265.Path;
+
+#if x86
+                if (!OSInfo.isWow64())
+                    encoderPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path), @"x86\x265.exe");
+#else
+                encoderPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path), @"x64\x265.exe");
+#endif
+                return new x265Encoder(encoderPath);
             }
             return null;
         }
 
-        public x265Encoder(string encoderPath)
-            : base()
+        public x265Encoder(string encoderPath) : base()
         {
-            UpdateCacher.CheckPackage("x265");
             executable = encoderPath;
-
-            string x265Path = Path.Combine(Path.GetDirectoryName(encoderPath), "avs4x265.exe");
-            if (File.Exists(x265Path))
-                executable = x265Path;
         }
 
         public override void ProcessLine(string line, StreamType stream, ImageType oType)
@@ -90,14 +93,9 @@ new JobProcessorFactory(new ProcessorFactory(init), "x265Encoder");
                     log.LogValue("aspect ratio", d.Value);
                 if (!String.IsNullOrEmpty(xs.CustomEncoderOptions))
                     log.LogEvent("custom command line: " + xs.CustomEncoderOptions);
-                string path = Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), "tools\\x265");
 #if x86
                 if (OSInfo.isWow64())
-                    sb.Append("--x265-binary \"" + Path.Combine(path, "x64\\x265.exe") + "\" ");
-                else
-                    sb.Append("--x265-binary \"" + Path.Combine(path, "x86\\x265.exe") + "\" ");
-#else
-                sb.Append("--x265-binary \"" + Path.Combine(path, "x64\\x265.exe") + "\" ");
+                    sb.Append("--x26x-binary \"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path), @"x64\x265.exe") + "\" ");
 #endif
             }
 

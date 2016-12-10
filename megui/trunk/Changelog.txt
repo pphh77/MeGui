@@ -1,3 +1,4 @@
+2685 [x265]                 switched to avs4x26x for x64 on an x86 OS
 2684 [Presets]              improved handling of preset selection/saving. Feature request #606
 2683 [x264]                 fixed "force sar" option (regression of 2628). Bug #862
 2682 [x264] + [x265]        added support for commands leading with a single hyphen (e.g. -D)

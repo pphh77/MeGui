@@ -94,6 +94,14 @@ namespace MeGUI
                     log.LogEvent("target device selected: " + xs.TargetDevice.ToString());
                 if (!String.IsNullOrEmpty(xs.CustomEncoderOptions))
                     log.LogEvent("custom command line: " + xs.CustomEncoderOptions);
+
+#if x86
+                // add correct executable
+                if (xs.X26410Bits)
+                    sb.Append("--x26x-binary \"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path), "x264-10b.exe") + "\" ");
+                else
+                    sb.Append("--x26x-binary \"" + MainForm.Instance.Settings.X264.Path + "\" ");
+#endif
             }
 
             oSettingsHandler.getFPS(ref fps_n, ref fps_d);
@@ -102,17 +110,6 @@ namespace MeGUI
             ///<summary>
             /// x264 Main Tab Settings
             ///</summary>
-
-#if x86
-            // add correct executable
-            if (!input.Equals("input") && !output.Equals("output"))
-            {
-                if (xs.X26410Bits)
-                    sb.Append(" -L \"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path), "x264-10b.exe") + "\" ");
-                else
-                    sb.Append(" -L \"" + MainForm.Instance.Settings.X264.Path + "\" ");
-            }
-#endif
 
             // AVC Profiles
             if (!xs.X26410Bits) // disable those profiles - not suitable for 10-bit encodings
