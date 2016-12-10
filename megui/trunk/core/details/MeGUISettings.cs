@@ -81,7 +81,7 @@ namespace MeGUI
         private ProgramSettings avimuxgui, avisynth, avisynthplugins, besplit, dgindexim, dgindex, dgindexnv,
                                 eac3to, fdkaac, ffmpeg, ffms, flac, haali, lame, lsmash, mediainfo,
                                 megui_core, megui_help, megui_libs, megui_updater, mkvmerge, mp4box, neroaacenc,
-                                oggenc, opus, pgcdemux, qaac, tsmuxer, vobsub, x264, x265, xvid;
+                                oggenc, opus, pgcdemux, qaac, tsmuxer, vsrip, x264, x265, xvid;
         #endregion
         public MeGUISettings()
 		{
@@ -1183,10 +1183,10 @@ namespace MeGUI
             set { tsmuxer = value; }
         }
 
-        public ProgramSettings VobSub
+        public ProgramSettings VobSubRipper
         {
-            get { return vobsub; }
-            set { vobsub = value; }
+            get { return vsrip; }
+            set { vsrip = value; }
         }
 
         /// <summary>
@@ -1340,8 +1340,8 @@ namespace MeGUI
                 fdkaac = new ProgramSettings("fdkaac");
             if (tsmuxer == null)
                 tsmuxer = new ProgramSettings("tsmuxer");
-            if (vobsub == null)
-                vobsub = new ProgramSettings("vobsub");
+            if (vsrip == null)
+                vsrip = new ProgramSettings("vsrip");
             if (x264 == null)
                 x264 = new ProgramSettings("x264");
             if (x265 == null)
@@ -1439,7 +1439,7 @@ namespace MeGUI
             if (!MainForm.Instance.Settings.UseQAAC)
                 UpdateCacher.CheckPackage("qaac", false, false);
             tsmuxer.UpdateInformation("tsmuxer", "tsMuxeR", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\tsmuxer\tsmuxer.exe"));
-            vobsub.UpdateInformation("vobsub", "VobSub", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\vobsub\vobsub.dll"));
+            vsrip.UpdateInformation("vsrip", "VobSub Ripper", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\vsrip\vsrip.exe"));
             x264.UpdateInformation("x264", "x264", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x264\x264.exe"));
             x264.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x264\avs4x26x.exe"));
             x264.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x264\x264-10b.exe"));

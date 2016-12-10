@@ -49,8 +49,11 @@ namespace MeGUI
         protected Thread readFromStdErrThread;
         protected Thread readFromStdOutThread;
         protected List<string> tempFiles = new List<string>();
-        protected bool bRunSecondTime = false;
+        protected bool bFirstPass = true;
+        protected bool bSecondPassNeeded = false;
         protected bool bWaitForExit = false;
+        protected bool bCommandLine = true;
+        protected int iSuccessCode = 0;
 
         #endregion
 
@@ -119,6 +122,25 @@ namespace MeGUI
             get { return true; }
         }
 
+        /// <summary>
+        /// true if the process main window should be hidden
+        /// </summary>
+        protected virtual bool hideProcess
+        {
+            get { return false; }
+        }
+
+        /// <summary>
+        /// true if a second run is needed
+        /// </summary>
+        /// <returns></returns>
+        protected virtual bool secondRunNeeded()
+        {
+            if (bFirstPass && bSecondPassNeeded)
+                return true;
+            return false;
+        }
+
         protected virtual void getErrorLine()
         {
             return;
@@ -137,11 +159,14 @@ namespace MeGUI
         protected void proc_Exited(object sender, EventArgs e)
         {
             mre.Set();  // Make sure nothing is waiting for pause to stop
-            stdoutDone.WaitOne(); // wait for stdout to finish processing
-            stderrDone.WaitOne(); // wait for stderr to finish processing
+            if (bCommandLine)
+            {
+                stdoutDone.WaitOne(); // wait for stdout to finish processing
+                stderrDone.WaitOne(); // wait for stderr to finish processing
+            }
 
             // check the exitcode
-            if (checkExitCode && proc.ExitCode != 0) 
+            if (checkExitCode && proc.ExitCode != iSuccessCode) 
             {
                 getErrorLine();
                 string strError = WindowUtil.GetErrorText(proc.ExitCode);
@@ -151,15 +176,13 @@ namespace MeGUI
                     log.LogEvent("Process exits with error: " + strError, ImageType.Error);
                 }
                 else
-                {
                     log.LogEvent("Process exits with error: " + strError);
-                }
             }
 
-            if (bRunSecondTime)
+            if (secondRunNeeded())
             {
+                bFirstPass = false;
                 su.HasError = false;
-                bRunSecondTime = false;
                 start();
             }
             else
@@ -198,11 +221,14 @@ namespace MeGUI
             ProcessStartInfo pstart = new ProcessStartInfo();
             pstart.FileName = executable;
             pstart.Arguments = Commandline;
-            pstart.RedirectStandardOutput = true;
-            pstart.RedirectStandardError = true;
+            if (bCommandLine)
+            {
+                pstart.RedirectStandardOutput = true;
+                pstart.RedirectStandardError = true;
+                pstart.UseShellExecute = false;
+            }
             pstart.WindowStyle = ProcessWindowStyle.Minimized;
             pstart.CreateNoWindow = true;
-            pstart.UseShellExecute = false;
             proc.StartInfo = pstart;
             proc.EnableRaisingEvents = true;
             proc.Exited += new EventHandler(proc_Exited);
@@ -212,17 +238,30 @@ namespace MeGUI
             try
             {
                 bool started = proc.Start();
-                startTime = DateTime.Now;
+                if (bFirstPass)
+                    startTime = DateTime.Now;
                 isProcessing = true;
                 log.LogEvent("Process started");
                 stdoutLog = log.Info(string.Format("[{0:G}] {1}", DateTime.Now, "Standard output stream"));
                 stderrLog = log.Info(string.Format("[{0:G}] {1}", DateTime.Now, "Standard error stream"));
-                readFromStdErrThread = new Thread(new ThreadStart(readStdErr));
-                readFromStdOutThread = new Thread(new ThreadStart(readStdOut));
-                readFromStdOutThread.Start();
-                readFromStdErrThread.Start();
+                if (bCommandLine)
+                {
+                    readFromStdErrThread = new Thread(new ThreadStart(readStdErr));
+                    readFromStdOutThread = new Thread(new ThreadStart(readStdOut));
+                    readFromStdOutThread.Start();
+                    readFromStdErrThread.Start();
+                }
                 new System.Windows.Forms.MethodInvoker(this.RunStatusCycle).BeginInvoke(null, null);
                 this.changePriority(MainForm.Instance.Settings.ProcessingPriority);
+
+                if (hideProcess)
+                {
+                    // try to hide the main window
+                    while (!proc.HasExited && !WindowUtil.GetIsWindowVisible(proc.MainWindowHandle))
+                        Thread.Sleep(100);
+                    if (!proc.HasExited)
+                        WindowUtil.HideWindow(proc.MainWindowHandle);
+                }
             }
             catch (Exception e)
             {
@@ -232,33 +271,26 @@ namespace MeGUI
 
         public void stop()
         {
-            if (proc != null && !proc.HasExited)
+            if (proc == null || proc.HasExited)
+                return;
+
+            try
             {
-                try
+                bWaitForExit = true;
+                mre.Set(); // if it's paused, then unpause
+                su.WasAborted = true;
+                proc.Kill();
+                while (bWaitForExit) // wait until the process has terminated without locking the GUI
                 {
-                    bWaitForExit = true;
-                    mre.Set(); // if it's paused, then unpause
-                    su.WasAborted = true;
-                    proc.Kill();
-                    while (bWaitForExit) // wait until the process has terminated without locking the GUI
-                    {
-                        System.Windows.Forms.Application.DoEvents();
-                        System.Threading.Thread.Sleep(100);
-                    }
-                    proc.WaitForExit();
-                    return;
+                    System.Windows.Forms.Application.DoEvents();
+                    System.Threading.Thread.Sleep(100);
                 }
-                catch (Exception e)
-                {
-                    throw new JobRunException(e);
-                }
+                proc.WaitForExit();
+                return;
             }
-            else
+            catch (Exception e)
             {
-                if (proc == null)
-                    throw new JobRunException("Encoder process does not exist");
-                else
-                    throw new JobRunException("Encoder process has already existed");
+                throw new JobRunException(e);
             }
         }
 
@@ -356,6 +388,7 @@ namespace MeGUI
                 rEvent.Set();
             }
         }
+
         protected void readStdOut()
         {
             StreamReader sr = null;
@@ -371,6 +404,7 @@ namespace MeGUI
             }
             readStream(sr, stdoutDone, StreamType.Stdout);
         }
+
         protected void readStdErr()
         {
             StreamReader sr = null;

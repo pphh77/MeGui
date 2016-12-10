@@ -38,8 +38,6 @@ namespace MeGUI
             return null;
         }
 
-        private bool bSecondPass;
-
         public HDStreamExtractorIndexer(string executablePath)
         {
             UpdateCacher.CheckPackage("eac3to");
@@ -109,7 +107,7 @@ namespace MeGUI
                         {
                             // haalo media plitter is missing ==> try to (re)install it
                             if (!su.WasAborted && FileUtil.InstallHaali(ref log))
-                                base.bRunSecondTime = true;
+                                base.bSecondPassNeeded = true;
                         }
                     }
                 }
@@ -125,7 +123,7 @@ namespace MeGUI
             if (line.StartsWith("process: ")) //status update
             {
                 su.PercentageDoneExact = getPercentage(line);
-                if (bSecondPass)
+                if (!base.bFirstPass)
                     su.Status = "Fixing audio gaps/overlaps...";
                 else
                     su.Status = "Extracting Tracks...";
@@ -139,14 +137,14 @@ namespace MeGUI
             {
                 startTime = DateTime.Now;
                 su.TimeElapsed = TimeSpan.Zero;
-                bSecondPass = true;
+                base.bFirstPass = false;
                 su.Status = "Fixing audio gaps/overlaps...";
                 base.ProcessLine(line, stream, oType);
             }
             else if (line.ToLowerInvariant().Contains("without making use of the gap/overlap information"))
             {
                 log.LogEvent("Job will be executed a second time to make use of the gap/overlap information");
-                base.bRunSecondTime = true;
+                base.bSecondPassNeeded = true;
                 base.ProcessLine(line, stream, oType);
             }
             else if (line.ToLowerInvariant().Contains("<error>"))

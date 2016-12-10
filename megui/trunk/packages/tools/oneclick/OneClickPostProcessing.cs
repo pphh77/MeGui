@@ -362,9 +362,32 @@ namespace MeGUI
                                     _log.LogEvent("Ignoring subtitle as the it cannot be found: " + trackFile, ImageType.Warning);
                             }
                             else
-                            {
+                            { 
                                 if (File.Exists(oTrack.DemuxFilePath))
-                                    subtitles.Add(new MuxStream(oTrack.DemuxFilePath, oTrack.Language, oTrack.Name, oTrack.Delay, oTrack.DefaultStream, oTrack.ForcedStream, null));
+                                {
+                                    string strTrackName = oTrack.Name;
+
+                                    // check if an forced stream is available
+                                    string strForcedFile = Path.Combine(Path.GetDirectoryName(oTrack.DemuxFilePath), Path.GetFileNameWithoutExtension(oTrack.DemuxFilePath) + "_forced.idx");
+                                    if (File.Exists(strForcedFile))
+                                    {
+                                        string strForceName = MeGUI.MainForm.Instance.Settings.AppendToForcedStreams;
+                                        string strTrackNameForced = oTrack.Name;
+                                        if (!String.IsNullOrEmpty(strForceName))
+                                        {
+                                            if (!strTrackNameForced.EndsWith(strForceName))
+                                            {
+                                                if (!String.IsNullOrEmpty(strTrackNameForced) && !strTrackNameForced.EndsWith(" "))
+                                                    strTrackNameForced += " ";
+                                                strTrackNameForced += strForceName;
+                                            }
+                                            if (strTrackName.EndsWith(strForceName))
+                                                strTrackName = (strTrackName.Substring(0, strTrackName.Length - strForceName.Length)).TrimEnd();
+                                        }
+                                        subtitles.Add(new MuxStream(oTrack.DemuxFilePath, oTrack.Language, strTrackNameForced, oTrack.Delay, oTrack.DefaultStream, true, null));
+                                    }
+                                    subtitles.Add(new MuxStream(oTrack.DemuxFilePath, oTrack.Language, strTrackName, oTrack.Delay, oTrack.DefaultStream, (File.Exists(strForcedFile) ? false : oTrack.ForcedStream), null));
+                                }
                                 else
                                     _log.LogEvent("Ignoring subtitle as the it cannot be found: " + oTrack.DemuxFilePath, ImageType.Warning);
                             }

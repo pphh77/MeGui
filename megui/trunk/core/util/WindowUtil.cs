@@ -19,11 +19,8 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows.Forms;
 
 namespace MeGUI.core.util
 {
@@ -42,6 +39,24 @@ namespace MeGUI.core.util
             StringBuilder sb = new StringBuilder(length + 1);
             GetWindowText(hWnd, sb, sb.Capacity);
             return sb.ToString();
+        }
+
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        [DllImport("user32.dll")]
+        static extern bool IsWindowVisible(IntPtr hWnd);
+
+        const int SW_HIDE = 0;
+        const int SW_SHOW = 5;
+        public static void HideWindow(IntPtr hWnd)
+        {
+            ShowWindow(hWnd, SW_HIDE); // Hide the window
+        }
+
+        public static bool GetIsWindowVisible(IntPtr hWnd)
+        {
+            return IsWindowVisible(hWnd); // Hide the window
         }
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]

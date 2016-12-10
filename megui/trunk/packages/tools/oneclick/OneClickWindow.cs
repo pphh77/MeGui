@@ -1173,7 +1173,7 @@ namespace MeGUI
                                 strInput = Path.ChangeExtension(strInput, ".IFO");
                         }
                         arrDVDSub.Add(oStream.TrackInfo.MMGTrackID);
-                        string outputFile = Path.Combine(dpp.WorkingDirectory, Path.GetFileNameWithoutExtension(strInput)) + "_" + oStream.TrackInfo.MMGTrackID + ".idx";
+                        string outputFile = Path.Combine(dpp.WorkingDirectory, Path.GetFileNameWithoutExtension(strInput)) + "_" + oStream.TrackInfo.MMGTrackID + "_" + oStream.Language + ".idx";
                         oStream.DemuxFilePath = outputFile;
                         dpp.FilesToDelete.Add(outputFile);
                         dpp.FilesToDelete.Add(Path.ChangeExtension(outputFile, ".sub"));
