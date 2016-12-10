@@ -940,22 +940,34 @@ namespace MeGUI.packages.video.x264
         /// <returns>true if the command can be found</returns>
         private bool extractCustomCommand(string strCommandToExtract, out string strCommandValue)
         {
-            String strNewCommandLine = "";
+            string strNewCommandLine = "";
             bool bFound = false;
             strCommandValue = String.Empty;
 
-            foreach (String strCommand in System.Text.RegularExpressions.Regex.Split(_xs.CustomEncoderOptions, "--"))
+            // add a leading space for easier command detection
+            _xs.CustomEncoderOptions = " " + _xs.CustomEncoderOptions;
+
+            // custom command line splitted bei either " -" or " --"
+            foreach (string strCommandTemp in System.Text.RegularExpressions.Regex.Split(_xs.CustomEncoderOptions, @"(?= --[a-zA-Z]{1}| -[a-zA-Z]{1})"))
             {
+                if (string.IsNullOrEmpty(strCommandTemp.Trim()))
+                    continue;
+                string strCommand = strCommandTemp;
+
+                string strLeading = string.Empty;
+                if (strCommand.StartsWith(" --"))
+                    strLeading = " --";
+                else if (strCommand.StartsWith(" -"))
+                    strLeading = " -";
+                strCommand = strCommand.Substring(strLeading.Length);
+
                 if (strCommand.Trim().ToLowerInvariant().StartsWith(strCommandToExtract.ToLowerInvariant()))
                 {
                     strCommandValue = strCommand.Substring(strCommandToExtract.Length).Trim();
                     bFound = true;
                 }
                 else
-                {
-                    if (!String.IsNullOrEmpty(strCommand.Trim()))
-                        strNewCommandLine += " --" + strCommand.Trim();
-                }
+                    strNewCommandLine += strLeading + strCommand;
             }
 
             _xs.CustomEncoderOptions = strNewCommandLine.Trim();

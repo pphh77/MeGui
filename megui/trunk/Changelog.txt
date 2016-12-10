@@ -1,4 +1,5 @@
-2681 [x264]                 removed option to select 32bit x264 on 64bit OS and merged the 8- and 10-bit packages
+2682 [x264] + [x265]        added support for commands leading with a single hyphen (e.g. -D)
+2681 [x264]                 removed option to select 32bit x264 on a 64bit OS and merged the 8- and 10-bit packages
 2679 [Update]               improved updater to download appropriate architecture packages
 2678 [AviSynthProfile]      added option to treat sources as anime for deinterlacing
 2677 [OneClick]             fixed wrong track information in some use cases
