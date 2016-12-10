@@ -56,7 +56,7 @@ namespace MeGUI
                      overwriteStats, keep2of3passOutput, autoUpdate, deleteCompletedJobs, deleteIntermediateFiles,
                      deleteAbortedOutput, openProgressWindow, bEac3toAutoSelectStreams, bUseFDKAac, bVobSubberKeepAll,
                      alwaysOnTop, addTimePosition, alwaysbackupfiles, bUseITU, bEac3toLastUsedFileMode,
-                     bAutoLoadDG, bAutoStartQueueStartup, b64bitX264, bAlwayUsePortableAviSynth, bVobSubberSingleFileExport,
+                     bAutoLoadDG, bAutoStartQueueStartup, bAlwayUsePortableAviSynth, bVobSubberSingleFileExport,
                      bEnsureCorrectPlaybackSpeed, bOpenAVSInThread, bExternalMuxerX264, bUseNeroAacEnc;
         private decimal forceFilmThreshold, acceptableFPSError;
         private int nbPasses, autoUpdateServerSubList, minComplexity, updateFormSplitter,
@@ -81,19 +81,10 @@ namespace MeGUI
         private ProgramSettings avimuxgui, avisynth, avisynthplugins, besplit, dgindexim, dgindex, dgindexnv,
                                 eac3to, fdkaac, ffmpeg, ffms, flac, haali, lame, lsmash, mediainfo,
                                 megui_core, megui_help, megui_libs, megui_updater, mkvmerge, mp4box, neroaacenc,
-                                oggenc, opus, pgcdemux, qaac, tsmuxer, vobsub, x264, x264_10b, x265, xvid;
+                                oggenc, opus, pgcdemux, qaac, tsmuxer, vobsub, x264, x265, xvid;
         #endregion
         public MeGUISettings()
 		{
-            string strMeGUIPath = Path.GetDirectoryName(Application.ExecutablePath);
-#if x64
-            b64bitX264 = true;
-#endif
-#if x86
-            if (OSInfo.isWow64())
-                b64bitX264 = true;
-#endif
-
             autoUpdateServerLists = new string[][] { new string[] { "Stable", "http://megui.org/auto/stable/" },
                 new string[] { "Development", "http://megui.org/auto/" }, new string[] { "Custom"}};
             lastUpdateCheck = DateTime.Now.AddDays(-77).ToUniversalTime();
@@ -106,7 +97,7 @@ namespace MeGUI
             dialogSettings = new DialogSettings();
             sdSettings = new SourceDetectorSettings();
             AedSettings = new AutoEncodeDefaultsSettings();
-            meguiupdatecache = Path.Combine(strMeGUIPath, "update_cache");
+            meguiupdatecache = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "update_cache");
 			autoForceFilm = true;
             bAutoLoadDG = true;
 			autoStartQueue = true;
@@ -490,15 +481,6 @@ namespace MeGUI
         {
             get { return afterEncodingCommand; }
             set { afterEncodingCommand = value; }
-        }
-
-        /// <summary>
-        /// bool to decide whether to use 64bit x264
-        /// </summary>
-        public bool Use64bitX264
-        {
-            get { return b64bitX264; }
-            set { b64bitX264 = value; }
         }
 
         ///<summary>
@@ -1216,15 +1198,6 @@ namespace MeGUI
             set { x264 = value; }
         }
 
-        /// <summary>
-        /// program settings of x264 10bit
-        /// </summary>
-        public ProgramSettings X264_10B
-        {
-            get { return x264_10b; }
-            set { x264_10b = value; }
-        }
-
         public ProgramSettings X265
         {
             get { return x265; }
@@ -1371,8 +1344,6 @@ namespace MeGUI
                 vobsub = new ProgramSettings("vobsub");
             if (x264 == null)
                 x264 = new ProgramSettings("x264");
-            if (x264_10b == null)
-                x264_10b = new ProgramSettings("x264_10b");
             if (x265 == null)
                 x265 = new ProgramSettings("x265");
             if (xvid == null)
@@ -1469,21 +1440,12 @@ namespace MeGUI
                 UpdateCacher.CheckPackage("qaac", false, false);
             tsmuxer.UpdateInformation("tsmuxer", "tsMuxeR", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\tsmuxer\tsmuxer.exe"));
             vobsub.UpdateInformation("vobsub", "VobSub", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\vobsub\vobsub.dll"));
-#if x64
-            x264.UpdateInformation("x264", "x264", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x264\x264_64.exe"));
-            x264_10b.UpdateInformation("x264_10b", "x264 10bit", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x264_10b\x264-10b_64.exe"));
-#endif
-#if x86
             x264.UpdateInformation("x264", "x264", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x264\x264.exe"));
-            x264_10b.UpdateInformation("x264_10b", "x264 10bit", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x264_10b\x264-10b.exe"));
             if (OSInfo.isWow64())
             {
-                x264.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x264\avs4x264mod.exe"));
-                x264.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x264\x264_64.exe"));
-                x264_10b.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x264_10b\avs4x264mod.exe"));
-                x264_10b.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x264_10b\x264-10b_64.exe"));
+                x264.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x264\avs4x26x.exe"));
+                x264.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x264\x264-10b.exe"));
             }
-#endif
             x265.UpdateInformation("x265", "x265", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x265\avs4x265.exe"));
             x265.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x265\x86\x265.exe"));
             x265.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x265\x64\x265.exe"));

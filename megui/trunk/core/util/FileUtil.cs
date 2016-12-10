@@ -777,7 +777,6 @@ namespace MeGUI.core.util
             targetDirectories.Add(Path.GetDirectoryName(Application.ExecutablePath));
             targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.FFmpeg.Path));
             targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path));
-            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X264_10B.Path));
             targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path));
             targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.XviD.Path));
 
@@ -814,7 +813,6 @@ namespace MeGUI.core.util
             targetDirectories.Add(Path.GetDirectoryName(Application.ExecutablePath));
             targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.FFmpeg.Path));
             targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path));
-            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X264_10B.Path));
             targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path));
             targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.XviD.Path));
 
@@ -888,7 +886,6 @@ namespace MeGUI.core.util
             targetDirectories.Add(Path.GetDirectoryName(Application.ExecutablePath));
             targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.FFmpeg.Path));
             targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path));
-            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X264_10B.Path));
             targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path));
             targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.XviD.Path));
 

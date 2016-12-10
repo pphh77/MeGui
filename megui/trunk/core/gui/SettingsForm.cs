@@ -48,15 +48,6 @@ namespace MeGUI
             defaultLanguage2.BindingContext = new BindingContext();
             defaultLanguage1.BindingContext = new BindingContext();
             SetToolTips();
-#if x86
-            if (!OSInfo.isWow64())
-                chkEnable64bitX264.Enabled = chkEnable64bitX264.Checked = false;
-#endif
-#if x64
-            chkEnable64bitX264.Enabled = false;
-            chkEnable64bitX264.Checked = true;
-            chkEnable64bitX264.Visible = false;
-#endif
             ffmsThreads.Maximum = System.Environment.ProcessorCount;
         }
 
@@ -232,7 +223,6 @@ namespace MeGUI
                 settings.DefaultOutputDir = defaultOutputDir.Filename;
                 settings.TempDirMP4 = tempDirMP4.Filename;
                 settings.AddTimePosition = cbAddTimePos.Checked;
-                settings.Use64bitX264 = chkEnable64bitX264.Checked;
                 settings.FFMSThreads = Decimal.ToInt32(ffmsThreads.Value);
                 settings.AppendToForcedStreams = txtForcedName.Text;
                 settings.UseITUValues = cbUseITUValues.Checked;
@@ -332,7 +322,6 @@ namespace MeGUI
                 cbAddTimePos.Checked = settings.AddTimePosition;
                 backupfiles.Checked = settings.AlwaysBackUpFiles;
                 cbAutoUpdateServerSubList.SelectedIndex = settings.AutoUpdateServerSubList;
-                chkEnable64bitX264.Checked = settings.Use64bitX264;
                 txtForcedName.Text = settings.AppendToForcedStreams;
                 if (ffmsThreads.Maximum < settings.FFMSThreads)
                     ffmsThreads.Value = ffmsThreads.Maximum;

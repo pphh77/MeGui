@@ -19,11 +19,9 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Globalization;
 using System.Text;
-using System.Windows.Forms; // used for the MethodInvoker
 
 using MeGUI.core.util;
 
@@ -31,40 +29,30 @@ namespace MeGUI
 {
     class x264Encoder : CommandlineVideoEncoder
     {
-        public static readonly JobProcessorFactory Factory =
-new JobProcessorFactory(new ProcessorFactory(init), "x264Encoder");
+        public static readonly JobProcessorFactory Factory = new JobProcessorFactory(new ProcessorFactory(init), "x264Encoder");
 
         private static IJobProcessor init(MainForm mf, Job j)
         {
             if (j is VideoJob && (j as VideoJob).Settings is x264Settings)
             {
+                UpdateCacher.CheckPackage("x264");
+
+                string encoderPath = mf.Settings.X264.Path;
                 x264Settings xs = (x264Settings)((j as VideoJob).Settings);
                 if (xs.X26410Bits)
-                {
-                    UpdateCacher.CheckPackage("x264_10b");
-                    return new x264Encoder(mf.Settings.X264_10B.Path);
-                }
-                else
-                {
-                    UpdateCacher.CheckPackage("x264");
-                    return new x264Encoder(mf.Settings.X264.Path);
-                }
+                    encoderPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path), "x264-10b.exe");
+#if x86
+                if (OSInfo.isWow64())
+                    encoderPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path), "avs4x26x.exe");
+#endif
+                return new x264Encoder(encoderPath);
             }
             return null;
         }
 
-        public x264Encoder(string encoderPath)
-            : base()
+        public x264Encoder(string encoderPath) : base()
         {
             executable = encoderPath;
-#if x86
-            if (OSInfo.isWow64() && MainForm.Instance.Settings.Use64bitX264)
-            {
-                string x264Path = Path.Combine(Path.GetDirectoryName(encoderPath), "avs4x264mod.exe");
-                if (File.Exists(x264Path))
-                    executable = x264Path;
-            }
-#endif
         }
 
         public override void ProcessLine(string line, StreamType stream, ImageType oType)
@@ -114,16 +102,20 @@ new JobProcessorFactory(new ProcessorFactory(init), "x264Encoder");
             ///<summary>
             /// x264 Main Tab Settings
             ///</summary>
+
 #if x86
-            // Enable/Disable 10-Bits Encoding
-            if (xs.X26410Bits && !input.Equals("input") && !output.Equals("output"))
+            // add correct executable
+            if (!input.Equals("input") && !output.Equals("output"))
             {
-                if (OSInfo.isWow64() && MainForm.Instance.Settings.Use64bitX264)
-                    sb.Append(" -L \"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X264_10B.Path), "x264-10b_64.exe") + "\" ");
+                if (xs.X26410Bits)
+                    sb.Append(" -L \"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path), "x264-10b.exe") + "\" ");
+                else
+                    sb.Append(" -L \"" + MainForm.Instance.Settings.X264.Path + "\" ");
             }
 #endif
+
             // AVC Profiles
-            if (!xs.X26410Bits) // disable those profiles - not suite for 10-Bits Encoding
+            if (!xs.X26410Bits) // disable those profiles - not suitable for 10-bit encodings
             {
                 xs.Profile = oSettingsHandler.getProfile();
                 switch (xs.Profile)
@@ -996,14 +988,6 @@ new JobProcessorFactory(new ProcessorFactory(init), "x264Encoder");
             {
                 return genCommandline(job.Input, job.Output, job.DAR, hres, vres, fps_n, fps_d, job.Settings as x264Settings, job.Zones, base.log);
             }
-        }
-
-        protected override void doExitConfig()
-        {
-            if (proc.ExitCode != 0 && !su.WasAborted && OSInfo.isWow64() && MainForm.Instance.Settings.Use64bitX264)
-                log.LogEvent("The 64 bit mode of x264 is enabled. Depending on the error it may help to disable it in the MeGUI settings.", ImageType.Warning);
-
-            base.doExitConfig();
         }
     }
 }
