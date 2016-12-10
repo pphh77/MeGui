@@ -964,11 +964,12 @@ namespace MeGUI
                 case 4: sb.Append("--sar 10:11 "); break;
                 case 5: sb.Append("--sar 12:11 "); break;
                 case 6: sb.Append("--sar 16:11 "); break;
-                case 7: sb.Append("--sar 32:27 "); break;
-                case 8: sb.Append("--sar 40:33 "); break;
-                case 9: sb.Append("--sar 64:45 "); break;
+                case 7: sb.Append("--sar 16:15 "); break;
+                case 8: sb.Append("--sar 32:27 "); break;
+                case 9: sb.Append("--sar 40:33 "); break;
+                case 10: sb.Append("--sar 64:45 "); break;
             }
-            
+
             //add the rest of the commandline regarding the output
             if (xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.twopass1
                 || xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.threepass1)
