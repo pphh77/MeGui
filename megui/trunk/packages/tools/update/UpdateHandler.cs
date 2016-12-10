@@ -1075,18 +1075,7 @@ namespace MeGUI
             bMeGUI64 = true;
 #endif
 
-            var nameAttribute = node.Attributes["os"];
-            if (nameAttribute != null)
-            {
-                strOSBuild += nameAttribute.Value;
-                if ((nameAttribute.Value.Equals("32") && bOS64) || (nameAttribute.Value.Equals("64") && !bOS64))
-                    return;
-
-                if (nameAttribute.Value.Equals("64"))
-                    strArchitecture = "64";
-            }
-
-            nameAttribute = node.Attributes["build"];
+            var nameAttribute = node.Attributes["build"];
             if (nameAttribute != null)
             {
                 strOSBuild += nameAttribute.Value;
@@ -1095,6 +1084,17 @@ namespace MeGUI
 
                 if (nameAttribute.Value.Equals("64"))
                     strArchitecture = "64";
+            }
+
+            nameAttribute = node.Attributes["os"];
+            if (nameAttribute != null)
+            {
+                strOSBuild += nameAttribute.Value;
+                if ((nameAttribute.Value.Equals("32") && bOS64) || (nameAttribute.Value.Equals("64") && !bOS64))
+                    return;
+
+                if (!nameAttribute.Value.Equals("32"))
+                    strArchitecture = nameAttribute.Value;
             }
 
             nameAttribute = node.Attributes["minos"];

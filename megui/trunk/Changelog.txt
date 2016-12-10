@@ -1,3 +1,4 @@
+2687 [Update]               added possibility to mark package architectures as "any"
 2686 [VobSubber]            switched to VobSub Ripper
                             forced subtitles will be extracted separately if available
                             the track language will be added if multiple track files are used

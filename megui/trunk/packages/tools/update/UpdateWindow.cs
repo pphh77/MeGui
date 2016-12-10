@@ -219,6 +219,8 @@ namespace MeGUI
                     serverArchitecture.Text = "x64";
                 else if (this.AvailableVersion.Architecture.Equals("32"))
                     serverArchitecture.Text = "x86";
+                else if (this.AvailableVersion.Architecture.Equals("any"))
+                    serverArchitecture.Text = "any";
 
                 ProgramSettings pSettings = UpdateCacher.GetPackage(this.name);
                 if (pSettings != null && !pSettings.UpdateAllowed())
