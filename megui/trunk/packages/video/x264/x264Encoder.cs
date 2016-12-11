@@ -96,11 +96,13 @@ namespace MeGUI
                     log.LogEvent("custom command line: " + xs.CustomEncoderOptions);
 
 #if x86
-                // add correct executable
-                if (xs.X26410Bits)
-                    sb.Append("--x26x-binary \"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path), "x264-10b.exe") + "\" ");
-                else
-                    sb.Append("--x26x-binary \"" + MainForm.Instance.Settings.X264.Path + "\" ");
+                if (OSInfo.isWow64())
+                {
+                    if (xs.X26410Bits)
+                        sb.Append("--x26x-binary \"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path), "x264-10b.exe") + "\" ");
+                    else
+                        sb.Append("--x26x-binary \"" + MainForm.Instance.Settings.X264.Path + "\" ");
+                }
 #endif
             }
 
