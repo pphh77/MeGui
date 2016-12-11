@@ -1,4 +1,6 @@
-2688 [x264]                 fixed incorrect command line when using a x86 OS
+2689 [VobSubber]            improved error handling if forced subtitles are not found (regression of 2686)
+                            added a warning if VOB file sizes above the specification limit are used
+2688 [x264]                 fixed incorrect command line when using a x86 OS (regression of 2681)
 2687 [Update]               added possibility to mark package architectures as "any"
 2686 [VobSubber]            switched to VobSub Ripper
                             forced subtitles will be extracted separately if available

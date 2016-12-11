@@ -87,6 +87,20 @@ namespace MeGUI
                 job.FilesToDelete.Add(strForcedFile);
                 job.FilesToDelete.Add(Path.ChangeExtension(strForcedFile, ".sub"));
             }
+
+            // check input VOB files
+            for (int i = 1; i < 10; i++)
+            {
+                // check first if the output file already exists and delete it
+                string vob = job.Input.Substring(0, job.Input.Length - 5) + i + ".VOB";
+                if (!File.Exists(vob))
+                    break;
+
+                FileInfo f = new FileInfo(vob);
+                if (f.Length > 1073741824)
+                    log.LogEvent("As the VOB file exceeds the 1 GB file size limit, not all subtitles may be extracted. file size: " + f.Length + ", file name: " + vob, ImageType.Warning);
+            }
+
             su.Status = "Demuxing subtitles...";
         }
 
@@ -149,12 +163,15 @@ namespace MeGUI
             {
                 strInputFile = Path.Combine(Path.GetDirectoryName(strInputFile), Path.GetFileNameWithoutExtension(strInputFile) + "_forced.idx");
                 string strSUBFile = Path.ChangeExtension(strInputFile, ".sub");
-                FileInfo f = new FileInfo(strSUBFile);
-                if (f.Length == 0)
+                FileInfo f = null;
+                if (File.Exists(strSUBFile))
+                    f = new FileInfo(strSUBFile);
+                if (f == null || f.Length == 0)
                 {
                     log.LogEvent("no forced subtitles found");
                     job.FilesToDelete.Add(strInputFile);
                     job.FilesToDelete.Add(strSUBFile);
+                    return;
                 }
             }
 
