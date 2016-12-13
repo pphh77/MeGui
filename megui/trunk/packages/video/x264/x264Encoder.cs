@@ -38,13 +38,14 @@ namespace MeGUI
                 UpdateCacher.CheckPackage("x264");
 
                 string encoderPath = mf.Settings.X264.Path;
-                x264Settings xs = (x264Settings)((j as VideoJob).Settings);
-                if (xs.X26410Bits)
-                    encoderPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path), "x264-10b.exe");
-#if x86
-                if (OSInfo.isWow64())
+                if (MainForm.Instance.Settings.IsMeGUIx64 || !MainForm.Instance.Settings.IsOSx64)
+                {
+                    x264Settings xs = (x264Settings)((j as VideoJob).Settings);
+                    if (xs.X26410Bits)
+                        encoderPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path), "x264-10b.exe");
+                }
+                else
                     encoderPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path), "avs4x26x.exe");
-#endif
                 return new x264Encoder(encoderPath);
             }
             return null;
@@ -95,15 +96,14 @@ namespace MeGUI
                 if (!String.IsNullOrEmpty(xs.CustomEncoderOptions))
                     log.LogEvent("custom command line: " + xs.CustomEncoderOptions);
 
-#if x86
-                if (OSInfo.isWow64())
+                if (!MainForm.Instance.Settings.IsMeGUIx64 && MainForm.Instance.Settings.IsOSx64)
                 {
+                    // add executable
                     if (xs.X26410Bits)
                         sb.Append("--x26x-binary \"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path), "x264-10b.exe") + "\" ");
                     else
                         sb.Append("--x26x-binary \"" + MainForm.Instance.Settings.X264.Path + "\" ");
                 }
-#endif
             }
 
             oSettingsHandler.getFPS(ref fps_n, ref fps_d);

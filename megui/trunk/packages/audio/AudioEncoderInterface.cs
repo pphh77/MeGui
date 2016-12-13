@@ -777,20 +777,26 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
         private bool OpenSourceWithBassAudio(out StringBuilder sbOpen)
         {
             sbOpen = new StringBuilder();
-            sbOpen.AppendFormat("LoadPlugin(\"{0}\"){1}", Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "BassAudio.dll"), Environment.NewLine);
-            sbOpen.AppendFormat("BassAudioSource(\"{0}\"){1}", audioJob.Input, Environment.NewLine);
-            _log.LogEvent("Trying to open the file with BassAudioSource()", ImageType.Information);
-            string strErrorText = String.Empty;
-            if (AudioUtil.AVSScriptHasAudio(sbOpen.ToString(), out strErrorText))
+            string strPluginPath = Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "BassAudio.dll");
+            if (File.Exists(strPluginPath))
             {
-                _log.LogEvent("Successfully opened the file with BassAudioSource()", ImageType.Information);
-                return true;
+                sbOpen.AppendFormat("LoadPlugin(\"{0}\"){1}", strPluginPath, Environment.NewLine);
+                sbOpen.AppendFormat("BassAudioSource(\"{0}\"){1}", audioJob.Input, Environment.NewLine);
+                _log.LogEvent("Trying to open the file with BassAudioSource()", ImageType.Information);
+                string strErrorText = String.Empty;
+                if (AudioUtil.AVSScriptHasAudio(sbOpen.ToString(), out strErrorText))
+                {
+                    _log.LogEvent("Successfully opened the file with BassAudioSource()", ImageType.Information);
+                    return true;
+                }
+                sbOpen = new StringBuilder();
+                if (String.IsNullOrEmpty(strErrorText))
+                    _log.LogEvent("Failed opening the file with BassAudioSource()", ImageType.Information);
+                else
+                    _log.LogEvent("Failed opening the file with BassAudioSource(). " + strErrorText, ImageType.Information);
             }
-            sbOpen = new StringBuilder();
-            if (String.IsNullOrEmpty(strErrorText))
-                _log.LogEvent("Failed opening the file with BassAudioSource()", ImageType.Information);
             else
-                _log.LogEvent("Failed opening the file with BassAudioSource(). " + strErrorText, ImageType.Information);
+                _log.LogEvent("Failed opening the file with BassAudioSource() as BassAudio.dll is not available", ImageType.Information);
             return false;
         }
 
@@ -1660,12 +1666,17 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             // copy the appropriate functions at the end of the script
             if (iAVSChannelCount > 6)
             {
-                script.AppendLine(@"
+                string strPluginPath = Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "AudioLimiter.dll");
+                bool bPluginAvailable = File.Exists(strPluginPath);
+
+                if (bPluginAvailable)
+                {
+                    script.AppendLine(@"
 # 7.1 Channels L,R,C,LFE,BL,BR,SL,SR -> standard 5.1
 function c71_c51(clip a)
   {");
-                script.AppendFormat("     LoadPlugin(\"{0}\"){1}", Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "AudioLimiter.dll"), Environment.NewLine);
-                script.AppendLine(@"
+                    script.AppendFormat("     LoadPlugin(\"{0}\"){1}", strPluginPath, Environment.NewLine);
+                    script.AppendLine(@"
      front = GetChannel(a, 1, 2, 3, 4)
      back  = GetChannel(a, 5, 6)
      side  = GetChannel(a, 7, 8)
@@ -1675,8 +1686,8 @@ function c71_c51(clip a)
 # 6.1 Channels L,R,C,LFE,BC,SL,SR -> standard 5.1
 function c61_c51(clip a)
   {");
-                script.AppendFormat("     LoadPlugin(\"{0}\"){1}", Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "AudioLimiter.dll"), Environment.NewLine);
-                script.AppendLine(@"
+                    script.AppendFormat("     LoadPlugin(\"{0}\"){1}", strPluginPath, Environment.NewLine);
+                    script.AppendLine(@"
      front = GetChannel(a, 1, 2, 3, 4)
      bcent = GetChannel(a, 5).Amplify(0.7071)
      back  = MergeChannels(bcent, bcent)
@@ -1684,6 +1695,32 @@ function c61_c51(clip a)
      mix   = MixAudio(back, side, 1.0, 1.0).SoftClipperFromAudX(0.0)
      return MergeChannels(front, mix)
   }");
+                }
+                else
+                {
+                    // plugin not available (x64)
+                    script.AppendLine(@"
+# As AudioLimiter.dll is not available, SoftClipperFromAudX() cannot be used
+# 7.1 Channels L,R,C,LFE,BL,BR,SL,SR -> standard 5.1
+function c71_c51(clip a)
+  {
+     front = GetChannel(a, 1, 2, 3, 4)
+     back  = GetChannel(a, 5, 6)
+     side  = GetChannel(a, 7, 8)
+     mix   = MixAudio(back, side, 1.0, 1.0)
+     return MergeChannels(front, mix)
+  }
+# 6.1 Channels L,R,C,LFE,BC,SL,SR -> standard 5.1
+function c61_c51(clip a)
+  {
+     front = GetChannel(a, 1, 2, 3, 4)
+     bcent = GetChannel(a, 5).Amplify(0.7071)
+     back  = MergeChannels(bcent, bcent)
+     side  = GetChannel(a, 6, 7)
+     mix   = MixAudio(back, side, 1.0, 1.0)
+     return MergeChannels(front, mix)
+  }");
+                }
             }
 
             switch (audioJob.Settings.DownmixMode)

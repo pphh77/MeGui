@@ -1069,11 +1069,8 @@ namespace MeGUI
 
             string strOSBuild = string.Empty;
             string strArchitecture = "32";
-            bool bOS64 = OSInfo.isWow64();
-            bool bMeGUI64 = false;
-#if x64
-            bMeGUI64 = true;
-#endif
+            bool bOS64 = MainForm.Instance.Settings.IsOSx64;
+            bool bMeGUI64 = MainForm.Instance.Settings.IsMeGUIx64;
 
             var nameAttribute = node.Attributes["build"];
             if (nameAttribute != null)

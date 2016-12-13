@@ -629,16 +629,17 @@ namespace MeGUI.core.util
 
             // detect system installation
             string syswow64path = Environment.GetFolderPath(Environment.SpecialFolder.System).ToLowerInvariant().Replace("\\system32", "\\SysWOW64");
-#if x86
-            // on a x86 MeGUI build try the SysWOW64 folder first
-            if (GetFileInformation(Path.Combine(syswow64path, "avisynth.dll"), out fileVersion, out fileDate, out fileProductName))
-                bFoundInstalledAviSynth = true;
-            else if (!Directory.Exists(syswow64path)
-                && GetFileInformation(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "avisynth.dll"), out fileVersion, out fileDate, out fileProductName))
-#endif
-#if x64
-            if (GetFileInformation(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "avisynth.dll"), out fileVersion, out fileDate, out fileProductName))
-#endif
+
+            if (!MainForm.Instance.Settings.IsMeGUIx64)
+            {
+                // on a x86 MeGUI build try the SysWOW64 folder first
+                if (GetFileInformation(Path.Combine(syswow64path, "avisynth.dll"), out fileVersion, out fileDate, out fileProductName))
+                    bFoundInstalledAviSynth = true;
+                else if (!Directory.Exists(syswow64path)
+                    && GetFileInformation(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "avisynth.dll"), out fileVersion, out fileDate, out fileProductName))
+                    bFoundInstalledAviSynth = true;
+            }
+            else if (GetFileInformation(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "avisynth.dll"), out fileVersion, out fileDate, out fileProductName))
                 bFoundInstalledAviSynth = true;
 
             if (bFoundInstalledAviSynth)
@@ -1084,28 +1085,29 @@ namespace MeGUI.core.util
             try
             {
                 // 55DA30FC-F16B-49FC-BAA5-AE59FC65F82D = Haali Matroska Splitter GUID
-#if x86
-                // proper check for x86 builds as there the splitter directly can be checked
-                Type comtype = Type.GetTypeFromCLSID(new Guid("55DA30FC-F16B-49FC-BAA5-AE59FC65F82D"));
-                object comobj = Activator.CreateInstance(comtype);
-#endif
-#if x64
-                // only check based on the registry of the splitter is installed
-                Microsoft.Win32.RegistryKey view32 = Microsoft.Win32.RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.ClassesRoot, Microsoft.Win32.RegistryView.Registry32);
-                Microsoft.Win32.RegistryKey key = view32.OpenSubKey(@"CLSID\{55DA30FC-F16B-49FC-BAA5-AE59FC65F82D}\InprocServer32");
-                if (key == null)
-                    return false;
-                string value = (string)key.GetValue(null);
-                if (string.IsNullOrEmpty(value) || !File.Exists(value))
-                    return false;
+                if (!MainForm.Instance.Settings.IsMeGUIx64)
+                {
+                    // proper check for x86 builds as there the splitter directly can be checked
+                    Type comtype = Type.GetTypeFromCLSID(new Guid("55DA30FC-F16B-49FC-BAA5-AE59FC65F82D"));
+                    object comobj = Activator.CreateInstance(comtype);
+                }
+                else
+                {
+                    // only check based on the registry if the splitter is installed
+                    Microsoft.Win32.RegistryKey view32 = Microsoft.Win32.RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.ClassesRoot, Microsoft.Win32.RegistryView.Registry32);
+                    Microsoft.Win32.RegistryKey key = view32.OpenSubKey(@"CLSID\{55DA30FC-F16B-49FC-BAA5-AE59FC65F82D}\InprocServer32");
+                    if (key == null)
+                        return false;
+                    string value = (string)key.GetValue(null);
+                    if (string.IsNullOrEmpty(value) || !File.Exists(value))
+                        return false;
+                }
                 return true;
-#endif
             }
             catch (Exception)
             {
                 return false;
             }
-            return true;
         }
 
         /// <summary>

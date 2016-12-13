@@ -57,15 +57,16 @@ namespace MeGUI
 
     public enum DenoiseFilterType
     {
-
         [EnumTitle("Minimal Noise", "Undot()")]
         MinimalNoise = 0,
         [EnumTitle("Little Noise", "mergechroma(blur(1.3))")]
         LittleNoise,
         [EnumTitle("Medium Noise", "FluxSmoothST(7,7)")]
-        MediumNoise,
-        [EnumTitle("Heavy Noise", "Convolution3D(\"movielq\")")]
+        MediumNoise
+#if x86
+        ,[EnumTitle("Heavy Noise", "Convolution3D(\"movielq\")")]
         HeavyNoise
+#endif
     }
 
     public enum NvDeinterlacerType
@@ -385,7 +386,7 @@ namespace MeGUI
             return filters;
         }
 
-        #region deinterlacing snippets
+#region deinterlacing snippets
         public static int Order(FieldOrder order)
         {
             int i_order = -1;
@@ -398,10 +399,10 @@ namespace MeGUI
 
         public static void AddYadif(FieldOrder order, List<DeinterlaceFilter> filters, bool bobber)
         {
-            string path = Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "yadif.dll");
+            string path = Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "yadifmod2.dll");
             filters.Add(new DeinterlaceFilter(
                 bobber ? "Yadif (with Bob)" : "Yadif",
-                string.Format("Load_Stdcall_Plugin(\"{0}\"){1}Yadif({2}order={3})", 
+                string.Format("LoadPlugin(\"{0}\"){1}Yadifmod2({2}order={3})", 
                     path, Environment.NewLine,
                     bobber ? "mode=1, " : "", Order(order))));
         }
@@ -480,9 +481,13 @@ namespace MeGUI
 
         public static void AddTMC(FieldOrder order, List<DeinterlaceFilter> filters)
         {
+            string strPluginPath = Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "TomsMoComp.dll");
+            if (!File.Exists(strPluginPath))
+                return;
+
             filters.Add(new DeinterlaceFilter(
                 "TomsMoComp",
-                string.Format("LoadPlugin(\"{0}\"){1}TomsMoComp({2},5,1)", Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "TomsMoComp.dll"), Environment.NewLine, Order(order))));
+                string.Format("LoadPlugin(\"{0}\"){1}TomsMoComp({2},5,1)", strPluginPath, Environment.NewLine, Order(order))));
         }
 
         public static void Portionize(List<DeinterlaceFilter> filters, string trimLine)
@@ -499,8 +504,8 @@ namespace MeGUI
             }
         }
 
-        #endregion
-        #region IVTC snippets
+#endregion
+#region IVTC snippets
         public static void AddTIVTC(string d2vFile, bool anime, bool hybrid, bool mostlyFilm, bool advancedDeinterlacing,
             FieldOrder fieldOrder, List<DeinterlaceFilter> filters)
         {
@@ -581,16 +586,16 @@ namespace MeGUI
         }
 
 
-        #endregion
-        #region decimate snippet
+#endregion
+#region decimate snippet
         public static void AddTDecimate(int decimateM, List<DeinterlaceFilter> filters)
         {
             filters.Add(new DeinterlaceFilter(
                 "Tritical Decimate",
                 string.Format("LoadPlugin(\"{0}\"){1}TDecimate(cycleR={2})", Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "TIVTC.dll"), Environment.NewLine, decimateM)));
         }
-        #endregion
-        #region analysis scripting
+#endregion
+#region analysis scripting
         private const string DetectionScript =
 @"{0} #original script
 {1} #trimming
@@ -636,7 +641,7 @@ SelectRangeEvery({3},{4},0)
             else
                 return null;
         }
-        #endregion
+#endregion
 
         public static void undercrop(ref CropValues crop, modValue mValue)
         {

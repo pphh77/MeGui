@@ -395,18 +395,20 @@ namespace MeGUI
                     }
                     break;
             }
-#if x64            
-            osName += " x64";
-#endif
-#if x86
-            if (x64Detection)
+
+            if (!MainForm.Instance.Settings.IsMeGUIx64)
             {
-                if (!isWow64())
-                    osName += " x86";
-                else
-                    osName += " x64";
+                if (x64Detection)
+                {
+                    if (!isWow64())
+                        osName += " x86";
+                    else
+                        osName += " x64";
+                }
             }
-#endif
+            else
+                osName += " x64";
+
             return osName;
         }
 

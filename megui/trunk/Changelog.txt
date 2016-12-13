@@ -1,3 +1,5 @@
+2690                        improved x64 build
+     [AviSynth]             replaced Yadif by Yadifmod2
 2689 [VobSubber]            improved error handling if forced subtitles are not found (regression of 2686)
                             added a warning if VOB file sizes above the specification limit are used
 2688 [x264]                 fixed incorrect command line when using a x86 OS (regression of 2681)

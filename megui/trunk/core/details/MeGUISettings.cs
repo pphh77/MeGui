@@ -55,9 +55,9 @@ namespace MeGUI
         private bool autoForceFilm, autoStartQueue, autoOpenScript, bUseQAAC, bUseX265, bUseDGIndexNV, bUseDGIndexIM,
                      overwriteStats, keep2of3passOutput, autoUpdate, deleteCompletedJobs, deleteIntermediateFiles,
                      deleteAbortedOutput, openProgressWindow, bEac3toAutoSelectStreams, bUseFDKAac, bVobSubberKeepAll,
-                     alwaysOnTop, addTimePosition, alwaysbackupfiles, bUseITU, bEac3toLastUsedFileMode,
+                     alwaysOnTop, addTimePosition, alwaysbackupfiles, bUseITU, bEac3toLastUsedFileMode, bMeGUIx64,
                      bAutoLoadDG, bAutoStartQueueStartup, bAlwayUsePortableAviSynth, bVobSubberSingleFileExport,
-                     bEnsureCorrectPlaybackSpeed, bOpenAVSInThread, bExternalMuxerX264, bUseNeroAacEnc;
+                     bEnsureCorrectPlaybackSpeed, bOpenAVSInThread, bExternalMuxerX264, bUseNeroAacEnc, bOSx64;
         private decimal forceFilmThreshold, acceptableFPSError;
         private int nbPasses, autoUpdateServerSubList, minComplexity, updateFormSplitter,
                     maxComplexity, jobColumnWidth, inputColumnWidth, outputColumnWidth, codecColumnWidth,
@@ -85,8 +85,17 @@ namespace MeGUI
         #endregion
         public MeGUISettings()
 		{
+            // OS / build detection
+#if x64
+            bMeGUIx64 = true;
+            bOSx64 = true;
+#else
+            bMeGUIx64 = false;
+            bOSx64 = OSInfo.isWow64();
+#endif
+
             autoUpdateServerLists = new string[][] { new string[] { "Stable", "http://megui.org/auto/stable/" },
-                new string[] { "Development", "http://megui.org/auto/" }, new string[] { "Custom"}};
+                new string[] { "Development", "http://megui.org/auto/" }, new string[] { "Custom" }};
             lastUpdateCheck = DateTime.Now.AddDays(-77).ToUniversalTime();
             lastUpdateServer = "http://megui.org/auto/stable/";
             disablePackageInterval = 14;
@@ -174,6 +183,18 @@ namespace MeGUI
         }
 
         #region properties
+
+        [XmlIgnore]
+        public bool IsMeGUIx64
+        {
+            get { return bMeGUIx64; }
+        }
+
+        [XmlIgnore]
+        public bool IsOSx64
+        {
+            get { return bOSx64; }
+        }
 
         public Point MainFormLocation
         {
@@ -396,7 +417,17 @@ namespace MeGUI
         /// </summary>
         public int AutoUpdateServerSubList
         {
-            get { return autoUpdateServerSubList; }
+            get
+            {
+#if DEBUG
+                return 1; // always development update server for MeGUI debug builds
+#else
+                if (bMeGUIx64)
+                    return 1; // always development update server for MeGUI x64
+                else
+                    return autoUpdateServerSubList;
+#endif
+            }
             set { autoUpdateServerSubList = value; }
         }
 
@@ -448,20 +479,7 @@ namespace MeGUI
         /// </summary>
         public string[][] AutoUpdateServerLists
         {
-            get
-            {
-#if x64 && !DEBUG
-                autoUpdateServerLists = new string[][] { new string[] { "Stable", "http://megui.org/auto/" },
-                                                         new string[] { "Development", "http://megui.org/auto/" },
-                                                         new string[] { "Custom"}};
-#endif
-#if DEBUG
-                autoUpdateServerLists = new string[][] { new string[] { "Stable", "http://megui.org/auto/" },
-                                                         new string[] { "Development", "http://megui.org/auto/" },
-                                                         new string[] { "Custom", "http://megui.org/auto/" }};
-#endif
-                return autoUpdateServerLists;
-            }
+            get { return autoUpdateServerLists; }
             set { autoUpdateServerLists = value; }
         }
 
@@ -1209,7 +1227,7 @@ namespace MeGUI
             get { return xvid; }
             set { xvid = value; }
         }
-        #endregion
+#endregion
 
         private bool bPortableAviSynth;
         /// <summary>
@@ -1233,7 +1251,7 @@ namespace MeGUI
             set { bAviSynthPlus = value; }
         }
 
-        #region Methods
+#region Methods
 
         public bool IsDGIIndexerAvailable()
         {
@@ -1355,20 +1373,24 @@ namespace MeGUI
             avisynth.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avs\DevIL.dll"));
             avisynth.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avs\plugins\DirectShowSource.dll"));
             avisynth.Required = true;
-            avisynthplugins.UpdateInformation("avisynth_plugin", "AviSynth plugins", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass.dll"));
-            avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\AudioLimiter.dll"));
-            avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass_aac.dll"));
-            avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass_ape.dll"));
-            avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass_cda.dll"));
-            avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass_flac.dll"));
-            avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass_mpc.dll"));
-            avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass_spx.dll"));
-            avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass_tta.dll"));
-            avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass_wma.dll"));
-            avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass_wv.dll"));
-            avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bassaudio.dll"));
-            avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\colormatrix.dll"));
-            avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\convolution3dyv12.dll"));
+            avisynthplugins.UpdateInformation("avisynth_plugin", "AviSynth plugins", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\colormatrix.dll"));
+            if (!bMeGUIx64)
+            {
+                avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\AudioLimiter.dll"));
+                avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass.dll"));
+                avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass_aac.dll"));
+                avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass_ape.dll"));
+                avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass_cda.dll"));
+                avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass_flac.dll"));
+                avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass_mpc.dll"));
+                avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass_spx.dll"));
+                avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass_tta.dll"));
+                avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass_wma.dll"));
+                avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass_wv.dll"));
+                avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bassaudio.dll"));
+                avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\convolution3dyv12.dll"));
+                avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\tomsmocomp.dll"));
+            }
             avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\decomb.dll"));
             avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\eedi2.dll"));
             avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\fluxsmooth.dll"));
@@ -1377,10 +1399,9 @@ namespace MeGUI
             avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\tdeint.dll"));
             avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\TimeStretch.dll"));
             avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\tivtc.dll"));
-            avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\tomsmocomp.dll"));
             avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\undot.dll"));
             avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\vsfilter.dll"));
-            avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\yadif.dll"));
+            avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\yadifmod2.dll"));
             avisynthplugins.Required = true;
             besplit.UpdateInformation("besplit", "Besplit", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\besplit\besplit.exe"));
             dgindexim.UpdateInformation("dgindexim", "DGIndexIM", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\dgindexim\dgindexim.exe"));
@@ -1436,6 +1457,7 @@ namespace MeGUI
             pgcdemux.UpdateInformation("pgcdemux", "PgcDemux", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\pgcdemux\pgcdemux.exe"));
             qaac.UpdateInformation("qaac", "QAAC", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\qaac\qaac.exe"));
             qaac.DoNotDeleteFoldersOnUpdate.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\qaac\QTfiles"));
+            qaac.DoNotDeleteFoldersOnUpdate.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\qaac\QTfiles64"));
             if (!MainForm.Instance.Settings.UseQAAC)
                 UpdateCacher.CheckPackage("qaac", false, false);
             tsmuxer.UpdateInformation("tsmuxer", "tsMuxeR", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\tsmuxer\tsmuxer.exe"));
@@ -1450,7 +1472,7 @@ namespace MeGUI
                 UpdateCacher.CheckPackage("x265", false, false);
             xvid.UpdateInformation("xvid_encraw", "Xvid", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\xvid_encraw\xvid_encraw.exe"));
        }
-        #endregion
+#endregion
     }
 
     public enum AfterEncoding { DoNothing = 0, Shutdown = 1, RunCommand = 2, CloseMeGUI = 3 }

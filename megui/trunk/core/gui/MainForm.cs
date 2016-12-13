@@ -161,9 +161,8 @@ namespace MeGUI
             this.trayIcon.Icon = new Icon(myAssembly.GetManifestResourceStream(name + "App.ico"));
             this.Icon = trayIcon.Icon;
             this.TitleText = Application.ProductName + " " + new System.Version(Application.ProductVersion).Build;
-#if x64
-            this.TitleText += " x64";
-#endif
+            if (MainForm.Instance.Settings.IsMeGUIx64)
+                this.TitleText += " x64";
             getVersionInformation();
             if (MainForm.Instance.Settings.AutoUpdateServerSubList == 1)
                 this.TitleText += " DEVELOPMENT UPDATE SERVER";
@@ -1011,8 +1010,12 @@ namespace MeGUI
             int iCount = 0;
             foreach (Process oProc in Process.GetProcessesByName(Application.ProductName))
             {
-                if (Application.ExecutablePath.Equals(oProc.MainModule.FileName))
-                    iCount++;
+                try
+                {
+                    if (Application.ExecutablePath.Equals(oProc.MainModule.FileName))
+                        iCount++;
+                }
+                catch { }
             }
             if (iCount > 1)
             {
@@ -1051,13 +1054,18 @@ namespace MeGUI
                     }
                 }
 
-                MessageBox.Show("MeGUI cannot be started as it cannot write to the application directory.\rPlease grant the required permissions or move application to an unprotected directory.", "MeGUI Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("MeGUI cannot be started as it cannot write to the application directory.\rPlease grant the required permissions or move the application to an unprotected directory.", "MeGUI Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
 #if !DEBUG
             Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+            string strDebugFile = Path.ChangeExtension(Application.ExecutablePath, ".pdb");
+            if (File.Exists(strDebugFile))
+            {
+                try { File.Delete(strDebugFile); } catch { }
+            } 
 #endif
             Application.EnableVisualStyles();
 
@@ -1319,12 +1327,10 @@ namespace MeGUI
         private void getVersionInformation()
         {
             LogItem i = Log.Info("Versions");
-#if x86
-            i.LogValue("MeGUI", new System.Version(Application.ProductVersion).Build);
-#endif
-#if x64
-            i.LogValue("MeGUI Version ", new System.Version(Application.ProductVersion).Build + " x64");
-#endif
+            if (!MainForm.Instance.Settings.IsMeGUIx64)
+                i.LogValue("MeGUI", new System.Version(Application.ProductVersion).Build);
+            else
+                i.LogValue("MeGUI", new System.Version(Application.ProductVersion).Build + " x64");
             i.LogValue("Operating System", string.Format("{0}{1} ({2}.{3}.{4}.{5})", OSInfo.GetOSName(), OSInfo.GetOSServicePack(), OSInfo.OSMajorVersion, OSInfo.OSMinorVersion, OSInfo.OSRevisionVersion, OSInfo.OSBuildVersion));
 
             string version40 = OSInfo.GetDotNetVersion("4.0");
