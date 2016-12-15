@@ -178,7 +178,7 @@ namespace MeGUI
             fakeInterlaced = false;
             nonDeterministic = false;
             _gopCalculation = 1;
-            quantizerCrf = 23;
+            quantizerCrf = 28;
             tuneFastDecode = tuneZeroLatency = false;
             stitchable = false;
 		}

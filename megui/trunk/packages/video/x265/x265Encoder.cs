@@ -37,13 +37,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "x265Encoder");
             if (j is VideoJob && (j as VideoJob).Settings is x265Settings)
             {
                 UpdateCacher.CheckPackage("x265");
-
-                string encoderPath = mf.Settings.X265.Path;
-                if (!MainForm.Instance.Settings.IsMeGUIx64 && !MainForm.Instance.Settings.IsOSx64)
-                    encoderPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path), @"x86\x265.exe");
-                else if (MainForm.Instance.Settings.IsMeGUIx64)
-                    encoderPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path), @"x64\x265.exe");
-                return new x265Encoder(encoderPath);
+                return new x265Encoder(mf.Settings.X265.Path);
             }
             return null;
         }
@@ -90,7 +84,9 @@ new JobProcessorFactory(new ProcessorFactory(init), "x265Encoder");
                     log.LogValue("aspect ratio", d.Value);
                 if (!String.IsNullOrEmpty(xs.CustomEncoderOptions))
                     log.LogEvent("custom command line: " + xs.CustomEncoderOptions);
-                if (!MainForm.Instance.Settings.IsMeGUIx64 && MainForm.Instance.Settings.IsOSx64)
+                if (!MainForm.Instance.Settings.IsOSx64)
+                    sb.Append("--x26x-binary \"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path), @"x86\x265.exe") + "\" ");
+                else
                     sb.Append("--x26x-binary \"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path), @"x64\x265.exe") + "\" ");
             }
 

@@ -1,3 +1,5 @@
+2691 [x265]                 fixed wrong command line (regression of 2685). Bug #863
+                            changed default --crf vaue to 28
 2690                        improved x64 build
      [AviSynth]             replaced Yadif by Yadifmod2
 2689 [VobSubber]            improved error handling if forced subtitles are not found (regression of 2686)
