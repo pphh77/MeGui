@@ -938,8 +938,8 @@ namespace MeGUI
         public static bool UseLSMASHVideoSource(string inputFile)
         {
             string extension = Path.GetExtension(inputFile).ToLowerInvariant();
-            return (extension.Equals(".mp4") || extension.Equals(".m4v") || extension.Equals(".mov")
-                || extension.Equals(".3gp") || extension.Equals(".3g2") || extension.Equals(".qt"));
+            return (extension.Equals(".mp4") || extension.Equals(".m4v") || extension.Equals(".mov") || extension.Equals(".m4a")
+                || extension.Equals(".3gp") || extension.Equals(".3g2") || extension.Equals(".qt") || extension.Equals(".aac"));
         }
 
         public static string getAssumeFPS(double fps, string strInput)

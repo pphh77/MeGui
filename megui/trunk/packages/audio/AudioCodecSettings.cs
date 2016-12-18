@@ -37,8 +37,10 @@ namespace MeGUI
 	    [EnumTitle("Keep Original Channels")]
 	    KeepOriginal, 
 	    [EnumTitle("Convert to Mono")]
-	    ConvertToMono,  
-	    [EnumTitle("Downmix multichannel to Stereo")]
+	    ConvertToMono,
+        [EnumTitle("Downmix multichannel to 5.1")]
+        Downmix51,
+        [EnumTitle("Downmix multichannel to Stereo")]
 	    StereoDownmix,
 	    [EnumTitle("Downmix multichannel to Dolby Pro Logic")]
 	    DPLDownmix,
@@ -165,7 +167,7 @@ namespace MeGUI
 			autoGain = false;
             applyDRC = false;
             normalize = 100;
-            preferredDecoder = AudioDecodingEngine.NicAudio;
+            preferredDecoder = AudioDecodingEngine.LWLibavAudioSource;
             timeModification = TimeModificationMode.KeepOriginal;
             sampleRate = SampleRateMode.KeepOriginal;
             customEncoderOptions = string.Empty;

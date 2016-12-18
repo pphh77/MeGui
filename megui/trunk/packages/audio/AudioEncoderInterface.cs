@@ -1006,11 +1006,11 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             {
                 bFound = OpenSourceWithNicAudio(out script, oInfo, false);
                 if (!bFound)
+                    bFound = OpenSourceWithLSMASHAudioSource(out script);
+                if (!bFound)
                     bFound = OpenSourceWithBassAudio(out script);
                 if (!bFound)
                     bFound = OpenSourceWithFFAudioSource(out script);
-                if (!bFound)
-                    bFound = OpenSourceWithLSMASHAudioSource(out script);
                 if (!bFound)
                     bFound = OpenSourceWithDirectShow(out script, oInfo);
             }
@@ -1018,11 +1018,11 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             {
                 bFound = OpenSourceWithBassAudio(out script);
                 if (!bFound)
+                    bFound = OpenSourceWithLSMASHAudioSource(out script);
+                if (!bFound)
                     bFound = OpenSourceWithNicAudio(out script, oInfo, false);
                 if (!bFound)
                     bFound = OpenSourceWithFFAudioSource(out script);
-                if (!bFound)
-                    bFound = OpenSourceWithLSMASHAudioSource(out script);
                 if (!bFound)
                     bFound = OpenSourceWithDirectShow(out script, oInfo);
             }
@@ -1042,11 +1042,11 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             {
                 bFound = OpenSourceWithFFAudioSource(out script);
                 if (!bFound)
+                    bFound = OpenSourceWithLSMASHAudioSource(out script);
+                if (!bFound)
                     bFound = OpenSourceWithNicAudio(out script, oInfo, false);
                 if (!bFound)
                     bFound = OpenSourceWithBassAudio(out script);
-                if (!bFound)
-                    bFound = OpenSourceWithLSMASHAudioSource(out script);
                 if (!bFound)
                     bFound = OpenSourceWithDirectShow(out script, oInfo);
             }
@@ -1054,13 +1054,13 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             {
                 bFound = OpenSourceWithDirectShow(out script, oInfo);
                 if (!bFound)
+                    bFound = OpenSourceWithLSMASHAudioSource(out script);
+                if (!bFound)
                     bFound = OpenSourceWithNicAudio(out script, oInfo, false);
                 if (!bFound)
                     bFound = OpenSourceWithBassAudio(out script);
                 if (!bFound)
                     bFound = OpenSourceWithFFAudioSource(out script);
-                if (!bFound)
-                    bFound = OpenSourceWithLSMASHAudioSource(out script);
             }
 
             if (!bFound && oInfo.AudioInfo.Tracks.Count > 0 && oInfo.AudioInfo.Tracks[0].Codec.Equals("DTS-HD Master Audio"))
@@ -1157,6 +1157,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 case ChannelMode.ConvertToMono:
                     script.AppendFormat("ConvertToMono(){0}", Environment.NewLine);
                     break;
+                case ChannelMode.Downmix51:
                 case ChannelMode.DPLDownmix:
                 case ChannelMode.DPLIIDownmix:
                 case ChannelMode.StereoDownmix:
@@ -1170,13 +1171,20 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                         _log.LogEvent("ignoring downmix because of the channel count mismatch", ImageType.Warning);
                         break;
                     }
-                    if (iChannelCount <= 2)
+                    if (iChannelCount <= 2 || (iChannelCount <= 6 && audioJob.Settings.DownmixMode == ChannelMode.Downmix51))
                     {
-                        _log.LogEvent("ignoring downmix as there is only " + iChannelCount + " channel", ImageType.Information);
+                        _log.LogEvent("ignoring downmix as there is only " + iChannelCount + " channel(s)", ImageType.Information);
                         break;
                     }
                     if (String.IsNullOrEmpty(strChannelPositions))
                         _log.LogEvent("no channel positions found. Downmix result may be wrong.", ImageType.Information);
+
+                    if (iChannelCount > 5)
+                    {
+                        string strPluginPath = Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "AudioLimiter.dll");
+                        if (File.Exists(strPluginPath))
+                            script.AppendFormat("LoadPlugin(\"{0}\"){1}", strPluginPath, Environment.NewLine);
+                    }
 
                     switch (strChannelPositions)
                     {
@@ -1245,7 +1253,13 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                                         else
                                             script.Append(@"c6_dpl2(ConvertAudioToFloat(last))" + Environment.NewLine);
                                         break;
-                        default:        if (audioJob.Settings.DownmixMode == ChannelMode.StereoDownmix)
+                        default:
+                                        if (audioJob.Settings.DownmixMode == ChannelMode.Downmix51)
+                                        {
+                                            script.Append(@"8<=Audiochannels(last)?c71_c51(ConvertAudioToFloat(last)):last" + Environment.NewLine);
+                                            script.Append(@"7==Audiochannels(last)?c61_c51(ConvertAudioToFloat(last)):last" + Environment.NewLine);
+                                        }
+                                        else if (audioJob.Settings.DownmixMode == ChannelMode.StereoDownmix)
                                         {
                                             script.Append(@"8<=Audiochannels(last)?c71_c51(ConvertAudioToFloat(last)):last" + Environment.NewLine);
                                             script.Append(@"7==Audiochannels(last)?c61_c51(ConvertAudioToFloat(last)):last" + Environment.NewLine);
@@ -1298,10 +1312,24 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                         createTemporallyEqFiles(tmp);
                         script.Append("2==Audiochannels(last)?x_upmix" + id + @"(last):last" + Environment.NewLine);
                     }
-                    else if (audioJob.Settings.DownmixMode == ChannelMode.UpmixUsingSoxEq)
-                        script.Append("2==Audiochannels(last)?x_upmixR" + id + @"(last):last" + Environment.NewLine);
-                    else
-                        script.Append("2==Audiochannels(last)?x_upmixC" + id + @"(last):last" + Environment.NewLine);
+                    else if (audioJob.Settings.DownmixMode != ChannelMode.Upmix)
+                    {
+                        string strPluginPath = Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "SoxFilter.dll");
+                        if (File.Exists(strPluginPath))
+                        {
+                            script.AppendFormat("LoadPlugin(\"{0}\"){1}", strPluginPath, Environment.NewLine);
+                            if (audioJob.Settings.DownmixMode == ChannelMode.UpmixUsingSoxEq)
+                                script.Append("2==Audiochannels(last)?x_upmixR" + id + @"(last):last" + Environment.NewLine);
+                            else
+                                script.Append("2==Audiochannels(last)?x_upmixC" + id + @"(last):last" + Environment.NewLine);
+                        }
+                        else
+                        {
+                            _log.LogEvent("as SoxFilter() is not availabble, use default upmix mode", ImageType.Information);
+                            createTemporallyEqFiles(tmp);
+                            script.Append("2==Audiochannels(last)?x_upmix" + id + @"(last):last" + Environment.NewLine);
+                        } 
+                    }   
                     break;
             }
 
@@ -1337,13 +1365,16 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             }
 
             // TimeModification
-            if (iChannelCount > 2 &&
-                (audioJob.Settings.TimeModification == TimeModificationMode.SlowDown25To23976WithCorrection ||
+            if (audioJob.Settings.TimeModification == TimeModificationMode.SlowDown25To23976WithCorrection ||
                 audioJob.Settings.TimeModification == TimeModificationMode.SlowDown25To24WithCorrection ||
                 audioJob.Settings.TimeModification == TimeModificationMode.SpeedUp23976To25WithCorrection ||
-                audioJob.Settings.TimeModification == TimeModificationMode.SpeedUp24To25WithCorrection))
-                _log.LogEvent("When TimeStretch() is used with more than 2 channels, each channel is processed individually in 1 channel mode. This will destroy the phase relationship between the channels.", ImageType.Warning);
- 
+                audioJob.Settings.TimeModification == TimeModificationMode.SpeedUp24To25WithCorrection)
+            {
+                string strPluginPath = Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "timestretch.dll");
+                if (File.Exists(strPluginPath))
+                    script.AppendFormat("LoadPlugin(\"{0}\"){1}", strPluginPath, Environment.NewLine);
+            }
+
             switch (audioJob.Settings.TimeModification)
             {
                 case TimeModificationMode.KeepOriginal:
@@ -1361,16 +1392,16 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                     script.Append("SSRC(Round((AudioRate()*25.0)/24.0)).AssumeSampleRate(AudioRate())" + Environment.NewLine);
                     break;
                 case TimeModificationMode.SpeedUp23976To25WithCorrection:
-                    script.Append("TimeStretch(tempo=(1001.0/9.6))" + Environment.NewLine);
+                    script.Append((MainForm.Instance.Settings.IsMeGUIx64 ? "TimeStretch" : "TimeStretchPlugin") + "(tempo=(1001.0/9.6))" + Environment.NewLine);
                     break;
                 case TimeModificationMode.SlowDown25To23976WithCorrection:
-                    script.Append("TimeStretch(tempo=(96.0/1.001))" + Environment.NewLine);
+                    script.Append((MainForm.Instance.Settings.IsMeGUIx64 ? "TimeStretch" : "TimeStretchPlugin") + "(tempo=(96.0/1.001))" + Environment.NewLine);
                     break;
                 case TimeModificationMode.SpeedUp24To25WithCorrection:
-                    script.Append("TimeStretch(tempo=(2500.0/24.0))" + Environment.NewLine);
+                    script.Append((MainForm.Instance.Settings.IsMeGUIx64 ? "TimeStretch" : "TimeStretchPlugin") + "(tempo=(2500.0/24.0))" + Environment.NewLine);
                     break;
                 case TimeModificationMode.SlowDown25To24WithCorrection:
-                    script.Append("TimeStretch(tempo=(2400.0/25.0))" + Environment.NewLine);
+                    script.Append((MainForm.Instance.Settings.IsMeGUIx64 ? "TimeStretch" : "TimeStretchPlugin") + "(tempo=(2400.0/25.0))" + Environment.NewLine);
                     break;
             }
 
@@ -1667,16 +1698,12 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             if (iAVSChannelCount > 6)
             {
                 string strPluginPath = Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "AudioLimiter.dll");
-                bool bPluginAvailable = File.Exists(strPluginPath);
-
-                if (bPluginAvailable)
+                if (File.Exists(strPluginPath))
                 {
                     script.AppendLine(@"
 # 7.1 Channels L,R,C,LFE,BL,BR,SL,SR -> standard 5.1
 function c71_c51(clip a)
-  {");
-                    script.AppendFormat("     LoadPlugin(\"{0}\"){1}", strPluginPath, Environment.NewLine);
-                    script.AppendLine(@"
+  {
      front = GetChannel(a, 1, 2, 3, 4)
      back  = GetChannel(a, 5, 6)
      side  = GetChannel(a, 7, 8)
@@ -1685,9 +1712,7 @@ function c71_c51(clip a)
   }
 # 6.1 Channels L,R,C,LFE,BC,SL,SR -> standard 5.1
 function c61_c51(clip a)
-  {");
-                    script.AppendFormat("     LoadPlugin(\"{0}\"){1}", strPluginPath, Environment.NewLine);
-                    script.AppendLine(@"
+  {
      front = GetChannel(a, 1, 2, 3, 4)
      bcent = GetChannel(a, 5).Amplify(0.7071)
      back  = MergeChannels(bcent, bcent)
@@ -1707,7 +1732,7 @@ function c71_c51(clip a)
      front = GetChannel(a, 1, 2, 3, 4)
      back  = GetChannel(a, 5, 6)
      side  = GetChannel(a, 7, 8)
-     mix   = MixAudio(back, side, 1.0, 1.0)
+     mix   = MixAudio(back, side, 1.0, 1.0)#.SoftClipperFromAudX(0.0)
      return MergeChannels(front, mix)
   }
 # 6.1 Channels L,R,C,LFE,BC,SL,SR -> standard 5.1
@@ -1717,7 +1742,7 @@ function c61_c51(clip a)
      bcent = GetChannel(a, 5).Amplify(0.7071)
      back  = MergeChannels(bcent, bcent)
      side  = GetChannel(a, 6, 7)
-     mix   = MixAudio(back, side, 1.0, 1.0)
+     mix   = MixAudio(back, side, 1.0, 1.0)#.SoftClipperFromAudX(0.0)
      return MergeChannels(front, mix)
   }");
                 }
@@ -1728,6 +1753,8 @@ function c61_c51(clip a)
                 case ChannelMode.KeepOriginal:
                     break;
                 case ChannelMode.ConvertToMono:
+                    break;
+                case ChannelMode.Downmix51:
                     break;
                 case ChannelMode.DPLDownmix:
                 case ChannelMode.DPLIIDownmix:
@@ -1990,8 +2017,8 @@ function x_upmix" + id + @"(clip a)
                     script.AppendLine(@"
 function x_upmixR" + id + @"(clip Stereo) 
  {
-    Front = mixaudio(Stereo.soxfilter(""filter 0-600""),mixaudio(Stereo.soxfilter(""filter 600-1200""),Stereo.soxfilter(""filter 1200-7000""),0.45,0.25),0.50,1)
-    Back = mixaudio(Stereo.soxfilter(""filter 0-600""),mixaudio(Stereo.soxfilter(""filter 600-1200""),Stereo.soxfilter(""filter 1200-7000""),0.35,0.15),0.40,1)
+    Front = mixaudio(Stereo.SoxFilter(""filter 0-600""),mixaudio(Stereo.SoxFilter(""filter 600-1200""),Stereo.SoxFilter(""filter 1200-7000""),0.45,0.25),0.50,1)
+    Back = mixaudio(Stereo.SoxFilter(""filter 0-600""),mixaudio(Stereo.SoxFilter(""filter 600-1200""),Stereo.SoxFilter(""filter 1200-7000""),0.35,0.15),0.40,1)
     fl = GetLeftChannel(Front)
     fr = GetRightChannel(Front)
     cc = ConvertToMono(stereo).SoxFilter(""filter 625-24000"")
@@ -2009,12 +2036,12 @@ function x_upmixC" + id + @"(clip stereo)
  {
     left = stereo.GetLeftChannel()
     right = stereo.GetRightChannel()
-    fl = mixaudio(left.soxfilter(""filter 0-24000""),right.soxfilter(""filter 0-24000""),0.6,-0.5)
-    fr = mixaudio(right.soxfilter(""filter 0-24000""),left.soxfilter(""filter 0-24000""),0.6,-0.5)
+    fl = mixaudio(left.SoxFilter(""filter 0-24000""),right.SoxFilter(""filter 0-24000""),0.6,-0.5)
+    fr = mixaudio(right.SoxFilter(""filter 0-24000""),left.SoxFilter(""filter 0-24000""),0.6,-0.5)
     cc = ConvertToMono(stereo).SoxFilter(""filter 625-24000"")
     lfe = ConvertToMono(stereo).SoxFilter(""lowpass 100"",""vol -0.5"")
-    sl = mixaudio(left.soxfilter(""filter 0-24000""),right.soxfilter(""filter 0-24000""),0.5,-0.4)
-    sr = mixaudio(right.soxfilter(""filter 0-24000""),left.soxfilter(""filter 0-24000""),0.5,-0.4)
+    sl = mixaudio(left.SoxFilter(""filter 0-24000""),right.SoxFilter(""filter 0-24000""),0.5,-0.4)
+    sr = mixaudio(right.SoxFilter(""filter 0-24000""),left.SoxFilter(""filter 0-24000""),0.5,-0.4)
     sl = DelayAudio(sl,0.02)
     sr = DelayAudio(sr,0.02)
      return MergeChannels(fl,fr,cc,lfe,sl,sr)                                                                                                                                              

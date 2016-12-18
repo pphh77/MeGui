@@ -51,6 +51,7 @@ namespace MeGUI.core.details.audio
                     :
                     new object[]{
                                 ChannelMode.KeepOriginal,
+                                ChannelMode.Downmix51,
                                 ChannelMode.StereoDownmix,
                                 ChannelMode.DPLDownmix,
                                 ChannelMode.DPLIIDownmix,

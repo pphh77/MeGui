@@ -1389,6 +1389,7 @@ namespace MeGUI
                 avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bass_wv.dll"));
                 avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\bassaudio.dll"));
                 avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\convolution3dyv12.dll"));
+                avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\soxfilter.dll"));
                 avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\tomsmocomp.dll"));
             }
             avisynthplugins.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\avisynth_plugin\decomb.dll"));

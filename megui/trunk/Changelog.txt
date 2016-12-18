@@ -1,4 +1,8 @@
-2692 [qaac]                 removed --no-delay option if LC is not used. Bug #865
+2693 [AudioEncoder]         default to LWLibavAudioSource()/LSMASHAudioSource()
+                            added downmix option to 5.1
+                            added proper LoadPlugin calls for TimeStrech()/TimeStretchPlugin() and SoxFilter()
+                            x64: remove filter/functions where the not available plugins AudioLimiter.dll or SoxFilter.dll are required
+2692 [qaac]                 removed --no-delay option if LC is not used (regression of 2377). Bug #865
 2691 [x265]                 fixed wrong command line (regression of 2685). Bug #863
                             changed default --crf vaue to 28
 2690                        improved x64 build

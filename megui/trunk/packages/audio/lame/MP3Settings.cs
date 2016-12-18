@@ -46,12 +46,13 @@ namespace MeGUI
 
 		private int quality;
         private int abrBitrate;
-		public MP3Settings()
-            : base(ID, AudioCodec.MP3, AudioEncoderType.LAME, 128)
+
+		public MP3Settings() : base(ID, AudioCodec.MP3, AudioEncoderType.LAME, 128)
 		{
 			quality = 4;
             base.DownmixMode = ChannelMode.StereoDownmix;
 		}
+
 		/// <summary>
 		/// gets / sets the quality for vbr mode
 		/// </summary>
