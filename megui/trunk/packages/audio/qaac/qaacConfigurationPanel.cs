@@ -145,9 +145,13 @@ namespace MeGUI.packages.audio.qaac
                     trackBar.TickFrequency = 20;
                     encoderGroupBox.Text = String.Format(" QAAC Options - Constant Bitrate  @ {0} kbit/s ", trackBar.Value);
                     break;
+            }  
+            if (cbProfile.SelectedItem != null)
+            {
+                if (((QaacProfile)(cbProfile.SelectedItem as EnumProxy).RealValue) == QaacProfile.ALAC)
+                    encoderGroupBox.Text = String.Format(" QAAC Options ");
+                chNoDelay.Visible = (((QaacProfile)(cbProfile.SelectedItem as EnumProxy).RealValue) == QaacProfile.LC);
             }
-            if (cbProfile.SelectedIndex == 2) 
-                encoderGroupBox.Text = String.Format("QAAC Options");
         }
 
         private void cbMode_SelectedIndexChanged(object sender, EventArgs e)

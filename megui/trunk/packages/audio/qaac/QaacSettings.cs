@@ -51,12 +51,12 @@ namespace MeGUI
         public static readonly QaacProfile[] SupportedProfiles = new QaacProfile[] { QaacProfile.LC, QaacProfile.HE, QaacProfile.ALAC };
         public static readonly QaacMode[]    SupportedModes    = new QaacMode[] { QaacMode.TVBR, QaacMode.CVBR, QaacMode.ABR, QaacMode.CBR };
 
-		public QaacSettings() 
-            : base(ID, AudioCodec.AAC, AudioEncoderType.QAAC, 0, BitrateManagementMode.VBR)
+		public QaacSettings() : base(ID, AudioCodec.AAC, AudioEncoderType.QAAC, 0, BitrateManagementMode.VBR)
 		{
             Quality = 91;
             Mode = QaacMode.TVBR;
             Profile = QaacProfile.LC;
+            noDelay = true;
 		}
 
         private QaacProfile profile;

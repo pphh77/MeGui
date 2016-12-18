@@ -1,3 +1,4 @@
+2692 [qaac]                 removed --no-delay option if LC is not used. Bug #865
 2691 [x265]                 fixed wrong command line (regression of 2685). Bug #863
                             changed default --crf vaue to 28
 2690                        improved x64 build

@@ -1570,7 +1570,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 }
 
                 if (!oSettings.CustomEncoderOptions.Contains("--no-delay"))
-                    if (oSettings.NoDelay) // To resolve some A/V sync issues 
+                    if (oSettings.NoDelay && oSettings.Profile == QaacProfile.LC) // To resolve some A/V sync issues 
                         sb.Append(" --no-delay");
 
                 if (!String.IsNullOrEmpty(oSettings.CustomEncoderOptions))
