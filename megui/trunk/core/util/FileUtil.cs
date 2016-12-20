@@ -623,7 +623,7 @@ namespace MeGUI.core.util
             string fileProductName = string.Empty;
             bool bFoundInstalledAviSynth = false;
 
-            // remove msvc files
+            // remove redist & portable avisynth files
             DeleteRuntimeFiles();
             PortableAviSynthActions(true);
 
@@ -714,8 +714,8 @@ namespace MeGUI.core.util
                 if (oLog != null)
                     oLog.LogValue("AviSynth", "not found", ImageType.Error);
             }
-            else if (!MainForm.Instance.Settings.AviSynthPlus)
-                LSMASHFileActions(false);
+            else
+                RedistFileActions();
         }
 
         /// <summary>
@@ -776,15 +776,37 @@ namespace MeGUI.core.util
         {
             ArrayList targetDirectories = new ArrayList();
             targetDirectories.Add(Path.GetDirectoryName(Application.ExecutablePath));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynthPlugins.Path));
             targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.FFmpeg.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.LSMASH.Path));
             targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path));
             targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path));
             targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.XviD.Path));
 
+            // get the redist files from the redist package
+            ArrayList sourceFiles = new ArrayList();
+            if (Directory.Exists(Path.GetDirectoryName(MainForm.Instance.Settings.Redist.Path)))
+            {
+                DirectoryInfo fi = new DirectoryInfo(Path.GetDirectoryName(MainForm.Instance.Settings.Redist.Path));
+                FileInfo[] files = fi.GetFiles("*.dll");
+                foreach (FileInfo f in files)
+                    sourceFiles.Add(f.Name);
+            }
+
+            // check each target directory and remove the redist files
             foreach (String dir in targetDirectories)
             {
                 if (!Directory.Exists(dir))
                     continue;
+
+                foreach (String file in sourceFiles)
+                {
+                    if (!File.Exists(Path.Combine(dir, file)))
+                        continue;
+
+                    try { File.Delete(Path.Combine(dir, file)); }
+                    catch { }
+                }
 
                 DirectoryInfo fi = new DirectoryInfo(dir);
                 FileInfo[] files = fi.GetFiles("msvc*.dll");
@@ -805,7 +827,7 @@ namespace MeGUI.core.util
         /// <summary>
         /// Enables or disables the portable AviSynth build
         /// </summary>
-        /// <param name="bRemove">if true the files will be removed / portable AviSynth will be disabled</param>
+        /// <param name="bRemove">if true the files will be removed</param>
         public static void PortableAviSynthActions(bool bRemove)
         {
             string avisynthPath = Path.GetDirectoryName(MainForm.Instance.Settings.AviSynth.Path);
@@ -820,18 +842,6 @@ namespace MeGUI.core.util
             ArrayList sourceFiles = new ArrayList();
             sourceFiles.Add("AviSynth.dll");
             sourceFiles.Add("DevIL.dll");
-            if (Directory.Exists(avisynthPath))
-            {
-                DirectoryInfo fi = new DirectoryInfo(avisynthPath);
-                FileInfo[] files = fi.GetFiles("msvc*.dll");
-                foreach (FileInfo f in files)
-                    sourceFiles.Add(f.Name);
-                files = fi.GetFiles("vc*.dll");
-                foreach (FileInfo f in files)
-                    sourceFiles.Add(f.Name);
-            }
-            else if (!bRemove)
-                return;
 
             foreach (String dir in targetDirectories)
             {
@@ -840,108 +850,80 @@ namespace MeGUI.core.util
 
                 if (!bRemove)
                 {
+                    // copy the avisynth files
                     foreach (String file in sourceFiles)
                     {
                         if (File.Exists(Path.Combine(dir, file)) &&
                             File.GetLastWriteTimeUtc(Path.Combine(dir, file)) == File.GetLastWriteTimeUtc(Path.Combine(avisynthPath, file)))
                             continue;
 
-                        try
-                        {
-                            File.Copy(Path.Combine(avisynthPath, file), Path.Combine(dir, file), true);
-                        }
+                        try { File.Copy(Path.Combine(avisynthPath, file), Path.Combine(dir, file), true); }
                         catch { }
                     }
                 }
                 else
                 {
-                    DirectoryInfo fi = new DirectoryInfo(dir);
-                    FileInfo[] files = fi.GetFiles();
-                    foreach (FileInfo f in files)
+                    // remove the avisynth files
+                    foreach (String file in sourceFiles)
                     {
-                        foreach (String file in sourceFiles)
-                        {
-                            if (!file.ToLowerInvariant().Equals(f.Name.ToLowerInvariant()))
-                                continue;
+                        if (!File.Exists(Path.Combine(dir, file)))
+                            continue;
 
-                            try
-                            {
-                                f.Delete();
-                            }
-                            catch { }
-                        }
+                        try { File.Delete(Path.Combine(dir, file)); }
+                        catch { }
                     }
                 }        
             }
         }
 
         /// <summary>
-        /// Enables or disables lsmash visual runtimes build
+        /// Enables or disables runtimes build
         /// </summary>
-        /// <param name="bRemove">if true the files will be removed</param>
-        public static void LSMASHFileActions(bool bRemove)
+        public static void RedistFileActions()
         {
-            string lsmashPath = Path.GetDirectoryName(MainForm.Instance.Settings.LSMASH.Path);
+            UpdateCacher.CheckPackage("redist");
 
             ArrayList targetDirectories = new ArrayList();
-            targetDirectories.Add(Path.GetDirectoryName(Application.ExecutablePath));
-            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.FFmpeg.Path));
-            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path));
-            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path));
-            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.XviD.Path));
-
-            ArrayList sourceFiles = new ArrayList();
-            if (Directory.Exists(lsmashPath))
+            if (MainForm.Instance.Settings.AviSynthPlus)
             {
-                DirectoryInfo fi = new DirectoryInfo(lsmashPath);
-                FileInfo[] files = fi.GetFiles("msvc*.dll");
-                foreach (FileInfo f in files)
-                    sourceFiles.Add(f.Name);
-                files = fi.GetFiles("vc*.dll");
+                // AVS+ expects the DLL files in the filter directories
+                targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynthPlugins.Path));
+                targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.LSMASH.Path));
+            }
+            else
+            {
+                // AVS expects the DLL files in the root & encoder directories
+                targetDirectories.Add(Path.GetDirectoryName(Application.ExecutablePath));
+                targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.FFmpeg.Path));
+                targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path));
+                targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path));
+                targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.XviD.Path));
+            }
+
+            // get the redist files from the redist package
+            string strRedistPath = Path.GetDirectoryName(MainForm.Instance.Settings.Redist.Path);
+            ArrayList sourceFiles = new ArrayList();
+            if (Directory.Exists(strRedistPath))
+            {
+                DirectoryInfo fi = new DirectoryInfo(strRedistPath);
+                FileInfo[] files = fi.GetFiles("*.dll");
                 foreach (FileInfo f in files)
                     sourceFiles.Add(f.Name);
             }
-            else if (!bRemove)
-                return;
 
             foreach (String dir in targetDirectories)
             {
                 if (!Directory.Exists(dir))
                     continue;
 
-                if (!bRemove)
+                foreach (String file in sourceFiles)
                 {
-                    foreach (String file in sourceFiles)
-                    {
-                        if (File.Exists(Path.Combine(dir, file)) &&
-                            File.GetLastWriteTimeUtc(Path.Combine(dir, file)) == File.GetLastWriteTimeUtc(Path.Combine(lsmashPath, file)))
-                            continue;
+                    if (File.Exists(Path.Combine(dir, file)) &&
+                        File.GetLastWriteTimeUtc(Path.Combine(dir, file)) == File.GetLastWriteTimeUtc(Path.Combine(strRedistPath, file)))
+                        continue;
 
-                        try
-                        {
-                            File.Copy(Path.Combine(lsmashPath, file), Path.Combine(dir, file), true);
-                        }
-                        catch { }
-                    }
-                }
-                else
-                {
-                    DirectoryInfo fi = new DirectoryInfo(dir);
-                    FileInfo[] files = fi.GetFiles();
-                    foreach (FileInfo f in files)
-                    {
-                        foreach (String file in sourceFiles)
-                        {
-                            if (!file.ToLowerInvariant().Equals(f.Name.ToLowerInvariant()))
-                                continue;
-
-                            try
-                            {
-                                f.Delete();
-                            }
-                            catch { }
-                        }
-                    }
+                    try { File.Copy(Path.Combine(strRedistPath, file), Path.Combine(dir, file), true); }
+                    catch { }
                 }
             }
         }

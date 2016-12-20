@@ -81,7 +81,7 @@ namespace MeGUI
         private ProgramSettings avimuxgui, avisynth, avisynthplugins, besplit, dgindexim, dgindex, dgindexnv,
                                 eac3to, fdkaac, ffmpeg, ffms, flac, haali, lame, lsmash, mediainfo,
                                 megui_core, megui_help, megui_libs, megui_updater, mkvmerge, mp4box, neroaacenc,
-                                oggenc, opus, pgcdemux, qaac, tsmuxer, vsrip, x264, x265, xvid;
+                                oggenc, opus, pgcdemux, qaac, redist, tsmuxer, vsrip, x264, x265, xvid;
         #endregion
         public MeGUISettings()
 		{
@@ -1195,6 +1195,12 @@ namespace MeGUI
             set { qaac = value; }
         }
 
+        public ProgramSettings Redist
+        {
+            get { return redist; }
+            set { redist = value; }
+        }
+
         public ProgramSettings TSMuxer
         {
             get { return tsmuxer; }
@@ -1318,6 +1324,8 @@ namespace MeGUI
                 dgindexnv = new ProgramSettings("dgindexnv");
             if (eac3to == null)
                 eac3to = new ProgramSettings("eac3to");
+            if (fdkaac == null)
+                fdkaac = new ProgramSettings("fdkaac");
             if (ffmpeg == null)
                 ffmpeg = new ProgramSettings("ffmpeg");
             if (ffms == null)
@@ -1354,8 +1362,8 @@ namespace MeGUI
                 pgcdemux = new ProgramSettings("pgcdemux");
             if (qaac == null)
                 qaac = new ProgramSettings("qaac");
-            if (fdkaac == null)
-                fdkaac = new ProgramSettings("fdkaac");
+            if (redist == null)
+                redist = new ProgramSettings("redist");
             if (tsmuxer == null)
                 tsmuxer = new ProgramSettings("tsmuxer");
             if (vsrip == null)
@@ -1461,6 +1469,7 @@ namespace MeGUI
             qaac.DoNotDeleteFoldersOnUpdate.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\qaac\QTfiles64"));
             if (!MainForm.Instance.Settings.UseQAAC)
                 UpdateCacher.CheckPackage("qaac", false, false);
+            redist.UpdateInformation("redist", "Redistributables", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\redist\_readme.txt"));
             tsmuxer.UpdateInformation("tsmuxer", "tsMuxeR", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\tsmuxer\tsmuxer.exe"));
             vsrip.UpdateInformation("vsrip", "VobSub Ripper", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\vsrip\vsrip.exe"));
             x264.UpdateInformation("x264", "x264", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x264\x264.exe"));

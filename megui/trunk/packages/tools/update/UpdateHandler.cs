@@ -625,18 +625,12 @@ namespace MeGUI
                             if (file.NeedsRestartedCopying)
                                 needsRestart = true;
 
-                            if (file.Name.Equals("ffmpeg") || file.Name.StartsWith("x26")
-                                || file.Name.Equals("xvid_encraw"))
+                            if (file.Name.Equals("ffmpeg") || file.Name.StartsWith("x26") || file.Name.Equals("avisynth_plugin")
+                                || file.Name.Equals("xvid_encraw") || file.Name.Equals("lsmash"))
                             {
                                 if (MainForm.Instance.Settings.PortableAviSynth)
                                     FileUtil.PortableAviSynthActions(false);
-                                if (!MainForm.Instance.Settings.AviSynthPlus)
-                                    FileUtil.LSMASHFileActions(false);
-                            }
-                            else if (file.Name.Equals("lsmash"))
-                            {
-                                if (!MainForm.Instance.Settings.AviSynthPlus)
-                                    FileUtil.LSMASHFileActions(false);
+                                FileUtil.RedistFileActions();
                             }
                         }
                     }

@@ -1,3 +1,4 @@
+2695                        improved redistributable handling
 2694 [VobSubber]            fixed error if output path contains blanks
                             removed 1GB warning
                             added CC files to the to be deleted intermediate files
