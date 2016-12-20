@@ -1,3 +1,6 @@
+2694 [VobSubber]            fixed error if output path contains blanks
+                            removed 1GB warning
+                            added CC files to the to be deleted intermediate files
 2693 [AudioEncoder]         default to LWLibavAudioSource()/LSMASHAudioSource()
                             added downmix option to 5.1
                             added proper LoadPlugin calls for TimeStrech()/TimeStretchPlugin() and SoxFilter()

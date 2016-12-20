@@ -54,7 +54,7 @@ namespace MeGUI
             // independent of the iteration write the subtitles first
             writeSubtitles();
 
-            if (base.bFirstPass)
+            if (base.bFirstPass && !su.HasError && !su.WasAborted)
             {
                 base.bSecondPassNeeded = true;
                 generateConfigFile();
@@ -68,7 +68,7 @@ namespace MeGUI
         {
             get
             {
-                return configFile;
+                return "\"" + configFile + "\"";
             }
         }
 
@@ -79,26 +79,28 @@ namespace MeGUI
             Util.ensureExists(configFile);
             job.FilesToDelete.Add(configFile);
             job.FilesToDelete.Add(Path.ChangeExtension(job.Input, ".chunks"));
+
+            // delete CC streams
+            string strForcedFile = Path.Combine(Path.GetDirectoryName(job.Output), Path.GetFileNameWithoutExtension(job.Output) + "_forced.idx");
+
+            job.FilesToDelete.Add(Path.ChangeExtension(job.Output, ".cc.raw"));
+            job.FilesToDelete.Add(Path.ChangeExtension(job.Output, ".cc.srt"));
+            job.FilesToDelete.Add(Path.ChangeExtension(job.Output, ".cc.utf16be.srt"));
+            job.FilesToDelete.Add(Path.ChangeExtension(job.Output, ".cc.utf16le.srt"));
+            job.FilesToDelete.Add(Path.ChangeExtension(job.Output, ".cc.utf8.srt"));
+            
+            job.FilesToDelete.Add(Path.ChangeExtension(strForcedFile, ".cc.raw"));
+            job.FilesToDelete.Add(Path.ChangeExtension(strForcedFile, ".cc.srt"));
+            job.FilesToDelete.Add(Path.ChangeExtension(strForcedFile, ".cc.utf16be.srt"));
+            job.FilesToDelete.Add(Path.ChangeExtension(strForcedFile, ".cc.utf16le.srt"));
+            job.FilesToDelete.Add(Path.ChangeExtension(strForcedFile, ".cc.utf8.srt"));
+
             if (!job.SingleFileExport)
             {
                 job.FilesToDelete.Add(job.Output);
                 job.FilesToDelete.Add(Path.ChangeExtension(job.Output, ".sub"));
-                string strForcedFile = Path.Combine(Path.GetDirectoryName(job.Output), Path.GetFileNameWithoutExtension(job.Output) + "_forced.idx");
                 job.FilesToDelete.Add(strForcedFile);
                 job.FilesToDelete.Add(Path.ChangeExtension(strForcedFile, ".sub"));
-            }
-
-            // check input VOB files
-            for (int i = 1; i < 10; i++)
-            {
-                // check first if the output file already exists and delete it
-                string vob = job.Input.Substring(0, job.Input.Length - 5) + i + ".VOB";
-                if (!File.Exists(vob))
-                    break;
-
-                FileInfo f = new FileInfo(vob);
-                if (f.Length > 1073741824)
-                    log.LogEvent("As the VOB file exceeds the 1 GB file size limit, not all subtitles may be extracted. file size: " + f.Length + ", file name: " + vob, ImageType.Warning);
             }
 
             su.Status = "Demuxing subtitles...";
