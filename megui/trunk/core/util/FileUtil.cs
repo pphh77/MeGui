@@ -623,9 +623,11 @@ namespace MeGUI.core.util
             string fileProductName = string.Empty;
             bool bFoundInstalledAviSynth = false;
 
-            // remove redist & portable avisynth files
-            DeleteRuntimeFiles();
+            // remove portable avisynth files
             PortableAviSynthActions(true);
+
+            // copy required runtime files
+            CopyRuntimeFiles();
 
             // detect system installation
             string syswow64path = Environment.GetFolderPath(Environment.SpecialFolder.System).ToLowerInvariant().Replace("\\system32", "\\SysWOW64");
@@ -665,7 +667,7 @@ namespace MeGUI.core.util
 
                 if (oLog != null)
                     oLog.LogValue("AviSynth" + (fileProductName.Contains("+") ? "+" : String.Empty),
-                        fileVersion + " (" + fileDate + ")" + ((!MainForm.Instance.Settings.AlwaysUsePortableAviSynth && bFoundInstalledAviSynth) ? String.Empty : " (inactive)"));
+                        fileVersion + " (" + fileDate + ")" + ((!MainForm.Instance.Settings.AlwaysUsePortableAviSynth && bFoundInstalledAviSynth) ? " (active)" : " (inactive)"));
 
                 if (bFoundInstalledAviSynth && !MainForm.Instance.Settings.AlwaysUsePortableAviSynth && fileProductName.Contains("+"))
                     MainForm.Instance.Settings.AviSynthPlus = true;
@@ -678,7 +680,7 @@ namespace MeGUI.core.util
             {
                 if (oLog != null)
                     oLog.LogValue("AviSynth" + (fileProductName.Contains("+") ? "+" : String.Empty) + " portable",
-                        fileVersion + " (" + fileDate + ")" + (!bFoundInstalledAviSynth ? String.Empty : " (active)"));
+                        fileVersion + " (" + fileDate + ")" + (bFoundInstalledAviSynth ? " (inactive)" : " (active)"));
                 if (!bFoundInstalledAviSynth || MainForm.Instance.Settings.AlwaysUsePortableAviSynth)
                 {
                     PortableAviSynthActions(false);
@@ -714,8 +716,6 @@ namespace MeGUI.core.util
                 if (oLog != null)
                     oLog.LogValue("AviSynth", "not found", ImageType.Error);
             }
-            else
-                RedistFileActions();
         }
 
         /// <summary>
@@ -769,60 +769,6 @@ namespace MeGUI.core.util
             return true;
         }
 
-        /// <summary>
-        /// Delete runtime files
-        /// </summary>
-        public static void DeleteRuntimeFiles()
-        {
-            ArrayList targetDirectories = new ArrayList();
-            targetDirectories.Add(Path.GetDirectoryName(Application.ExecutablePath));
-            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynthPlugins.Path));
-            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.FFmpeg.Path));
-            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.LSMASH.Path));
-            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path));
-            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path));
-            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.XviD.Path));
-
-            // get the redist files from the redist package
-            ArrayList sourceFiles = new ArrayList();
-            if (Directory.Exists(Path.GetDirectoryName(MainForm.Instance.Settings.Redist.Path)))
-            {
-                DirectoryInfo fi = new DirectoryInfo(Path.GetDirectoryName(MainForm.Instance.Settings.Redist.Path));
-                FileInfo[] files = fi.GetFiles("*.dll");
-                foreach (FileInfo f in files)
-                    sourceFiles.Add(f.Name);
-            }
-
-            // check each target directory and remove the redist files
-            foreach (String dir in targetDirectories)
-            {
-                if (!Directory.Exists(dir))
-                    continue;
-
-                foreach (String file in sourceFiles)
-                {
-                    if (!File.Exists(Path.Combine(dir, file)))
-                        continue;
-
-                    try { File.Delete(Path.Combine(dir, file)); }
-                    catch { }
-                }
-
-                DirectoryInfo fi = new DirectoryInfo(dir);
-                FileInfo[] files = fi.GetFiles("msvc*.dll");
-                foreach (FileInfo f in files)
-                {
-                    try { f.Delete(); }
-                    catch { }
-                }
-                files = fi.GetFiles("vc*.dll");
-                foreach (FileInfo f in files)
-                {
-                    try { f.Delete(); }
-                    catch { }
-                }
-            }
-        }
 
         /// <summary>
         /// Enables or disables the portable AviSynth build
@@ -877,28 +823,25 @@ namespace MeGUI.core.util
         }
 
         /// <summary>
-        /// Enables or disables runtimes build
+        /// copies runtime/redist files
         /// </summary>
-        public static void RedistFileActions()
+        public static void CopyRuntimeFiles()
         {
             UpdateCacher.CheckPackage("redist");
 
+            // AVS expects the DLL files in the MeGUI root & encoder directories
+            // AVS+ expects the DLL files in the filter directories
+            // therefore copy all redist files into all of these directories
+
             ArrayList targetDirectories = new ArrayList();
-            if (MainForm.Instance.Settings.AviSynthPlus)
-            {
-                // AVS+ expects the DLL files in the filter directories
-                targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynthPlugins.Path));
-                targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.LSMASH.Path));
-            }
-            else
-            {
-                // AVS expects the DLL files in the root & encoder directories
-                targetDirectories.Add(Path.GetDirectoryName(Application.ExecutablePath));
-                targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.FFmpeg.Path));
-                targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path));
-                targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path));
-                targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.XviD.Path));
-            }
+            targetDirectories.Add(Path.GetDirectoryName(Application.ExecutablePath));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.FFmpeg.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.XviD.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynthPlugins.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynth.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.LSMASH.Path));
 
             // get the redist files from the redist package
             string strRedistPath = Path.GetDirectoryName(MainForm.Instance.Settings.Redist.Path);

@@ -1,3 +1,4 @@
+2696                        copy redistributable files always to the potential necessary directories
 2695                        improved redistributable handling
 2694 [VobSubber]            fixed error if output path contains blanks
                             removed 1GB warning

@@ -1469,7 +1469,7 @@ namespace MeGUI
             qaac.DoNotDeleteFoldersOnUpdate.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\qaac\QTfiles64"));
             if (!MainForm.Instance.Settings.UseQAAC)
                 UpdateCacher.CheckPackage("qaac", false, false);
-            redist.UpdateInformation("redist", "Redistributables", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\redist\_readme.txt"));
+            redist.UpdateInformation("redist", "Runtime Files", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\redist\_readme.txt"));
             tsmuxer.UpdateInformation("tsmuxer", "tsMuxeR", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\tsmuxer\tsmuxer.exe"));
             vsrip.UpdateInformation("vsrip", "VobSub Ripper", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\vsrip\vsrip.exe"));
             x264.UpdateInformation("x264", "x264", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x264\x264.exe"));
