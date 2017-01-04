@@ -494,7 +494,7 @@ namespace MeGUI
             // create pgcdemux job if needed
             if (Path.GetExtension(input.Filename).ToUpperInvariant().Equals(".IFO"))
             {
-                if (iFile.VideoInfo.PGCCount > 0 || iFile.VideoInfo.AngleCount > 0)
+                if (iFile.VideoInfo.PGCCount > 1 || iFile.VideoInfo.AngleCount > 0)
                 {
                     // pgcdemux must be used as either multiple PGCs or a multi-angle disc are found
                     string tempFile = Path.Combine(Path.GetDirectoryName(output.Text), Path.GetFileNameWithoutExtension(output.Text) + "_1.VOB");

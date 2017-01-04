@@ -1563,10 +1563,10 @@ namespace MeGUI
         public int FPS_N;  // online needed for AVS file check
         public int FPS_D;  // online needed for AVS file check
         public int PGCNumber;
-        public int PGCCount;
+        public int PGCCount; // if 0 then no PGC is available (no DVD source), if > 1 then a multi-pgc structure is found
         public int BitDepth;
         public int AngleNumber;
-        public int AngleCount;
+        public int AngleCount; // if 0 then not a multi-angle disc, > 0 multi-angles may be available
 
         private string _strVideoScanType;
         private VideoCodec _vCodec;

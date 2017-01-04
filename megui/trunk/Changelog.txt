@@ -1,3 +1,4 @@
+2700 [FileIndexer]          fixed unnecessary use of pgcdemux for sources with only one PGC and no angles (regressions of 2668)
 2699 [VobSubber]            added option to extract forced subtitles in dedicated file(s)
      [OneClick]             fixed wrong assignment of automatically detected forced IDX/SUB subtitles (regression of 2686)
 2696                        runtime files will always be copied
