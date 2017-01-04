@@ -299,6 +299,7 @@
     <Compile Include="core\gui\VideoPlayer.Designer.cs">
       <DependentUpon>VideoPlayer.cs</DependentUpon>
     </Compile>
+    <Compile Include="core\util\SubtitleUtil.cs" />
     <Compile Include="packages\audio\fdkaac\FDKAACSettings.cs" />
     <Compile Include="packages\audio\fdkaac\FDKAACConfigurationPanel.cs">
       <SubType>UserControl</SubType>

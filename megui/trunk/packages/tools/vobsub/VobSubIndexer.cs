@@ -54,7 +54,7 @@ namespace MeGUI
             // independent of the iteration write the subtitles first
             writeSubtitles();
 
-            if (base.bFirstPass && !su.HasError && !su.WasAborted)
+            if (job.ExtractForcedTracks && base.bFirstPass && !su.HasError && !su.WasAborted)
             {
                 base.bSecondPassNeeded = true;
                 generateConfigFile();

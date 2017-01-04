@@ -62,12 +62,17 @@ namespace MeGUI
         {
             InitializeComponent();
             this.chkSingleFileExport.Checked = MainForm.Instance.Settings.VobSubberSingleFileExport;
-            this.keepAllTracks.Checked = MainForm.Instance.Settings.VobSubberKeepAll;
+            this.chkKeepAllStreams.Checked = MainForm.Instance.Settings.VobSubberKeepAll;
+            this.chkShowAllStreams.Checked = MainForm.Instance.Settings.VobSubberShowAll;
+            this.chkExtractForced.Checked = MainForm.Instance.Settings.VobSubberExtractForced;
         }
 
-        protected override void OnClosing(CancelEventArgs e)
+        private void VobSubIndexWindow_FormClosed(object sender, FormClosedEventArgs e)
         {
-            base.OnClosing(e);
+            MainForm.Instance.Settings.VobSubberSingleFileExport = this.chkSingleFileExport.Checked;
+            MainForm.Instance.Settings.VobSubberKeepAll = this.chkKeepAllStreams.Checked;
+            MainForm.Instance.Settings.VobSubberShowAll = this.chkShowAllStreams.Checked;
+            MainForm.Instance.Settings.VobSubberExtractForced = this.chkExtractForced.Checked;
         }
         #endregion
 
@@ -197,11 +202,11 @@ namespace MeGUI
             // (un)select all based on keepAllTracks
             for (int i = 0; i < subtitleTracks.Items.Count; i++)
             {
-                subtitleTracks.SetItemChecked(i, keepAllTracks.Checked);
+                subtitleTracks.SetItemChecked(i, chkKeepAllStreams.Checked);
             }
 
             // no need to check further if all tracks should be selected
-            if (keepAllTracks.Checked)
+            if (chkKeepAllStreams.Checked)
                 return;
 
             // check if any of the tracks should be selected based on the default MeGUI language(s)
@@ -239,7 +244,7 @@ namespace MeGUI
             List<int> trackIDs = new List<int>();
             foreach (string s in subtitleTracks.CheckedItems)
                 trackIDs.Add(Int32.Parse(s.Substring(1,2)));
-            return new SubtitleIndexJob(input.Filename, output.Filename, keepAllTracks.Checked, trackIDs, iPGC, iAngle, chkSingleFileExport.Checked);
+            return new SubtitleIndexJob(input.Filename, output.Filename, chkKeepAllStreams.Checked, trackIDs, iPGC, iAngle, chkSingleFileExport.Checked, chkExtractForced.Checked);
         }
 
         /// <summary>
@@ -263,11 +268,11 @@ namespace MeGUI
             checkIndexIO();
             if (indexAllTracks)
             {
-                keepAllTracks.Checked = true;
+                chkKeepAllStreams.Checked = true;
             }
             else
             {
-                demuxSelectedTracks.Checked = true;
+                chkKeepAllStreams.Checked = false;
                 int index = 0;
                 List<int> checkedItems = new List<int>();
                 foreach (string item in subtitleTracks.Items)
@@ -295,18 +300,13 @@ namespace MeGUI
 
             SetSubtitles();
             checkIndexIO();
-            keepAllTracks_CheckedChanged(null, null);
+            chkKeepAllStreams_CheckedChanged(null, null);
         }
 
-        private void chkSingleFileExport_CheckedChanged(object sender, EventArgs e)
-        {
-            MainForm.Instance.Settings.VobSubberSingleFileExport = this.chkSingleFileExport.Checked;
-        }
 
-        private void keepAllTracks_CheckedChanged(object sender, EventArgs e)
+        private void chkKeepAllStreams_CheckedChanged(object sender, EventArgs e)
         {
-            MainForm.Instance.Settings.VobSubberKeepAll = this.keepAllTracks.Checked;
-            subtitleTracks.Enabled = !keepAllTracks.Checked;
+            subtitleTracks.Enabled = !chkKeepAllStreams.Checked;
             PreselectItems();
         }
     }

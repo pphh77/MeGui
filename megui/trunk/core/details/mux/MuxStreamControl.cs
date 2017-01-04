@@ -21,9 +21,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 using MeGUI.core.util;
@@ -182,21 +179,7 @@ namespace MeGUI.core.details.mux
 
         private void chkForceStream_CheckedChanged(object sender, EventArgs e)
         {
-            string strForceName = MeGUI.MainForm.Instance.Settings.AppendToForcedStreams;
-
-            if (String.IsNullOrEmpty(strForceName))
-                return;
-
-            if (chkForceStream.Checked && !subName.Text.EndsWith(strForceName))
-            {
-                if (!String.IsNullOrEmpty(subName.Text) && !subName.Text.EndsWith(" "))
-                    subName.Text += " ";
-                subName.Text += strForceName;
-            }
-            else if (!chkForceStream.Checked && subName.Text.EndsWith(strForceName))
-            {
-                subName.Text = (subName.Text.Substring(0, subName.Text.Length - strForceName.Length)).TrimEnd();
-            }
+            subName.Text = SubtitleUtil.ApplyForcedStringToTrackName(chkForceStream.Checked, subName.Text);
         }
     }
 }

@@ -362,31 +362,35 @@ namespace MeGUI
                                     _log.LogEvent("Ignoring subtitle as the it cannot be found: " + trackFile, ImageType.Warning);
                             }
                             else
-                            { 
-                                if (File.Exists(oTrack.DemuxFilePath))
+                            {
+                                // sometimes the language is detected differently by vsrip and the IFO parser. Therefore search also for other files
+                                string strDemuxFile = oTrack.DemuxFilePath;
+                                if (!File.Exists(strDemuxFile) && Path.GetFileNameWithoutExtension(strDemuxFile).Contains("_"))
+                                {
+                                    string strDemuxFileName = Path.GetFileNameWithoutExtension(strDemuxFile);
+                                    strDemuxFileName = strDemuxFileName.Substring(0, strDemuxFileName.LastIndexOf("_")) + "_*" + Path.GetExtension(strDemuxFile);
+                                    foreach (string strFileName in Directory.GetFiles(Path.GetDirectoryName(strDemuxFile), strDemuxFileName))
+                                    {
+                                        strDemuxFile = Path.Combine(Path.GetDirectoryName(strDemuxFile), strFileName);
+                                        intermediateFiles.Add(strDemuxFile);
+                                        intermediateFiles.Add(Path.ChangeExtension(strDemuxFile, ".sub"));
+                                        _log.LogEvent("Subtitle + " + oTrack.DemuxFilePath + " cannot be found. " + strFileName + " will be used instead", ImageType.Information);
+                                        break;
+                                    }
+                                }
+                                if (File.Exists(strDemuxFile))
                                 {
                                     string strTrackName = oTrack.Name;
 
-                                    // check if an forced stream is available
-                                    string strForcedFile = Path.Combine(Path.GetDirectoryName(oTrack.DemuxFilePath), Path.GetFileNameWithoutExtension(oTrack.DemuxFilePath) + "_forced.idx");
+                                    // check if a forced stream is available
+                                    string strForcedFile = Path.Combine(Path.GetDirectoryName(strDemuxFile), Path.GetFileNameWithoutExtension(strDemuxFile) + "_forced.idx");
                                     if (File.Exists(strForcedFile))
                                     {
-                                        string strForceName = MeGUI.MainForm.Instance.Settings.AppendToForcedStreams;
-                                        string strTrackNameForced = oTrack.Name;
-                                        if (!String.IsNullOrEmpty(strForceName))
-                                        {
-                                            if (!strTrackNameForced.EndsWith(strForceName))
-                                            {
-                                                if (!String.IsNullOrEmpty(strTrackNameForced) && !strTrackNameForced.EndsWith(" "))
-                                                    strTrackNameForced += " ";
-                                                strTrackNameForced += strForceName;
-                                            }
-                                            if (strTrackName.EndsWith(strForceName))
-                                                strTrackName = (strTrackName.Substring(0, strTrackName.Length - strForceName.Length)).TrimEnd();
-                                        }
-                                        subtitles.Add(new MuxStream(oTrack.DemuxFilePath, oTrack.Language, strTrackNameForced, oTrack.Delay, oTrack.DefaultStream, true, null));
+                                        subtitles.Add(new MuxStream(strForcedFile, oTrack.Language, SubtitleUtil.ApplyForcedStringToTrackName(true, oTrack.Name), oTrack.Delay, oTrack.DefaultStream, true, null));
+                                        intermediateFiles.Add(strForcedFile);
+                                        intermediateFiles.Add(Path.ChangeExtension(strForcedFile, ".sub"));
                                     }
-                                    subtitles.Add(new MuxStream(oTrack.DemuxFilePath, oTrack.Language, strTrackName, oTrack.Delay, oTrack.DefaultStream, (File.Exists(strForcedFile) ? false : oTrack.ForcedStream), null));
+                                    subtitles.Add(new MuxStream(strDemuxFile, oTrack.Language, SubtitleUtil.ApplyForcedStringToTrackName(false, oTrack.Name), oTrack.Delay, oTrack.DefaultStream, (File.Exists(strForcedFile) ? false : oTrack.ForcedStream), null));
                                 }
                                 else
                                     _log.LogEvent("Ignoring subtitle as the it cannot be found: " + oTrack.DemuxFilePath, ImageType.Warning);
