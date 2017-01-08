@@ -1,4 +1,5 @@
-2700 [FileIndexer]          fixed unnecessary use of pgcdemux for sources with only one PGC and no angles (regressions of 2668)
+2701 [FileIndexer]          fixed unable to select specific audio tracks to be demuxed from a DVD source with DG Indexer (regression of 2668)
+2700 [FileIndexer]          fixed unnecessary use of pgcdemux for sources with only one PGC and no angles (regression of 2668)
 2699 [VobSubber]            added option to extract forced subtitles in dedicated file(s)
      [OneClick]             fixed wrong assignment of automatically detected forced IDX/SUB subtitles (regression of 2686)
 2696                        runtime files will always be copied

@@ -398,7 +398,7 @@ namespace MeGUI
             {
                 if (IndexerUsed == IndexType.D2V)
                 {
-                    if (strContainerFormat.Equals("MPEG-PS"))
+                    if (strContainerFormat.Equals("MPEG-PS") || strContainerFormat.Equals("DVD Video"))
                     {
                         demuxTracks.Enabled = true;
                     }
