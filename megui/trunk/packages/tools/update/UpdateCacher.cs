@@ -62,6 +62,7 @@ namespace MeGUI
                         continue;
 
                     f.LastWriteTimeUtc = DateTime.UtcNow;
+                    File.Delete(Path.Combine(updateCache, "_obsolete_" + f.Name));
                     f.MoveTo(Path.Combine(updateCache, "_obsolete_" + f.Name));
                     MainForm.Instance.UpdateHandler.AddTextToLog("Marked file as obsolete: " + f.Name.Substring(10), ImageType.Information, false);
                 }
@@ -76,6 +77,7 @@ namespace MeGUI
                         continue;
 
                     f.LastWriteTimeUtc = DateTime.UtcNow;
+                    File.Delete(Path.Combine(updateCache, "_obsolete_" + f.Name));
                     f.MoveTo(Path.Combine(updateCache, "_obsolete_" + f.Name));
                     MainForm.Instance.UpdateHandler.AddTextToLog("Marked file as obsolete: " + f.Name.Substring(10), ImageType.Information, false);
                 }

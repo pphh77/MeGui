@@ -354,10 +354,18 @@ namespace MeGUI
 				if (twoPasses || threePasses) // we just created the last pass, now create previous one(s)
 				{
 					job.FilesToDelete.Add(job.Settings.Logfile);
+                    job.FilesToDelete.Add(job.Settings.Logfile + ".temp");
                     if (job.Settings.SettingsID.Equals("x264"))
                     {
                         string mbtreeFile = Path.ChangeExtension(job.Output, ".stats.mbtree");
                         job.FilesToDelete.Add(mbtreeFile);
+                        job.FilesToDelete.Add(mbtreeFile + ".temp");
+                    }
+                    else if (job.Settings.SettingsID.Equals("x265"))
+                    {
+                        string cutreeFile = Path.ChangeExtension(job.Output, ".stats.cutree");
+                        job.FilesToDelete.Add(cutreeFile);
+                        job.FilesToDelete.Add(cutreeFile + ".temp");
                     }
                     firstpass = cloneJob(job);
 					firstpass.Output = ""; // the first pass has no output
