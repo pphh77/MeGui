@@ -43,6 +43,11 @@ namespace MeGUI
         {
             UpdateCacher.CheckPackage("mkvmerge");
             this.executable = executablePath;
+
+            // Exit code 0 = everything was OK
+            // Exit code 1 = there were non-fatal warnings
+            // Exit code 2 = there was a fatal error
+            this.arrSuccessCodes.Add(1);
         }
 
         #region line processing

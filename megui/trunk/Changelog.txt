@@ -1,3 +1,5 @@
+2703 [MKV Muxer]            added 1 as an successful exit code. therefore (de)mux jobs with warnings only will not fail anymore.
+                            improved handling of --default-duration
 2702 [x265]                 added the cutree file to the intermediate file set. Bug #869
 2701 [FileIndexer]          fixed unable to select specific audio tracks to be demuxed from a DVD source with DG Indexer (regression of 2668)
 2700 [FileIndexer]          fixed unnecessary use of pgcdemux for sources with only one PGC and no angles (regression of 2668)

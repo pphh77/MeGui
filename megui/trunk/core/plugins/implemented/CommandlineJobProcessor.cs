@@ -53,7 +53,7 @@ namespace MeGUI
         protected bool bSecondPassNeeded = false;
         protected bool bWaitForExit = false;
         protected bool bCommandLine = true;
-        protected int iSuccessCode = 0;
+        protected List<int> arrSuccessCodes = new List<int>() { 0 }; 
 
         #endregion
 
@@ -166,7 +166,7 @@ namespace MeGUI
             }
 
             // check the exitcode
-            if (checkExitCode && proc.ExitCode != iSuccessCode) 
+            if (checkExitCode && !arrSuccessCodes.Contains(proc.ExitCode))
             {
                 getErrorLine();
                 string strError = WindowUtil.GetErrorText(proc.ExitCode);

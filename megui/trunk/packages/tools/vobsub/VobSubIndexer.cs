@@ -45,7 +45,9 @@ namespace MeGUI
             UpdateCacher.CheckPackage("vsrip");
             executable = MainForm.Instance.Settings.VobSubRipper.Path;
             bCommandLine = false;
-            iSuccessCode = 2;
+
+            // success exit code is 2
+            this.arrSuccessCodes = new System.Collections.Generic.List<int>() { 2 };
         }
 
         #region IJobProcessor Members
