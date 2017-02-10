@@ -31,7 +31,6 @@ namespace MeGUI
             ChapterInfo pgc = new ChapterInfo();
             List<Chapter> chapters = new List<Chapter>();
             pgc.SourceName = location;
-            pgc.SourceHash = ChapterExtractor.ComputeMD5Sum(location);
             pgc.SourceType = "Blu-Ray";
             pgc.Title = Path.GetFileNameWithoutExtension(location);
 

@@ -66,7 +66,6 @@ namespace MeGUI
             {
                 Chapters = list,
                 SourceName = location,
-                SourceHash = ChapterExtractor.ComputeMD5Sum(location),
                 FramesPerSecond = 0,
                 Title = Path.GetFileNameWithoutExtension(location)
             });

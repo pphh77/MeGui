@@ -62,7 +62,6 @@ namespace MeGUI
             pgc.SourcePath = Path.GetDirectoryName(strIFOFile);
             pgc.TitleNumber = iTitle;
             pgc.PGCNumber = iPGC;
-            pgc.SourceHash = ChapterExtractor.ComputeMD5Sum(strIFOFile);
             pgc.Title = Path.GetFileNameWithoutExtension(strIFOFile);
             if (iTitle > 0)
                 pgc.Title = "VTS_" + iTitle.ToString("D2");

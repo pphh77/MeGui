@@ -82,7 +82,6 @@ namespace MeGUI
             {
                 Chapters = list,
                 SourceName = location,
-                SourceHash = ChapterExtractor.ComputeMD5Sum(tempChapterFile),
                 FramesPerSecond = oInfo.VideoInfo.FPS,
                 Title = Path.GetFileNameWithoutExtension(location)
             });

@@ -1,3 +1,4 @@
+2704 [ChapterCreator]       removed an internal hash function to be FIPS compliant. #Bug 873
 2703 [MKV Muxer]            added 1 as an successful exit code. therefore (de)mux jobs with warnings only will not fail anymore.
                             improved handling of --default-duration
 2702 [x265]                 added the cutree file to the intermediate file set. Bug #869

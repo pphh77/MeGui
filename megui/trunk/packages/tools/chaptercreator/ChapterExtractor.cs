@@ -8,7 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 
 namespace MeGUI
 {
@@ -21,13 +20,6 @@ namespace MeGUI
         public event EventHandler<ProgramChainArg> StreamDetected;
         public event EventHandler<ProgramChainArg> ChaptersLoaded;
         public event EventHandler ExtractionComplete;
-
-        public static string ComputeMD5Sum(string path)
-        {
-            return BitConverter.ToString(new
-                MD5CryptoServiceProvider().ComputeHash(System.IO.File.ReadAllBytes(path)))
-                .Replace("-", "").ToLowerInvariant();
-        }
 
         protected void OnExtractionComplete()
         {
