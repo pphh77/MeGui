@@ -47,9 +47,9 @@ namespace MeGUI
         };
         private string[][] autoUpdateServerLists;
         private DateTime lastUpdateCheck;
-        private string strMainAudioFormat, strMainFileFormat, meguiupdatecache,
+        private string strMainAudioFormat, strMainFileFormat, meguiupdatecache, neroAacEncPath,
                        defaultLanguage1, defaultLanguage2, afterEncodingCommand, videoExtension, audioExtension,
-                       strEac3toLastFolderPath, strEac3toLastDestinationPath, tempDirMP4, neroAacEncPath,
+                       strEac3toLastFolderPath, strEac3toLastFilePath, strEac3toLastDestinationPath, tempDirMP4,
                        fdkAacPath, httpproxyaddress, httpproxyport, httpproxyuid, httpproxypwd, defaultOutputDir,
                        appendToForcedStreams, lastUsedOneClickFolder, lastUpdateServer, chapterCreatorSortString;
         private bool autoForceFilm, autoStartQueue, autoOpenScript, bUseQAAC, bUseX265, bUseDGIndexNV, bUseDGIndexIM,
@@ -125,7 +125,7 @@ namespace MeGUI
 			deleteIntermediateFiles = true;
 			deleteAbortedOutput = true;
             bEac3toAutoSelectStreams = true;
-            strEac3toLastFolderPath = strEac3toLastDestinationPath = "";
+            strEac3toLastFolderPath = strEac3toLastFilePath = strEac3toLastDestinationPath = "";
             bEac3toLastUsedFileMode = false;
             openProgressWindow = true;
             videoExtension = "";
@@ -365,6 +365,12 @@ namespace MeGUI
         {
             get { return strEac3toLastFolderPath; }
             set { strEac3toLastFolderPath = value; }
+        }
+
+        public string Eac3toLastFilePath
+        {
+            get { return strEac3toLastFilePath; }
+            set { strEac3toLastFilePath = value; }
         }
 
         public string Eac3toLastDestinationPath

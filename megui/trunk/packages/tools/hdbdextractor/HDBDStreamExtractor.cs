@@ -160,9 +160,11 @@ namespace MeGUI.packages.tools.hdbdextractor
             }
             else
             {
+                openFileDialog1.InitialDirectory = MainForm.Instance.Settings.Eac3toLastFilePath;
                 dr = openFileDialog1.ShowDialog();
                 if (dr != DialogResult.OK)
                     return;
+                MainForm.Instance.Settings.Eac3toLastFilePath = System.IO.Path.GetDirectoryName(openFileDialog1.FileName);
 
                 inputType = 2;
                 int idx = 0;
@@ -188,7 +190,11 @@ namespace MeGUI.packages.tools.hdbdextractor
                 return;
 
             if (String.IsNullOrEmpty(FolderOutputTextBox.Text))
+            {
                 FolderOutputTextBox.Text = MeGUI.core.util.FileUtil.GetOutputFolder(outputFolder);
+                if (!MeGUI.core.util.FileUtil.IsDirWriteable(FolderOutputTextBox.Text) && !String.IsNullOrEmpty(MainForm.Instance.Settings.Eac3toLastDestinationPath))
+                    FolderOutputTextBox.Text = MainForm.Instance.Settings.Eac3toLastDestinationPath;
+            }
 
             FeatureDataGridView.DataSource = null;
             FeatureDataGridView.Rows.Clear();
