@@ -19,8 +19,6 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 using MeGUI.core.util;
 
@@ -55,9 +53,10 @@ namespace MeGUI.packages.video.x265
                     case "10:11": _xs.SampleAR = 4; break;
                     case "12:11": _xs.SampleAR = 5; break;
                     case "16:11": _xs.SampleAR = 6; break;
-                    case "32:27": _xs.SampleAR = 7; break;
-                    case "40:33": _xs.SampleAR = 8; break;
-                    case "64:45": _xs.SampleAR = 9; break;
+                    case "16:15": _xs.SampleAR = 7; break;
+                    case "32:27": _xs.SampleAR = 8; break;
+                    case "40:33": _xs.SampleAR = 9; break;
+                    case "64:45": _xs.SampleAR = 10; break;
                     default:
                         CustomSarValue = strCustomValue;
                         _xs.SampleAR = 0; break;
@@ -76,9 +75,10 @@ namespace MeGUI.packages.video.x265
                     case "10:11": _xs.SampleAR = 4; break;
                     case "12:11": _xs.SampleAR = 5; break;
                     case "16:11": _xs.SampleAR = 6; break;
-                    case "32:27": _xs.SampleAR = 7; break;
-                    case "40:33": _xs.SampleAR = 8; break;
-                    case "64:45": _xs.SampleAR = 9; break;
+                    case "16:15": _xs.SampleAR = 7; break;
+                    case "32:27": _xs.SampleAR = 8; break;
+                    case "40:33": _xs.SampleAR = 9; break;
+                    case "64:45": _xs.SampleAR = 10; break;
                     default: CustomSarValue = s.X + ":" + s.Y; break;
                 }
             }
