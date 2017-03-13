@@ -154,6 +154,7 @@ namespace MeGUI
             this.autoEncodeDefaultsButton = new System.Windows.Forms.Button();
             this.toolTipHelp = new System.Windows.Forms.ToolTip(this.components);
             this.helpButton1 = new MeGUI.core.gui.HelpButton();
+            this.chk64Bit = new System.Windows.Forms.CheckBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
             groupBox1.SuspendLayout();
             this.otherGroupBox.SuspendLayout();
@@ -1034,6 +1035,7 @@ namespace MeGUI
             // 
             // groupBox6
             // 
+            this.groupBox6.Controls.Add(this.chk64Bit);
             this.groupBox6.Controls.Add(this.useX265);
             this.groupBox6.Controls.Add(this.chx264ExternalMuxer);
             this.groupBox6.Controls.Add(this.useQAAC);
@@ -1352,6 +1354,18 @@ namespace MeGUI
             this.helpButton1.Size = new System.Drawing.Size(38, 23);
             this.helpButton1.TabIndex = 1;
             // 
+            // chk64Bit
+            // 
+            this.chk64Bit.AutoSize = true;
+            this.chk64Bit.Checked = true;
+            this.chk64Bit.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chk64Bit.Location = new System.Drawing.Point(225, 66);
+            this.chk64Bit.Name = "chk64Bit";
+            this.chk64Bit.Size = new System.Drawing.Size(141, 17);
+            this.chk64Bit.TabIndex = 51;
+            this.chk64Bit.Text = "Use x64 tools if possible";
+            this.chk64Bit.UseVisualStyleBackColor = true;
+            // 
             // SettingsForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 14);
@@ -1511,5 +1525,6 @@ namespace MeGUI
         private System.Windows.Forms.CheckBox useDGIndexIM;
         private System.Windows.Forms.Label lblMinimumLength;
         private System.Windows.Forms.NumericUpDown minimumTitleLength;
+        private System.Windows.Forms.CheckBox chk64Bit;
     }
 }

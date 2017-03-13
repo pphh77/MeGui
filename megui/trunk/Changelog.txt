@@ -1,3 +1,4 @@
+2707 [Update]               x86: added option to use x86 tools on a x64 system
 2706 [x264]                 fixed wrong SAR values in some cases (regression of 2683)
      [x265]                 added 16:15 to the predefined --sar values
 2705 [HD Streams Extractor] improved input/output folder selection

@@ -38,7 +38,7 @@ namespace MeGUI
                 UpdateCacher.CheckPackage("x264");
 
                 string encoderPath = mf.Settings.X264.Path;
-                if (MainForm.Instance.Settings.IsMeGUIx64 || !MainForm.Instance.Settings.IsOSx64)
+                if (MainForm.Instance.Settings.IsMeGUIx64 || !MainForm.Instance.Settings.Usex64Tools)
                 {
                     x264Settings xs = (x264Settings)((j as VideoJob).Settings);
                     if (xs.X26410Bits)
@@ -96,7 +96,7 @@ namespace MeGUI
                 if (!String.IsNullOrEmpty(xs.CustomEncoderOptions))
                     log.LogEvent("custom command line: " + xs.CustomEncoderOptions);
 
-                if (!MainForm.Instance.Settings.IsMeGUIx64 && MainForm.Instance.Settings.IsOSx64)
+                if (!MainForm.Instance.Settings.IsMeGUIx64 && MainForm.Instance.Settings.Usex64Tools)
                 {
                     // add executable
                     if (xs.X26410Bits)

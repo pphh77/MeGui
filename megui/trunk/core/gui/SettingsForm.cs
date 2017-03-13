@@ -49,6 +49,7 @@ namespace MeGUI
             defaultLanguage1.BindingContext = new BindingContext();
             SetToolTips();
             ffmsThreads.Maximum = System.Environment.ProcessorCount;
+            chk64Bit.Visible = !MainForm.Instance.Settings.IsMeGUIx64 && MainForm.Instance.Settings.IsOSx64;
         }
 
         /// <summary>
@@ -267,6 +268,8 @@ namespace MeGUI
                 settings.UseExternalMuxerX264 = chx264ExternalMuxer.Checked;
                 settings.AlwaysUsePortableAviSynth = cbUseIncludedAviSynth.Checked;
                 settings.ChapterCreatorMinimumLength = (int)minimumTitleLength.Value;
+                settings.Usex64Tools = chk64Bit.Checked;
+
 				return settings;
 			}
 			set
@@ -337,7 +340,8 @@ namespace MeGUI
                 chx264ExternalMuxer.Checked = settings.UseExternalMuxerX264;
                 cbUseIncludedAviSynth.Checked = settings.AlwaysUsePortableAviSynth;
                 minimumTitleLength.Value = settings.ChapterCreatorMinimumLength;
-			}
+                chk64Bit.Checked = settings.Usex64Tools;
+            }
 		}
 		#endregion
 

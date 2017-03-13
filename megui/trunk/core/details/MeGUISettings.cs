@@ -58,7 +58,7 @@ namespace MeGUI
                      alwaysOnTop, addTimePosition, alwaysbackupfiles, bUseITU, bEac3toLastUsedFileMode, bMeGUIx64,
                      bAutoLoadDG, bAutoStartQueueStartup, bAlwayUsePortableAviSynth, bVobSubberSingleFileExport,
                      bEnsureCorrectPlaybackSpeed, bOpenAVSInThread, bExternalMuxerX264, bUseNeroAacEnc, bOSx64,
-                     bVobSubberExtractForced, bVobSubberShowAll;
+                     bVobSubberExtractForced, bVobSubberShowAll, bUsex64Tools;
         private decimal forceFilmThreshold, acceptableFPSError;
         private int nbPasses, autoUpdateServerSubList, minComplexity, updateFormSplitter,
                     maxComplexity, jobColumnWidth, inputColumnWidth, outputColumnWidth, codecColumnWidth,
@@ -94,6 +94,7 @@ namespace MeGUI
             bMeGUIx64 = false;
             bOSx64 = OSInfo.isWow64();
 #endif
+            bUsex64Tools = true;
 
             autoUpdateServerLists = new string[][] { new string[] { "Stable", "http://megui.org/auto/stable/" },
                 new string[] { "Development", "http://megui.org/auto/" }, new string[] { "Custom" }};
@@ -197,6 +198,19 @@ namespace MeGUI
         public bool IsOSx64
         {
             get { return bOSx64; }
+        }
+
+        public bool Usex64Tools
+        {
+            get
+            {
+                if (!IsOSx64)
+                    bUsex64Tools = false;
+                else if (IsMeGUIx64)
+                    bUsex64Tools = true;
+                return bUsex64Tools;
+            }
+            set { bUsex64Tools = value; }
         }
 
         public Point MainFormLocation
