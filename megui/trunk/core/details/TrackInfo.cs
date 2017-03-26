@@ -194,6 +194,13 @@ namespace MeGUI
             set { _bMKVTrack = value; }
         }
 
+        private bool _bExtractCore;
+        public bool ExtractCore
+        {
+            get { return _bExtractCore; }
+            set { _bExtractCore = value; }
+        }
+
         [XmlIgnore()]
         public String DemuxFileName
         {
@@ -227,7 +234,14 @@ namespace MeGUI
                 switch (strCodec)
                 {
                     // audio
-                    case "AC-3": strExtension = "ac3"; break;
+                    case "AC-3":
+                        if (!_bExtractCore)
+                            strExtension = "ac3";
+                        else
+                            strExtension = "eac3";
+                        break;
+                    case "E-AC-3":
+                    case "E-AC-3-EX": strExtension = "eac3"; break;
                     case "TRUEHD": strExtension = "thd"; break;
                     case "DTS": strExtension = "dts"; break;
                     case "MP3": strExtension = "mp3"; break;

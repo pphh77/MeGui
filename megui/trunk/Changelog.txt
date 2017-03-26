@@ -1,3 +1,5 @@
+2709 [HD Streams Extractor] fixed extraction of DTS Express tracks. Bug #871
+                            fixed extraction of E-AC3 with core tracks. Bug #870
 2708 [AVS Script Creator]   improved video refresh/preview behaviour. Bug #853
                             fixed sometimes wrongly shown resize values if "encode non-mod16" is used (regression of 2357)
 2707 [Update]               x86: added option to use x86 tools on a x64 system

@@ -36,8 +36,9 @@ namespace eac3to
                 switch (AudioType)
                 {
                     case AudioStreamType.EAC3:
+                    case AudioStreamType.EAC3_EX:
                         return new object[] { "EAC3", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
-                    case AudioStreamType.DTS:                        
+                    case AudioStreamType.DTS:
                         return new object[] { "DTS", "DTSHD", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
                     case AudioStreamType.TrueHD:
                         return new object[] { "THD", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
@@ -88,12 +89,16 @@ namespace eac3to
                     break;
                 case "DTS":
                 case "DTS-ES":
+                case "DTS EXPRESS":
                 case "DTS MASTER AUDIO":
                 case "DTS HI-RES":
                     audioStream.AudioType = AudioStreamType.DTS;
                     break;
                 case "E-AC3":
                     audioStream.AudioType = AudioStreamType.EAC3;
+                    break;
+                case "E-AC3 EX":
+                    audioStream.AudioType = AudioStreamType.EAC3_EX;
                     break;
                 case "TRUEHD":
                 case "TRUEHD (ATMOS)":

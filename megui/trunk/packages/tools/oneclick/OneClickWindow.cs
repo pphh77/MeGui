@@ -851,6 +851,14 @@ namespace MeGUI
                         }
                     }
 
+                    //check if core must be extracted
+                    if (oStreamControl.SelectedStream.TrackInfo.Codec.ToLowerInvariant().Contains("e-ac-3-ex"))
+                    {
+                        oStreamControl.SelectedStream.TrackInfo.Codec = "AC-3";
+                        oStreamControl.SelectedStream.TrackInfo.ExtractCore = true;
+                        bCoreOnly = true;
+                    }
+
                     OneClickStream oStream = oStreamControl.SelectedStream.Clone();
                     sb.Append(string.Format("{0}:\"{1}\" ", oStream.TrackInfo.TrackID,
                         Path.Combine(dpp.WorkingDirectory, oStream.TrackInfo.DemuxFileName)));

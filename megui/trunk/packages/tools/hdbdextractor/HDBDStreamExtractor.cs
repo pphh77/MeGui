@@ -358,7 +358,10 @@ namespace MeGUI.packages.tools.hdbdextractor
                         System.IO.Path.Combine(FolderOutputTextBox.Text, string.Format("{0}T{1}_{2} - {3}.{4}", filePrefix, stream.Number, Extensions.GetStringValue(stream.Type), row.Cells["languageDataGridViewTextBoxColumn"].Value, (row.Cells["StreamExtractAsComboBox"].Value).ToString().ToLowerInvariant())),
                         row.Cells["StreamAddOptionsTextBox"].Value).Trim());
 
-                if (row.Cells["StreamExtractAsComboBox"].Value.Equals(AudioCodec.DTS.ID))
+                if (stream.Type == eac3to.StreamType.Audio && 
+                    (row.Cells["StreamExtractAsComboBox"].Value.Equals(AudioCodec.DTS.ID) || 
+                    ((AudioStream)stream).AudioType == AudioStreamType.EAC3_EX ||
+                    (((AudioStream)stream).AudioType == AudioStreamType.EAC3 && row.Cells["StreamExtractAsComboBox"].Value.Equals("AC3"))))
                     sb.Append(" -core");
 
                 sb.Append(" ");

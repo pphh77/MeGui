@@ -895,6 +895,11 @@ namespace MeGUI
                                 oInfo.Audio.RemoveRange(iAudioCount, 1);
                             }
 
+                            if (((eac3to.AudioStream)oTrack).AudioType == eac3to.AudioStreamType.EAC3_EX)
+                            {
+                                oInfo.Audio[iAudioCount].Format = "E-AC-3-EX";
+                            }
+
                             if (oInfo.Audio.Count > iAudioCount)
                             {
                                 oInfo.Audio[iAudioCount].ID = oTrack.Number.ToString();

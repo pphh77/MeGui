@@ -34,6 +34,8 @@ namespace eac3to
         AC3,
         [StringValue("E-AC3")]
         EAC3,
+        [StringValue("E-AC3 EX")]
+        EAC3_EX,
         [StringValue("DTS")]
         DTS,
         [StringValue("TrueHD")]
