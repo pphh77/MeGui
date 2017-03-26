@@ -557,7 +557,8 @@ namespace MeGUI
                 }
                 else
                 {
-                    LoadLibraryA("avisynthwrapper.dll");
+                    if (_countDLL == 0)
+                        LoadLibraryA("avisynthwrapper.dll");
                     _countDLL++;
                     MainForm.Instance.AviSynthWrapperLog.LogValue("sessions open: " + _countDLL + ", id: " + _random, script + Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.StackTrace);
                 }

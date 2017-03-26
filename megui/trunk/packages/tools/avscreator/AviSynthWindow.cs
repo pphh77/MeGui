@@ -221,7 +221,6 @@ namespace MeGUI
 		private string generateScript()
 		{
 			script = new StringBuilder();
-            //scriptLoad = new StringBuilder(); Better to use AviSynth plugin dir and it is easier for avs templates/profiles
 			
 			string inputLine = "#input";
 			string deinterlaceLines = "#deinterlace";
@@ -229,16 +228,7 @@ namespace MeGUI
 			string cropLine = "#crop";
 			string resizeLine = "#resize";
 
-            double fps = (double)fpsBox.Value;
-            inputLine = ScriptServer.GetInputLine(this.input.Filename, 
-                                                  this.indexFile,
-                                                  deinterlace.Checked, 
-                                                  sourceType, 
-                                                  colourCorrect.Checked, 
-                                                  mpeg2Deblocking.Checked, 
-                                                  flipVertical.Checked, 
-                                                  fps,
-                                                  dss2.Checked);
+            inputLine = GetInputLine();
 
             if (nvDeInt.Enabled)
             {
@@ -285,6 +275,44 @@ namespace MeGUI
             }
             return newScript;
 		}
+
+        private string _tempInputLine;
+        private string _tempInputFileName, _tempInputIndexFile;
+        private bool _tempDeinterlacer, _tempColourCorrect, _tempMpeg2Deblocking, _tempFlipVertical, _tempDSS2;
+        private PossibleSources _tempInputSourceType;
+        private double _tempFPS;
+        private string GetInputLine()
+        {
+            double fps = (double)fpsBox.Value;
+
+            if (_tempInputFileName != this.input.Filename || _tempInputIndexFile != this.indexFile ||
+                _tempDeinterlacer != deinterlace.Checked || _tempInputSourceType != sourceType ||
+                _tempColourCorrect != colourCorrect.Checked || _tempMpeg2Deblocking != mpeg2Deblocking.Checked ||
+                _tempFlipVertical != flipVertical.Checked || _tempFPS != (double)fpsBox.Value || _tempDSS2 != dss2.Checked)
+            {
+                _tempInputFileName = this.input.Filename;
+                _tempInputIndexFile = this.indexFile;
+                _tempDeinterlacer = deinterlace.Checked;
+                _tempInputSourceType = sourceType;
+                _tempColourCorrect = colourCorrect.Checked;
+                _tempMpeg2Deblocking = mpeg2Deblocking.Checked;
+                _tempFlipVertical = flipVertical.Checked;
+                _tempFPS = (double)fpsBox.Value;
+                _tempDSS2 = dss2.Checked;
+
+                _tempInputLine = ScriptServer.GetInputLine(_tempInputFileName,
+                                                  _tempInputIndexFile,
+                                                  _tempDeinterlacer,
+                                                  _tempInputSourceType,
+                                                  _tempColourCorrect,
+                                                  _tempMpeg2Deblocking,
+                                                  _tempFlipVertical,
+                                                  _tempFPS,
+                                                  _tempDSS2);
+            }
+            
+            return _tempInputLine;
+        }
 
         private AviSynthSettings GetProfileSettings()
         {
@@ -363,14 +391,14 @@ namespace MeGUI
                     openVDubFrameServer(videoInput);
                     break;
                 default:
-                    if (File.Exists(videoInput + ".ffindex"))
-                    {
-                        sourceType = PossibleSources.ffindex;
-                        openVideo(videoInput);
-                    }
                     if (File.Exists(videoInput + ".lwi"))
                     {
                         sourceType = PossibleSources.lsmash;
+                        openVideo(videoInput);
+                    }
+                    else if (File.Exists(videoInput + ".ffindex"))
+                    {
+                        sourceType = PossibleSources.ffindex;
                         openVideo(videoInput);
                     }
                     else
@@ -1247,9 +1275,9 @@ namespace MeGUI
             calcAspectError();
             checkControls();
             
-            eventsOn = true;
             if (bShowScript)
                 showScript(bForceScript);
+            eventsOn = true;
         }
 
         private void setModType()
@@ -1379,7 +1407,7 @@ namespace MeGUI
 
             // remove upsizing or undersizing if value cannot be changed
             if (!resize.Checked && !((!bAllowUpsizing || bResizeEnabled) && (int)file.VideoInfo.Width - Cropping.left - Cropping.right < outputWidth))
-                outputWidth = outputWidth - Cropping.left - Cropping.right;
+                outputWidth = (int)file.VideoInfo.Width - Cropping.left - Cropping.right;
 
             CropValues paddingValues;
             CropValues cropValues = Cropping.Clone();

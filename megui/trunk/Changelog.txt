@@ -1,3 +1,5 @@
+2708 [AVS Script Creator]   improved video refresh/preview behaviour. Bug #853
+                            fixed sometimes wrongly shown resize values if "encode non-mod16" is used (regression of 2357)
 2707 [Update]               x86: added option to use x86 tools on a x64 system
 2706 [x264]                 fixed wrong SAR values in some cases (regression of 2683)
      [x265]                 added 16:15 to the predefined --sar values

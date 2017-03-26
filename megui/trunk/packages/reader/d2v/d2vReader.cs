@@ -36,7 +36,7 @@ namespace MeGUI
         public int HandleLevel(string file)
         {
             if (file.ToLowerInvariant().EndsWith(".d2v"))
-                return 10;
+                return 18;
             return -1;
         }
         #endregion

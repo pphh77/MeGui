@@ -46,7 +46,7 @@ namespace MeGUI
 
             if (FileIndexerWindow.isDGMFile(file))
                 return -1;
-            return 12;
+            return 19;
         }
 
         #endregion

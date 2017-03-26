@@ -979,13 +979,13 @@ namespace MeGUI
             PackageSystem.Tools.Register(new AVCLevelTool());
             PackageSystem.Tools.Register(new VobSubTool());
             PackageSystem.Tools.Register(new MeGUI.packages.tools.hdbdextractor.HdBdExtractorTool());
-            PackageSystem.MediaFileTypes.Register(new AvsFileFactory());
-            PackageSystem.MediaFileTypes.Register(new d2vFileFactory());
-            PackageSystem.MediaFileTypes.Register(new dgmFileFactory());
-            PackageSystem.MediaFileTypes.Register(new dgiFileFactory());
-            PackageSystem.MediaFileTypes.Register(new ffmsFileFactory());
-            PackageSystem.MediaFileTypes.Register(new lsmashFileFactory());
-            PackageSystem.MediaFileTypes.Register(new MediaInfoFileFactory());
+            PackageSystem.MediaFileTypes.Register(new AvsFileFactory());        // HandleLevel 30
+            PackageSystem.MediaFileTypes.Register(new dgmFileFactory());        // HandleLevel 20
+            PackageSystem.MediaFileTypes.Register(new dgiFileFactory());        // HandleLevel 19
+            PackageSystem.MediaFileTypes.Register(new d2vFileFactory());        // HandleLevel 18
+            PackageSystem.MediaFileTypes.Register(new lsmashFileFactory());     // HandleLevel 13
+            PackageSystem.MediaFileTypes.Register(new ffmsFileFactory());       // HandleLevel 12
+            PackageSystem.MediaFileTypes.Register(new MediaInfoFileFactory());  // HandleLevel  5
             PackageSystem.JobPreProcessors.Register(BitrateCalculatorPreProcessor.CalculationProcessor);
             PackageSystem.JobPostProcessors.Register(d2vIndexJobPostProcessor.PostProcessor);
             PackageSystem.JobPostProcessors.Register(dgmIndexJobPostProcessor.PostProcessor);

@@ -45,7 +45,7 @@ namespace MeGUI
                 return -1;
 
             if (FileIndexerWindow.isDGMFile(file))
-                return 11;
+                return 20;
             return -1;
         }
 

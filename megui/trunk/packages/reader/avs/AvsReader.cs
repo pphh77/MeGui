@@ -43,7 +43,7 @@ namespace MeGUI
         public int HandleLevel(string file)
         {
             if (file.ToLowerInvariant().EndsWith(".avs"))
-                return 10;
+                return 30;
             return -1;
         }
 
