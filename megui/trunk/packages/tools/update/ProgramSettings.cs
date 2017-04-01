@@ -199,8 +199,7 @@ namespace MeGUI
                 (_name.Equals("dgindexnv") && !MainForm.Instance.Settings.UseDGIndexNV) ||
                 (_name.Equals("fdkaac") && !MainForm.Instance.Settings.UseFDKAac) ||
                 (_name.Equals("neroaacenc") && !MainForm.Instance.Settings.UseNeroAacEnc) ||
-                (_name.Equals("qaac") && !MainForm.Instance.Settings.UseQAAC) ||
-                (_name.Equals("x265") && !MainForm.Instance.Settings.UseX265))
+                (_name.Equals("qaac") && !MainForm.Instance.Settings.UseQAAC))
             {
                 _enabled = false;
                 return false;

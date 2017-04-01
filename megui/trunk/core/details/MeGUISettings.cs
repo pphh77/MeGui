@@ -52,7 +52,7 @@ namespace MeGUI
                        strEac3toLastFolderPath, strEac3toLastFilePath, strEac3toLastDestinationPath, tempDirMP4,
                        fdkAacPath, httpproxyaddress, httpproxyport, httpproxyuid, httpproxypwd, defaultOutputDir,
                        appendToForcedStreams, lastUsedOneClickFolder, lastUpdateServer, chapterCreatorSortString;
-        private bool autoForceFilm, autoStartQueue, autoOpenScript, bUseQAAC, bUseX265, bUseDGIndexNV, bUseDGIndexIM,
+        private bool autoForceFilm, autoStartQueue, autoOpenScript, bUseQAAC, bUseDGIndexNV, bUseDGIndexIM,
                      overwriteStats, keep2of3passOutput, autoUpdate, deleteCompletedJobs, deleteIntermediateFiles,
                      deleteAbortedOutput, openProgressWindow, bEac3toAutoSelectStreams, bUseFDKAac, bVobSubberKeepAll,
                      alwaysOnTop, addTimePosition, alwaysbackupfiles, bUseITU, bEac3toLastUsedFileMode, bMeGUIx64,
@@ -176,7 +176,7 @@ namespace MeGUI
             bUseITU = true;
             bOpenAVSInThread = true;
             lastUsedOneClickFolder = "";
-            bUseNeroAacEnc = bUseFDKAac = bUseQAAC = bUseX265 = bUseDGIndexNV = bUseDGIndexIM = false;
+            bUseNeroAacEnc = bUseFDKAac = bUseQAAC = bUseDGIndexNV = bUseDGIndexIM = false;
             chapterCreatorMinimumLength = 900;
             bExternalMuxerX264 = true;
             bVobSubberSingleFileExport = false;
@@ -1062,12 +1062,6 @@ namespace MeGUI
             set { bUseQAAC = value; }
         }
 
-        public bool UseX265
-        {
-            get { return bUseX265; }
-            set { bUseX265 = value; }
-        }
-
         public ProgramSettings AviMuxGui
         {
             get { return avimuxgui; }
@@ -1513,8 +1507,6 @@ namespace MeGUI
             x265.UpdateInformation("x265", "x265", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x265\avs4x26x.exe"));
             x265.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x265\x86\x265.exe"));
             x265.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x265\x64\x265.exe"));
-            if (!MainForm.Instance.Settings.UseX265)
-                UpdateCacher.CheckPackage("x265", false, false);
             xvid.UpdateInformation("xvid_encraw", "Xvid", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\xvid_encraw\xvid_encraw.exe"));
        }
 #endregion

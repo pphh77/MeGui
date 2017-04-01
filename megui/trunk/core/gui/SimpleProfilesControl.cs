@@ -134,9 +134,6 @@ namespace MeGUI.core.gui
                 if ((oProfile.Data.BaseSettings is QaacSettings) && !MainForm.Instance.Settings.UseQAAC)
                     continue;
 
-                if ((oProfile.Data.BaseSettings is x265Settings) && !MainForm.Instance.Settings.UseX265)
-                    continue;
-
                 comboBox1.Items.Add(oProfile);
             }
             SelectProfile(Manager.GetSelectedProfile(ProfileSet));

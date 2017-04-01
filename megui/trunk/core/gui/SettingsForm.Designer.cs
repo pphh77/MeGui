@@ -127,7 +127,7 @@ namespace MeGUI
             this.lblFDK = new System.Windows.Forms.Label();
             this.fdkaacLocation = new MeGUI.FileBar();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
-            this.useX265 = new System.Windows.Forms.CheckBox();
+            this.chk64Bit = new System.Windows.Forms.CheckBox();
             this.chx264ExternalMuxer = new System.Windows.Forms.CheckBox();
             this.useQAAC = new System.Windows.Forms.CheckBox();
             this.lblForcedName = new System.Windows.Forms.Label();
@@ -154,7 +154,6 @@ namespace MeGUI
             this.autoEncodeDefaultsButton = new System.Windows.Forms.Button();
             this.toolTipHelp = new System.Windows.Forms.ToolTip(this.components);
             this.helpButton1 = new MeGUI.core.gui.HelpButton();
-            this.chk64Bit = new System.Windows.Forms.CheckBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
             groupBox1.SuspendLayout();
             this.otherGroupBox.SuspendLayout();
@@ -1036,7 +1035,6 @@ namespace MeGUI
             // groupBox6
             // 
             this.groupBox6.Controls.Add(this.chk64Bit);
-            this.groupBox6.Controls.Add(this.useX265);
             this.groupBox6.Controls.Add(this.chx264ExternalMuxer);
             this.groupBox6.Controls.Add(this.useQAAC);
             this.groupBox6.Controls.Add(this.lblForcedName);
@@ -1051,16 +1049,17 @@ namespace MeGUI
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = " Misc ";
             // 
-            // useX265
+            // chk64Bit
             // 
-            this.useX265.AutoSize = true;
-            this.useX265.Location = new System.Drawing.Point(12, 43);
-            this.useX265.Name = "useX265";
-            this.useX265.Size = new System.Drawing.Size(85, 17);
-            this.useX265.TabIndex = 50;
-            this.useX265.Text = "Enable x265";
-            this.useX265.UseVisualStyleBackColor = true;
-            this.useX265.CheckedChanged += new System.EventHandler(this.useX265_CheckedChanged);
+            this.chk64Bit.AutoSize = true;
+            this.chk64Bit.Checked = true;
+            this.chk64Bit.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chk64Bit.Location = new System.Drawing.Point(225, 66);
+            this.chk64Bit.Name = "chk64Bit";
+            this.chk64Bit.Size = new System.Drawing.Size(141, 17);
+            this.chk64Bit.TabIndex = 51;
+            this.chk64Bit.Text = "Use x64 tools if possible";
+            this.chk64Bit.UseVisualStyleBackColor = true;
             // 
             // chx264ExternalMuxer
             // 
@@ -1354,18 +1353,6 @@ namespace MeGUI
             this.helpButton1.Size = new System.Drawing.Size(38, 23);
             this.helpButton1.TabIndex = 1;
             // 
-            // chk64Bit
-            // 
-            this.chk64Bit.AutoSize = true;
-            this.chk64Bit.Checked = true;
-            this.chk64Bit.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chk64Bit.Location = new System.Drawing.Point(225, 66);
-            this.chk64Bit.Name = "chk64Bit";
-            this.chk64Bit.Size = new System.Drawing.Size(141, 17);
-            this.chk64Bit.TabIndex = 51;
-            this.chk64Bit.Text = "Use x64 tools if possible";
-            this.chk64Bit.UseVisualStyleBackColor = true;
-            // 
             // SettingsForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 14);
@@ -1516,7 +1503,6 @@ namespace MeGUI
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox cbHttpProxyMode;
         private System.Windows.Forms.CheckBox chx264ExternalMuxer;
-        private System.Windows.Forms.CheckBox useX265;
         private System.Windows.Forms.CheckBox cbUseIncludedAviSynth;
         private System.Windows.Forms.GroupBox groupBox7;
         private System.Windows.Forms.CheckBox useFDKAac;

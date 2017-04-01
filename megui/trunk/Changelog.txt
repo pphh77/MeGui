@@ -1,3 +1,4 @@
+2711 [x265]                 removed the option to enable x265 as it is now always enabled
 2710 [HD Streams Extractor] extract E-AC3 by default with -core (workaround for a eac3to issue). Bug #870
                             Changed handling of unknown/unsupported tracks
 2709 [HD Streams Extractor] fixed extraction of DTS Express tracks. Bug #871

@@ -261,10 +261,6 @@ namespace MeGUI
                     UpdateCacher.CheckPackage("qaac", useQAAC.Checked, false);
                 settings.UseQAAC = useQAAC.Checked;
 
-                if (useX265.Checked != internalSettings.UseX265)
-                    UpdateCacher.CheckPackage("x265", useX265.Checked, false);
-                settings.UseX265 = useX265.Checked;
-
                 settings.UseExternalMuxerX264 = chx264ExternalMuxer.Checked;
                 settings.AlwaysUsePortableAviSynth = cbUseIncludedAviSynth.Checked;
                 settings.ChapterCreatorMinimumLength = (int)minimumTitleLength.Value;
@@ -336,7 +332,6 @@ namespace MeGUI
                 useNeroAacEnc.Checked = settings.UseNeroAacEnc;
                 useFDKAac.Checked = settings.UseFDKAac;
                 useQAAC.Checked = settings.UseQAAC;
-                useX265.Checked = settings.UseX265;
                 chx264ExternalMuxer.Checked = settings.UseExternalMuxerX264;
                 cbUseIncludedAviSynth.Checked = settings.AlwaysUsePortableAviSynth;
                 minimumTitleLength.Value = settings.ChapterCreatorMinimumLength;
@@ -411,12 +406,6 @@ namespace MeGUI
         {
             if (useQAAC.Checked && !internalSettings.UseQAAC)
                 MessageBox.Show("You have to restart MeGUI in order to get access to QAAC.\r\nAlso external dependencies must be installed if not already available. More information can be found here:\r\nhttps://sites.google.com/site/qaacpage/", "Restart required", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        private void useX265_CheckedChanged(object sender, EventArgs e)
-        {
-            if (useX265.Checked && !internalSettings.UseX265)
-                MessageBox.Show("You have to restart MeGUI in order to get access to x265.", "Restart required", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void useDGIndexNV_CheckedChanged(object sender, EventArgs e)
