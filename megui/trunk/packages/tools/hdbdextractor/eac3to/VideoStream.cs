@@ -26,27 +26,27 @@ namespace eac3to
     /// <summary>A Stream of StreamType Video</summary>
     public class VideoStream : Stream
     {
-        public VStreamType VType { get; set; }
+        public VideoStreamType VideoType { get; set; }
         public override string Language { get; set; }
 
         public override object[] ExtractTypes
         {
             get
             {
-                switch (VType)
+                switch (VideoType)
                 {
-                    case VStreamType.AVC:
+                    case VideoStreamType.AVC:
                         return new object[] { "MKV", "H264" };
-                    case VStreamType.VC1:
+                    case VideoStreamType.VC1:
                         return new object[] { "MKV", "VC1" };
-                    case VStreamType.MPEG:
+                    case VideoStreamType.MPEG:
                         return new object[] { "MKV", "M2V" };
-                    case VStreamType.THEORA:
+                    case VideoStreamType.THEORA:
                         return new object[] { "MKV", "OGG" };
-                    case VStreamType.DIRAC:
+                    case VideoStreamType.DIRAC:
                         return new object[] { "MKV", "DRC" };
                     default:
-                        return new object[] { "MKV" };
+                        return new object[] { "UNKNOWN" };
                 }
             }
         }
@@ -69,23 +69,24 @@ namespace eac3to
             switch (type.ToUpperInvariant())
             {
                 case "H264/AVC":
-                    videoStream.VType = VStreamType.AVC;
+                    videoStream.VideoType = VideoStreamType.AVC;
                     break;
                 case "VC-1":
-                    videoStream.VType = VStreamType.VC1;
+                    videoStream.VideoType = VideoStreamType.VC1;
                     break;
                 case "MPEG":
                 case "MPEG2":
-                    videoStream.VType = VStreamType.MPEG;
+                    videoStream.VideoType = VideoStreamType.MPEG;
                     break;
                 case "THEORA":
-                    videoStream.VType = VStreamType.THEORA;
+                    videoStream.VideoType = VideoStreamType.THEORA;
                     break;
                 case "DIRAC":
-                    videoStream.VType = VStreamType.DIRAC;
+                    videoStream.VideoType = VideoStreamType.DIRAC;
                     break;
                 default:
-                    videoStream.VType = VStreamType.AVC;
+                    _log.Warn("\"" + type + "\" is not known. " + s);
+                    videoStream.VideoType = VideoStreamType.UNKNOWN;
                     break;
             }
             return videoStream;

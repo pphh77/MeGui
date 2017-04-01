@@ -45,6 +45,8 @@ namespace MeGUI
                         if (mFile != null)
                         {
                             bestHandleLevel = handleLevel;
+                            if (bestMediaFile != null)
+                                bestMediaFile.Dispose();
                             bestMediaFile = mFile;
                         }
                     }

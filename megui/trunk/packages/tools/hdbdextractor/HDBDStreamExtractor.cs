@@ -346,22 +346,26 @@ namespace MeGUI.packages.tools.hdbdextractor
                 if (extractStream.Value == null || int.Parse(extractStream.Value.ToString()) != 1)
                     continue;
 
+                string strExtension = row.Cells["StreamExtractAsComboBox"].Value.ToString().ToLowerInvariant();
+                if (strExtension.ToUpperInvariant().Equals("EAC3_CORE"))
+                    strExtension = "eac3";
                 if (row.Cells["StreamExtractAsComboBox"].Value == null)
                     throw new ApplicationException(string.Format("Specify an extraction type for stream:\r\n\n\t{0}: {1}", stream.Number, stream.Description));
 
                 if (FolderSelection.Checked)
                     sb.Append(string.Format("{0}:\"{1}\" {2} ", stream.Number,
-                        System.IO.Path.Combine(FolderOutputTextBox.Text, string.Format("{0}F{1}_T{2}_{3} - {4}.{5}", filePrefix, ((Feature)FeatureDataGridView.SelectedRows[0].DataBoundItem).Number, stream.Number, Extensions.GetStringValue(stream.Type), row.Cells["languageDataGridViewTextBoxColumn"].Value, (row.Cells["StreamExtractAsComboBox"].Value).ToString().ToLowerInvariant())),
-                        row.Cells["StreamAddOptionsTextBox"].Value).Trim());
+                        System.IO.Path.Combine(FolderOutputTextBox.Text, string.Format("{0}F{1}_T{2}_{3} - {4}.{5}", filePrefix, 
+                        ((Feature)FeatureDataGridView.SelectedRows[0].DataBoundItem).Number, stream.Number, Extensions.GetStringValue(stream.Type), 
+                        row.Cells["languageDataGridViewTextBoxColumn"].Value, strExtension)), row.Cells["StreamAddOptionsTextBox"].Value).Trim());
                 else
                     sb.Append(string.Format("{0}:\"{1}\" {2} ", stream.Number,
-                        System.IO.Path.Combine(FolderOutputTextBox.Text, string.Format("{0}T{1}_{2} - {3}.{4}", filePrefix, stream.Number, Extensions.GetStringValue(stream.Type), row.Cells["languageDataGridViewTextBoxColumn"].Value, (row.Cells["StreamExtractAsComboBox"].Value).ToString().ToLowerInvariant())),
+                        System.IO.Path.Combine(FolderOutputTextBox.Text, string.Format("{0}T{1}_{2} - {3}.{4}", filePrefix, stream.Number,
+                        Extensions.GetStringValue(stream.Type), row.Cells["languageDataGridViewTextBoxColumn"].Value, strExtension)),
                         row.Cells["StreamAddOptionsTextBox"].Value).Trim());
 
                 if (stream.Type == eac3to.StreamType.Audio && 
                     (row.Cells["StreamExtractAsComboBox"].Value.Equals(AudioCodec.DTS.ID) || 
-                    ((AudioStream)stream).AudioType == AudioStreamType.EAC3_EX ||
-                    (((AudioStream)stream).AudioType == AudioStreamType.EAC3 && row.Cells["StreamExtractAsComboBox"].Value.Equals("AC3"))))
+                    (((AudioStream)stream).AudioType == AudioStreamType.EAC3 && row.Cells["StreamExtractAsComboBox"].Value.Equals("EAC3_CORE"))))
                     sb.Append(" -core");
 
                 sb.Append(" ");

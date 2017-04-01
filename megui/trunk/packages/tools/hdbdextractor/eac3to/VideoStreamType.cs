@@ -23,8 +23,10 @@ using MeGUI.packages.tools.hdbdextractor;
 namespace eac3to
 {
     /// <summary>An enumeration of Video Stream types</summary>
-    public enum VStreamType
+    public enum VideoStreamType
     {
+        [StringValue("UNKNOWN")]
+        UNKNOWN,
         [StringValue("AVC")]
         AVC,
         [StringValue("VC-1")]

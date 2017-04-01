@@ -122,11 +122,9 @@ namespace eac3to
             string strIdentifier = s.Split(',')[0];
             Stream stream = null;
 
-            if (strIdentifier.Contains("HEVC") || strIdentifier.Contains("VobSub"))
-                stream = new UnknownStream(s, _log);
-            else if (strIdentifier.Contains("AVC") || strIdentifier.Contains("MVC") || strIdentifier.Contains("VC-1") || strIdentifier.Contains("MPEG") ||
-                        strIdentifier.Contains("DIRAC") || strIdentifier.Contains("THEORA"))
-                        stream = VideoStream.Parse(s, _log);
+            if (strIdentifier.Contains("AVC") || strIdentifier.Contains("MVC") || strIdentifier.Contains("VC-1") || strIdentifier.Contains("MPEG") ||
+                        strIdentifier.Contains("DIRAC") || strIdentifier.Contains("THEORA") || strIdentifier.Contains("HEVC"))
+                stream = VideoStream.Parse(s, _log);
             else if (strIdentifier.Contains("AC3") || strIdentifier.Contains("TrueHD") || strIdentifier.Contains("DTS") ||
                         strIdentifier.Contains("RAW") || strIdentifier.Contains("PCM") || strIdentifier.Contains("MP") || strIdentifier.Contains("AAC") ||
                         strIdentifier.Contains("FLAC") || strIdentifier.Contains("WAVPACK") || strIdentifier.Contains("TTA") || strIdentifier.Contains("VORBIS"))
@@ -138,6 +136,11 @@ namespace eac3to
             else if (strIdentifier.Contains("Joined"))
                 stream = JoinStream.Parse(s, _log);
             else
+                stream = new UnknownStream(s, _log);
+
+            if ((stream is AudioStream && ((AudioStream)stream).AudioType == AudioStreamType.UNKNOWN) ||
+                (stream is SubtitleStream && ((SubtitleStream)stream).SubtitleType == SubtitleStreamType.UNKNOWN) ||
+                (stream is VideoStream && ((VideoStream)stream).VideoType == VideoStreamType.UNKNOWN))
                 stream = new UnknownStream(s, _log);
 
             return stream;

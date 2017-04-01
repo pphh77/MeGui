@@ -20,12 +20,31 @@
 
 using System;
 using MeGUI.core.util;
+using MeGUI.packages.tools.hdbdextractor;
 
 namespace eac3to
 {
+    /// <summary>An enumeration of Subtitle Stream types</summary>
+    public enum SubtitleStreamType
+    {
+        [StringValue("UNKNOWN")]
+        UNKNOWN,
+        [StringValue("ASS")]
+        ASS,
+        [StringValue("SSA")]
+        SSA,
+        [StringValue("SRT")]
+        SRT,
+        [StringValue("IDX")]
+        IDX,
+        [StringValue("SUP")]
+        SUP
+    }
+
     /// <summary>A Stream of StreamType Subtitle</summary>
     public class SubtitleStream : Stream
     {
+        public SubtitleStreamType SubtitleType { get; set; }
         public override string Language { get; set; }
         public bool IsSDH { get; set; }
 
@@ -33,20 +52,19 @@ namespace eac3to
         {
             get
             {
-                switch (base.Description.Substring(11, 3))
+                switch (SubtitleType)
                 {
-                    case "ASS":
+                    case SubtitleStreamType.ASS:
                         return new object[] { "ASS" };
-                    case "SSA":
+                    case SubtitleStreamType.SSA:
                         return new object[] { "SSA" };
-                    case "SRT":
+                    case SubtitleStreamType.SRT:
                         return new object[] { "SRT" };
-                    case "Vob":
-                        return new object[] { "IDX" };
-                    default:
+                    case SubtitleStreamType.SUP:
                         return new object[] { "SUP" };
+                    default:
+                        return new object[] { "UNKNOWN" };
                 }
-
             }
         }
 
@@ -65,7 +83,26 @@ namespace eac3to
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
 
+            string type = s.Substring(s.IndexOf(":") + 12, 3).Trim();
             SubtitleStream subtitleStream = new SubtitleStream(s, _log);
+            switch (type.ToUpperInvariant())
+            {
+                case "ASS":
+                    subtitleStream.SubtitleType = SubtitleStreamType.ASS; break;
+                case "SSA":
+                    subtitleStream.SubtitleType = SubtitleStreamType.SSA; break;
+                case "SRT":
+                    subtitleStream.SubtitleType = SubtitleStreamType.SRT; break;
+                case "PGS":
+                    subtitleStream.SubtitleType = SubtitleStreamType.SUP; break;
+                case "VOB":
+                    subtitleStream.SubtitleType = SubtitleStreamType.UNKNOWN; break;
+                default:
+                    _log.Warn("\"" + type + "\" is not known. " + s);
+                    subtitleStream.SubtitleType = SubtitleStreamType.UNKNOWN;
+                    break;
+            }
+
             subtitleStream.IsSDH = s.Contains("\"SDH\"") ? true : false;
             return subtitleStream;
         }
