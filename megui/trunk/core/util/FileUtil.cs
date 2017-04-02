@@ -680,7 +680,7 @@ namespace MeGUI.core.util
             {
                 if (oLog != null)
                     oLog.LogValue("AviSynth" + (fileProductName.Contains("+") ? "+" : String.Empty) + " portable",
-                        fileVersion + " (" + fileDate + ")" + (bFoundInstalledAviSynth ? " (inactive)" : " (active)"));
+                        fileVersion + " (" + fileDate + ")" + ((!MainForm.Instance.Settings.AlwaysUsePortableAviSynth && bFoundInstalledAviSynth) ? " (inactive)" : " (active)"));
                 if (!bFoundInstalledAviSynth || MainForm.Instance.Settings.AlwaysUsePortableAviSynth)
                 {
                     PortableAviSynthActions(false);
