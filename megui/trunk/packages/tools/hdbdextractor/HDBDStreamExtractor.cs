@@ -241,7 +241,7 @@ namespace MeGUI.packages.tools.hdbdextractor
                 switch (s.Type)
                 {
                     case eac3to.StreamType.Chapter:
-                        comboBox.Value = "TXT";
+                        comboBox.Value = comboBox.Items[0];
                         break;
                     case eac3to.StreamType.Join:
                         if (s.Name == "Joined EVO")
@@ -250,17 +250,10 @@ namespace MeGUI.packages.tools.hdbdextractor
                             comboBox.Value = "VOB";
                         break;
                     case eac3to.StreamType.Subtitle:
-                        switch (s.Description.Substring(11, 3))
-                        {
-                            case "ASS": comboBox.Value = "ASS"; break;
-                            case "SSA": comboBox.Value = "SSA"; break;
-                            case "SRT": comboBox.Value = "SRT"; break;
-                            case "Vob": comboBox.Value = "IDX"; break;
-                            default: comboBox.Value = "SUP"; break;
-                        }
+                        comboBox.Value = comboBox.Items[0];
                         break;
                     case eac3to.StreamType.Video:
-                        comboBox.Value = "MKV";
+                        comboBox.Value = comboBox.Items[0];
                         break;
                     case eac3to.StreamType.Audio:
                         comboBox.Value = comboBox.Items[0];

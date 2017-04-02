@@ -29,6 +29,8 @@ namespace eac3to
         UNKNOWN,
         [StringValue("AVC")]
         AVC,
+        [StringValue("MVC")]
+        MVC,
         [StringValue("VC-1")]
         VC1,
         [StringValue("MPEG")]

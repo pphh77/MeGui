@@ -37,6 +37,8 @@ namespace eac3to
                 {
                     case VideoStreamType.AVC:
                         return new object[] { "MKV", "H264" };
+                    case VideoStreamType.MVC:
+                        return new object[] { "H264" };
                     case VideoStreamType.VC1:
                         return new object[] { "MKV", "VC1" };
                     case VideoStreamType.MPEG:
@@ -64,12 +66,15 @@ namespace eac3to
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
  
-            string type = s.Substring(s.IndexOf(":") + 1, s.IndexOf(',') - s.IndexOf(":") - 1).Trim();
+            string type = s.Substring(s.IndexOf(":") + 1, s.IndexOf(',') - s.IndexOf(":") - 1).Trim().Split(' ')[0];
             VideoStream videoStream = new VideoStream(s, _log);
             switch (type.ToUpperInvariant())
             {
                 case "H264/AVC":
                     videoStream.VideoType = VideoStreamType.AVC;
+                    break;
+                case "H264/MVC":
+                    videoStream.VideoType = VideoStreamType.MVC;
                     break;
                 case "VC-1":
                     videoStream.VideoType = VideoStreamType.VC1;
