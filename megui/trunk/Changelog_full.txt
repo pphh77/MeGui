@@ -1,3 +1,121 @@
+2715                        stable release
+2714 [Main]                 fixed sometimes wrong versions log for the portable AviSynth build
+2713 [Update]               x64: do not check for the 32bit x265.exe
+2712 [HD Streams Extractor] fixed 3D MVC extraction (regression of 2710)
+2711 [x265]                 removed the option to enable x265 as it is now always enabled
+2710 [HD Streams Extractor] extract E-AC3 by default with -core (workaround for a eac3to issue). Bug #870
+                            Changed handling of unknown/unsupported tracks
+2709 [HD Streams Extractor] fixed extraction of DTS Express tracks. Bug #871
+                            fixed extraction of E-AC3 with core tracks. Bug #870
+2708 [AVS Script Creator]   improved video refresh/preview behaviour. Bug #853
+                            fixed sometimes wrongly shown resize values if "encode non-mod16" is used (regression of 2357)
+2707 [Update]               x86: added option to use x86 tools on a x64 system
+2706 [x264]                 fixed wrong SAR values in some cases (regression of 2683)
+     [x265]                 added 16:15 to the predefined --sar values
+2705 [HD Streams Extractor] improved input/output folder selection
+2704 [ChapterCreator]       removed an internal md5 hash function to be FIPS compliant. #Bug 873
+2703 [MKV Muxer]            added 1 as an successful exit code. therefore (de)mux jobs with warnings only will not fail anymore.
+                            improved handling of --default-duration
+2702 [x265]                 added the cutree file to the intermediate file set. Bug #869
+2701 [FileIndexer]          fixed unable to select specific audio tracks to be demuxed from a DVD source with DG Indexer (regression of 2668)
+2700 [FileIndexer]          fixed unnecessary use of pgcdemux for sources with only one PGC and no angles (regression of 2668)
+2699 [VobSubber]            added option to extract forced subtitles in dedicated file(s)
+     [OneClick]             fixed wrong assignment of automatically detected forced IDX/SUB subtitles (regression of 2686)
+2696                        runtime files will always be copied
+2695                        improved runtime file handling
+2694 [VobSubber]            fixed error if output path contains blanks
+     [VobSubber]            removed 1GB warning
+     [VobSubber]            added CC files to the to be deleted intermediate files
+2693 [AudioEncoder]         default to LWLibavAudioSource()/LSMASHAudioSource()
+     [AudioEncoder]         added downmix option to 5.1
+     [AudioEncoder]         added proper LoadPlugin calls for TimeStrech()/TimeStretchPlugin() and SoxFilter()
+     [AudioEncoder]         x64: remove filter/functions where the not available plugins AudioLimiter.dll or SoxFilter.dll are required
+2692 [qaac]                 removed --no-delay option if LC is not used (regression of 2377). Bug #865
+2691 [x265]                 fixed wrong command line (regression of 2685). Bug #863
+                            changed default --crf vaue to 28
+2690                        improved x64 build
+     [AviSynth]             replaced Yadif by Yadifmod2
+2689 [VobSubber]            improved error handling if forced subtitles are not found (regression of 2686)
+                            added a warning if VOB file sizes above the specification limit are used
+2688 [x264]                 fixed incorrect command line when using a x86 OS (regression of 2681)
+2687 [Update]               added possibility to mark package architectures as "any"
+2686 [VobSubber]            switched to VobSub Ripper
+                            forced subtitles will be extracted separately if available
+                            the track language will be added if multiple track files are used
+2685 [x265]                 switched to avs4x26x for x64 on an x86 OS
+2684 [Presets]              improved handling of preset selection/saving. Feature request #606
+2683 [x264]                 fixed "force sar" option (regression of 2628). Bug #862
+2682 [x264] + [x265]        added support for custom commands leading with a single hyphen (e.g. -D)
+2681 [x264]                 removed option to select 32bit x264 on a 64bit OS and merged the 8- and 10-bit packages
+2679 [Update]               improved updater to download appropriate architecture packages
+2678 [AviSynthProfile]      added option to treat sources as anime for deinterlacing
+2677 [OneClick]             fixed wrong track information in some use cases
+2676 [x265]                 fixed duplicated custom command line values (regression of 2673)
+2675                        improved portable AviSynth runtime handling
+2674 [Audio Cutter]         preselect output file. Feature request #597
+2673 [x265]                 added --sar detection. Feature request #601
+2672 [Title Selector]       added option to change the minimum title length also in the global settings
+2671 [VobSubber]            remember the "keep all..." setting. Feature request #600
+2670 [Haali Media Splitter] added "Haali Media Splitter" as update package
+                            improved detection if it is installed
+                            if it is needed by the HD Streams Extractor it will be installed (administrative permissions are required)
+2669 [VobSubber]            added title selector for DVD sources incl. multi-angle support
+2668 [FileIndexer]          added title selector for DVD sources incl. multi-angle support
+2667 [TitleSelector]        added support for multi-angle DVD sources
+     [OneClick]             added support for multi-angle DVD sources
+2666 [TitleSelector]        improved title selector for DVD/Blu-ray sources
+2665 [OneClick]             added support for folders as drag&drop source of the input control
+2664 [IFOParser]            improved type detection
+2663 [FileIndexer]          fixed processing of DVDs with only one PGC (regression of 2658)
+2662 [IFOParser]            fixed sometimes not able to get the language information (regression of 2657)
+2661 [Main]                 reverted 2639. Bug #843
+2660 [Presets]              fixed not changing the selected preset if no change has been made in the configuration window. Bug #844
+2659 [VobSubber]            fixed subtitle export for multi-angle discs
+2658 [OneClick]+[FileIndexer] only use pgcdemux if it is a multi-pgc or multi-angle DVD source
+2657 [IFOParser]            add subtitle type only if there are multiple types
+2656 [OneClick]+[ChapterCreator] improved DVD/Blu-ray structure detection
+2655 [IFOParser]            fixed missing first subtitle track if it contains more than one subtitle type
+                            added type information (4:3/wide/letterbox/pan&scan) to the description of the subtitle track
+                            added multi-angle detection
+2653 [AudioEncoder]         fixed an error when aborting the job during the initial steps
+2652 [HD Streams Extractor] for DVD/Blu-ray sources a prefix and suffix is attached to the output file name. Feature request #597
+                            added warning if "Haali Matroska Muxer" is required
+2651 [FileIndexer]          added IFO as supported input files
+                            improved PGC handling
+2650 [OneClick] +           for DVD/Blu-ray sources a prefix and suffix is attached to the output file name. Feature request #597
+     [FileIndexer]          pgcdemux will be used in any case as a workaround for multi-angle DVDs
+                            added MPLS as supported input files (OneClick)
+2649 [ChapterCreator]       added the PGC number to the output as suffix
+2648 [VobSubber]            added the PGC number to the output as suffix
+                            preselect tracks based on the default language(s)
+                            improved logging
+2647 [PGCDemux]             changed where the intermediate files are created
+2646 [VobSubber] +          use the default MeGUI output path if possible. Feature request #597
+     [ChapterCreator]       for DVD/Blu-ray sources a prefix is attached to the output file name. Feature request #597
+2645 [VobSubber]            added option to demux all tracks in a single file (as before 2637). Feature request #595
+2644 [HD Streams Extractor] added IDX/VobSub as unsupported format
+2643 [x264]                 adjusted "--preset slow" settings (requires x264 2721+). Bug #855
+2642 [L-SMASH Indexer]      blocked the VC-1 codec as it is not properly supported anymore. Bug #851
+2641 [AudioEncoder]         fixed handling of MediaInfo information for HD audio tracks
+2640 [AviSynth]             improved debug handling
+2639 [Main]                 removed aspect ratio controls from the video preview control. Bug #843
+2638 [Profile]              added support to import old export files (regression of 2635). Bug #849
+2637 [VobSubber]            each track will be demuxed into a dedicated file set to avoid missing tracks when muxing. Bug #845
+     [VobSubber]+[OneClick] for multiple tracks the source will only be indexed once
+2636 [Audio Encoder]        cosmetic change. Bug #826
+2635 [Profile]              fixed import & export of profiles (regression of 2590). Bug #842
+2634 [L-SMASH Indexer]      added support for MSVC 2015 runtimes
+2633                        updated the wiki links to point to https://en.wikibooks.org/wiki/MeGUI
+2631 [MediaInfo]            improved DVD audio track language detection
+2630 [Audio Encoder]        fixed a crash if a very large audio delay is used
+2629 [OneClick]             fixed Blu-Ray playlist processing if a track has no proper language tag (regression of 2572)
+2628 [x264]                 added 16:15 to the --sar values
+2627 [Main]                 detects during startup if AviSynth can be used
+                            automatic fallback to the portable AviSynth
+2626 [AvisynthWrapper]      updated to recent avisynth.h (requires AviSynth 2.6)
+                            improved error handling
+                            added x64 support
+2625 [Flac Encoder]         fixed always using compression level 0 (regression of 2536)
 2624 [Log]                  do not print a warning when "Haali Matroska Splitter" is not found
 2623 [OneClick]             removed the deprecated option "Language to set if it cannot be determined"
 2622 [File Indexer]         choose by default in the file selector "All supported files"
