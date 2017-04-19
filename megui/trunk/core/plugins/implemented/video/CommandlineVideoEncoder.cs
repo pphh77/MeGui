@@ -74,11 +74,29 @@ namespace MeGUI
         protected void getInputProperties(VideoJob job)
         {
             double fps;
-            Dar d;
+            Dar d = Dar.A1x1;
             JobUtil.GetAllInputProperties(job.Input, out numberOfFrames, out fps, out fps_n, out fps_d, out hres, out vres, out d);
             dar = job.DAR;
             su.NbFramesTotal = numberOfFrames;
             su.ClipLength = TimeSpan.FromSeconds((double)numberOfFrames / fps);
+
+            // log
+            if (log != null)
+            {
+                log.LogEvent("resolution: " + hres + "x" + vres);
+                log.LogEvent("frame rate: " + fps_n + "/" + fps_d);
+                log.LogEvent("frames: " + numberOfFrames);
+                if (dar.HasValue && d.AR == dar.Value.AR)
+                {
+                    log.LogValue("aspect ratio", d);
+                }
+                else
+                {
+                    log.LogValue("aspect ratio (avs)", d);
+                    if (dar.HasValue)
+                        log.LogValue("aspect ratio (job)", dar.Value);
+                }
+            }
         }
 
         protected override void doExitConfig()

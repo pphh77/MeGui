@@ -87,10 +87,6 @@ namespace MeGUI
             // log
             if (log != null)
             {
-                log.LogEvent("resolution: " + hres + "x" + vres);
-                log.LogEvent("frame rate: " + fps_n + "/" + fps_d);
-                if (d.HasValue)
-                    log.LogValue("aspect ratio", d.Value);
                 if (xs.TargetDevice.ID > 0)
                     log.LogEvent("target device selected: " + xs.TargetDevice.ToString());
                 if (!String.IsNullOrEmpty(xs.CustomEncoderOptions))

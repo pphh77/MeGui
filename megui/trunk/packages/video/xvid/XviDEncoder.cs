@@ -84,10 +84,6 @@ new JobProcessorFactory(new ProcessorFactory(init), "XviDEncoder");
             // log
             if (log != null)
             {
-                log.LogEvent("resolution: " + hres + "x" + vres);
-                log.LogEvent("frame rate: " + fps_n + "/" + fps_d);
-                if (d.HasValue)
-                    log.LogValue("aspect ratio", d.Value);
                 if (!String.IsNullOrEmpty(xs.CustomEncoderOptions))
                     log.LogEvent("custom command line: " + xs.CustomEncoderOptions);
             }

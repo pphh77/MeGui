@@ -1,3 +1,6 @@
+2716 [VideoEncoder]         extended avs log information
+
+
 Changelog 2624 --> 2715
 
 Features/Changes:
