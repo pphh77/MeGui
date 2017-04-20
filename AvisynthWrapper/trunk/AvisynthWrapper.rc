@@ -50,8 +50,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,2626,0
- PRODUCTVERSION 1,0,2626,0
+ FILEVERSION 1,0,2717,0
+ PRODUCTVERSION 1,0,2717,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -68,12 +68,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "MeGUI"
             VALUE "FileDescription", "A Wrapper for Avisynth library"
-            VALUE "FileVersion", "1.0.2626.0"
+            VALUE "FileVersion", "1.0.2717.0"
             VALUE "InternalName", "Avisynth.dll"
-            VALUE "LegalCopyright", "Copyright (C) 2015"
+            VALUE "LegalCopyright", "Copyright (C) 2017"
             VALUE "OriginalFilename", "Avisynth.dll"
             VALUE "ProductName", "AvisynthWrapper.dll"
-            VALUE "ProductVersion", "1.0.2626.0"
+            VALUE "ProductVersion", "1.0.2717.0"
         END
     END
     BLOCK "VarFileInfo"

@@ -22,7 +22,11 @@ typedef __int64 int64_t;
 #define MAX_CLIPS  1024
 #define ERRMSG_LEN 1024
 
-const AVS_Linkage *AVS_linkage = 0;
+#define AVISYNTH_INTERFACE_VERSION_5_OR_HIGHER 0
+
+#if AVISYNTH_INTERFACE_VERSION_5_OR_HIGHER
+const AVS_Linkage *AVS_linkage = 0; // AviSynth 2.6 only
+#endif
 
 typedef struct tagSafeStruct
 {
@@ -38,7 +42,7 @@ extern "C" {
 	__declspec(dllexport) int __stdcall dimzon_avs_init_2(SafeStruct** ppstr, char *func, char *arg, AVSDLLVideoInfo *vi, int* originalPixelType, int* originalSampleType, char *cs);
 	__declspec(dllexport) int __stdcall dimzon_avs_destroy(SafeStruct** ppstr);
 	__declspec(dllexport) int __stdcall dimzon_avs_getlasterror(SafeStruct* pstr, char *str, int len);
-	__declspec(dllexport) int __stdcall dimzon_avs_getvframe(SafeStruct* pstr, void *buf, int stride, int frm );
+	__declspec(dllexport) int __stdcall dimzon_avs_getvframe(SafeStruct* pstr, void *buf, int stride, int frm);
 	__declspec(dllexport) int __stdcall dimzon_avs_getaframe(SafeStruct* pstr, void *buf, __int64 start, __int64 count);
 	__declspec(dllexport) int __stdcall dimzon_avs_getintvariable(SafeStruct* pstr, const char* name, int* result);
 }
@@ -46,7 +50,7 @@ extern "C" {
 
 /*new implementation*/
 
-int __stdcall dimzon_avs_getintvariable(SafeStruct* pstr, const char* name , int* result)
+int __stdcall dimzon_avs_getintvariable(SafeStruct* pstr, const char* name, int* result)
 {
 	try
 	{
@@ -90,7 +94,7 @@ int __stdcall dimzon_avs_getaframe(SafeStruct* pstr, void *buf, __int64 start, _
 {
 	try
 	{
-		pstr->clp->GetAudio(buf,start,count,pstr->env);
+		pstr->clp->GetAudio(buf, start, count, pstr->env);
 		pstr->err[0] = 0;
 		return 0;
 	}
@@ -106,7 +110,8 @@ int __stdcall dimzon_avs_getaframe(SafeStruct* pstr, void *buf, __int64 start, _
 	}
 }
 
-int __stdcall dimzon_avs_getvframe(SafeStruct* pstr, void *buf, int stride, int frm )
+
+int __stdcall dimzon_avs_getvframe(SafeStruct* pstr, void *buf, int stride, int frm)
 {
 	try
 	{
@@ -114,7 +119,7 @@ int __stdcall dimzon_avs_getvframe(SafeStruct* pstr, void *buf, int stride, int 
 		if (buf && stride)
 		{
 			pstr->env->BitBlt((BYTE*)buf, stride, f->GetReadPtr(), f->GetPitch(),
-							  f->GetRowSize(), f->GetHeight());
+				f->GetRowSize(), f->GetHeight());
 		}
 		pstr->err[0] = 0;
 		return 0;
@@ -130,6 +135,7 @@ int __stdcall dimzon_avs_getvframe(SafeStruct* pstr, void *buf, int stride, int 
 		return -1;
 	}
 }
+
 
 int __stdcall dimzon_avs_getlasterror(SafeStruct* pstr, char *str, int len)
 {
@@ -173,7 +179,11 @@ int __stdcall dimzon_avs_destroy(SafeStruct** ppstr)
 
 		if (pstr->env)
 		{
-			pstr->env->DeleteScriptEnvironment();
+#if AVISYNTH_INTERFACE_VERSION_5_OR_HIGHER
+			pstr->env->DeleteScriptEnvironment(); // AviSynth 2.6
+#else
+			delete pstr->env; // AviSynth 2.5
+#endif
 			pstr->env = NULL;
 		}
 
@@ -182,7 +192,9 @@ int __stdcall dimzon_avs_destroy(SafeStruct** ppstr)
 			FreeLibrary(pstr->dll);
 		}
 
-		AVS_linkage = 0;
+#if AVISYNTH_INTERFACE_VERSION_5_OR_HIGHER
+		AVS_linkage = 0;  // AviSynth 2.6 only
+#endif
 
 		free(pstr);
 		*ppstr = NULL;
@@ -194,11 +206,11 @@ int __stdcall dimzon_avs_destroy(SafeStruct** ppstr)
 	}
 }
 
-int __stdcall dimzon_avs_init(SafeStruct** ppstr, char *func ,char *arg, AVSDLLVideoInfo *vi, int* originalPixelType, int* originalSampleType, char *cs)
+int __stdcall dimzon_avs_init(SafeStruct** ppstr, char *func, char *arg, AVSDLLVideoInfo *vi, int* originalPixelType, int* originalSampleType, char *cs)
 {
 	SafeStruct* pstr = ((SafeStruct*)malloc(sizeof(SafeStruct)));
 	*ppstr = pstr;
-	memset(pstr,0,sizeof(SafeStruct));
+	memset(pstr, 0, sizeof(SafeStruct));
 
 	pstr->dll = LoadLibrary("avisynth.dll");
 	if (!pstr->dll)
@@ -207,7 +219,7 @@ int __stdcall dimzon_avs_init(SafeStruct** ppstr, char *func ,char *arg, AVSDLLV
 		return 1;
 	}
 
-	IScriptEnvironment* (* CreateScriptEnvironment)(int version) = (IScriptEnvironment*(*)(int)) GetProcAddress(pstr->dll, "CreateScriptEnvironment");
+	IScriptEnvironment* (*CreateScriptEnvironment)(int version) = (IScriptEnvironment*(*)(int)) GetProcAddress(pstr->dll, "CreateScriptEnvironment");
 	if (!CreateScriptEnvironment)
 	{
 		strncpy_s(pstr->err, ERRMSG_LEN, "Cannot load CreateScriptEnvironment", _TRUNCATE);
@@ -218,9 +230,17 @@ int __stdcall dimzon_avs_init(SafeStruct** ppstr, char *func ,char *arg, AVSDLLV
 
 	if (pstr->env == NULL)
 	{
+#if AVISYNTH_INTERFACE_VERSION_5_OR_HIGHER
 		strncpy_s(pstr->err, ERRMSG_LEN, "Avisynth 2.6 required", _TRUNCATE);
+#else
+		strncpy_s(pstr->err, ERRMSG_LEN, "Avisynth 2.5 required", _TRUNCATE);
+#endif
 		return 3;
 	}
+
+#if AVISYNTH_INTERFACE_VERSION_5_OR_HIGHER
+	AVS_linkage = pstr->env->GetAVSLinkage(); // AviSynth 2.6 only
+#endif
 
 	try
 	{
@@ -231,14 +251,14 @@ int __stdcall dimzon_avs_init(SafeStruct** ppstr, char *func ,char *arg, AVSDLLV
 			return 4;
 		}
 		pstr->clp = res.AsClip();
-		VideoInfo inf  = pstr->clp->GetVideoInfo();
+		VideoInfo inf = pstr->clp->GetVideoInfo();
 		VideoInfo infh = pstr->clp->GetVideoInfo();
 
 		if (inf.HasVideo())
 		{
-			*originalPixelType =  inf.pixel_type;
+			*originalPixelType = inf.pixel_type;
 
-			if ( strcmp("RGB24", cs)==0 && (!inf.IsRGB24()) )
+			if (strcmp("RGB24", cs) == 0 && (!inf.IsRGB24()))
 			{
 				res = pstr->env->Invoke("ConvertToRGB24", AVSValue(&res, 1));
 				pstr->clp = res.AsClip();
@@ -251,20 +271,20 @@ int __stdcall dimzon_avs_init(SafeStruct** ppstr, char *func ,char *arg, AVSDLLV
 				}
 			}
 
-			if ( strcmp("RGB32", cs)==0 && (!inf.IsRGB32()) )
+			if (strcmp("RGB32", cs) == 0 && (!inf.IsRGB32()))
 			{
 				res = pstr->env->Invoke("ConvertToRGB32", AVSValue(&res, 1));
 				pstr->clp = res.AsClip();
 				infh = pstr->clp->GetVideoInfo();
 
-				if (!infh.IsRGB32()) 
+				if (!infh.IsRGB32())
 				{
 					strncpy_s(pstr->err, ERRMSG_LEN, "Cannot convert video to RGB32", _TRUNCATE);
 					return 5;
 				}
 			}
 
-			if ( strcmp("YUY2", cs)==0 && (!inf.IsYUY2()) )
+			if (strcmp("YUY2", cs) == 0 && (!inf.IsYUY2()))
 			{
 				res = pstr->env->Invoke("ConvertToYUY2", AVSValue(&res, 1));
 				pstr->clp = res.AsClip();
@@ -276,7 +296,7 @@ int __stdcall dimzon_avs_init(SafeStruct** ppstr, char *func ,char *arg, AVSDLLV
 				}
 			}
 
-			if ( strcmp("YV12", cs)==0 && (!inf.IsYV12()) )
+			if (strcmp("YV12", cs) == 0 && (!inf.IsYV12()))
 			{
 				res = pstr->env->Invoke("ConvertToYV12", AVSValue(&res, 1));
 				pstr->clp = res.AsClip();
@@ -292,7 +312,7 @@ int __stdcall dimzon_avs_init(SafeStruct** ppstr, char *func ,char *arg, AVSDLLV
 		if (inf.HasAudio())
 		{
 			*originalSampleType = inf.SampleType();
-			if ( *originalSampleType != SAMPLE_INT16)
+			if (*originalSampleType != SAMPLE_INT16)
 			{
 				res = pstr->env->Invoke("ConvertAudioTo16bit", res);
 				pstr->clp = res.AsClip();
@@ -306,23 +326,23 @@ int __stdcall dimzon_avs_init(SafeStruct** ppstr, char *func ,char *arg, AVSDLLV
 		}
 
 		inf = pstr->clp->GetVideoInfo();
-		if (vi != NULL) 
+		if (vi != NULL)
 		{
-			vi->width   = inf.width;
-			vi->height  = inf.height;
-			vi->raten   = inf.fps_numerator;
-			vi->rated   = inf.fps_denominator;
+			vi->width = inf.width;
+			vi->height = inf.height;
+			vi->raten = inf.fps_numerator;
+			vi->rated = inf.fps_denominator;
 			vi->aspectn = 0;
 			vi->aspectd = 1;
 			vi->interlaced_frame = 0;
-			vi->top_field_first  = 0;
+			vi->top_field_first = 0;
 			vi->num_frames = inf.num_frames;
 			vi->pixel_type = inf.pixel_type;
 
 			vi->audio_samples_per_second = inf.audio_samples_per_second;
-			vi->num_audio_samples        = inf.num_audio_samples;
-			vi->sample_type              = inf.sample_type;
-			vi->nchannels                = inf.nchannels;
+			vi->num_audio_samples = inf.num_audio_samples;
+			vi->sample_type = inf.sample_type;
+			vi->nchannels = inf.nchannels;
 		}
 
 		pstr->res = new AVSValue(res);
@@ -332,7 +352,7 @@ int __stdcall dimzon_avs_init(SafeStruct** ppstr, char *func ,char *arg, AVSDLLV
 	}
 	catch (AvisynthError err)
 	{
-		strncpy_s(pstr->err, ERRMSG_LEN, err.msg,_TRUNCATE);
+		strncpy_s(pstr->err, ERRMSG_LEN, err.msg, _TRUNCATE);
 		return 999;
 	}
 	catch (...)
@@ -347,7 +367,7 @@ int __stdcall dimzon_avs_init_2(SafeStruct** ppstr, char *func, char *arg, AVSDL
 	// same as dimzon_avs_init() but without the fix audio output at 16 bit. New for AviSynth v2.5.7
 	SafeStruct* pstr = ((SafeStruct*)malloc(sizeof(SafeStruct)));
 	*ppstr = pstr;
-	memset(pstr,0,sizeof(SafeStruct));
+	memset(pstr, 0, sizeof(SafeStruct));
 
 	pstr->dll = LoadLibrary("avisynth.dll");
 	if (!pstr->dll)
@@ -356,7 +376,7 @@ int __stdcall dimzon_avs_init_2(SafeStruct** ppstr, char *func, char *arg, AVSDL
 		return 1;
 	}
 
-	IScriptEnvironment* (* CreateScriptEnvironment)(int version) = (IScriptEnvironment*(*)(int)) GetProcAddress(pstr->dll, "CreateScriptEnvironment");
+	IScriptEnvironment* (*CreateScriptEnvironment)(int version) = (IScriptEnvironment*(*)(int)) GetProcAddress(pstr->dll, "CreateScriptEnvironment");
 	if (!CreateScriptEnvironment)
 	{
 		strncpy_s(pstr->err, ERRMSG_LEN, "Cannot load CreateScriptEnvironment", _TRUNCATE);
@@ -367,30 +387,36 @@ int __stdcall dimzon_avs_init_2(SafeStruct** ppstr, char *func, char *arg, AVSDL
 
 	if (pstr->env == NULL)
 	{
+#if AVISYNTH_INTERFACE_VERSION_5_OR_HIGHER
 		strncpy_s(pstr->err, ERRMSG_LEN, "Avisynth 2.6 required", _TRUNCATE);
+#else
+		strncpy_s(pstr->err, ERRMSG_LEN, "Avisynth 2.5 required", _TRUNCATE);
+#endif
 		return 3;
 	}
 
-	AVS_linkage = pstr->env->GetAVSLinkage();
+#if AVISYNTH_INTERFACE_VERSION_5_OR_HIGHER
+	AVS_linkage = pstr->env->GetAVSLinkage(); // AviSynth 2.6 only
+#endif
 
 	try
 	{
 		AVSValue arg(arg);
 		AVSValue res = pstr->env->Invoke(func, AVSValue(&arg, 1));
-		if (!res.IsClip()) 
+		if (!res.IsClip())
 		{
 			strncpy_s(pstr->err, ERRMSG_LEN, "The script's return was not a video clip.", _TRUNCATE);
 			return 4;
 		}
 		pstr->clp = res.AsClip();
-		VideoInfo inf  = pstr->clp->GetVideoInfo();
+		VideoInfo inf = pstr->clp->GetVideoInfo();
 		VideoInfo infh = pstr->clp->GetVideoInfo();
 
 		if (inf.HasVideo())
 		{
-			*originalPixelType =  inf.pixel_type;
+			*originalPixelType = inf.pixel_type;
 
-			if ( strcmp("RGB24", cs)==0 && (!inf.IsRGB24()) )
+			if (strcmp("RGB24", cs) == 0 && (!inf.IsRGB24()))
 			{
 				res = pstr->env->Invoke("ConvertToRGB24", AVSValue(&res, 1));
 				pstr->clp = res.AsClip();
@@ -402,19 +428,19 @@ int __stdcall dimzon_avs_init_2(SafeStruct** ppstr, char *func, char *arg, AVSDL
 				}
 			}
 
-			if ( strcmp("RGB32", cs)==0 && (!inf.IsRGB32()) )
+			if (strcmp("RGB32", cs) == 0 && (!inf.IsRGB32()))
 			{
 				res = pstr->env->Invoke("ConvertToRGB32", AVSValue(&res, 1));
 				pstr->clp = res.AsClip();
 				infh = pstr->clp->GetVideoInfo();
-				if (!infh.IsRGB32()) 
+				if (!infh.IsRGB32())
 				{
 					strncpy_s(pstr->err, ERRMSG_LEN, "Cannot convert video to RGB32", _TRUNCATE);
 					return 5;
 				}
 			}
 
-			if ( strcmp("YUY2", cs)==0 && (!inf.IsYUY2()) )
+			if (strcmp("YUY2", cs) == 0 && (!inf.IsYUY2()))
 			{
 				res = pstr->env->Invoke("ConvertToYUY2", AVSValue(&res, 1));
 				pstr->clp = res.AsClip();
@@ -426,7 +452,7 @@ int __stdcall dimzon_avs_init_2(SafeStruct** ppstr, char *func, char *arg, AVSDL
 				}
 			}
 
-			if ( strcmp("YV12", cs)==0 && (!inf.IsYV12()) )
+			if (strcmp("YV12", cs) == 0 && (!inf.IsYV12()))
 			{
 				res = pstr->env->Invoke("ConvertToYV12", AVSValue(&res, 1));
 				pstr->clp = res.AsClip();
@@ -441,23 +467,23 @@ int __stdcall dimzon_avs_init_2(SafeStruct** ppstr, char *func, char *arg, AVSDL
 		}
 
 		inf = pstr->clp->GetVideoInfo();
-		if (vi != NULL) 
+		if (vi != NULL)
 		{
-			vi->width   = inf.width;
-			vi->height  = inf.height;
-			vi->raten   = inf.fps_numerator;
-			vi->rated   = inf.fps_denominator;
+			vi->width = inf.width;
+			vi->height = inf.height;
+			vi->raten = inf.fps_numerator;
+			vi->rated = inf.fps_denominator;
 			vi->aspectn = 0;
 			vi->aspectd = 1;
 			vi->interlaced_frame = 0;
-			vi->top_field_first  = 0;
+			vi->top_field_first = 0;
 			vi->num_frames = inf.num_frames;
 			vi->pixel_type = inf.pixel_type;
 
 			vi->audio_samples_per_second = inf.audio_samples_per_second;
-			vi->num_audio_samples        = inf.num_audio_samples;
-			vi->sample_type              = inf.sample_type;
-			vi->nchannels                = inf.nchannels;
+			vi->num_audio_samples = inf.num_audio_samples;
+			vi->sample_type = inf.sample_type;
+			vi->nchannels = inf.nchannels;
 		}
 
 		pstr->res = new AVSValue(res);
