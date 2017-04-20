@@ -1,3 +1,5 @@
+2718 [FFMS Indexer]         enabled AVI file handling
+2717 [AviSynth Wrapper]     improved error handling
 2716 [VideoEncoder]         extended avs log information
 
 
