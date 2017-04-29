@@ -1345,8 +1345,6 @@ namespace MeGUI
 
             this.UpdateHandler = new UpdateHandler();
 
-            FileUtil.CheckAviSynth(i);
-            FileUtil.GetFileInformation("AvisynthWrapper", Path.GetDirectoryName(Application.ExecutablePath) + @"\AvisynthWrapper.dll", ref i);
             string haaliPath = FileUtil.GetHaaliInstalledPath();
             FileUtil.GetFileInformation("Haali Media Splitter", Path.Combine(haaliPath, "splitter.ax"), ref i);
             FileUtil.GetFileInformation("Haali DSS2", Path.Combine(haaliPath, "avss.dll"), ref i);
@@ -1356,6 +1354,7 @@ namespace MeGUI
             FileUtil.GetFileInformation("MessageBoxExLib", Path.GetDirectoryName(Application.ExecutablePath) + @"\MessageBoxExLib.dll", ref i);
             FileUtil.GetFileInformation("SevenZipSharp", Path.GetDirectoryName(Application.ExecutablePath) + @"\SevenZipSharp.dll", ref i);
             FileUtil.GetFileInformation("7z", Path.GetDirectoryName(Application.ExecutablePath) + @"\7z.dll", ref i);
+            FileUtil.CheckAviSynth(ref i);
         }
 
         public void setOverlayIcon(Icon oIcon)

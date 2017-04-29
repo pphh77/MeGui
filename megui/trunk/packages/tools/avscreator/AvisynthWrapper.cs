@@ -140,6 +140,12 @@ namespace MeGUI
         private static extern int dimzon_avs_getvframe(IntPtr avs, IntPtr buf, int stride, int frm);
         [DllImport("AvisynthWrapper", ExactSpelling = true, SetLastError = false, CharSet = CharSet.Ansi)]
         private static extern int dimzon_avs_getintvariable(IntPtr avs, string name, ref int val);
+        [DllImport("AvisynthWrapper", ExactSpelling = true, SetLastError = false, CharSet = CharSet.Ansi)]
+        private static extern int dimzon_avs_getinterfaceversion(ref int val);
+        [DllImport("AvisynthWrapper", ExactSpelling = true, SetLastError = false, CharSet = CharSet.Ansi)]
+        private static extern int dimzon_avs_getstrfunction(IntPtr avs, string func, [MarshalAs(UnmanagedType.LPStr)] StringBuilder sb, int len);
+        [DllImport("AvisynthWrapper", ExactSpelling = true, SetLastError = false, CharSet = CharSet.Ansi)]
+        private static extern int dimzon_avs_functionexists(IntPtr avs, string func, ref bool val);
         [DllImport("kernel32", SetLastError = true)]
         private static extern bool FreeLibrary(IntPtr hModule);
         [DllImport("kernel32", SetLastError = true)]
@@ -402,7 +408,15 @@ namespace MeGUI
             }
         }
 
-		#endregion
+        #endregion
+
+        public string GetStrFunction(string strFunction)
+        {
+            const int errlen = 1024;
+            StringBuilder sb = new StringBuilder(errlen);
+            sb.Length = dimzon_avs_getstrfunction(this._avs, strFunction, sb, errlen);
+            return sb.ToString();
+        }
 
         public int GetIntVariable(string variableName, int defaultValue)
         {
@@ -439,18 +453,74 @@ namespace MeGUI
                 throw new AviSynthException(getLastError());
         }
 
+        public static int GetAvisynthWrapperInterfaceVersion()
+        {
+            int iVersion = 0;
+            try
+            {
+                int iResult = dimzon_avs_getinterfaceversion(ref iVersion);
+            }
+            catch (Exception) { }
+            return iVersion;
+        }
 
         /// <summary>
         /// Detects if the AviSynth version can be used
         /// </summary>
         /// <returns>0 if everything is fine, 3 if the version is outdated or a different value for other errors</param>
-        public static int CheckAvisynthInstallation()
+        public static int CheckAvisynthInstallation(out string strVersion, out bool bIsAVS26, out bool bIsAVSPlus, out bool bIsMT)
         {
+            strVersion = "";
+            bIsAVS26 = false;
+            bIsAVSPlus = false;
+            bIsMT = false;
+            
+
             IntPtr _avs = new IntPtr(0);
             AVSDLLVideoInfo _vi = new AVSDLLVideoInfo();
             AviSynthColorspace _colorSpace = AviSynthColorspace.Unknown;
             AudioSampleType _sampleType = AudioSampleType.Unknown;
             int iStartResult = dimzon_avs_init_2(ref _avs, "Eval", "Version()", ref _vi, ref _colorSpace, ref _sampleType, AviSynthColorspace.RGB24.ToString());
+
+            if (iStartResult == 0)
+            {
+                int iWrapperVersion = GetAvisynthWrapperInterfaceVersion();
+                try
+                {
+                    const int errlen = 1024;
+                    StringBuilder sb = new StringBuilder(errlen);
+                    sb.Length = dimzon_avs_getstrfunction(_avs, "VersionString", sb, errlen);
+                    strVersion = sb.ToString();
+
+                    bool bResult = false;
+                    int iResult = dimzon_avs_functionexists(_avs, "AutoloadPlugins", ref bResult);
+                    bIsAVSPlus = false;
+                    if (iResult == 0)
+                        bIsAVSPlus = bResult;
+
+                    if (iWrapperVersion < 5)
+                    {
+                        bResult = false;
+                        iResult = dimzon_avs_functionexists(_avs, "ConvertToYV16", ref bResult);
+                        bIsAVS26 = false;
+                        if (iResult == 0)
+                            bIsAVS26 = bResult;
+                    }
+                    else
+                        bIsAVS26 = true;
+
+                    string strMTFunction = "Prefetch";
+                    if (!bIsAVSPlus)
+                        strMTFunction = "SetMTMode";
+                    bResult = false;
+                    iResult = dimzon_avs_functionexists(_avs, strMTFunction, ref bResult);
+                    bIsMT = false;
+                    if (iResult == 0)
+                        bIsMT = bResult;
+                }
+                catch (Exception) { }
+            }
+
             int iCloseResult = dimzon_avs_destroy(ref _avs);
             _avs = new IntPtr(0);
             return iStartResult;
