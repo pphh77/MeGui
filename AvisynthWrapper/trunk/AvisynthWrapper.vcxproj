@@ -138,6 +138,9 @@
       </DataExecutionPrevention>
       <MinimumRequiredVersion />
     </Link>
+    <PreBuildEvent>
+      <Command>cmd /c "SubWCRev $(ProjectDir) $(ProjectDir)AvisynthWrapper.template $(ProjectDir)AvisynthWrapper.rc&amp;exit 0"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -165,6 +168,9 @@
       <TargetMachine>MachineX86</TargetMachine>
       <MinimumRequiredVersion />
     </Link>
+    <PreBuildEvent>
+      <Command>cmd /c "SubWCRev $(ProjectDir) $(ProjectDir)AvisynthWrapper.template $(ProjectDir)AvisynthWrapper.rc&amp;exit 0"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -191,6 +197,9 @@
       </DataExecutionPrevention>
       <MinimumRequiredVersion />
     </Link>
+    <PreBuildEvent>
+      <Command>cmd /c "SubWCRev $(ProjectDir) $(ProjectDir)AvisynthWrapper.template $(ProjectDir)AvisynthWrapper.rc&amp;exit 0"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="avisynthdll.h" />

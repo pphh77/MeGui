@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="AvisynthWrapper.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="avisynthdll.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="avs_core_3\avisynth.h">
+      <Filter>avs_core_3</Filter>
+    </ClInclude>
+    <ClInclude Include="avs_core_3\internal.h">
+      <Filter>avs_core_3</Filter>
+    </ClInclude>
+    <ClInclude Include="avs_core_6_mt\alignment.h">
+      <Filter>avs_core_6_mt</Filter>
+    </ClInclude>
+    <ClInclude Include="avs_core_6_mt\avisynth.h">
+      <Filter>avs_core_6_mt</Filter>
+    </ClInclude>
+    <ClInclude Include="avs_core_6_mt\capi.h">
+      <Filter>avs_core_6_mt</Filter>
+    </ClInclude>
+    <ClInclude Include="avs_core_6_mt\config.h">
+      <Filter>avs_core_6_mt</Filter>
+    </ClInclude>
+    <ClInclude Include="avs_core_6_mt\cpuid.h">
+      <Filter>avs_core_6_mt</Filter>
+    </ClInclude>
+    <ClInclude Include="avs_core_6_mt\minmax.h">
+      <Filter>avs_core_6_mt</Filter>
+    </ClInclude>
+    <ClInclude Include="avs_core_6_mt\types.h">
+      <Filter>avs_core_6_mt</Filter>
+    </ClInclude>
+    <ClInclude Include="avs_core_6_mt\win.h">
+      <Filter>avs_core_6_mt</Filter>
+    </ClInclude>
+    <ClInclude Include="avs_core_2\avisynth.h">
+      <Filter>avs_core_2</Filter>
+    </ClInclude>
+    <ClInclude Include="avs_core_2\internal.h">
+      <Filter>avs_core_2</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="AvisynthWrapper.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AvisynthWrapper.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="avs_core_2">
+      <UniqueIdentifier>{4ae7288a-b110-45ce-9db4-a50731f14200}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="avs_core_3">
+      <UniqueIdentifier>{dc70426e-c3d0-4fa3-99ec-fcda42519aa7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="avs_core_6_mt">
+      <UniqueIdentifier>{c0eeb9f9-6e66-4b5d-812b-de1f58ed19c8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
