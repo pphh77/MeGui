@@ -70,7 +70,7 @@ BEGIN
             VALUE "FileDescription", "A Wrapper for Avisynth library"
             VALUE "FileVersion", "1.0.$WCREV$.0"
             VALUE "InternalName", "Avisynth.dll"
-            VALUE "LegalCopyright", "Copyright (C) 2015"
+            VALUE "LegalCopyright", "Copyright (C) 2017"
             VALUE "OriginalFilename", "Avisynth.dll"
             VALUE "ProductName", "AvisynthWrapper.dll"
             VALUE "ProductVersion", "1.0.$WCREV$.0"

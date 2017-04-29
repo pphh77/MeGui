@@ -12,9 +12,24 @@
 #include <string.h>
 #include <io.h>
 #include <fcntl.h>
-#include "internal.h"
-#include "avisynth.h"
 #include <windows.h>
+
+// include the necessary avisynth.h files
+#define AVISYNTH_INTERFACE_BUILD_VERSION 3
+
+#if AVISYNTH_INTERFACE_BUILD_VERSION > 4
+// interface 6 does produce a black video frame when using ffms
+#include "avs_core_6_mt\avisynth.h"
+#elif AVISYNTH_INTERFACE_BUILD_VERSION == 3
+// seems to work
+#include "avs_core_3\internal.h"
+#include "avs_core_3\avisynth.h"
+#else
+// interface 2 does not work with x64
+// but this is the orginal avswrapper avisynth.h
+#include "avs_core_2\internal.h"
+#include "avs_core_2\avisynth.h"
+#endif
 
 typedef __int64 int64_t;
 #include "avisynthdll.h"
@@ -22,9 +37,7 @@ typedef __int64 int64_t;
 #define MAX_CLIPS  1024
 #define ERRMSG_LEN 1024
 
-#define AVISYNTH_INTERFACE_VERSION_5_OR_HIGHER 0
-
-#if AVISYNTH_INTERFACE_VERSION_5_OR_HIGHER
+#if AVISYNTH_INTERFACE_BUILD_VERSION > 4
 const AVS_Linkage *AVS_linkage = 0; // AviSynth 2.6 only
 #endif
 
@@ -45,6 +58,7 @@ extern "C" {
 	__declspec(dllexport) int __stdcall dimzon_avs_getvframe(SafeStruct* pstr, void *buf, int stride, int frm);
 	__declspec(dllexport) int __stdcall dimzon_avs_getaframe(SafeStruct* pstr, void *buf, __int64 start, __int64 count);
 	__declspec(dllexport) int __stdcall dimzon_avs_getintvariable(SafeStruct* pstr, const char* name, int* result);
+	__declspec(dllexport) int __stdcall dimzon_avs_getinterfaceversion(int* result);
 }
 
 
@@ -90,6 +104,59 @@ int __stdcall dimzon_avs_getintvariable(SafeStruct* pstr, const char* name, int*
 	}
 }
 
+int __stdcall dimzon_avs_getinterfaceversion(int* result)
+{
+	try
+	{
+		*result = AVISYNTH_INTERFACE_VERSION;
+		return 0;
+	}
+	catch (...)
+	{
+		return -1;
+	}
+}
+
+int __stdcall dimzon_avs_functionexists(SafeStruct* pstr, const char* func, bool* result)
+{
+	try
+	{
+		pstr->err[0] = 0;
+		try
+		{
+			AVSValue var = pstr->env->FunctionExists(func);
+			if (var.Defined())
+			{
+				if (!var.IsBool())
+				{
+					strncpy_s(pstr->err, ERRMSG_LEN, "Variable is not Boolean", _TRUNCATE);
+					return -2;
+				}
+				*result = var.AsBool();
+				return 0;
+			}
+			else
+			{
+				return 999; // Signal "Not defined"
+			}
+		}
+		catch (AvisynthError err)
+		{
+			strncpy_s(pstr->err, ERRMSG_LEN, err.msg, _TRUNCATE);
+			return -1;
+		}
+	}
+	catch (IScriptEnvironment::NotFound)
+	{
+		return 666; // Signal "Not Found"
+	}
+	catch (...)
+	{
+		strncpy_s(pstr->err, ERRMSG_LEN, "Unhandled error: dimzon_avs_getintvariable", _TRUNCATE);
+		return -1;
+	}
+}
+
 int __stdcall dimzon_avs_getaframe(SafeStruct* pstr, void *buf, __int64 start, __int64 count)
 {
 	try
@@ -110,7 +177,6 @@ int __stdcall dimzon_avs_getaframe(SafeStruct* pstr, void *buf, __int64 start, _
 	}
 }
 
-
 int __stdcall dimzon_avs_getvframe(SafeStruct* pstr, void *buf, int stride, int frm)
 {
 	try
@@ -118,8 +184,7 @@ int __stdcall dimzon_avs_getvframe(SafeStruct* pstr, void *buf, int stride, int 
 		PVideoFrame f = pstr->clp->GetFrame(frm, pstr->env);
 		if (buf && stride)
 		{
-			pstr->env->BitBlt((BYTE*)buf, stride, f->GetReadPtr(), f->GetPitch(),
-				f->GetRowSize(), f->GetHeight());
+			pstr->env->BitBlt((BYTE*)buf, stride, f->GetReadPtr(), f->GetPitch(), f->GetRowSize(), f->GetHeight());
 		}
 		pstr->err[0] = 0;
 		return 0;
@@ -136,6 +201,20 @@ int __stdcall dimzon_avs_getvframe(SafeStruct* pstr, void *buf, int stride, int 
 	}
 }
 
+int __stdcall dimzon_avs_getstrfunction(SafeStruct* pstr, char *func, char *str, int len)
+{
+	try
+	{
+		AVSValue arg;
+		strncpy_s(str, len, pstr->env->Invoke(func, AVSValue(&arg, 0)).AsString(), len - 1);
+		return (int)strlen(str);
+	}
+	catch (...)
+	{
+		strncpy_s(str, ERRMSG_LEN, "Unhandled error: dimzon_avs_getstrfunction", _TRUNCATE);
+		return (int)strlen(str);
+	}
+}
 
 int __stdcall dimzon_avs_getlasterror(SafeStruct* pstr, char *str, int len)
 {
@@ -179,7 +258,7 @@ int __stdcall dimzon_avs_destroy(SafeStruct** ppstr)
 
 		if (pstr->env)
 		{
-#if AVISYNTH_INTERFACE_VERSION_5_OR_HIGHER
+#if AVISYNTH_INTERFACE_BUILD_VERSION > 4
 			pstr->env->DeleteScriptEnvironment(); // AviSynth 2.6
 #else
 			delete pstr->env; // AviSynth 2.5
@@ -192,7 +271,7 @@ int __stdcall dimzon_avs_destroy(SafeStruct** ppstr)
 			FreeLibrary(pstr->dll);
 		}
 
-#if AVISYNTH_INTERFACE_VERSION_5_OR_HIGHER
+#if AVISYNTH_INTERFACE_BUILD_VERSION > 4
 		AVS_linkage = 0;  // AviSynth 2.6 only
 #endif
 
@@ -230,7 +309,7 @@ int __stdcall dimzon_avs_init(SafeStruct** ppstr, char *func, char *arg, AVSDLLV
 
 	if (pstr->env == NULL)
 	{
-#if AVISYNTH_INTERFACE_VERSION_5_OR_HIGHER
+#if AVISYNTH_INTERFACE_BUILD_VERSION > 4
 		strncpy_s(pstr->err, ERRMSG_LEN, "Avisynth 2.6 required", _TRUNCATE);
 #else
 		strncpy_s(pstr->err, ERRMSG_LEN, "Avisynth 2.5 required", _TRUNCATE);
@@ -238,7 +317,7 @@ int __stdcall dimzon_avs_init(SafeStruct** ppstr, char *func, char *arg, AVSDLLV
 		return 3;
 	}
 
-#if AVISYNTH_INTERFACE_VERSION_5_OR_HIGHER
+#if AVISYNTH_INTERFACE_BUILD_VERSION > 4
 	AVS_linkage = pstr->env->GetAVSLinkage(); // AviSynth 2.6 only
 #endif
 
@@ -387,7 +466,7 @@ int __stdcall dimzon_avs_init_2(SafeStruct** ppstr, char *func, char *arg, AVSDL
 
 	if (pstr->env == NULL)
 	{
-#if AVISYNTH_INTERFACE_VERSION_5_OR_HIGHER
+#if AVISYNTH_INTERFACE_BUILD_VERSION > 4
 		strncpy_s(pstr->err, ERRMSG_LEN, "Avisynth 2.6 required", _TRUNCATE);
 #else
 		strncpy_s(pstr->err, ERRMSG_LEN, "Avisynth 2.5 required", _TRUNCATE);
@@ -395,7 +474,7 @@ int __stdcall dimzon_avs_init_2(SafeStruct** ppstr, char *func, char *arg, AVSDL
 		return 3;
 	}
 
-#if AVISYNTH_INTERFACE_VERSION_5_OR_HIGHER
+#if AVISYNTH_INTERFACE_BUILD_VERSION > 4
 	AVS_linkage = pstr->env->GetAVSLinkage(); // AviSynth 2.6 only
 #endif
 

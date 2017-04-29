@@ -6,3 +6,6 @@ EXPORTS
 	dimzon_avs_getvframe
 	dimzon_avs_getaframe
 	dimzon_avs_getintvariable
+    dimzon_avs_getstrfunction
+    dimzon_avs_functionexists
+    dimzon_avs_getinterfaceversion
