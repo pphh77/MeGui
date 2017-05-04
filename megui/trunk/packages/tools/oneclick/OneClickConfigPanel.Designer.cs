@@ -169,7 +169,7 @@ namespace MeGUI.packages.tools.oneclick
             this.otherGroupBox.Size = new System.Drawing.Size(416, 152);
             this.otherGroupBox.TabIndex = 38;
             this.otherGroupBox.TabStop = false;
-            this.otherGroupBox.Text = " Filesize and Avisynth setup ";
+            this.otherGroupBox.Text = "AviSynth setup ";
             // 
             // keepInputResolution
             // 
