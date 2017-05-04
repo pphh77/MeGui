@@ -1,3 +1,4 @@
+2723 [OneClick]             improved error handling of invalid AviSynth scripts
 2722 [Main]                 if not at least AviSynth 2.6 is installed the portable build will be used
                             improved AviSynth logging 
 2720 [AviSynth Wrapper]     added functions to detect AviSynth details

@@ -296,6 +296,10 @@ namespace MeGUI
                         if (!bContinue)
                         {
                             _log.Error("Job creation aborted due to invalid AviSynth script");
+                            _processTime.Abort();
+                            su.WasAborted = true;
+                            su.IsComplete = true;
+                            raiseEvent();
                             return;
                         }
                     }
