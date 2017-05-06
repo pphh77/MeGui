@@ -78,7 +78,6 @@ namespace MeGUI.packages.tools.oneclick
                 val.Filesize = fileSize.Value;
                 val.OutputResolution = (long)horizontalResolution.Value;
                 val.PrerenderVideo = preprocessVideo.Checked;
-                val.SignalAR = signalAR.Checked;
                 val.SplitSize = splitSize.Value;
                 val.AutoCrop = autoCrop.Checked;
                 val.KeepInputResolution = keepInputResolution.Checked;
@@ -139,7 +138,6 @@ namespace MeGUI.packages.tools.oneclick
                 fileSize.Value = value.Filesize;
                 horizontalResolution.Value = value.OutputResolution;
                 preprocessVideo.Checked = value.PrerenderVideo;
-                signalAR.Checked = value.SignalAR;
                 chkDisableIntermediateMKV.Checked = value.DisableIntermediateMKV;
                 splitSize.Value = value.SplitSize;
                 autoCrop.Checked = value.AutoCrop;
@@ -227,9 +225,9 @@ namespace MeGUI.packages.tools.oneclick
         private void keepInputResolution_CheckedChanged(object sender, EventArgs e)
         {
             if (keepInputResolution.Checked)
-                horizontalResolution.Enabled = autoCrop.Enabled = signalAR.Enabled = false;
+                horizontalResolution.Enabled = autoCrop.Enabled = false;
             else
-                horizontalResolution.Enabled = autoCrop.Enabled = signalAR.Enabled = true;
+                horizontalResolution.Enabled = autoCrop.Enabled = true;
         }
 
         private void videoProfile_SelectedProfileChanged(object sender, EventArgs e)
@@ -244,7 +242,7 @@ namespace MeGUI.packages.tools.oneclick
         {
             if (chkDontEncodeVideo.Checked)
             {
-                horizontalResolution.Enabled = autoCrop.Enabled = signalAR.Enabled = videoProfile.Enabled = false;
+                horizontalResolution.Enabled = autoCrop.Enabled = videoProfile.Enabled = false;
                 usechaptersmarks.Enabled = keepInputResolution.Enabled = preprocessVideo.Enabled = false;
                 autoDeint.Enabled = fileSize.Enabled = avsProfile.Enabled = false;
             }
@@ -257,9 +255,9 @@ namespace MeGUI.packages.tools.oneclick
                 else
                     usechaptersmarks.Enabled = false;
                 if (keepInputResolution.Checked)
-                    horizontalResolution.Enabled = autoCrop.Enabled = signalAR.Enabled = false;
+                    horizontalResolution.Enabled = autoCrop.Enabled = false;
                 else
-                    horizontalResolution.Enabled = autoCrop.Enabled = signalAR.Enabled = true;
+                    horizontalResolution.Enabled = autoCrop.Enabled = true;
             }
         }
 

@@ -667,7 +667,6 @@ namespace MeGUI
 
             // bools
             chkDontEncodeVideo.Checked = settings.DontEncodeVideo;
-            signalAR.Checked = settings.SignalAR;
             autoDeint.Checked = settings.AutomaticDeinterlacing;
             autoCrop.Checked = settings.AutoCrop;
             keepInputResolution.Checked = settings.KeepInputResolution;
@@ -979,20 +978,16 @@ namespace MeGUI
                 dpp.OutputSize = fileSize.Value;
                 dpp.PrerenderJob = addPrerenderJob.Checked;
                 dpp.UseChaptersMarks = usechaptersmarks.Checked;
-                dpp.SignalAR = signalAR.Checked;
             }
             else
             {
                 dpp.AutoDeinterlace = dpp.PrerenderJob = dpp.UseChaptersMarks = false;
-                dpp.KeepInputResolution = dpp.SignalAR = false;
+                dpp.KeepInputResolution = false;
                 dpp.OutputSize = null;
             }
 
             if (keepInputResolution.Checked || !String.IsNullOrEmpty(dpp.VideoFileToMux))
-            {
                 dpp.HorizontalOutputResolution = 0;
-                dpp.SignalAR = true;
-            }
             else
                 dpp.HorizontalOutputResolution = (int)horizontalResolution.Value;
 
@@ -1473,31 +1468,28 @@ namespace MeGUI
         private void keepInputResolution_CheckedChanged(object sender, EventArgs e)
         {
             if (keepInputResolution.Checked || chkDontEncodeVideo.Checked)
-                horizontalResolution.Enabled = autoCrop.Enabled = signalAR.Enabled = ar.Enabled = false;
+                horizontalResolution.Enabled = autoCrop.Enabled = false;
             else
-                horizontalResolution.Enabled = autoCrop.Enabled = signalAR.Enabled = ar.Enabled = true;
+                horizontalResolution.Enabled = autoCrop.Enabled = true;
         }
 
         private void chkDontEncodeVideo_CheckedChanged(object sender, EventArgs e)
         {
             if (chkDontEncodeVideo.Checked)
             {
-                horizontalResolution.Enabled = autoCrop.Enabled = signalAR.Enabled = videoProfile.Enabled = false;
+                horizontalResolution.Enabled = autoCrop.Enabled = videoProfile.Enabled = false;
                 usechaptersmarks.Enabled = keepInputResolution.Enabled = addPrerenderJob.Enabled = false;
                 autoDeint.Enabled = fileSize.Enabled = avsProfile.Enabled = ar.Enabled = false;
             }
             else
             {
-                videoProfile.Enabled = keepInputResolution.Enabled = addPrerenderJob.Enabled = true;
+                ar.Enabled = videoProfile.Enabled = keepInputResolution.Enabled = addPrerenderJob.Enabled = true;
                 autoDeint.Enabled = fileSize.Enabled = avsProfile.Enabled = true;
                 if (videoProfile.SelectedProfile.FQName.StartsWith("x264"))
                     usechaptersmarks.Enabled = true;
                 else
                     usechaptersmarks.Enabled = false;
-                if (keepInputResolution.Checked)
-                    horizontalResolution.Enabled = autoCrop.Enabled = signalAR.Enabled = ar.Enabled = false;
-                else
-                    horizontalResolution.Enabled = autoCrop.Enabled = signalAR.Enabled = ar.Enabled = true;
+                keepInputResolution_CheckedChanged(null, null);
             }
             updatePossibleContainers();
         }

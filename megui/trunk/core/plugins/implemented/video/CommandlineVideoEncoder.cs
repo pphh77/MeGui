@@ -58,7 +58,7 @@ namespace MeGUI
                     sr.Close();
                 }
                 catch (Exception) {}
-                log.LogValue("Avisynth input script", strAVSFile);
+                log.LogValue("AviSynth input script", strAVSFile);
             }
             su.Status = "Encoding video...";
             getInputProperties(job);

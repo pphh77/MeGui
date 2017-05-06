@@ -398,7 +398,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 _start = DateTime.Now;
                 using (AviSynthScriptEnvironment env = new AviSynthScriptEnvironment())
                 {
-                    _log.LogEvent("Avisynth script environment opened");
+                    _log.LogEvent("AviSynth script environment opened");
                     using (AviSynthClip a = env.ParseScript(_avisynthAudioScript))
                     {
                         _log.LogEvent("Script loaded");
@@ -588,7 +588,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 _encoderProcess.StartInfo = info;
                 _encoderProcess.Start();
 
-                // Take priority from Avisynth thread rather than default in settings
+                // Take priority from AviSynth thread rather than default in settings
                 // just in case user has managed to change job setting before getting here.
                 if (_encoderThread.Priority == ThreadPriority.Lowest)
                     this.changePriority(ProcessPriority.IDLE);
@@ -2051,7 +2051,7 @@ function x_upmixC" + id + @"(clip stereo)
 
             _avisynthAudioScript = script.ToString();
 
-            _log.LogValue("Avisynth script", _avisynthAudioScript);
+            _log.LogValue("AviSynth script", _avisynthAudioScript);
             _log.LogValue("Command line used", _encoderCommandLine);
         }
 

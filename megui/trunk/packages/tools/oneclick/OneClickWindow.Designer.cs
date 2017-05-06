@@ -84,7 +84,6 @@ namespace MeGUI
             this.avsProfile = new MeGUI.core.gui.ConfigableProfilesControl();
             this.ar = new MeGUI.core.gui.ARChooser();
             this.autoDeint = new System.Windows.Forms.CheckBox();
-            this.signalAR = new System.Windows.Forms.CheckBox();
             this.outputResolutionLabel = new System.Windows.Forms.Label();
             this.horizontalResolution = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
@@ -380,20 +379,20 @@ namespace MeGUI
             this.subtitleAddTrack,
             this.subtitleRemoveTrack});
             this.subtitleMenu.Name = "subtitleMenu";
-            this.subtitleMenu.Size = new System.Drawing.Size(150, 48);
+            this.subtitleMenu.Size = new System.Drawing.Size(149, 48);
             this.subtitleMenu.Opening += new System.ComponentModel.CancelEventHandler(this.subtitleMenu_Opening);
             // 
             // subtitleAddTrack
             // 
             this.subtitleAddTrack.Name = "subtitleAddTrack";
-            this.subtitleAddTrack.Size = new System.Drawing.Size(149, 22);
+            this.subtitleAddTrack.Size = new System.Drawing.Size(148, 22);
             this.subtitleAddTrack.Text = "Add Track";
             this.subtitleAddTrack.Click += new System.EventHandler(this.subtitleAddTrack_Click);
             // 
             // subtitleRemoveTrack
             // 
             this.subtitleRemoveTrack.Name = "subtitleRemoveTrack";
-            this.subtitleRemoveTrack.Size = new System.Drawing.Size(149, 22);
+            this.subtitleRemoveTrack.Size = new System.Drawing.Size(148, 22);
             this.subtitleRemoveTrack.Text = "Remove Track";
             this.subtitleRemoveTrack.Click += new System.EventHandler(this.subtitleRemoveTrack_Click);
             // 
@@ -403,20 +402,20 @@ namespace MeGUI
             this.audioAddTrack,
             this.audioRemoveTrack});
             this.audioMenu.Name = "audioMenu";
-            this.audioMenu.Size = new System.Drawing.Size(150, 48);
+            this.audioMenu.Size = new System.Drawing.Size(149, 48);
             this.audioMenu.Opening += new System.ComponentModel.CancelEventHandler(this.audioMenu_Opening);
             // 
             // audioAddTrack
             // 
             this.audioAddTrack.Name = "audioAddTrack";
-            this.audioAddTrack.Size = new System.Drawing.Size(149, 22);
+            this.audioAddTrack.Size = new System.Drawing.Size(148, 22);
             this.audioAddTrack.Text = "Add Track";
             this.audioAddTrack.Click += new System.EventHandler(this.audioAddTrack_Click);
             // 
             // audioRemoveTrack
             // 
             this.audioRemoveTrack.Name = "audioRemoveTrack";
-            this.audioRemoveTrack.Size = new System.Drawing.Size(149, 22);
+            this.audioRemoveTrack.Size = new System.Drawing.Size(148, 22);
             this.audioRemoveTrack.Text = "Remove Track";
             this.audioRemoveTrack.Click += new System.EventHandler(this.audioRemoveTrack_Click);
             // 
@@ -454,7 +453,6 @@ namespace MeGUI
             this.avsBox.Controls.Add(this.avsProfile);
             this.avsBox.Controls.Add(this.ar);
             this.avsBox.Controls.Add(this.autoDeint);
-            this.avsBox.Controls.Add(this.signalAR);
             this.avsBox.Controls.Add(this.outputResolutionLabel);
             this.avsBox.Controls.Add(this.horizontalResolution);
             this.avsBox.Controls.Add(this.label2);
@@ -521,16 +519,6 @@ namespace MeGUI
             this.autoDeint.Text = "Automatic Deinterlacing";
             this.autoDeint.UseVisualStyleBackColor = true;
             // 
-            // signalAR
-            // 
-            this.signalAR.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.signalAR.AutoSize = true;
-            this.signalAR.Location = new System.Drawing.Point(282, 19);
-            this.signalAR.Name = "signalAR";
-            this.signalAR.Size = new System.Drawing.Size(112, 17);
-            this.signalAR.TabIndex = 5;
-            this.signalAR.Text = "Anamorph Output";
-            // 
             // outputResolutionLabel
             // 
             this.outputResolutionLabel.Location = new System.Drawing.Point(7, 13);
@@ -569,20 +557,20 @@ namespace MeGUI
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(7, 96);
+            this.label2.Location = new System.Drawing.Point(6, 96);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(82, 13);
             this.label2.TabIndex = 4;
-            this.label2.Text = "Avisynth Profile";
+            this.label2.Text = "AviSynth Profile";
             // 
             // ARLabel
             // 
             this.ARLabel.AutoSize = true;
             this.ARLabel.Location = new System.Drawing.Point(6, 69);
             this.ARLabel.Name = "ARLabel";
-            this.ARLabel.Size = new System.Drawing.Size(105, 13);
+            this.ARLabel.Size = new System.Drawing.Size(57, 13);
             this.ARLabel.TabIndex = 4;
-            this.ARLabel.Text = "Display Aspect Ratio";
+            this.ARLabel.Text = "Input DAR";
             // 
             // locationGroupBox
             // 
@@ -834,20 +822,21 @@ namespace MeGUI
             this.goButton.Name = "goButton";
             this.goButton.Size = new System.Drawing.Size(75, 23);
             this.goButton.TabIndex = 29;
-            this.goButton.Text = "Go!";
+            this.goButton.Text = "Queue";
             this.goButton.UseVisualStyleBackColor = true;
             this.goButton.Click += new System.EventHandler(this.goButton_Click);
             // 
             // openOnQueue
             // 
             this.openOnQueue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.openOnQueue.AutoSize = true;
             this.openOnQueue.Checked = true;
             this.openOnQueue.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.openOnQueue.Location = new System.Drawing.Point(273, 520);
+            this.openOnQueue.Location = new System.Drawing.Point(302, 523);
             this.openOnQueue.Name = "openOnQueue";
-            this.openOnQueue.Size = new System.Drawing.Size(106, 24);
+            this.openOnQueue.Size = new System.Drawing.Size(77, 17);
             this.openOnQueue.TabIndex = 33;
-            this.openOnQueue.Text = "close after Go!";
+            this.openOnQueue.Text = "close after";
             // 
             // cbGUIMode
             // 
@@ -971,7 +960,6 @@ namespace MeGUI
         private core.gui.ConfigableProfilesControl avsProfile;
         private core.gui.ARChooser ar;
         private System.Windows.Forms.CheckBox autoDeint;
-        private System.Windows.Forms.CheckBox signalAR;
         private System.Windows.Forms.Label outputResolutionLabel;
         private System.Windows.Forms.NumericUpDown horizontalResolution;
         private System.Windows.Forms.Label label2;

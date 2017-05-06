@@ -281,7 +281,7 @@ namespace MeGUI
                     //Open the video
                     Dar? dar;
                     avsFile = createAVSFile(job.IndexFile, job.Input, job.PostprocessingProperties.DAR,
-                        job.PostprocessingProperties.HorizontalOutputResolution, job.PostprocessingProperties.SignalAR, _log,
+                        job.PostprocessingProperties.HorizontalOutputResolution, _log,
                         job.PostprocessingProperties.AvsSettings, job.PostprocessingProperties.AutoDeinterlace, videoSettings, out dar,
                         job.PostprocessingProperties.AutoCrop, job.PostprocessingProperties.KeepInputResolution,
                         job.PostprocessingProperties.UseChaptersMarks);
@@ -516,13 +516,11 @@ namespace MeGUI
         /// <param name="sarX">pixel aspect ratio X</param>
         /// <param name="sarY">pixel aspect ratio Y</param>
         /// <param name="height">the final height of the video</param>
-        /// <param name="signalAR">whether or not ar signalling is to be used for the output 
-        /// (depending on this parameter, resizing changes to match the source AR)</param>
         /// <param name="autoCrop">whether or not autoCrop is used for the input</param>
         /// <returns>the name of the AviSynth script created, empty if there was an error</returns>
         private string createAVSFile(string indexFile, string inputFile, Dar? AR, int desiredOutputWidth,
-            bool signalAR, LogItem _log, AviSynthSettings avsSettings, bool autoDeint,
-            VideoCodecSettings settings, out Dar? dar, bool autoCrop, bool keepInputResolution, bool useChaptersMarks)
+            LogItem _log, AviSynthSettings avsSettings, bool autoDeint, VideoCodecSettings settings,
+            out Dar? dar, bool autoCrop, bool keepInputResolution, bool useChaptersMarks)
         {
             dar = null;
             Dar customDAR;
@@ -536,6 +534,13 @@ namespace MeGUI
             int outputHeightIncludingPadding = 0;
             int outputWidthCropped = 0;
             int outputHeightCropped = 0;
+
+            // encode anamorph either when it is selected in the avs profile or the input resolution should not be touched
+            bool signalAR = (avsSettings.Mod16Method != mod16Method.none) || keepInputResolution;
+
+            // make sure the proper anamorphic encode is selected if the input resolution should not be touched
+            if (keepInputResolution && avsSettings.Mod16Method != mod16Method.nonMod16)
+                avsSettings.Mod16Method = mod16Method.nonMod16;
 
             // open index file to retrieve information
             if (job.PostprocessingProperties.IndexType == FileIndexerWindow.IndexType.DGI)
@@ -666,7 +671,8 @@ namespace MeGUI
                 avsSettings.AcceptableAspectError, xTargetDevice, Convert.ToDouble(inputFPS_N) / inputFPS_D, 
                 ref outputWidthIncludingPadding, ref outputHeightIncludingPadding, out paddingValues, out suggestedDar, _log);
             keepInputResolution = !resizeEnabled;
-            if ((keepInputResolution || signalAR) && suggestedDar.HasValue)
+
+            if (signalAR && suggestedDar.HasValue)
                 dar = suggestedDar;
 
             // log calculated output resolution
@@ -775,7 +781,7 @@ namespace MeGUI
                 }
             }
 
-            _log.LogValue("Generated Avisynth script", newScript);
+            _log.LogValue("Generated AviSynth script", newScript);
             string strOutputAVSFile;
             if (String.IsNullOrEmpty(indexFile))
                 strOutputAVSFile = Path.ChangeExtension(Path.Combine(job.PostprocessingProperties.WorkingDirectory, Path.GetFileName(inputFile)), ".avs");

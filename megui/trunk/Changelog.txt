@@ -1,3 +1,4 @@
+2726 [OneClick]             removed the "Anamorph Output" option in the OneClick profile. Please use the anamorphic encoding options in the AviSynth profile instead.
 2725 [Main]                 fixed wrong AR of a "video encoding" queued job in rare cases (regression of 2610)
 2724 [OneClick]             cosmetic fix as sometimes even with "don't encode video" some video processing options were not disabled
 2723 [OneClick]             improved error handling of invalid AviSynth scripts

@@ -56,7 +56,6 @@ namespace MeGUI.packages.tools.oneclick
             this.avsProfile = new MeGUI.core.gui.ConfigableProfilesControl();
             this.preprocessVideo = new System.Windows.Forms.CheckBox();
             this.autoDeint = new System.Windows.Forms.CheckBox();
-            this.signalAR = new System.Windows.Forms.CheckBox();
             this.horizontalResolution = new System.Windows.Forms.NumericUpDown();
             this.outputResolutionLabel = new System.Windows.Forms.Label();
             this.tabControl1 = new System.Windows.Forms.TabControl();
@@ -151,7 +150,7 @@ namespace MeGUI.packages.tools.oneclick
             label3.Name = "label3";
             label3.Size = new System.Drawing.Size(78, 13);
             label3.TabIndex = 40;
-            label3.Text = "Avisynth profile";
+            label3.Text = "AviSynth profile";
             // 
             // otherGroupBox
             // 
@@ -161,7 +160,6 @@ namespace MeGUI.packages.tools.oneclick
             this.otherGroupBox.Controls.Add(this.avsProfile);
             this.otherGroupBox.Controls.Add(this.preprocessVideo);
             this.otherGroupBox.Controls.Add(this.autoDeint);
-            this.otherGroupBox.Controls.Add(this.signalAR);
             this.otherGroupBox.Controls.Add(this.horizontalResolution);
             this.otherGroupBox.Controls.Add(this.outputResolutionLabel);
             this.otherGroupBox.Location = new System.Drawing.Point(6, 99);
@@ -222,16 +220,6 @@ namespace MeGUI.packages.tools.oneclick
             this.autoDeint.TabIndex = 35;
             this.autoDeint.Text = "Automatic Deinterlacing";
             this.autoDeint.UseVisualStyleBackColor = true;
-            // 
-            // signalAR
-            // 
-            this.signalAR.AutoSize = true;
-            this.signalAR.Location = new System.Drawing.Point(272, 21);
-            this.signalAR.Name = "signalAR";
-            this.signalAR.Size = new System.Drawing.Size(109, 17);
-            this.signalAR.TabIndex = 32;
-            this.signalAR.Text = "Anamorph Output";
-            this.signalAR.UseVisualStyleBackColor = true;
             // 
             // horizontalResolution
             // 
@@ -316,6 +304,7 @@ namespace MeGUI.packages.tools.oneclick
             this.chkDontEncodeVideo.Size = new System.Drawing.Size(119, 17);
             this.chkDontEncodeVideo.TabIndex = 42;
             this.chkDontEncodeVideo.Text = "Don\'t encode video";
+            this.chkDontEncodeVideo.CheckedChanged += new System.EventHandler(this.chkDontEncodeVideo_CheckedChanged);
             // 
             // usechaptersmarks
             // 
@@ -956,7 +945,6 @@ namespace MeGUI.packages.tools.oneclick
 
         private System.Windows.Forms.GroupBox otherGroupBox;
         private System.Windows.Forms.CheckBox autoDeint;
-        private System.Windows.Forms.CheckBox signalAR;
         private System.Windows.Forms.NumericUpDown horizontalResolution;
         private System.Windows.Forms.Label outputResolutionLabel;
         private System.Windows.Forms.CheckBox preprocessVideo;

@@ -94,16 +94,6 @@ namespace MeGUI
             set { chapterExtracted = value; }
         }
 
-		/// <summary>
-		/// gets / sets whether the aspect ratio should be signalled in the output and thus
-		/// resizing should not unstretch anamorphically stretched content
-		/// </summary>
-		public bool SignalAR
-		{
-			get { return signalAR; }
-			set { signalAR = value; }
-		}
-
         /// <summary>
         /// gets / sets the AutoCrop function
         /// </summary>

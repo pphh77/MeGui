@@ -118,13 +118,6 @@ namespace MeGUI
             set { dontEncodeVideo = value; }
         }
 
-        private bool signalAR;
-        public bool SignalAR
-        {
-            get { return signalAR; }
-            set { signalAR = value; }
-        }
-
         private bool automaticDeinterlacing;
         public bool AutomaticDeinterlacing
         {
@@ -327,7 +320,6 @@ namespace MeGUI
             dontEncodeVideo = false;
             disableIntermediateMKV = false;
             useChaptersMarks = true;
-			signalAR = false;
             autoCrop = true;
             keepInputResolution = false;
 			outputResolution = 720;
