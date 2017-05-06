@@ -312,15 +312,7 @@ namespace MeGUI
         public void openVideoFile(string fileName, MediaInfoFile oNewInfo)
         {
             if (oNewInfo == null)
-            {
-                if (oInfo != null)
-                {
-                    if (!oInfo.FileName.ToLowerInvariant().Equals(fileName.ToLowerInvariant()))
-                        oInfo = new MediaInfoFile(fileName);
-                }
-                else
-                    oInfo = new MediaInfoFile(fileName);
-            }
+                oInfo = new MediaInfoFile(fileName);
             else
                 oInfo = oNewInfo;
 

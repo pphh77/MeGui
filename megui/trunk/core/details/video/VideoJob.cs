@@ -44,8 +44,7 @@ namespace MeGUI
             set { zones = value; }
         }
 
-        public VideoJob(string input, string output,
-            VideoCodecSettings settings, Dar? dar, Zone[] zones)
+        public VideoJob(string input, string output, VideoCodecSettings settings, Dar? dar, Zone[] zones)
             : base(input, output)
         {
             Settings = settings;
