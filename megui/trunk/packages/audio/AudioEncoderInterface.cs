@@ -2101,32 +2101,21 @@ function x_upmixC" + id + @"(clip stereo)
 					{
 					    case ProcessPriority.IDLE:
 							_encoderThread.Priority = ThreadPriority.Lowest;
-                            if (_encoderProcess != null)
-                                _encoderProcess.PriorityClass = ProcessPriorityClass.Idle;
 							break;
 						case ProcessPriority.BELOW_NORMAL:
 							_encoderThread.Priority = ThreadPriority.BelowNormal;
-                            if (_encoderProcess != null)
-                                _encoderProcess.PriorityClass = ProcessPriorityClass.BelowNormal;
 							break;
 						case ProcessPriority.NORMAL:
 							_encoderThread.Priority = ThreadPriority.Normal;
-                            if (_encoderProcess != null)
-                                _encoderProcess.PriorityClass = ProcessPriorityClass.Normal;
 							break;
 						case ProcessPriority.ABOVE_NORMAL:
 							_encoderThread.Priority = ThreadPriority.AboveNormal;
-                            if (_encoderProcess != null)
-                                _encoderProcess.PriorityClass = ProcessPriorityClass.AboveNormal;
 							break;
 						case ProcessPriority.HIGH:
 							_encoderThread.Priority = ThreadPriority.Highest;
-                            if (_encoderProcess != null)
-                                _encoderProcess.PriorityClass = ProcessPriorityClass.High;
 							break;
 				    }
-                    if (_encoderProcess != null)
-                        VistaStuff.SetProcessPriority(_encoderProcess.Handle, _encoderProcess.PriorityClass);
+                    VistaStuff.SetProcessPriority(_encoderProcess, priority);
                     MainForm.Instance.Settings.ProcessingPriority = priority;
                     return;
                 }

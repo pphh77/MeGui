@@ -22,9 +22,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Management;
 using System.Runtime.InteropServices;
-using System.Runtime.ConstrainedExecution;
-using System.Text;
 using System.Threading;
 
 namespace MeGUI.core.util
@@ -44,26 +43,81 @@ namespace MeGUI.core.util
         }
 
         /// <value>
-        /// Sets the memory and I/O priority on Windows Vista or newer operating systems
+        /// Sets the process, memory and I/O priority on Windows Vista or newer operating systems
         /// </value>
         [Browsable(false)]
-        public static void SetProcessPriority(IntPtr handle, ProcessPriorityClass priority)
+        public static void SetProcessPriority(Process oMainProcess, ProcessPriority processPriority)
         {
-            if (IsVistaOrNot)
+            try
             {
-                int prioIO = VistaStuff.PRIORITY_IO_NORMAL;
-                int prioMemory = VistaStuff.PRIORITY_MEMORY_NORMAL;
-                if (priority == ProcessPriorityClass.Idle || priority == ProcessPriorityClass.BelowNormal)
+                if (oMainProcess == null || oMainProcess.HasExited)
+                    return;
+
+                ProcessPriorityClass priority = ProcessPriorityClass.Idle;
+                switch (processPriority)
                 {
-                    prioIO = VistaStuff.PRIORITY_IO_LOW;
-                    prioMemory = VistaStuff.PRIORITY_MEMORY_LOW;
-                    SetPriorityClass(handle, PROCESS_MODE_BACKGROUND_BEGIN);
+                    case ProcessPriority.IDLE:
+                        priority = ProcessPriorityClass.Idle;
+                        break;
+                    case ProcessPriority.BELOW_NORMAL:
+                        priority = ProcessPriorityClass.BelowNormal;
+                        break;
+                    case ProcessPriority.NORMAL:
+                        priority = ProcessPriorityClass.Normal;
+                        break;
+                    case ProcessPriority.ABOVE_NORMAL:
+                        priority = ProcessPriorityClass.AboveNormal;
+                        break;
+                    case ProcessPriority.HIGH:
+                        priority = ProcessPriorityClass.RealTime;
+                        break;
                 }
-                else
-                    SetPriorityClass(handle, PROCESS_MODE_BACKGROUND_END);
-                NtSetInformationProcess(handle, PROCESS_INFORMATION_IO_PRIORITY, ref prioIO, Marshal.SizeOf(prioIO));
-                NtSetInformationProcess(handle, PROCESS_INFORMATION_MEMORY_PRIORITY, ref prioMemory, Marshal.SizeOf(prioMemory));
+
+                List<Process> arrProc = GetChildProcesses(oMainProcess);
+                arrProc.Insert(0, oMainProcess);
+
+                foreach (Process oProc in arrProc)
+                {
+                    if (oProc == null || oProc.HasExited)
+                        continue;
+
+                    // set process priority
+                    oProc.PriorityClass = priority;
+
+                    if (!IsVistaOrNot)
+                        continue;
+
+                    int prioIO = VistaStuff.PRIORITY_IO_NORMAL;
+                    int prioMemory = VistaStuff.PRIORITY_MEMORY_NORMAL;
+                    if (priority == ProcessPriorityClass.Idle || priority == ProcessPriorityClass.BelowNormal)
+                    {
+                        prioIO = VistaStuff.PRIORITY_IO_LOW;
+                        prioMemory = VistaStuff.PRIORITY_MEMORY_LOW;
+                        SetPriorityClass(oProc.Handle, PROCESS_MODE_BACKGROUND_BEGIN);
+                    }
+                    else
+                        SetPriorityClass(oProc.Handle, PROCESS_MODE_BACKGROUND_END);
+                    NtSetInformationProcess(oProc.Handle, PROCESS_INFORMATION_IO_PRIORITY, ref prioIO, Marshal.SizeOf(prioIO));
+                    NtSetInformationProcess(oProc.Handle, PROCESS_INFORMATION_MEMORY_PRIORITY, ref prioMemory, Marshal.SizeOf(prioMemory));
+                }
             }
+            catch { }
+        }
+
+
+        public static List<Process> GetChildProcesses(Process process)
+        {
+            List<Process> children = new List<Process>();
+            ManagementObjectSearcher mos = new ManagementObjectSearcher(String.Format("Select * From Win32_Process Where ParentProcessID={0}", process.Id));
+
+            foreach (ManagementObject mo in mos.Get())
+            {
+                Process oProc = Process.GetProcessById(Convert.ToInt32(mo["ProcessID"]));
+                children.Add(oProc);
+                children.AddRange(GetChildProcesses(oProc));
+            }
+
+            return children;
         }
 
         /// <value>

@@ -321,25 +321,7 @@ namespace MeGUI
             {
                 try
                 {
-    				switch (priority)
-					{
-						case ProcessPriority.IDLE:
-	    						proc.PriorityClass = ProcessPriorityClass.Idle;
-								break;
-						case ProcessPriority.BELOW_NORMAL:
-								proc.PriorityClass = ProcessPriorityClass.BelowNormal;
-								break;
-		    			case ProcessPriority.NORMAL:
-			    				proc.PriorityClass = ProcessPriorityClass.Normal;
-				    			break;
-						case ProcessPriority.ABOVE_NORMAL:
-					    		proc.PriorityClass = ProcessPriorityClass.AboveNormal;
-								break;
-						case ProcessPriority.HIGH:
-						    	proc.PriorityClass = ProcessPriorityClass.RealTime;
-								break;
-					}
-                    VistaStuff.SetProcessPriority(proc.Handle, proc.PriorityClass);
+                    VistaStuff.SetProcessPriority(proc, priority);
                     MainForm.Instance.Settings.ProcessingPriority = priority;
 				    return;
                 }
