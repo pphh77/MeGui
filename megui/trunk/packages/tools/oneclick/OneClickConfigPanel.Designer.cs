@@ -120,6 +120,8 @@ namespace MeGUI.packages.tools.oneclick
             this.audioMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.audioAddTrack = new System.Windows.Forms.ToolStripMenuItem();
             this.audioRemoveTrack = new System.Windows.Forms.ToolStripMenuItem();
+            this.ar = new MeGUI.core.gui.ARChooser();
+            this.ARLabel = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
             this.otherGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.horizontalResolution)).BeginInit();
@@ -146,9 +148,9 @@ namespace MeGUI.packages.tools.oneclick
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new System.Drawing.Point(6, 96);
+            label3.Location = new System.Drawing.Point(6, 82);
             label3.Name = "label3";
-            label3.Size = new System.Drawing.Size(78, 13);
+            label3.Size = new System.Drawing.Size(80, 13);
             label3.TabIndex = 40;
             label3.Text = "AviSynth profile";
             // 
@@ -162,9 +164,9 @@ namespace MeGUI.packages.tools.oneclick
             this.otherGroupBox.Controls.Add(this.autoDeint);
             this.otherGroupBox.Controls.Add(this.horizontalResolution);
             this.otherGroupBox.Controls.Add(this.outputResolutionLabel);
-            this.otherGroupBox.Location = new System.Drawing.Point(6, 99);
+            this.otherGroupBox.Location = new System.Drawing.Point(6, 123);
             this.otherGroupBox.Name = "otherGroupBox";
-            this.otherGroupBox.Size = new System.Drawing.Size(416, 152);
+            this.otherGroupBox.Size = new System.Drawing.Size(416, 128);
             this.otherGroupBox.TabIndex = 38;
             this.otherGroupBox.TabStop = false;
             this.otherGroupBox.Text = "AviSynth setup ";
@@ -172,7 +174,7 @@ namespace MeGUI.packages.tools.oneclick
             // keepInputResolution
             // 
             this.keepInputResolution.AutoSize = true;
-            this.keepInputResolution.Location = new System.Drawing.Point(109, 46);
+            this.keepInputResolution.Location = new System.Drawing.Point(109, 19);
             this.keepInputResolution.Name = "keepInputResolution";
             this.keepInputResolution.Size = new System.Drawing.Size(236, 17);
             this.keepInputResolution.TabIndex = 42;
@@ -185,7 +187,7 @@ namespace MeGUI.packages.tools.oneclick
             this.autoCrop.AutoSize = true;
             this.autoCrop.Checked = true;
             this.autoCrop.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.autoCrop.Location = new System.Drawing.Point(188, 21);
+            this.autoCrop.Location = new System.Drawing.Point(179, 43);
             this.autoCrop.Name = "autoCrop";
             this.autoCrop.Size = new System.Drawing.Size(70, 17);
             this.autoCrop.TabIndex = 41;
@@ -194,7 +196,7 @@ namespace MeGUI.packages.tools.oneclick
             // 
             // avsProfile
             // 
-            this.avsProfile.Location = new System.Drawing.Point(109, 90);
+            this.avsProfile.Location = new System.Drawing.Point(109, 78);
             this.avsProfile.Name = "avsProfile";
             this.avsProfile.ProfileSet = "AviSynth";
             this.avsProfile.Size = new System.Drawing.Size(298, 22);
@@ -203,7 +205,7 @@ namespace MeGUI.packages.tools.oneclick
             // preprocessVideo
             // 
             this.preprocessVideo.AutoSize = true;
-            this.preprocessVideo.Location = new System.Drawing.Point(109, 118);
+            this.preprocessVideo.Location = new System.Drawing.Point(109, 106);
             this.preprocessVideo.Name = "preprocessVideo";
             this.preprocessVideo.Size = new System.Drawing.Size(101, 17);
             this.preprocessVideo.TabIndex = 37;
@@ -214,7 +216,7 @@ namespace MeGUI.packages.tools.oneclick
             // 
             this.autoDeint.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.autoDeint.AutoSize = true;
-            this.autoDeint.Location = new System.Drawing.Point(272, 118);
+            this.autoDeint.Location = new System.Drawing.Point(272, 106);
             this.autoDeint.Name = "autoDeint";
             this.autoDeint.Size = new System.Drawing.Size(138, 17);
             this.autoDeint.TabIndex = 35;
@@ -228,7 +230,7 @@ namespace MeGUI.packages.tools.oneclick
             0,
             0,
             0});
-            this.horizontalResolution.Location = new System.Drawing.Point(109, 20);
+            this.horizontalResolution.Location = new System.Drawing.Point(109, 42);
             this.horizontalResolution.Maximum = new decimal(new int[] {
             9999,
             0,
@@ -250,7 +252,7 @@ namespace MeGUI.packages.tools.oneclick
             // 
             // outputResolutionLabel
             // 
-            this.outputResolutionLabel.Location = new System.Drawing.Point(6, 16);
+            this.outputResolutionLabel.Location = new System.Drawing.Point(6, 39);
             this.outputResolutionLabel.Name = "outputResolutionLabel";
             this.outputResolutionLabel.Size = new System.Drawing.Size(100, 26);
             this.outputResolutionLabel.TabIndex = 30;
@@ -284,13 +286,15 @@ namespace MeGUI.packages.tools.oneclick
             // 
             // groupBox6
             // 
+            this.groupBox6.Controls.Add(this.ARLabel);
+            this.groupBox6.Controls.Add(this.ar);
             this.groupBox6.Controls.Add(this.chkDontEncodeVideo);
             this.groupBox6.Controls.Add(this.usechaptersmarks);
             this.groupBox6.Controls.Add(this.videoProfile);
             this.groupBox6.Controls.Add(this.videoCodecLabel);
             this.groupBox6.Location = new System.Drawing.Point(6, 6);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(416, 87);
+            this.groupBox6.Size = new System.Drawing.Size(416, 111);
             this.groupBox6.TabIndex = 47;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = " Video Setup ";
@@ -299,7 +303,7 @@ namespace MeGUI.packages.tools.oneclick
             // 
             this.chkDontEncodeVideo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.chkDontEncodeVideo.AutoSize = true;
-            this.chkDontEncodeVideo.Location = new System.Drawing.Point(77, 22);
+            this.chkDontEncodeVideo.Location = new System.Drawing.Point(81, 22);
             this.chkDontEncodeVideo.Name = "chkDontEncodeVideo";
             this.chkDontEncodeVideo.Size = new System.Drawing.Size(119, 17);
             this.chkDontEncodeVideo.TabIndex = 42;
@@ -309,7 +313,7 @@ namespace MeGUI.packages.tools.oneclick
             // usechaptersmarks
             // 
             this.usechaptersmarks.AutoSize = true;
-            this.usechaptersmarks.Location = new System.Drawing.Point(202, 22);
+            this.usechaptersmarks.Location = new System.Drawing.Point(210, 22);
             this.usechaptersmarks.Name = "usechaptersmarks";
             this.usechaptersmarks.Size = new System.Drawing.Size(197, 17);
             this.usechaptersmarks.TabIndex = 41;
@@ -318,10 +322,10 @@ namespace MeGUI.packages.tools.oneclick
             // 
             // videoProfile
             // 
-            this.videoProfile.Location = new System.Drawing.Point(77, 47);
+            this.videoProfile.Location = new System.Drawing.Point(81, 47);
             this.videoProfile.Name = "videoProfile";
             this.videoProfile.ProfileSet = "Video";
-            this.videoProfile.Size = new System.Drawing.Size(330, 22);
+            this.videoProfile.Size = new System.Drawing.Size(326, 22);
             this.videoProfile.TabIndex = 40;
             // 
             // videoCodecLabel
@@ -905,6 +909,29 @@ namespace MeGUI.packages.tools.oneclick
             this.audioRemoveTrack.Text = "Remove Track";
             this.audioRemoveTrack.Click += new System.EventHandler(this.audioRemoveTrack_Click);
             // 
+            // ar
+            // 
+            this.ar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ar.CustomDARs = new MeGUI.core.util.Dar[0];
+            this.ar.HasLater = true;
+            this.ar.Location = new System.Drawing.Point(99, 72);
+            this.ar.MaximumSize = new System.Drawing.Size(1000, 29);
+            this.ar.MinimumSize = new System.Drawing.Size(64, 29);
+            this.ar.Name = "ar";
+            this.ar.SelectedIndex = 0;
+            this.ar.Size = new System.Drawing.Size(308, 29);
+            this.ar.TabIndex = 44;
+            // 
+            // ARLabel
+            // 
+            this.ARLabel.AutoSize = true;
+            this.ARLabel.Location = new System.Drawing.Point(6, 80);
+            this.ARLabel.Name = "ARLabel";
+            this.ARLabel.Size = new System.Drawing.Size(87, 13);
+            this.ARLabel.TabIndex = 45;
+            this.ARLabel.Text = "Force Input DAR";
+            // 
             // OneClickConfigPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1013,5 +1040,7 @@ namespace MeGUI.packages.tools.oneclick
         private System.Windows.Forms.Button deleteWorking;
         private System.Windows.Forms.Button deleteOutput;
         private System.Windows.Forms.CheckBox chkDisableIntermediateMKV;
+        private System.Windows.Forms.Label ARLabel;
+        private core.gui.ARChooser ar;
     }
 }

@@ -127,6 +127,7 @@ namespace MeGUI.packages.tools.oneclick
                 val.LeadingName = txtLeadingName.Text;
                 val.WorkingNameReplace = txtWorkingNameDelete.Text;
                 val.WorkingNameReplaceWith = txtWorkingNameReplaceWith.Text;
+                val.DAR = ar.Value;
                 return val;
             }
             set
@@ -195,6 +196,8 @@ namespace MeGUI.packages.tools.oneclick
                     cbLanguageSelect.SelectedItem = "all";
                 else
                     cbLanguageSelect.SelectedItem = "none";
+
+                ar.Value = value.DAR;
             }
         }
 
@@ -224,7 +227,7 @@ namespace MeGUI.packages.tools.oneclick
 
         private void keepInputResolution_CheckedChanged(object sender, EventArgs e)
         {
-            if (keepInputResolution.Checked)
+            if (keepInputResolution.Checked || chkDontEncodeVideo.Checked)
                 horizontalResolution.Enabled = autoCrop.Enabled = false;
             else
                 horizontalResolution.Enabled = autoCrop.Enabled = true;
@@ -254,10 +257,7 @@ namespace MeGUI.packages.tools.oneclick
                     usechaptersmarks.Enabled = true;
                 else
                     usechaptersmarks.Enabled = false;
-                if (keepInputResolution.Checked)
-                    horizontalResolution.Enabled = autoCrop.Enabled = false;
-                else
-                    horizontalResolution.Enabled = autoCrop.Enabled = true;
+                keepInputResolution_CheckedChanged(null, null);
             }
         }
 

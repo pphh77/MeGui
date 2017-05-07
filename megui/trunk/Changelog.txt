@@ -1,7 +1,12 @@
+2631 [OneClick]             added aspect ratio selection to the OneClick profile
+                            input aspect ratio can always be selected
+                            if an input aspect ratio will be selected this will be forced
+                            the aspect ratio will not be forced by the muxer if the video track has been encoded
+                            cosmetics
 2630 [AutoEncode]           do not force the aspect ratio to be written by the muxer as it is available in the video stream
 2629 [Muxer]                added/improved aspect ratio writing (all muxers except the AVI muxer)
                             for the M2TS muxer only some input video types are supported
-                            improved logging 
+                            improved logging
 2628 [VideoEncoder]         forced aspect ratio to be written to the encoding
                             if not available in the job the avs aspect ratio information will be used
 2627 [Worker]               priority changes will also be applied to child processes. Feature request #615
@@ -10,7 +15,7 @@
 2724 [OneClick]             cosmetic fix as sometimes even with "don't encode video" some video processing options were not disabled
 2723 [OneClick]             improved error handling of invalid AviSynth scripts
 2722 [Main]                 if not at least AviSynth 2.6 is installed the portable build will be used
-                            improved AviSynth logging 
+                            improved AviSynth logging
 2720 [AviSynth Wrapper]     added functions to detect AviSynth details
 2719 [AviSynth Wrapper]     updated wrapper to interface 3
 2718 [FFMS Indexer]         enabled AVI file handling

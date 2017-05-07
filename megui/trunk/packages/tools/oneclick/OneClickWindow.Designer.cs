@@ -82,12 +82,10 @@ namespace MeGUI
             this.keepInputResolution = new System.Windows.Forms.CheckBox();
             this.autoCrop = new System.Windows.Forms.CheckBox();
             this.avsProfile = new MeGUI.core.gui.ConfigableProfilesControl();
-            this.ar = new MeGUI.core.gui.ARChooser();
             this.autoDeint = new System.Windows.Forms.CheckBox();
             this.outputResolutionLabel = new System.Windows.Forms.Label();
             this.horizontalResolution = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
-            this.ARLabel = new System.Windows.Forms.Label();
             this.locationGroupBox = new System.Windows.Forms.GroupBox();
             this.chapterFile = new MeGUI.FileBar();
             this.workingDirectory = new MeGUI.FileBar();
@@ -104,6 +102,8 @@ namespace MeGUI
             this.containerFormat = new System.Windows.Forms.ComboBox();
             this.splitting = new MeGUI.core.gui.TargetSizeSCBox();
             this.videoGroupBox = new System.Windows.Forms.GroupBox();
+            this.ARLabel = new System.Windows.Forms.Label();
+            this.ar = new MeGUI.core.gui.ARChooser();
             this.chkDontEncodeVideo = new System.Windows.Forms.CheckBox();
             this.usechaptersmarks = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -451,15 +451,13 @@ namespace MeGUI
             this.avsBox.Controls.Add(this.keepInputResolution);
             this.avsBox.Controls.Add(this.autoCrop);
             this.avsBox.Controls.Add(this.avsProfile);
-            this.avsBox.Controls.Add(this.ar);
             this.avsBox.Controls.Add(this.autoDeint);
             this.avsBox.Controls.Add(this.outputResolutionLabel);
             this.avsBox.Controls.Add(this.horizontalResolution);
             this.avsBox.Controls.Add(this.label2);
-            this.avsBox.Controls.Add(this.ARLabel);
-            this.avsBox.Location = new System.Drawing.Point(6, 102);
+            this.avsBox.Location = new System.Drawing.Point(6, 128);
             this.avsBox.Name = "avsBox";
-            this.avsBox.Size = new System.Drawing.Size(452, 144);
+            this.avsBox.Size = new System.Drawing.Size(452, 118);
             this.avsBox.TabIndex = 44;
             this.avsBox.TabStop = false;
             this.avsBox.Text = " AviSynth Settings ";
@@ -467,7 +465,7 @@ namespace MeGUI
             // keepInputResolution
             // 
             this.keepInputResolution.AutoSize = true;
-            this.keepInputResolution.Location = new System.Drawing.Point(120, 42);
+            this.keepInputResolution.Location = new System.Drawing.Point(119, 19);
             this.keepInputResolution.Name = "keepInputResolution";
             this.keepInputResolution.Size = new System.Drawing.Size(241, 17);
             this.keepInputResolution.TabIndex = 25;
@@ -480,7 +478,7 @@ namespace MeGUI
             this.autoCrop.AutoSize = true;
             this.autoCrop.Checked = true;
             this.autoCrop.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.autoCrop.Location = new System.Drawing.Point(202, 19);
+            this.autoCrop.Location = new System.Drawing.Point(190, 43);
             this.autoCrop.Name = "autoCrop";
             this.autoCrop.Size = new System.Drawing.Size(72, 17);
             this.autoCrop.TabIndex = 24;
@@ -489,30 +487,16 @@ namespace MeGUI
             // 
             // avsProfile
             // 
-            this.avsProfile.Location = new System.Drawing.Point(119, 92);
+            this.avsProfile.Location = new System.Drawing.Point(120, 69);
             this.avsProfile.Name = "avsProfile";
             this.avsProfile.ProfileSet = "AviSynth";
             this.avsProfile.Size = new System.Drawing.Size(330, 22);
             this.avsProfile.TabIndex = 23;
             // 
-            // ar
-            // 
-            this.ar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ar.CustomDARs = new MeGUI.core.util.Dar[0];
-            this.ar.HasLater = true;
-            this.ar.Location = new System.Drawing.Point(119, 61);
-            this.ar.MaximumSize = new System.Drawing.Size(1000, 29);
-            this.ar.MinimumSize = new System.Drawing.Size(64, 29);
-            this.ar.Name = "ar";
-            this.ar.SelectedIndex = 0;
-            this.ar.Size = new System.Drawing.Size(330, 29);
-            this.ar.TabIndex = 22;
-            // 
             // autoDeint
             // 
             this.autoDeint.AutoSize = true;
-            this.autoDeint.Location = new System.Drawing.Point(119, 120);
+            this.autoDeint.Location = new System.Drawing.Point(119, 97);
             this.autoDeint.Name = "autoDeint";
             this.autoDeint.Size = new System.Drawing.Size(139, 17);
             this.autoDeint.TabIndex = 20;
@@ -521,7 +505,7 @@ namespace MeGUI
             // 
             // outputResolutionLabel
             // 
-            this.outputResolutionLabel.Location = new System.Drawing.Point(7, 13);
+            this.outputResolutionLabel.Location = new System.Drawing.Point(6, 36);
             this.outputResolutionLabel.Name = "outputResolutionLabel";
             this.outputResolutionLabel.Size = new System.Drawing.Size(100, 30);
             this.outputResolutionLabel.TabIndex = 3;
@@ -534,7 +518,7 @@ namespace MeGUI
             0,
             0,
             0});
-            this.horizontalResolution.Location = new System.Drawing.Point(120, 16);
+            this.horizontalResolution.Location = new System.Drawing.Point(120, 42);
             this.horizontalResolution.Maximum = new decimal(new int[] {
             9999,
             0,
@@ -557,20 +541,11 @@ namespace MeGUI
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 96);
+            this.label2.Location = new System.Drawing.Point(6, 73);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(82, 13);
+            this.label2.Size = new System.Drawing.Size(83, 13);
             this.label2.TabIndex = 4;
             this.label2.Text = "AviSynth Profile";
-            // 
-            // ARLabel
-            // 
-            this.ARLabel.AutoSize = true;
-            this.ARLabel.Location = new System.Drawing.Point(6, 69);
-            this.ARLabel.Name = "ARLabel";
-            this.ARLabel.Size = new System.Drawing.Size(57, 13);
-            this.ARLabel.TabIndex = 4;
-            this.ARLabel.Text = "Input DAR";
             // 
             // locationGroupBox
             // 
@@ -748,6 +723,8 @@ namespace MeGUI
             // 
             // videoGroupBox
             // 
+            this.videoGroupBox.Controls.Add(this.ARLabel);
+            this.videoGroupBox.Controls.Add(this.ar);
             this.videoGroupBox.Controls.Add(this.chkDontEncodeVideo);
             this.videoGroupBox.Controls.Add(this.usechaptersmarks);
             this.videoGroupBox.Controls.Add(this.label4);
@@ -755,10 +732,33 @@ namespace MeGUI
             this.videoGroupBox.Controls.Add(this.addPrerenderJob);
             this.videoGroupBox.Location = new System.Drawing.Point(6, 6);
             this.videoGroupBox.Name = "videoGroupBox";
-            this.videoGroupBox.Size = new System.Drawing.Size(452, 90);
+            this.videoGroupBox.Size = new System.Drawing.Size(452, 116);
             this.videoGroupBox.TabIndex = 41;
             this.videoGroupBox.TabStop = false;
             this.videoGroupBox.Text = " Video Settings ";
+            // 
+            // ARLabel
+            // 
+            this.ARLabel.AutoSize = true;
+            this.ARLabel.Location = new System.Drawing.Point(7, 90);
+            this.ARLabel.Name = "ARLabel";
+            this.ARLabel.Size = new System.Drawing.Size(57, 13);
+            this.ARLabel.TabIndex = 42;
+            this.ARLabel.Text = "Input DAR";
+            // 
+            // ar
+            // 
+            this.ar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ar.CustomDARs = new MeGUI.core.util.Dar[0];
+            this.ar.HasLater = true;
+            this.ar.Location = new System.Drawing.Point(119, 83);
+            this.ar.MaximumSize = new System.Drawing.Size(1000, 29);
+            this.ar.MinimumSize = new System.Drawing.Size(64, 29);
+            this.ar.Name = "ar";
+            this.ar.SelectedIndex = 0;
+            this.ar.Size = new System.Drawing.Size(327, 29);
+            this.ar.TabIndex = 41;
             // 
             // chkDontEncodeVideo
             // 
@@ -792,10 +792,10 @@ namespace MeGUI
             // 
             // videoProfile
             // 
-            this.videoProfile.Location = new System.Drawing.Point(119, 39);
+            this.videoProfile.Location = new System.Drawing.Point(120, 39);
             this.videoProfile.Name = "videoProfile";
             this.videoProfile.ProfileSet = "Video";
-            this.videoProfile.Size = new System.Drawing.Size(327, 22);
+            this.videoProfile.Size = new System.Drawing.Size(326, 22);
             this.videoProfile.TabIndex = 17;
             this.videoProfile.SelectedProfileChanged += new System.EventHandler(this.ProfileChanged);
             // 
@@ -958,16 +958,16 @@ namespace MeGUI
         private System.Windows.Forms.CheckBox keepInputResolution;
         private System.Windows.Forms.CheckBox autoCrop;
         private core.gui.ConfigableProfilesControl avsProfile;
-        private core.gui.ARChooser ar;
         private System.Windows.Forms.CheckBox autoDeint;
         private System.Windows.Forms.Label outputResolutionLabel;
         private System.Windows.Forms.NumericUpDown horizontalResolution;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label ARLabel;
         private core.gui.TargetSizeSCBox fileSize;
         private System.Windows.Forms.Label filesizeLabel;
         private System.Windows.Forms.ComboBox cbGUIMode;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.TabPage tabPage5;
+        private System.Windows.Forms.Label ARLabel;
+        private core.gui.ARChooser ar;
     }
 }

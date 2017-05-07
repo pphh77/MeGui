@@ -498,7 +498,8 @@ namespace MeGUI
 
             updateWorkingName(iFile.FileName);
 
-            this.ar.Value = _videoInputInfo.VideoInfo.DAR;
+            if (_oSettings.DAR.HasValue)
+                this.ar.Value = _oSettings.DAR;
 
             if (VideoSettings.EncoderType.ID == "x264" && this.chapterFile.Filename != null)
                 this.usechaptersmarks.Enabled = true;
@@ -690,6 +691,8 @@ namespace MeGUI
 
             if (!string.IsNullOrEmpty(input.SelectedText))
                 updateWorkingName(input.SelectedText);
+
+            ar.Value = settings.DAR.Value;
         }
 
         private void goButton_Click(object sender, EventArgs e)
@@ -735,7 +738,11 @@ namespace MeGUI
 
             // set initial oneclick job settings
             OneClickPostprocessingProperties dpp = new OneClickPostprocessingProperties();
-            dpp.DAR = ar.Value;
+            if (ar.Value.HasValue)
+                dpp.DAR = ar.Value;
+            else
+                dpp.DAR = _videoInputInfo.VideoInfo.DAR;
+            dpp.ForcedDAR = ar.Value;
             dpp.AvsSettings = (AviSynthSettings)avsProfile.SelectedProfile.BaseSettings.Clone();
             dpp.Container = (ContainerType)containerFormat.SelectedItem;
             dpp.FinalOutput = output.Filename;
@@ -1479,11 +1486,11 @@ namespace MeGUI
             {
                 horizontalResolution.Enabled = autoCrop.Enabled = videoProfile.Enabled = false;
                 usechaptersmarks.Enabled = keepInputResolution.Enabled = addPrerenderJob.Enabled = false;
-                autoDeint.Enabled = fileSize.Enabled = avsProfile.Enabled = ar.Enabled = false;
+                autoDeint.Enabled = fileSize.Enabled = avsProfile.Enabled = false;
             }
             else
             {
-                ar.Enabled = videoProfile.Enabled = keepInputResolution.Enabled = addPrerenderJob.Enabled = true;
+                videoProfile.Enabled = keepInputResolution.Enabled = addPrerenderJob.Enabled = true;
                 autoDeint.Enabled = fileSize.Enabled = avsProfile.Enabled = true;
                 if (videoProfile.SelectedProfile.FQName.StartsWith("x264"))
                     usechaptersmarks.Enabled = true;

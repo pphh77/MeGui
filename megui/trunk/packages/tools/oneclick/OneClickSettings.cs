@@ -125,6 +125,16 @@ namespace MeGUI
             set { automaticDeinterlacing = value; }
         }
 
+        /// <summary>
+        /// gets / sets the aspect ratio of the video input (if known)
+        /// </summary>
+        private Dar? ar;
+        public Dar? DAR
+        {
+            get { return ar; }
+            set { ar = value; }
+        }
+
         private bool autoCrop;
         public bool AutoCrop
         {
@@ -353,6 +363,7 @@ namespace MeGUI
             IndexerPriority.Add(FileIndexerWindow.IndexType.LSMASH.ToString());
             IndexerPriority.Add(FileIndexerWindow.IndexType.FFMS.ToString());
             IndexerPriority.Add(FileIndexerWindow.IndexType.AVISOURCE.ToString());
+            ar = null;
 		}
 
         #region GenericSettings Members

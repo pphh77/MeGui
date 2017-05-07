@@ -279,10 +279,9 @@ namespace MeGUI
                 if (String.IsNullOrEmpty(job.PostprocessingProperties.VideoFileToMux))
                 {
                     //Open the video
-                    Dar? dar;
                     avsFile = createAVSFile(job.IndexFile, job.Input, job.PostprocessingProperties.DAR,
                         job.PostprocessingProperties.HorizontalOutputResolution, _log,
-                        job.PostprocessingProperties.AvsSettings, job.PostprocessingProperties.AutoDeinterlace, videoSettings, out dar,
+                        job.PostprocessingProperties.AvsSettings, job.PostprocessingProperties.AutoDeinterlace, videoSettings,
                         job.PostprocessingProperties.AutoCrop, job.PostprocessingProperties.KeepInputResolution,
                         job.PostprocessingProperties.UseChaptersMarks);
 
@@ -308,12 +307,12 @@ namespace MeGUI
                     myVideo.Output = Path.Combine(job.PostprocessingProperties.WorkingDirectory, Path.GetFileNameWithoutExtension(job.Input) + "_Video");
                     myVideo.NumberOfFrames = frameCount;
                     myVideo.Framerate = (decimal)frameRate;
-                    myVideo.DAR = dar;
                     myVideo.VideoType = new MuxableType((new VideoEncoderProvider().GetSupportedOutput(videoSettings.EncoderType))[0], videoSettings.Codec);
                     myVideo.Settings = videoSettings;
                 }
                 else
                 {
+                    myVideo.DAR = job.PostprocessingProperties.ForcedDAR;
                     myVideo.Output = job.PostprocessingProperties.VideoFileToMux;
                     MediaInfoFile oInfo = new MediaInfoFile(myVideo.Output, ref _log);
                     if (Path.GetExtension(job.PostprocessingProperties.VideoFileToMux).Equals(".unknown") && !String.IsNullOrEmpty(oInfo.ContainerFileTypeString))
@@ -520,9 +519,9 @@ namespace MeGUI
         /// <returns>the name of the AviSynth script created, empty if there was an error</returns>
         private string createAVSFile(string indexFile, string inputFile, Dar? AR, int desiredOutputWidth,
             LogItem _log, AviSynthSettings avsSettings, bool autoDeint, VideoCodecSettings settings,
-            out Dar? dar, bool autoCrop, bool keepInputResolution, bool useChaptersMarks)
+            bool autoCrop, bool keepInputResolution, bool useChaptersMarks)
         {
-            dar = null;
+            Dar? dar = null;
             Dar customDAR;
             IMediaFile iMediaFile = null;
             IVideoReader reader;

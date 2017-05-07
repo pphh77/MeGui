@@ -31,14 +31,14 @@ namespace MeGUI
 	/// </summary>
 	public class OneClickPostprocessingProperties
 	{
-		private bool signalAR, autoDeint, autoCrop, keepInputResolution, prerenderJob, 
+		private bool autoDeint, autoCrop, keepInputResolution, prerenderJob, 
             useChapterMarks, chapterExtracted, eac3toDemux, applyDelayCorrection;
         private int horizontalOutputResolution, _titleNumberToProcess;
         private FileSize? splitSize;
         private ContainerType container;
 		private FileSize? outputSize;
-		private Dar? ar;
-		private VideoCodecSettings videoSettings;
+		private Dar? ar, forcedar;
+        private VideoCodecSettings videoSettings;
         private AviSynthSettings avsSettings;
 		private double customAR;
         private string chapterFile, finalOutput, aviSynthScript, deviceType, inputFile,
@@ -52,10 +52,10 @@ namespace MeGUI
 
 		public OneClickPostprocessingProperties()
 		{
-			signalAR = false;
             autoCrop = true;
             keepInputResolution = false;
             ar = null;
+            forcedar = null;
             avsSettings = new AviSynthSettings();
 			horizontalOutputResolution = 720;
 			customAR = 1.0;
@@ -179,6 +179,15 @@ namespace MeGUI
 			get { return ar; }
 			set { ar = value; }
 		}
+
+        /// <summary>
+        /// gets / sets the forced aspect ratio of the video input
+        /// </summary>
+        public Dar? ForcedDAR
+        {
+            get { return forcedar; }
+            set { forcedar = value; }
+        }
 
         public AviSynthSettings AvsSettings
         {
