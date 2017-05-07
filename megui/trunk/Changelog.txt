@@ -1,3 +1,4 @@
+2632 [OneClick]             improved error handling
 2631 [OneClick]             added aspect ratio selection to the OneClick profile
                             input aspect ratio can always be selected
                             if an input aspect ratio will be selected this will be forced

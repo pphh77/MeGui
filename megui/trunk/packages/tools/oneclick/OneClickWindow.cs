@@ -692,7 +692,10 @@ namespace MeGUI
             if (!string.IsNullOrEmpty(input.SelectedText))
                 updateWorkingName(input.SelectedText);
 
-            ar.Value = settings.DAR.Value;
+            if (settings.DAR != null)
+                ar.Value = settings.DAR.Value;
+            else
+                ar.Value = null;
         }
 
         private void goButton_Click(object sender, EventArgs e)
