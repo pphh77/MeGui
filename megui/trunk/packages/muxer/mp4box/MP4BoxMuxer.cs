@@ -23,7 +23,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using System.Windows.Forms;
 
 using MeGUI.core.details;
 using MeGUI.core.util;
@@ -32,8 +31,8 @@ namespace MeGUI
 {
     class MP4BoxMuxer : CommandlineMuxer
     {
-        public static readonly JobProcessorFactory Factory =
-new JobProcessorFactory(new ProcessorFactory(init), "MP4BoxMuxer");
+        public static readonly JobProcessorFactory Factory = 
+            new JobProcessorFactory(new ProcessorFactory(init), "MP4BoxMuxer");
 
         private static IJobProcessor init(MainForm mf, Job j)
         {
@@ -262,6 +261,12 @@ new JobProcessorFactory(new ProcessorFactory(init), "MP4BoxMuxer");
                     if (settings.Framerate.HasValue)
                         fpsString = settings.Framerate.Value.ToString(ci);
                     sb.Append(":fps=" + fpsString);
+
+                    if (settings.DAR.HasValue)
+                    {
+                        Sar sar = settings.DAR.Value.ToSar((int)oVideoInfo.VideoInfo.Width, (int)oVideoInfo.VideoInfo.Height);
+                        sb.Append(":par=" + sar.X + ":" + sar.Y);
+                    }
 
                     if (!string.IsNullOrEmpty(settings.VideoName))
                     {

@@ -18,6 +18,8 @@
 // 
 // ****************************************************************************
 
+using System;
+
 using MeGUI.core.details;
 using MeGUI.core.util;
 
@@ -44,6 +46,16 @@ namespace MeGUI
         {
             ensureInputFilesExistIfNeeded(job.Settings);
             setProjectedFileSize();
+
+            if (log != null)
+            {
+                if (job.Settings.DAR.HasValue)
+                    log.LogValue("aspect ratio (job)", job.Settings.DAR.Value);
+                if (job.Settings.Framerate.HasValue)
+                    log.LogValue("frame rate (job)", job.Settings.Framerate.Value);
+                if (!String.IsNullOrEmpty(job.Settings.DeviceType))
+                    log.LogValue("device type", job.Settings.DeviceType);
+            }
         }
 
         private void ensureInputFilesExistIfNeeded(MuxSettings settings)

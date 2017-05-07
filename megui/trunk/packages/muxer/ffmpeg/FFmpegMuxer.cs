@@ -21,7 +21,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Windows.Forms;
 
 using MeGUI.core.details;
 using MeGUI.core.util;
@@ -91,7 +90,11 @@ namespace MeGUI
                 if (settings.Framerate.HasValue)
                     fpsString = settings.Framerate.Value.ToString(ci);
 
-                sb.Append("-y -i \"" + inputFile + "\" -vcodec copy -vtag XVID -r " + fpsString + " \"" + job.Output + "\" ");
+                string aspect = null;
+                if (settings.DAR.HasValue)
+                    aspect = " -aspect " + settings.DAR.Value.X + ":" + settings.DAR.Value.Y;
+
+                sb.Append("-y -i \"" + inputFile + "\" -vcodec copy -vtag XVID -r " + fpsString + aspect + " \"" + job.Output + "\" ");
 
                 return sb.ToString();
             }

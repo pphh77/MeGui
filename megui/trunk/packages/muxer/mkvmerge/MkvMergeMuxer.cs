@@ -21,7 +21,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Windows.Forms;
 
 using MeGUI.core.details;
 using MeGUI.core.util;
@@ -30,8 +29,8 @@ namespace MeGUI
 {
     class MkvMergeMuxer : CommandlineMuxer
     {
-        public static readonly JobProcessorFactory Factory =
-new JobProcessorFactory(new ProcessorFactory(init), "MkvMergeMuxer");
+        public static readonly JobProcessorFactory Factory = 
+            new JobProcessorFactory(new ProcessorFactory(init), "MkvMergeMuxer");
         
         private static IJobProcessor init(MainForm mf, Job j)
         {
@@ -142,7 +141,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "MkvMergeMuxer");
                     else
                         trackID = 0;
 
-                    if (settings.DAR.HasValue && !string.IsNullOrEmpty(settings.VideoInput))
+                    if (settings.DAR.HasValue)
                         sb.Append(" --aspect-ratio " + trackID + ":" + settings.DAR.Value.X + "/" + settings.DAR.Value.Y);
                     else
                         sb.Append(" --engage keep_bitstream_ar_info"); // assuming that SAR info is already in the stream...

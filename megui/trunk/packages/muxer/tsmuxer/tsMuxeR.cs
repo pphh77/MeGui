@@ -23,20 +23,17 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using System.Windows.Forms;
 using System.Text.RegularExpressions;
 
 using MeGUI.core.details;
 using MeGUI.core.util;
 
-using MediaInfoWrapper;
-
 namespace MeGUI
 {
     class tsMuxeR : CommandlineMuxer
     {
-        public static readonly JobProcessorFactory Factory =
-new JobProcessorFactory(new ProcessorFactory(init), "TSMuxer");
+        public static readonly JobProcessorFactory Factory = 
+            new JobProcessorFactory(new ProcessorFactory(init), "TSMuxer");
 
         private static IJobProcessor init(MainForm mf, Job j)
         {
@@ -196,6 +193,9 @@ new JobProcessorFactory(new ProcessorFactory(init), "TSMuxer");
 
                         sw.Write("\n" + vcodecID + ", ");
                         sw.Write("\"" + videoFile + "\"");
+
+                        if (settings.DAR.HasValue)
+                            sw.Write(", ar=" + settings.DAR.Value.X + ":" + settings.DAR.Value.Y);
 
                         string fpsString = oVideoInfo.VideoInfo.FPS.ToString(ci);
                         if (settings.Framerate.HasValue)
