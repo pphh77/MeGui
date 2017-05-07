@@ -32,7 +32,6 @@ namespace MeGUI
     {
         #region variables
         private ulong numberOfFrames;
-        private Dar? dar;
         private ulong? currentFrameNumber;
         protected int lastStatusUpdateFramePosition = 0;
         protected int hres = 0, vres = 0;
@@ -76,7 +75,7 @@ namespace MeGUI
             double fps;
             Dar d = Dar.A1x1;
             JobUtil.GetAllInputProperties(job.Input, out numberOfFrames, out fps, out fps_n, out fps_d, out hres, out vres, out d);
-            dar = job.DAR;
+            Dar? dar = job.DAR;
             su.NbFramesTotal = numberOfFrames;
             su.ClipLength = TimeSpan.FromSeconds((double)numberOfFrames / fps);
 
@@ -97,6 +96,9 @@ namespace MeGUI
                         log.LogValue("aspect ratio (job)", dar.Value);
                 }
             }
+
+            if (!job.DAR.HasValue)
+                job.DAR = d;
         }
 
         protected override void doExitConfig()

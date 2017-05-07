@@ -53,7 +53,6 @@ namespace MeGUI
         }
 
         private Dar? dar;
-
         public Dar? DAR
         {
             get { return dar; }
