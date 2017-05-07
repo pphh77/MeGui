@@ -304,53 +304,52 @@ namespace MeGUI
 		/// <param name="e"></param>
 		private void queueButton_Click(object sender, System.EventArgs e)
 		{
-			if (!string.IsNullOrEmpty(this.muxedOutput.Filename))
+            if (String.IsNullOrEmpty(this.muxedOutput.Filename))
+                return;
+
+            FileSize? desiredSize = targetSize.Value;
+            FileSize? splitSize = splitting.Value;
+
+            if (FileSizeRadio.Checked)
+                log.LogValue("Desired Size ", desiredSize);
+            else if (averageBitrateRadio.Checked)
+                log.LogValue("Projected Bitrate ", string.Format("{0}kbps", projectedBitrateKBits.Text));
+
+            log.LogValue("Split Size ", splitSize);
+
+            MuxStream[] audio;
+            AudioJob[] aStreams;
+            AudioEncoderType[] muxTypes;
+			separateEncodableAndMuxableAudioStreams(out aStreams, out audio, out muxTypes);
+			MuxStream[] subtitles = new MuxStream[0];
+			string chapters = "";
+			string videoInput = vInfo.VideoInput;
+            string videoOutput = vInfo.VideoOutput;
+            string muxedOutput = this.muxedOutput.Filename;
+            ContainerType cot = this.container.SelectedItem as ContainerType;
+
+            // determine audio language 
+            foreach (MuxStream stream in audio)
+            {
+                string strLanguage = LanguageSelectionContainer.GetLanguageFromFileName(Path.GetFileNameWithoutExtension(stream.path));
+                if (!String.IsNullOrEmpty(strLanguage))
+                    stream.language = strLanguage;
+            }
+
+            if (addSubsNChapters.Checked)
 			{
-
-                FileSize? desiredSize = targetSize.Value;
-                FileSize? splitSize = splitting.Value;
-
-                if (FileSizeRadio.Checked)
-                    log.LogValue("Desired Size ", desiredSize);
-                else if (averageBitrateRadio.Checked)
-                    log.LogValue("Projected Bitrate ", string.Format("{0}kbps", projectedBitrateKBits.Text));
-
-                log.LogValue("Split Size ", splitSize);
-
-                MuxStream[] audio;
-                AudioJob[] aStreams;
-                AudioEncoderType[] muxTypes;
-				separateEncodableAndMuxableAudioStreams(out aStreams, out audio, out muxTypes);
-				MuxStream[] subtitles = new MuxStream[0];
-				string chapters = "";
-				string videoInput = vInfo.VideoInput;
-                string videoOutput = vInfo.VideoOutput;
-                string muxedOutput = this.muxedOutput.Filename;
-                ContainerType cot = this.container.SelectedItem as ContainerType;
-
-                // determine audio language 
-                foreach (MuxStream stream in audio)
-                {
-                    string strLanguage = LanguageSelectionContainer.GetLanguageFromFileName(Path.GetFileNameWithoutExtension(stream.path));
-                    if (!String.IsNullOrEmpty(strLanguage))
-                        stream.language = strLanguage;
-                }
-
-                if (addSubsNChapters.Checked)
-				{
-                    AdaptiveMuxWindow amw = new AdaptiveMuxWindow();
-                    amw.setMinimizedMode(videoOutput, "", videoStream.Settings.EncoderType, JobUtil.getFramerate(videoInput), audio,
-                        muxTypes, muxedOutput, splitSize, cot);
-                    if (amw.ShowDialog() == DialogResult.OK)
-                        amw.getAdditionalStreams(out audio, out subtitles, out chapters, out muxedOutput, out cot);
-                    else // user aborted, abort the whole process
-                        return;
-                }
-                removeStreamsToBeEncoded(ref audio, aStreams);
-                MainForm.Instance.Jobs.addJobsWithDependencies(VideoUtil.GenerateJobSeries(this.videoStream, muxedOutput, aStreams, subtitles, chapters,
-                    desiredSize, splitSize, cot, this.prerender, audio, log, this.device.Text, vInfo.Zones, null, null, false), true);
-                this.Close();
-			}
+                AdaptiveMuxWindow amw = new AdaptiveMuxWindow();
+                amw.setMinimizedMode(videoOutput, "", videoStream.Settings.EncoderType, JobUtil.getFramerate(videoInput), audio,
+                    muxTypes, muxedOutput, splitSize, cot);
+                if (amw.ShowDialog() == DialogResult.OK)
+                    amw.getAdditionalStreams(out audio, out subtitles, out chapters, out muxedOutput, out cot);
+                else // user aborted, abort the whole process
+                    return;
+            }
+            removeStreamsToBeEncoded(ref audio, aStreams);
+            MainForm.Instance.Jobs.addJobsWithDependencies(VideoUtil.GenerateJobSeries(videoStream, muxedOutput, aStreams, subtitles, chapters,
+                desiredSize, splitSize, cot, prerender, audio, log, device.Text, vInfo.Zones, null, null, false), true);
+            this.Close();
 		}
 
         /// <summary>
@@ -491,7 +490,6 @@ namespace MeGUI
                 myVideo.Output = info.Video.Info.VideoOutput;
                 myVideo.NumberOfFrames = frameCount;
                 myVideo.Framerate = (decimal)frameRate;
-                myVideo.DAR = info.Video.Info.DAR;
                 myVideo.VideoType = info.Video.CurrentMuxableVideoType;
                 myVideo.Settings = vSettings;
                 

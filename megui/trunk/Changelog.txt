@@ -1,3 +1,7 @@
+2630 [AutoEncode]           do not force the aspect ratio to be written by the muxer as it is available in the video stream
+2629 [Muxer]                added/improved aspect ratio writing (all muxers except the AVI muxer)
+                            for the M2TS muxer only some input video types are supported
+                            improved logging 
 2628 [VideoEncoder]         forced aspect ratio to be written to the encoding
                             if not available in the job the avs aspect ratio information will be used
 2627 [Worker]               priority changes will also be applied to child processes. Feature request #615
