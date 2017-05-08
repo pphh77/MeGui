@@ -1,3 +1,6 @@
+2633 [OneClick]             added button to clear the working directory path and the chapters file
+     [AVS Script Creator]   added button to clear the subtitle file
+     [Muxer]                added button to clear the chapter file
 2632 [OneClick]             improved error handling
 2631 [OneClick]             added aspect ratio selection to the OneClick profile
                             input aspect ratio can always be selected

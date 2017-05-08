@@ -87,6 +87,8 @@ namespace MeGUI
             this.horizontalResolution = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
             this.locationGroupBox = new System.Windows.Forms.GroupBox();
+            this.deleteChapter = new System.Windows.Forms.Button();
+            this.deleteWorking = new System.Windows.Forms.Button();
             this.chapterFile = new MeGUI.FileBar();
             this.workingDirectory = new MeGUI.FileBar();
             this.chapterLabel = new System.Windows.Forms.Label();
@@ -549,6 +551,8 @@ namespace MeGUI
             // 
             // locationGroupBox
             // 
+            this.locationGroupBox.Controls.Add(this.deleteChapter);
+            this.locationGroupBox.Controls.Add(this.deleteWorking);
             this.locationGroupBox.Controls.Add(this.chapterFile);
             this.locationGroupBox.Controls.Add(this.workingDirectory);
             this.locationGroupBox.Controls.Add(this.chapterLabel);
@@ -562,6 +566,26 @@ namespace MeGUI
             this.locationGroupBox.TabStop = false;
             this.locationGroupBox.Text = " Extra IO ";
             // 
+            // deleteChapter
+            // 
+            this.deleteChapter.Location = new System.Drawing.Point(420, 48);
+            this.deleteChapter.Name = "deleteChapter";
+            this.deleteChapter.Size = new System.Drawing.Size(26, 24);
+            this.deleteChapter.TabIndex = 41;
+            this.deleteChapter.Text = "X";
+            this.deleteChapter.UseVisualStyleBackColor = true;
+            this.deleteChapter.Click += new System.EventHandler(this.deleteChapter_Click);
+            // 
+            // deleteWorking
+            // 
+            this.deleteWorking.Location = new System.Drawing.Point(420, 16);
+            this.deleteWorking.Name = "deleteWorking";
+            this.deleteWorking.Size = new System.Drawing.Size(26, 24);
+            this.deleteWorking.TabIndex = 40;
+            this.deleteWorking.Text = "X";
+            this.deleteWorking.UseVisualStyleBackColor = true;
+            this.deleteWorking.Click += new System.EventHandler(this.deleteWorking_Click);
+            // 
             // chapterFile
             // 
             this.chapterFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -570,11 +594,11 @@ namespace MeGUI
             this.chapterFile.Filter = "Chapter files (*.txt)|*.txt";
             this.chapterFile.FilterIndex = 0;
             this.chapterFile.FolderMode = false;
-            this.chapterFile.Location = new System.Drawing.Point(120, 47);
+            this.chapterFile.Location = new System.Drawing.Point(124, 47);
             this.chapterFile.Name = "chapterFile";
             this.chapterFile.ReadOnly = true;
             this.chapterFile.SaveMode = false;
-            this.chapterFile.Size = new System.Drawing.Size(326, 26);
+            this.chapterFile.Size = new System.Drawing.Size(290, 26);
             this.chapterFile.TabIndex = 39;
             this.chapterFile.Title = null;
             // 
@@ -590,7 +614,7 @@ namespace MeGUI
             this.workingDirectory.Name = "workingDirectory";
             this.workingDirectory.ReadOnly = true;
             this.workingDirectory.SaveMode = false;
-            this.workingDirectory.Size = new System.Drawing.Size(326, 26);
+            this.workingDirectory.Size = new System.Drawing.Size(294, 26);
             this.workingDirectory.TabIndex = 38;
             this.workingDirectory.Title = null;
             this.workingDirectory.FileSelected += new MeGUI.FileBarEventHandler(this.workingDirectory_FileSelected);
@@ -673,7 +697,7 @@ namespace MeGUI
             // 
             this.devicetype.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.devicetype.FormattingEnabled = true;
-            this.devicetype.Location = new System.Drawing.Point(351, 69);
+            this.devicetype.Location = new System.Drawing.Point(349, 69);
             this.devicetype.Name = "devicetype";
             this.devicetype.Size = new System.Drawing.Size(95, 21);
             this.devicetype.TabIndex = 44;
@@ -969,5 +993,7 @@ namespace MeGUI
         private System.Windows.Forms.TabPage tabPage5;
         private System.Windows.Forms.Label ARLabel;
         private core.gui.ARChooser ar;
+        private System.Windows.Forms.Button deleteChapter;
+        private System.Windows.Forms.Button deleteWorking;
     }
 }

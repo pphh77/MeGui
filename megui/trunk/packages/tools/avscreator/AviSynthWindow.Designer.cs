@@ -87,6 +87,13 @@ namespace MeGUI
             this.inputDARLabel = new System.Windows.Forms.Label();
             this.videoInputLabel = new System.Windows.Forms.Label();
             this.filterTab = new System.Windows.Forms.TabPage();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.deleteSubtitle = new System.Windows.Forms.Button();
+            this.label9 = new System.Windows.Forms.Label();
+            this.SubtitlesPath = new System.Windows.Forms.TextBox();
+            this.cbCharset = new System.Windows.Forms.ComboBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.openSubtitlesButton = new System.Windows.Forms.Button();
             this.tabSources = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.mpegOptGroupBox = new System.Windows.Forms.GroupBox();
@@ -112,11 +119,6 @@ namespace MeGUI
             this.deinterlace = new System.Windows.Forms.CheckBox();
             this.deinterlaceType = new System.Windows.Forms.ComboBox();
             this.filtersGroupbox = new System.Windows.Forms.GroupBox();
-            this.cbCharset = new System.Windows.Forms.ComboBox();
-            this.label8 = new System.Windows.Forms.Label();
-            this.openSubtitlesButton = new System.Windows.Forms.Button();
-            this.SubtitlesPath = new System.Windows.Forms.TextBox();
-            this.SubtitlesLabel = new System.Windows.Forms.Label();
             this.noiseFilterType = new System.Windows.Forms.ComboBox();
             this.noiseFilter = new System.Windows.Forms.CheckBox();
             this.resizeFilterType = new System.Windows.Forms.ComboBox();
@@ -152,6 +154,7 @@ namespace MeGUI
             this.gbOutput.SuspendLayout();
             this.videoGroupBox.SuspendLayout();
             this.filterTab.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.tabSources.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.mpegOptGroupBox.SuspendLayout();
@@ -604,7 +607,7 @@ namespace MeGUI
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(8, 115);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(82, 13);
+            this.label6.Size = new System.Drawing.Size(83, 13);
             this.label6.TabIndex = 7;
             this.label6.Text = "AviSynth profile";
             // 
@@ -626,6 +629,7 @@ namespace MeGUI
             // 
             // filterTab
             // 
+            this.filterTab.Controls.Add(this.groupBox1);
             this.filterTab.Controls.Add(this.tabSources);
             this.filterTab.Controls.Add(this.deinterlacingGroupBox);
             this.filterTab.Controls.Add(this.filtersGroupbox);
@@ -635,6 +639,100 @@ namespace MeGUI
             this.filterTab.TabIndex = 2;
             this.filterTab.Text = "Filters";
             this.filterTab.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.deleteSubtitle);
+            this.groupBox1.Controls.Add(this.label9);
+            this.groupBox1.Controls.Add(this.SubtitlesPath);
+            this.groupBox1.Controls.Add(this.cbCharset);
+            this.groupBox1.Controls.Add(this.label8);
+            this.groupBox1.Controls.Add(this.openSubtitlesButton);
+            this.groupBox1.Location = new System.Drawing.Point(3, 362);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(449, 68);
+            this.groupBox1.TabIndex = 15;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = " Subtitles ";
+            // 
+            // deleteSubtitle
+            // 
+            this.deleteSubtitle.Location = new System.Drawing.Point(418, 15);
+            this.deleteSubtitle.Name = "deleteSubtitle";
+            this.deleteSubtitle.Size = new System.Drawing.Size(27, 22);
+            this.deleteSubtitle.TabIndex = 15;
+            this.deleteSubtitle.Text = "X";
+            this.deleteSubtitle.UseVisualStyleBackColor = true;
+            this.deleteSubtitle.Click += new System.EventHandler(this.deleteSubtitle_Click);
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(9, 20);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(27, 13);
+            this.label9.TabIndex = 14;
+            this.label9.Text = "File:";
+            // 
+            // SubtitlesPath
+            // 
+            this.SubtitlesPath.BackColor = System.Drawing.SystemColors.Control;
+            this.SubtitlesPath.Location = new System.Drawing.Point(97, 15);
+            this.SubtitlesPath.Name = "SubtitlesPath";
+            this.SubtitlesPath.ReadOnly = true;
+            this.SubtitlesPath.Size = new System.Drawing.Size(282, 21);
+            this.SubtitlesPath.TabIndex = 9;
+            // 
+            // cbCharset
+            // 
+            this.cbCharset.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbCharset.Enabled = false;
+            this.cbCharset.FormattingEnabled = true;
+            this.cbCharset.Items.AddRange(new object[] {
+            "Default",
+            "ANSI",
+            "Symbol",
+            "Shiftjis",
+            "Hangeul",
+            "Hangul",
+            "GB2312",
+            "Chinese Big 5",
+            "OEM",
+            "Johab",
+            "Hebrew",
+            "Arabic",
+            "Greek",
+            "Turkish",
+            "Vietnamese",
+            "Thai",
+            "East Europe",
+            "Russian",
+            "Mac",
+            "Baltic"});
+            this.cbCharset.Location = new System.Drawing.Point(97, 42);
+            this.cbCharset.Name = "cbCharset";
+            this.cbCharset.Size = new System.Drawing.Size(239, 21);
+            this.cbCharset.TabIndex = 12;
+            this.cbCharset.SelectedIndexChanged += new System.EventHandler(this.refreshScript);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(9, 45);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(49, 13);
+            this.label8.TabIndex = 13;
+            this.label8.Text = "Charset:";
+            // 
+            // openSubtitlesButton
+            // 
+            this.openSubtitlesButton.Location = new System.Drawing.Point(385, 15);
+            this.openSubtitlesButton.Name = "openSubtitlesButton";
+            this.openSubtitlesButton.Size = new System.Drawing.Size(27, 22);
+            this.openSubtitlesButton.TabIndex = 10;
+            this.openSubtitlesButton.Text = "...";
+            this.openSubtitlesButton.UseVisualStyleBackColor = true;
+            this.openSubtitlesButton.Click += new System.EventHandler(this.openSubtitlesButton_Click);
             // 
             // tabSources
             // 
@@ -849,10 +947,10 @@ namespace MeGUI
             this.deinterlacingGroupBox.Enabled = false;
             this.deinterlacingGroupBox.Location = new System.Drawing.Point(3, 121);
             this.deinterlacingGroupBox.Name = "deinterlacingGroupBox";
-            this.deinterlacingGroupBox.Size = new System.Drawing.Size(449, 164);
+            this.deinterlacingGroupBox.Size = new System.Drawing.Size(449, 153);
             this.deinterlacingGroupBox.TabIndex = 12;
             this.deinterlacingGroupBox.TabStop = false;
-            this.deinterlacingGroupBox.Text = "Deinterlacing";
+            this.deinterlacingGroupBox.Text = " Deinterlacing ";
             // 
             // deintM
             // 
@@ -956,90 +1054,17 @@ namespace MeGUI
             // 
             this.filtersGroupbox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.filtersGroupbox.Controls.Add(this.cbCharset);
-            this.filtersGroupbox.Controls.Add(this.label8);
-            this.filtersGroupbox.Controls.Add(this.openSubtitlesButton);
-            this.filtersGroupbox.Controls.Add(this.SubtitlesPath);
-            this.filtersGroupbox.Controls.Add(this.SubtitlesLabel);
             this.filtersGroupbox.Controls.Add(this.noiseFilterType);
             this.filtersGroupbox.Controls.Add(this.noiseFilter);
             this.filtersGroupbox.Controls.Add(this.resizeFilterType);
             this.filtersGroupbox.Controls.Add(this.resizeFilterLabel);
             this.filtersGroupbox.Enabled = false;
-            this.filtersGroupbox.Location = new System.Drawing.Point(3, 291);
+            this.filtersGroupbox.Location = new System.Drawing.Point(3, 280);
             this.filtersGroupbox.Name = "filtersGroupbox";
-            this.filtersGroupbox.Size = new System.Drawing.Size(449, 139);
+            this.filtersGroupbox.Size = new System.Drawing.Size(449, 76);
             this.filtersGroupbox.TabIndex = 9;
             this.filtersGroupbox.TabStop = false;
-            this.filtersGroupbox.Text = "Filters";
-            // 
-            // cbCharset
-            // 
-            this.cbCharset.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbCharset.FormattingEnabled = true;
-            this.cbCharset.Items.AddRange(new object[] {
-            "Default",
-            "ANSI",
-            "Symbol",
-            "Shiftjis",
-            "Hangeul",
-            "Hangul",
-            "GB2312",
-            "Chinese Big 5",
-            "OEM",
-            "Johab",
-            "Hebrew",
-            "Arabic",
-            "Greek",
-            "Turkish",
-            "Vietnamese",
-            "Thai",
-            "East Europe",
-            "Russian",
-            "Mac",
-            "Baltic"});
-            this.cbCharset.Location = new System.Drawing.Point(151, 108);
-            this.cbCharset.Name = "cbCharset";
-            this.cbCharset.Size = new System.Drawing.Size(121, 21);
-            this.cbCharset.TabIndex = 11;
-            this.cbCharset.SelectedIndexChanged += new System.EventHandler(this.refreshScript);
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(96, 111);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(49, 13);
-            this.label8.TabIndex = 10;
-            this.label8.Text = "Charset:";
-            // 
-            // openSubtitlesButton
-            // 
-            this.openSubtitlesButton.Location = new System.Drawing.Point(416, 80);
-            this.openSubtitlesButton.Name = "openSubtitlesButton";
-            this.openSubtitlesButton.Size = new System.Drawing.Size(27, 22);
-            this.openSubtitlesButton.TabIndex = 9;
-            this.openSubtitlesButton.Text = "...";
-            this.openSubtitlesButton.UseVisualStyleBackColor = true;
-            this.openSubtitlesButton.Click += new System.EventHandler(this.openSubtitlesButton_Click);
-            // 
-            // SubtitlesPath
-            // 
-            this.SubtitlesPath.BackColor = System.Drawing.SystemColors.Control;
-            this.SubtitlesPath.Location = new System.Drawing.Point(97, 80);
-            this.SubtitlesPath.Name = "SubtitlesPath";
-            this.SubtitlesPath.ReadOnly = true;
-            this.SubtitlesPath.Size = new System.Drawing.Size(313, 21);
-            this.SubtitlesPath.TabIndex = 8;
-            // 
-            // SubtitlesLabel
-            // 
-            this.SubtitlesLabel.AutoSize = true;
-            this.SubtitlesLabel.Location = new System.Drawing.Point(9, 83);
-            this.SubtitlesLabel.Name = "SubtitlesLabel";
-            this.SubtitlesLabel.Size = new System.Drawing.Size(52, 13);
-            this.SubtitlesLabel.TabIndex = 7;
-            this.SubtitlesLabel.Text = "Subtitles:";
+            this.filtersGroupbox.Text = " Filters ";
             // 
             // noiseFilterType
             // 
@@ -1251,6 +1276,8 @@ namespace MeGUI
             this.videoGroupBox.ResumeLayout(false);
             this.videoGroupBox.PerformLayout();
             this.filterTab.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.tabSources.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.mpegOptGroupBox.ResumeLayout(false);
@@ -1265,7 +1292,6 @@ namespace MeGUI
             this.deinterlacingGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.deintM)).EndInit();
             this.filtersGroupbox.ResumeLayout(false);
-            this.filtersGroupbox.PerformLayout();
             this.editTab.ResumeLayout(false);
             this.editTab.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
@@ -1350,15 +1376,17 @@ namespace MeGUI
         private GroupBox dgOptions;
         private ComboBox cbNvDeInt;
         private CheckBox nvDeInt;
-        private Label SubtitlesLabel;
-        private Button openSubtitlesButton;
-        private TextBox SubtitlesPath;
         private CheckBox dss2;
-        private Label label8;
-        private ComboBox cbCharset;
         private CheckBox nvResize;
         private ComboBox modValueBox;
         private Label lblAR;
         private Label lblAspectError;
+        private GroupBox groupBox1;
+        private TextBox SubtitlesPath;
+        private ComboBox cbCharset;
+        private Label label8;
+        private Button openSubtitlesButton;
+        private Button deleteSubtitle;
+        private Label label9;
     }
 }

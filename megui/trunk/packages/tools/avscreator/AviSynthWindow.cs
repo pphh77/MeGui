@@ -1208,7 +1208,6 @@ namespace MeGUI
                 string ext = Path.GetExtension(openSubsDialog.FileName).ToString().ToLowerInvariant();
                 this.SubtitlesPath.Text = openSubsDialog.FileName;
                 cbCharset.Enabled = (ext != ".idx");
-                MessageBox.Show("Subtitles successfully added to the script...", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else 
                 MessageBox.Show("The subtitles you have chosen were already added...", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -1382,6 +1381,12 @@ namespace MeGUI
                     cropBottom.Maximum = (int)file.VideoInfo.Height - Cropping.top - mod;
                 }
             }
+        }
+
+        private void deleteSubtitle_Click(object sender, EventArgs e)
+        {
+            SubtitlesPath.Text = null;
+            showScript(false);
         }
 
         private void setOutputResolution(bool bResizeEnabled)

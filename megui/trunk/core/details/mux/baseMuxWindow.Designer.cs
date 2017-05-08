@@ -1,4 +1,24 @@
-﻿namespace MeGUI
+﻿// ****************************************************************************
+// 
+// Copyright (C) 2005-2017 Doom9 & al
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// 
+// ****************************************************************************
+
+namespace MeGUI
 {
     partial class baseMuxWindow
     {
@@ -39,7 +59,7 @@
             this.MuxFPSLabel = new System.Windows.Forms.Label();
             this.removeVideoTrack = new System.Windows.Forms.Button();
             this.chaptersGroupbox = new System.Windows.Forms.GroupBox();
-            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.deleteChapterFile = new System.Windows.Forms.Button();
             this.chaptersInputLabel = new System.Windows.Forms.Label();
             this.chapters = new MeGUI.FileBar();
             this.outputGroupbox = new System.Windows.Forms.GroupBox();
@@ -74,7 +94,6 @@
             this.videoGroupbox.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.chaptersGroupbox.SuspendLayout();
-            this.tableLayoutPanel3.SuspendLayout();
             this.outputGroupbox.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             this.audioPanel.SuspendLayout();
@@ -117,7 +136,7 @@
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 48.99329F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 51.00671F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 39F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 41F));
             this.tableLayoutPanel2.Controls.Add(this.videoInputLabel, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.videoName, 3, 1);
             this.tableLayoutPanel2.Controls.Add(this.fps, 1, 1);
@@ -147,10 +166,10 @@
             // videoName
             // 
             this.videoName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.videoName.Location = new System.Drawing.Point(247, 42);
+            this.videoName.Location = new System.Drawing.Point(246, 42);
             this.videoName.MaxLength = 100;
             this.videoName.Name = "videoName";
-            this.videoName.Size = new System.Drawing.Size(142, 21);
+            this.videoName.Size = new System.Drawing.Size(141, 21);
             this.videoName.TabIndex = 5;
             // 
             // fps
@@ -162,7 +181,7 @@
             this.fps.Name = "fps";
             this.fps.NullString = "Not set";
             this.fps.SelectedIndex = 0;
-            this.fps.Size = new System.Drawing.Size(136, 29);
+            this.fps.Size = new System.Drawing.Size(135, 29);
             this.fps.TabIndex = 3;
             this.fps.SelectionChanged += new MeGUI.StringChanged(this.fps_SelectionChanged);
             // 
@@ -170,7 +189,7 @@
             // 
             this.videoNameLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.videoNameLabel.AutoSize = true;
-            this.videoNameLabel.Location = new System.Drawing.Point(210, 46);
+            this.videoNameLabel.Location = new System.Drawing.Point(209, 46);
             this.videoNameLabel.Margin = new System.Windows.Forms.Padding(0);
             this.videoNameLabel.Name = "videoNameLabel";
             this.videoNameLabel.Size = new System.Drawing.Size(34, 13);
@@ -208,7 +227,7 @@
             // removeVideoTrack
             // 
             this.removeVideoTrack.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.removeVideoTrack.Location = new System.Drawing.Point(400, 41);
+            this.removeVideoTrack.Location = new System.Drawing.Point(399, 41);
             this.removeVideoTrack.Name = "removeVideoTrack";
             this.removeVideoTrack.Size = new System.Drawing.Size(24, 23);
             this.removeVideoTrack.TabIndex = 39;
@@ -218,7 +237,9 @@
             // chaptersGroupbox
             // 
             this.tableLayoutPanel1.SetColumnSpan(this.chaptersGroupbox, 4);
-            this.chaptersGroupbox.Controls.Add(this.tableLayoutPanel3);
+            this.chaptersGroupbox.Controls.Add(this.deleteChapterFile);
+            this.chaptersGroupbox.Controls.Add(this.chaptersInputLabel);
+            this.chaptersGroupbox.Controls.Add(this.chapters);
             this.chaptersGroupbox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.chaptersGroupbox.Location = new System.Drawing.Point(3, 361);
             this.chaptersGroupbox.Name = "chaptersGroupbox";
@@ -227,29 +248,24 @@
             this.chaptersGroupbox.TabStop = false;
             this.chaptersGroupbox.Text = "Chapter";
             // 
-            // tableLayoutPanel3
+            // deleteChapterFile
             // 
-            this.tableLayoutPanel3.ColumnCount = 2;
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.Controls.Add(this.chaptersInputLabel, 0, 0);
-            this.tableLayoutPanel3.Controls.Add(this.chapters, 1, 0);
-            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 17);
-            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-            this.tableLayoutPanel3.RowCount = 1;
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(432, 28);
-            this.tableLayoutPanel3.TabIndex = 0;
+            this.deleteChapterFile.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.deleteChapterFile.Location = new System.Drawing.Point(410, 17);
+            this.deleteChapterFile.Name = "deleteChapterFile";
+            this.deleteChapterFile.Size = new System.Drawing.Size(24, 23);
+            this.deleteChapterFile.TabIndex = 40;
+            this.deleteChapterFile.Text = "X";
+            this.deleteChapterFile.Click += new System.EventHandler(this.deleteChapterFile_Click);
             // 
             // chaptersInputLabel
             // 
             this.chaptersInputLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.chaptersInputLabel.AutoSize = true;
-            this.chaptersInputLabel.Location = new System.Drawing.Point(3, 7);
+            this.chaptersInputLabel.Location = new System.Drawing.Point(6, 22);
             this.chaptersInputLabel.Name = "chaptersInputLabel";
             this.chaptersInputLabel.Size = new System.Drawing.Size(70, 13);
-            this.chaptersInputLabel.TabIndex = 0;
+            this.chaptersInputLabel.TabIndex = 4;
             this.chaptersInputLabel.Text = "Chapters File";
             // 
             // chapters
@@ -259,12 +275,12 @@
             this.chapters.Filter = "";
             this.chapters.FilterIndex = 0;
             this.chapters.FolderMode = false;
-            this.chapters.Location = new System.Drawing.Point(79, 3);
+            this.chapters.Location = new System.Drawing.Point(88, 17);
             this.chapters.Name = "chapters";
             this.chapters.ReadOnly = true;
             this.chapters.SaveMode = false;
-            this.chapters.Size = new System.Drawing.Size(350, 22);
-            this.chapters.TabIndex = 1;
+            this.chapters.Size = new System.Drawing.Size(316, 22);
+            this.chapters.TabIndex = 3;
             this.chapters.Title = null;
             this.chapters.FileSelected += new MeGUI.FileBarEventHandler(this.chapters_FileSelected);
             // 
@@ -607,8 +623,7 @@
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
             this.chaptersGroupbox.ResumeLayout(false);
-            this.tableLayoutPanel3.ResumeLayout(false);
-            this.tableLayoutPanel3.PerformLayout();
+            this.chaptersGroupbox.PerformLayout();
             this.outputGroupbox.ResumeLayout(false);
             this.outputGroupbox.PerformLayout();
             this.tableLayoutPanel4.ResumeLayout(false);
@@ -628,8 +643,6 @@
 
         }
         #endregion
-
-        protected FileBar chapters;
         protected FileBar output;
         protected FileBar vInput;
         protected MeGUI.core.gui.FPSChooser fps;
@@ -661,16 +674,17 @@
         private System.Windows.Forms.Label splittingLabel;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
         private System.Windows.Forms.Button removeVideoTrack;
         private System.Windows.Forms.Label videoInputLabel;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.Label MuxFPSLabel;
-        private System.Windows.Forms.Label chaptersInputLabel;
         private System.Windows.Forms.Label muxedOutputLabel;
         private System.Windows.Forms.SaveFileDialog saveFileDialog;
         private System.Windows.Forms.GroupBox outputGroupbox;
         private System.Windows.Forms.Label videoNameLabel;
+        private System.Windows.Forms.Button deleteChapterFile;
+        private System.Windows.Forms.Label chaptersInputLabel;
+        protected FileBar chapters;
     }
 }

@@ -19,10 +19,8 @@
 // ****************************************************************************
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
@@ -357,6 +355,11 @@ namespace MeGUI
         private void muxStreamControl2_FileUpdated(object sender, EventArgs e)
         {
             fileUpdated();
+        }
+
+        private void deleteChapterFile_Click(object sender, EventArgs e)
+        {
+            chapters.Filename = null;
         }
 
         private void cbContainer_SelectedIndexChanged(object sender, EventArgs e)

@@ -2004,6 +2004,16 @@ namespace MeGUI
 
             return false;
         }
+
+        private void deleteChapter_Click(object sender, EventArgs e)
+        {
+            chapterFile.Filename = null;
+        }
+
+        private void deleteWorking_Click(object sender, EventArgs e)
+        {
+            workingDirectory.Filename = null;
+        }
     }
 
     [Serializable]
