@@ -262,10 +262,16 @@ namespace MeGUI
                         fpsString = settings.Framerate.Value.ToString(ci);
                     sb.Append(":fps=" + fpsString);
 
-                    if (settings.DAR.HasValue)
+                    if (oVideoInfo.HasVideo)
                     {
-                        Sar sar = settings.DAR.Value.ToSar((int)oVideoInfo.VideoInfo.Width, (int)oVideoInfo.VideoInfo.Height);
-                        sb.Append(":par=" + sar.X + ":" + sar.Y);
+                        Dar? dar = oVideoInfo.VideoInfo.DAR;
+                        if (settings.DAR.HasValue)
+                            dar = settings.DAR;
+                        if (dar != null && dar.HasValue)
+                        {
+                            Sar sar = dar.Value.ToSar((int)oVideoInfo.VideoInfo.Width, (int)oVideoInfo.VideoInfo.Height);
+                            sb.Append(":par=" + sar.X + ":" + sar.Y);
+                        }
                     }
 
                     if (!string.IsNullOrEmpty(settings.VideoName))
@@ -276,6 +282,7 @@ namespace MeGUI
                     }
                     else
                         sb.Append(":name="); // to erase the default GPAC string
+
                     sb.Append("\"");
                 }
                 int trackCount = 0;
