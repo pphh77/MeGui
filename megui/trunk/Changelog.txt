@@ -1,3 +1,4 @@
+2634 [Profile]              removed redundant second warning when changing a profile which should be saved to the scratchpad. Feature request #606
 2633 [OneClick]             added button to clear the working directory path and the chapters file
      [AVS Script Creator]   added button to clear the subtitle file
      [Muxer]                added button to clear the chapter file

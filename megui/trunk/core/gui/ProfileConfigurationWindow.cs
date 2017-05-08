@@ -44,6 +44,7 @@ namespace MeGUI.core.gui
         private bool bSaveSettings = false;
         private bool bSettingsChanged = false;  // will be true if something has been changed
         private GenericProfile<TSettings> oldSelectedPreset;
+        private bool bIgnoreChanges = false;
 
         private TSettings Settings
         {
@@ -162,9 +163,9 @@ namespace MeGUI.core.gui
         private void videoProfile_SelectedIndexChanged(object sender, EventArgs e)
         {
             GenericProfile<TSettings> prof = oldSelectedPreset;
-            if (prof != null && !s.Settings.Equals(prof.BaseSettings))
+            if (!bIgnoreChanges && prof != null && !s.Settings.Equals(prof.BaseSettings))
             {
-                switch (MessageBox.Show("The formerly selected preset has been modified. Do you want to save the changes?", "Preset update", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
+                switch (MessageBox.Show("The formerly selected preset has been modified.\nDo you want to save the changes?", "Preset update", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
                 {
                     case DialogResult.Yes:
                         prof.Settings = s.Settings;
@@ -232,7 +233,7 @@ namespace MeGUI.core.gui
                 prof.BaseSettings = Settings;
             else
             {
-                switch (MessageBox.Show("The selected preset has been modified. Update the selected preset? (Pressing \"No\" will save your changes to the scratchpad)",
+                switch (MessageBox.Show("The selected preset has been modified. Update the selected preset?\nPressing \"No\" will save your changes to the scratchpad.",
                     "Preset update", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question))
                 {
                     case DialogResult.Yes:
@@ -240,7 +241,9 @@ namespace MeGUI.core.gui
                         break;
 
                     case DialogResult.No:
+                        bIgnoreChanges = true;
                         putSettingsInScratchpad();
+                        bIgnoreChanges = false;
                         break;
 
                     case DialogResult.Cancel:
