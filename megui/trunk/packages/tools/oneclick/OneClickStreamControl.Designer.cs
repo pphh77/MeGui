@@ -61,7 +61,6 @@ namespace MeGUI
             this.encoderProfile = new MeGUI.core.gui.ConfigableProfilesControl();
             this.chkDefaultStream = new System.Windows.Forms.CheckBox();
             this.chkForceStream = new System.Windows.Forms.CheckBox();
-            this.removeSubtitleTrack = new System.Windows.Forms.Button();
             this.input = new MeGUI.core.gui.FileSCBox();
             this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.delay)).BeginInit();
@@ -70,11 +69,12 @@ namespace MeGUI
             // 
             // subName
             // 
-            this.tableLayoutPanel1.SetColumnSpan(this.subName, 2);
+            this.tableLayoutPanel1.SetColumnSpan(this.subName, 3);
+            this.subName.Dock = System.Windows.Forms.DockStyle.Fill;
             this.subName.Location = new System.Drawing.Point(232, 33);
             this.subName.MaxLength = 100;
             this.subName.Name = "subName";
-            this.subName.Size = new System.Drawing.Size(168, 20);
+            this.subName.Size = new System.Drawing.Size(199, 20);
             this.subName.TabIndex = 40;
             // 
             // SubNamelabel
@@ -166,7 +166,6 @@ namespace MeGUI
             this.tableLayoutPanel1.Controls.Add(this.subtitleLanguageLabel, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.chkDefaultStream, 3, 2);
             this.tableLayoutPanel1.Controls.Add(this.chkForceStream, 4, 2);
-            this.tableLayoutPanel1.Controls.Add(this.removeSubtitleTrack, 5, 1);
             this.tableLayoutPanel1.Controls.Add(this.input, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.subtitleInputLabel, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 3);
@@ -245,16 +244,6 @@ namespace MeGUI
             this.chkForceStream.Visible = false;
             this.chkForceStream.CheckedChanged += new System.EventHandler(this.chkForceStream_CheckedChanged);
             // 
-            // removeSubtitleTrack
-            // 
-            this.removeSubtitleTrack.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.removeSubtitleTrack.Location = new System.Drawing.Point(407, 33);
-            this.removeSubtitleTrack.Margin = new System.Windows.Forms.Padding(0);
-            this.removeSubtitleTrack.Name = "removeSubtitleTrack";
-            this.removeSubtitleTrack.Size = new System.Drawing.Size(22, 23);
-            this.removeSubtitleTrack.TabIndex = 46;
-            this.removeSubtitleTrack.Text = "X";
-            // 
             // input
             // 
             this.input.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -308,7 +297,6 @@ namespace MeGUI
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         public System.Windows.Forms.CheckBox chkDefaultStream;
         public System.Windows.Forms.CheckBox chkForceStream;
-        protected System.Windows.Forms.Button removeSubtitleTrack;
         private core.gui.FileSCBox input;
         private core.gui.ConfigableProfilesControl encoderProfile;
         private System.Windows.Forms.ComboBox cbEncodingMode;

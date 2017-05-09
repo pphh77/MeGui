@@ -136,7 +136,7 @@ namespace MeGUI
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 48.99329F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 51.00671F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 41F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 43F));
             this.tableLayoutPanel2.Controls.Add(this.videoInputLabel, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.videoName, 3, 1);
             this.tableLayoutPanel2.Controls.Add(this.fps, 1, 1);
@@ -166,10 +166,10 @@ namespace MeGUI
             // videoName
             // 
             this.videoName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.videoName.Location = new System.Drawing.Point(246, 42);
+            this.videoName.Location = new System.Drawing.Point(245, 42);
             this.videoName.MaxLength = 100;
             this.videoName.Name = "videoName";
-            this.videoName.Size = new System.Drawing.Size(141, 21);
+            this.videoName.Size = new System.Drawing.Size(140, 21);
             this.videoName.TabIndex = 5;
             // 
             // fps
@@ -181,7 +181,7 @@ namespace MeGUI
             this.fps.Name = "fps";
             this.fps.NullString = "Not set";
             this.fps.SelectedIndex = 0;
-            this.fps.Size = new System.Drawing.Size(135, 29);
+            this.fps.Size = new System.Drawing.Size(134, 29);
             this.fps.TabIndex = 3;
             this.fps.SelectionChanged += new MeGUI.StringChanged(this.fps_SelectionChanged);
             // 
@@ -189,7 +189,7 @@ namespace MeGUI
             // 
             this.videoNameLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.videoNameLabel.AutoSize = true;
-            this.videoNameLabel.Location = new System.Drawing.Point(209, 46);
+            this.videoNameLabel.Location = new System.Drawing.Point(208, 46);
             this.videoNameLabel.Margin = new System.Windows.Forms.Padding(0);
             this.videoNameLabel.Name = "videoNameLabel";
             this.videoNameLabel.Size = new System.Drawing.Size(34, 13);
@@ -227,7 +227,7 @@ namespace MeGUI
             // removeVideoTrack
             // 
             this.removeVideoTrack.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.removeVideoTrack.Location = new System.Drawing.Point(399, 41);
+            this.removeVideoTrack.Location = new System.Drawing.Point(398, 41);
             this.removeVideoTrack.Name = "removeVideoTrack";
             this.removeVideoTrack.Size = new System.Drawing.Size(24, 23);
             this.removeVideoTrack.TabIndex = 39;

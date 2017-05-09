@@ -1,3 +1,23 @@
+// ****************************************************************************
+// 
+// Copyright (C) 2005-2017 Doom9 & al
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// 
+// ****************************************************************************
+
 namespace MeGUI.core.details.mux
 {
     partial class MuxStreamControl
@@ -39,18 +59,17 @@ namespace MeGUI.core.details.mux
             this.input = new MeGUI.FileBar();
             this.chkDefaultStream = new System.Windows.Forms.CheckBox();
             this.chkForceStream = new System.Windows.Forms.CheckBox();
-            this.removeSubtitleTrack = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.audioDelay)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // subName
             // 
-            this.tableLayoutPanel1.SetColumnSpan(this.subName, 2);
+            this.tableLayoutPanel1.SetColumnSpan(this.subName, 3);
             this.subName.Location = new System.Drawing.Point(232, 30);
             this.subName.MaxLength = 100;
             this.subName.Name = "subName";
-            this.subName.Size = new System.Drawing.Size(168, 20);
+            this.subName.Size = new System.Drawing.Size(196, 20);
             this.subName.TabIndex = 40;
             // 
             // SubNamelabel
@@ -140,7 +159,6 @@ namespace MeGUI.core.details.mux
             this.tableLayoutPanel1.Controls.Add(this.subtitleLanguageLabel, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.chkDefaultStream, 3, 2);
             this.tableLayoutPanel1.Controls.Add(this.chkForceStream, 4, 2);
-            this.tableLayoutPanel1.Controls.Add(this.removeSubtitleTrack, 5, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -194,16 +212,6 @@ namespace MeGUI.core.details.mux
             this.chkForceStream.Visible = false;
             this.chkForceStream.CheckedChanged += new System.EventHandler(this.chkForceStream_CheckedChanged);
             // 
-            // removeSubtitleTrack
-            // 
-            this.removeSubtitleTrack.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.removeSubtitleTrack.Location = new System.Drawing.Point(407, 29);
-            this.removeSubtitleTrack.Margin = new System.Windows.Forms.Padding(0);
-            this.removeSubtitleTrack.Name = "removeSubtitleTrack";
-            this.removeSubtitleTrack.Size = new System.Drawing.Size(22, 23);
-            this.removeSubtitleTrack.TabIndex = 46;
-            this.removeSubtitleTrack.Text = "X";
-            // 
             // MuxStreamControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -231,6 +239,5 @@ namespace MeGUI.core.details.mux
         public System.Windows.Forms.CheckBox chkDefaultStream;
         public FileBar input;
         public System.Windows.Forms.CheckBox chkForceStream;
-        protected System.Windows.Forms.Button removeSubtitleTrack;
     }
 }
