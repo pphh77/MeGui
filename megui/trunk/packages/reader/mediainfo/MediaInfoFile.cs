@@ -420,6 +420,7 @@ namespace MeGUI
 
                     AudioTrackInfo ati = new AudioTrackInfo();
                     ati.SourceFileName = _file;
+                    ati.Name = atrack.Title;
                     ati.DefaultTrack = atrack.DefaultString.ToLowerInvariant().Equals("yes");
                     ati.ForcedTrack = atrack.ForcedString.ToLowerInvariant().Equals("yes");
                     // DGIndex expects audio index not ID for TS

@@ -1,3 +1,4 @@
+2638 [OneClick]             fixed detection of audio track names
 2637 [Muxer] + [OneClick]   removed unnecessary "X" buttons
 2636 [Update]               x64: fixed detection of the DGIndexIM package 
 2635 [MP4 Muxer]            write always aspect ratio information to preserve anamorphic information. Bug #837
