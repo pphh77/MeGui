@@ -1,24 +1,25 @@
-2638 [OneClick]             fixed detection of audio track names
-2637 [Muxer] + [OneClick]   removed unnecessary "X" buttons
-2636 [Update]               x64: fixed detection of the DGIndexIM package 
-2635 [MP4 Muxer]            write always aspect ratio information to preserve anamorphic information. Bug #837
-2634 [Profile]              removed redundant second warning when changing a profile which should be saved to the scratchpad. Feature request #606
-2633 [OneClick]             added button to clear the working directory path and the chapters file
+2739 [MediaInfo]            removed the external dependency to MediaInfoWrapper.dll
+2738 [OneClick]             fixed detection of audio track names
+2737 [Muxer] + [OneClick]   removed unnecessary "X" buttons
+2736 [Update]               x64: fixed detection of the DGIndexIM package 
+2735 [MP4 Muxer]            write always aspect ratio information to preserve anamorphic information. Bug #837
+2734 [Profile]              removed redundant second warning when changing a profile which should be saved to the scratchpad. Feature request #606
+2733 [OneClick]             added button to clear the working directory path and the chapters file
      [AVS Script Creator]   added button to clear the subtitle file
      [Muxer]                added button to clear the chapter file
-2632 [OneClick]             fixed OneClick startup error (regression of 2631)
-2631 [OneClick]             added aspect ratio selection to the OneClick profile
+2732 [OneClick]             fixed OneClick startup error (regression of 2631)
+2731 [OneClick]             added aspect ratio selection to the OneClick profile
                             input aspect ratio can always be selected
                             if an input aspect ratio will be selected this will be forced
                             the aspect ratio will not be forced by the muxer if the video track has been encoded
                             cosmetics
-2630 [AutoEncode]           do not force the aspect ratio to be written by the muxer as it is available in the video stream
-2629 [Muxer]                added/improved aspect ratio writing (all muxers except the AVI muxer)
+2730 [AutoEncode]           do not force the aspect ratio to be written by the muxer as it is available in the video stream
+2729 [Muxer]                added/improved aspect ratio writing (all muxers except the AVI muxer)
                             for the M2TS muxer only some input video types are supported
                             improved logging
-2628 [VideoEncoder]         forced aspect ratio to be written to the encoding
+2728 [VideoEncoder]         forced aspect ratio to be written to the encoding
                             if not available in the job the avs aspect ratio information will be used
-2627 [Worker]               priority changes will also be applied to child processes. Feature request #615
+2727 [Worker]               priority changes will also be applied to child processes. Feature request #615
 2726 [OneClick]             removed the "Anamorph Output" option in the OneClick profile. Please use the anamorphic encoding options in the AviSynth profile instead.
 2725 [Main]                 fixed wrong AR of a "video encoding" queued job in rare cases (regression of 2610)
 2724 [OneClick]             cosmetic fix as sometimes even with "don't encode video" some video processing options were not disabled

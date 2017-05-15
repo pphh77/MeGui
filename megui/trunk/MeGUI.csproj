@@ -104,10 +104,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="MediaInfoWrapper, Version=0.7.4.4, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\MediaInfoWrapper.dll</HintPath>
-    </Reference>
     <Reference Include="MessageBoxExLib, Version=1.0.2218.28317, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\MessageBoxExLib.dll</HintPath>
@@ -309,6 +305,12 @@
     </Compile>
     <Compile Include="packages\muxer\ffmpeg\FFmpegMuxer.cs" />
     <Compile Include="packages\reader\lmash\lsmashReader.cs" />
+    <Compile Include="packages\reader\mediainfo\wrapper\AudioTrack.cs" />
+    <Compile Include="packages\reader\mediainfo\wrapper\ChaptersTrack.cs" />
+    <Compile Include="packages\reader\mediainfo\wrapper\GeneralTrack.cs" />
+    <Compile Include="packages\reader\mediainfo\wrapper\MediaInfoWrapper.cs" />
+    <Compile Include="packages\reader\mediainfo\wrapper\TextTrack.cs" />
+    <Compile Include="packages\reader\mediainfo\wrapper\VideoTrack.cs" />
     <Compile Include="packages\reader\ttxt\ttxtReader.cs" />
     <Compile Include="packages\tools\autoencode\AutoEncodeWindow.Designer.cs">
       <DependentUpon>AutoEncodeWindow.cs</DependentUpon>

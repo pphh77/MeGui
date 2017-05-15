@@ -1481,7 +1481,6 @@ namespace MeGUI
             megui_libs.UpdateInformation("libs", "MeGUI Libraries", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"7z.dll"));
             megui_libs.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"AvisynthWrapper.dll"));
             megui_libs.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"ICSharpCode.SharpZipLib.dll"));
-            megui_libs.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"MediaInfoWrapper.dll"));
             megui_libs.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"MessageBoxExLib.dll"));
             megui_libs.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"SevenZipSharp.dll"));
             megui_libs.Required = true;

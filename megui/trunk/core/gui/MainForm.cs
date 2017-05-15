@@ -1350,7 +1350,6 @@ namespace MeGUI
             FileUtil.GetFileInformation("Haali DSS2", Path.Combine(haaliPath, "avss.dll"), ref i);
             FileUtil.GetFileInformation("ICSharpCode.SharpZipLib", Path.GetDirectoryName(Application.ExecutablePath) + @"\ICSharpCode.SharpZipLib.dll", ref i);
             FileUtil.GetFileInformation("MediaInfo", Path.GetDirectoryName(Application.ExecutablePath) + @"\MediaInfo.dll", ref i);
-            FileUtil.GetFileInformation("MediaInfoWrapper", Path.GetDirectoryName(Application.ExecutablePath) + @"\MediaInfoWrapper.dll", ref i);
             FileUtil.GetFileInformation("MessageBoxExLib", Path.GetDirectoryName(Application.ExecutablePath) + @"\MessageBoxExLib.dll", ref i);
             FileUtil.GetFileInformation("SevenZipSharp", Path.GetDirectoryName(Application.ExecutablePath) + @"\SevenZipSharp.dll", ref i);
             FileUtil.GetFileInformation("7z", Path.GetDirectoryName(Application.ExecutablePath) + @"\7z.dll", ref i);
