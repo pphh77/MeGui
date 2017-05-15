@@ -22,8 +22,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Threading;
 using System.Text;
-using System.Text.RegularExpressions;
 
 using MediaInfoWrapper;
 
@@ -72,130 +72,6 @@ namespace MeGUI
 
     public class MediaInfoFile : IMediaFile
     {
-        public static MediaFile Open(string file)
-        {
-            try
-            {
-                MediaInfo m = new MediaInfo(file);
-
-                // tracks
-                List<MediaTrack> tracks = new List<MediaTrack>();
-                foreach (MediaInfoWrapper.VideoTrack t in m.Video)
-                {
-                    VideoTrack v = new VideoTrack();
-                    v.Codec = v.VCodec = getVideoCodec(t.Codec);
-                    v.Info = new TrackInfo(t.Language, t.Title);
-
-                    ulong width = ulong.Parse(t.Width);
-                    ulong height = ulong.Parse(t.Height);
-                    ulong frameCount = ulong.Parse(t.FrameCount);
-                    double fps = (easyParseDouble(t.FrameRate) ?? easyParseDouble(t.FrameRateOriginal) ?? 99);
-
-                    Dar dar = Resolution.GetDAR((int)width, (int)height, t.AspectRatio, null, null);
-
-                    v.StreamInfo = new VideoInfo2(width, height, dar, frameCount, fps);
-                    v.TrackNumber = uint.Parse(t.ID);
-                    tracks.Add(v);
-                }
-
-                foreach (MediaInfoWrapper.AudioTrack t in m.Audio)
-                {
-                    AudioTrack a = new AudioTrack();
-                    a.Codec = a.ACodec = getAudioCodec(t.Format);
-                    a.Info = new TrackInfo(t.Language, t.Title);
-
-                    a.StreamInfo = new AudioInfo();
-
-                    a.TrackNumber = uint.Parse(t.ID);
-
-                    tracks.Add(a);
-                }
-
-                foreach (MediaInfoWrapper.TextTrack t in m.Text)
-                {
-                    SubtitleTrack s = new SubtitleTrack();
-                    s.Codec = s.SCodec = getSubtitleCodec(t.Codec);
-                    s.Info = new TrackInfo(t.Language, t.Title);
-                    s.StreamInfo = new SubtitleInfo2();
-                    s.TrackNumber = uint.Parse(t.ID);
-
-                    tracks.Add(s);
-                }
-
-                if (m.General.Count != 1)
-                    throw new Exception("Expected one general track");
-
-                GeneralTrack g = m.General[0];
-                ContainerType cType = getContainerType(g.Format, g.FormatString);
-                TimeSpan playTime = TimeSpan.Parse(g.PlayTimeString3);
-
-                Chapters chapters = null;
-                if (m.Chapters.Count == 1)
-                    chapters = parseChapters(m.Chapters[0]);
-
-                m.Dispose();
-                return new MediaFile(tracks, chapters, playTime, cType);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private static Regex chaptersRegex = new Regex(
-            @"^(?<num>\d+)\s*:\s*(?<hours>\d+):(?<mins>\d+):(?<secs>\d+).(?<ms>\d+) (?<name>.*)$", 
-            RegexOptions.Multiline| RegexOptions.Compiled);
-        private static Chapters parseChapters(MediaInfoWrapper.ChaptersTrack t)
-        {
-            // sample:
-
-/*Language             : English
-1                    : 00:00:00.000 Part 1
-2                    : 00:42:20.064 Part 2
-3                    : 01:26:34.240 Part 3*/
-
-            List<Chapter> chapters = new List<Chapter>();
-            foreach (Match m in chaptersRegex.Matches(t.Inform))
-            {
-                Chapter c = new Chapter();
-                c.name = m.Groups["name"].Value;
-                c.StartTime = new TimeSpan(0,
-                    int.Parse(m.Groups["hours"].Value),
-                    int.Parse(m.Groups["mins"].Value),
-                    int.Parse(m.Groups["secs"].Value),
-                    int.Parse(m.Groups["ms"].Value));
-                chapters.Add(c);
-            }
-            Chapters ch = new Chapters();
-            ch.Data = chapters;
-            return ch;
-        }
-
-        private static SubtitleCodec getSubtitleCodec(string p)
-        {
-            try
-            {
-                return null;
-            }
-            catch (Exception)
-            {
-               throw new Exception("The method or operation is not implemented.");
-            }
-        }
-
-        public static T? easyParse<T>(Getter<T> parse)
-            where T : struct
-        {
-            try
-            {
-                return parse();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
         #region variables
         private static readonly CultureInfo culture = new CultureInfo("en-us");
         private static Dictionary<string, VideoCodec> knownVideoDescriptions;
@@ -274,7 +150,9 @@ namespace MeGUI
             this._AudioInfo = new AudioInformation();
             this._SubtitleInfo = new SubtitleInformation();
             this._VideoInfo = new VideoInformation(false, 0, 0, Dar.A1x1, 0, 0, 0, 1);
-            
+
+            MediaInfo info = null;
+
             try
             {
                 LogItem infoLog = null;
@@ -380,7 +258,19 @@ namespace MeGUI
                         file = ifoFile;
                     }
                 }
-                MediaInfo info = new MediaInfo(file);
+
+                // open MediaInfo in a thread to prevent GUI locking 
+                Thread processMediaInfo = new Thread(new ThreadStart(delegate
+                {
+                    info = new MediaInfo(file);
+                }));
+                processMediaInfo.Start();
+                while (processMediaInfo.ThreadState == ThreadState.Running)
+                {
+                    System.Windows.Forms.Application.DoEvents();
+                    Thread.Sleep(100);
+                }
+
                 CorrectSourceInformation(ref info, file, infoLog, iPGCNumber, iAngleNumber);
                 if (infoLog != null)
                     WriteSourceInformation(info, file, infoLog);
@@ -602,13 +492,17 @@ namespace MeGUI
                         Int32.TryParse(track.BitDepth, out _VideoInfo.BitDepth);
                     }
                 }
-                info.Dispose();
             }
             catch (Exception ex)
             {
                 if (oLog == null)
                     oLog = MainForm.Instance.Log.Info("MediaInfo");
                 oLog.LogValue("MediaInfo - Unhandled Error", ex, ImageType.Error);
+            }
+            finally
+            {
+                if (info != null)
+                    info.Dispose();
             }
         }
 
@@ -779,18 +673,9 @@ namespace MeGUI
                 {
                     LogItem oTrack = new LogItem("Chapters");
 
-                    oTrack.Info("ID: " + t.ID);
-                    oTrack.Info("StreamOrder: " + t.StreamOrder);
-                    oTrack.Info("Codec: " + t.Codec);
-                    oTrack.Info("Inform: " + t.Inform);
-                    oTrack.Info("Title: " + t.Title);
-                    oTrack.Info("Language: " + t.Language);
-                    oTrack.Info("LanguageString: " + t.LanguageString);
-                    oTrack.Info("Default: " + t.Default);
-                    oTrack.Info("DefaultString: " + t.DefaultString);
-                    oTrack.Info("Forced: " + t.Forced);
-                    oTrack.Info("ForcedString: " + t.ForcedString);
-
+                    foreach (KeyValuePair<string, string> oChapter in t.Chapters)
+                        oTrack.Info(oChapter.Key + ": " + oChapter.Value);
+                   
                     infoLog.Add(oTrack);
                 }                
             }

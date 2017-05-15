@@ -74,25 +74,6 @@ namespace MeGUI
         }
 		#endregion
 		#region helper methods
-		/// <summary>
-		/// shows an array of chapters in the GUI
-		/// </summary>
-		/// <param name="chaps">the chapters to be shown</param>
-		private void showChapters(Chapter[] chaps)
-		{
-			this.chapterListView.Items.Clear();
-			foreach (Chapter chap in chaps)
-			{
-				ListViewItem item = new ListViewItem(new string[] {chap.timecode, chap.name});
-				item.Tag = chap;
-				chapterListView.Items.Add(item);
-                if (item.Index % 2 != 0)
-                    item.BackColor = Color.White;
-                else
-                    item.BackColor = Color.FromArgb(255, 225, 235, 255);
-			}
-		}
-
         private void FreshChapterView()
         {
             this.Cursor = Cursors.WaitCursor;
@@ -489,11 +470,10 @@ namespace MeGUI
             output.Text = Path.ChangeExtension(output.Text, "xml");
         }
 	}
+
 	public struct Chapter
 	{
 		public string timecode;
-        public TimeSpan StartTime;
-		public string name;
 
         //add-on
         public TimeSpan Time { get; set; }
