@@ -363,6 +363,20 @@ namespace MeGUI
             updateFilename();
         }
 
+        private void setControlState(bool bDisableControls)
+        {
+            if (bDisableControls)
+            {
+                this.Cursor = Cursors.WaitCursor;
+                goButton.Enabled = tabControl1.Enabled = false;
+            }
+            else
+            {
+                this.Cursor = Cursors.Default;
+                goButton.Enabled = tabControl1.Enabled = true;
+            }
+        }
+
         public void setInput(string strFileorFolderName)
         {
             input.AddCustomItem(strFileorFolderName);
@@ -388,8 +402,7 @@ namespace MeGUI
                     || !String.IsNullOrEmpty(FileUtil.GetDVDPath(strFolder)))
                 {
                     // DVD or Blu-ray structure found
-                    this.Cursor = Cursors.WaitCursor;
-                    goButton.Enabled = false;
+                    setControlState(true);
                     OneClickProcessing oProcessorFolder = new OneClickProcessing(this, strFolder, _oSettings, _oLog);
                     return;
                 }
@@ -405,8 +418,7 @@ namespace MeGUI
                 MessageBox.Show("These files or folders cannot be used in OneClick mode.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            this.Cursor = Cursors.WaitCursor;
-            goButton.Enabled = false;
+            setControlState(true);
             OneClickProcessing oProcessor = new OneClickProcessing(this, arrFilesToProcess, _oSettings, _oLog); 
         }
         
@@ -417,14 +429,13 @@ namespace MeGUI
                 MessageBox.Show("Input " + fileName + " does not exists", "Input not found", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            this.Cursor = System.Windows.Forms.Cursors.WaitCursor;
-            goButton.Enabled = false;
+            setControlState(true);
             OneClickProcessing oProcessor = new OneClickProcessing(this, fileName, _oSettings, _oLog);
         }
 
         public void setOpenFailure(bool bSilent)
         {
-            this.Cursor = System.Windows.Forms.Cursors.Default;
+            setControlState(false);
             if (!bSilent)
                 MessageBox.Show("This file or folder cannot be used in OneClick mode.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
@@ -507,8 +518,7 @@ namespace MeGUI
             if (bAutomatedProcessing)
                 createOneClickJob(arrFilesToProcess);
 
-            this.Cursor = System.Windows.Forms.Cursors.Default;
-            goButton.Enabled = true;
+            setControlState(false);
         }
 
         private bool beingCalled;
@@ -700,7 +710,7 @@ namespace MeGUI
 
         private void goButton_Click(object sender, EventArgs e)
         {
-            goButton.Enabled = false;
+            setControlState(true);
             createOneClickJob(null);
         }
 
@@ -732,7 +742,7 @@ namespace MeGUI
 
             if (!verifyInputSettings(_videoInputInfo, strWorkingDirectory))
             {
-                goButton.Enabled = true;
+                setControlState(false);
                 return;
             }
 
@@ -1329,8 +1339,8 @@ namespace MeGUI
 
             if (!this.openOnQueue.Checked && this.Visible)
             {
+                setControlState(false);
                 tabControl1.SelectedTab = tabControl1.TabPages[0];
-                goButton.Enabled = true;
             }
             else
                 this.Close();
