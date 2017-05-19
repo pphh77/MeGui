@@ -84,7 +84,7 @@ namespace MeGUI.core.gui
 
         protected override void OnHandleCreated(EventArgs e)
         {
-            if (Application.RenderWithVisualStyles && ((Environment.OSVersion.Version.Major == 5 && Environment.OSVersion.Version.Minor >= 1) || Environment.OSVersion.Version.Major > 5))
+            if (Application.RenderWithVisualStyles && OSInfo.IsWindowsXPOrNewer)
             {
                 // >= Windows XP
                 SetWindowTheme(this.Handle, "", "");

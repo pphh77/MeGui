@@ -114,25 +114,39 @@ namespace MeGUI.core.util
             return logItem;
         }
 
-
         public LogItem LogValue(string name, object value)
         {
-            return LogValue(name, value, ImageType.Information);
+            return LogValue(name, value, ImageType.Information, true);
+        }
+
+        public LogItem LogValue(string name, object value, bool bIncludeTime)
+        {
+            return LogValue(name, value, ImageType.Information, bIncludeTime);
         }
 
         public LogItem LogValue(string name, object value, ImageType im)
         {
-            return Add(AutomatedLogger.LogValue(string.Format("[{0:G}] {1}", DateTime.Now, name), value, im));
+            return LogValue(name, value, im, true);
+        }
+
+        public LogItem LogValue(string name, object value, ImageType im, bool bIncludeTime)
+        {
+            return Add(AutomatedLogger.LogValue(bIncludeTime ? string.Format("[{0:G}] {1}", DateTime.Now, name) : name , value, im));
         }
 
         public LogItem LogEvent(string eventName)
         {
-            return LogEvent(eventName, ImageType.Information);
+            return LogEvent(eventName, ImageType.Information, true);
         }
 
         public LogItem LogEvent(string eventName, ImageType image)
         {
-            return Add(new LogItem(string.Format("[{0:G}] {1}", DateTime.Now, eventName), image));
+            return LogEvent(eventName, image, true);
+        }
+
+        public LogItem LogEvent(string eventName, ImageType image, bool bIncludeTime)
+        {
+            return Add(new LogItem(bIncludeTime ? string.Format("[{0:G}] {1}", DateTime.Now, eventName) : eventName, image));
         }
 
         public LogItem Info(string text)

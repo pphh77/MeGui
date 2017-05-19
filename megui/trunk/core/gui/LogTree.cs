@@ -45,7 +45,7 @@ namespace MeGUI.core.gui
 
             Log.SubItemAdded += delegate(object sender, EventArgs<LogItem> args)
             {
-                Util.ThreadSafeRun(treeView, delegate { treeView.Nodes.Add(register(args.Data)); });
+                Util.ThreadSafeRun(treeView, delegate { treeView.Nodes.Add(Register(args.Data)); });
             };
         }
 
@@ -53,19 +53,20 @@ namespace MeGUI.core.gui
         public readonly LogItem Log = new LogItem("Log", ImageType.NoImage);
 
 
-        private TreeNode register(LogItem log)
+        private TreeNode Register(LogItem log)
         {
             List<TreeNode> subNodes = log.SubEvents.ConvertAll<TreeNode>(delegate(LogItem e)
             {
-                return register(e);
+                return Register(e);
             });
 
-            TreeNode node = new TreeNode(log.Text, (int)log.Type, (int)log.Type, subNodes.ToArray());
-            node.Tag = log;
-
+            TreeNode node = new TreeNode(log.Text, (int)log.Type, (int)log.Type, subNodes.ToArray())
+            {
+                Tag = log
+            };
             log.SubItemAdded += delegate(object sender, EventArgs<LogItem> args)
             {
-                Util.ThreadSafeRun(treeView, delegate { node.Nodes.Add(register(args.Data)); });
+                Util.ThreadSafeRun(treeView, delegate { node.Nodes.Add(Register(args.Data)); });
             };
 
             log.TypeChanged += delegate(object sender, EventArgs<ImageType> args)
@@ -84,22 +85,22 @@ namespace MeGUI.core.gui
             return node;
         }
 
-        private void ofIndividualNodeToolStripMenuItem_Click(object sender, EventArgs e)
+        private void OfIndividualNodeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            show(selectedLogItem, false);
+            Show(SelectedLogItem, false);
         }
 
-        private void ofBranchToolStripMenuItem_Click(object sender, EventArgs e)
+        private void OfBranchToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            show(selectedLogItem, true);
+            Show(SelectedLogItem, true);
         }
 
-        private void editLog_Click(object sender, EventArgs e)
+        private void EditLog_Click(object sender, EventArgs e)
         {
-            show(Log, true);
+            Show(Log, true);
         }
 
-        private LogItem selectedLogItem
+        private LogItem SelectedLogItem
         {
             get
             {
@@ -110,34 +111,36 @@ namespace MeGUI.core.gui
             }
         }
 
-        private void show(LogItem l, bool subnodes)
+        private void Show(LogItem l, bool subnodes)
         {
             if (l == null)
                 return;
 
-            TextViewer t = new TextViewer();
-            t.Contents = l.ToString(subnodes);
-            t.Wrap = false;
+            TextViewer t = new TextViewer()
+            {
+                Contents = l.ToString(subnodes),
+                Wrap = false
+            };
             t.ShowDialog();
         }
 
-        private void saveLog_Click(object sender, EventArgs e)
+        private void SaveLog_Click(object sender, EventArgs e)
         {
-            save(Log);
+            Save(Log);
         }
 
-        private void saveBranch_Click(object sender, EventArgs e)
+        private void SaveBranch_Click(object sender, EventArgs e)
         {
-            LogItem i = selectedLogItem;
+            LogItem i = SelectedLogItem;
             if (i == null)
             {
                 MessageBox.Show("No log branch selected", "Can't save file", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            save(i);
+            Save(i);
         }
 
-        private void save(LogItem i)
+        private void Save(LogItem i)
         {
             if (saveDialog.ShowDialog() != DialogResult.OK)
                 return;
@@ -154,7 +157,7 @@ namespace MeGUI.core.gui
 
         }
 
-       private void expandOrCollapseAll(LogItem i, bool expand)
+       private void ExpandOrCollapseAll(LogItem i, bool expand)
         {
             if (expand)
                 i.Expand();
@@ -162,47 +165,44 @@ namespace MeGUI.core.gui
                 i.Collapse();
 
             foreach (LogItem i2 in i.SubEvents)
-                expandOrCollapseAll(i2, expand);
+                ExpandOrCollapseAll(i2, expand);
         }
 
-        private void expandAll(LogItem i) { expandOrCollapseAll(i, true); }
-        private void collapseAll(LogItem i) { expandOrCollapseAll(i, false); }
+        private void ExpandAll(LogItem i) { ExpandOrCollapseAll(i, true); }
+        private void CollapseAll(LogItem i) { ExpandOrCollapseAll(i, false); }
 
-        private void expandLog_Click(object sender, EventArgs e)
+        private void ExpandLog_Click(object sender, EventArgs e)
         {
-            expandAll(Log);
+            ExpandAll(Log);
         }
 
-        private void expandBranch_Click(object sender, EventArgs e)
+        private void ExpandBranch_Click(object sender, EventArgs e)
         {
-            expandAll(selectedLogItem);
+            ExpandAll(SelectedLogItem);
         }
 
-        private void collapseLog_Click(object sender, EventArgs e)
+        private void CollapseLog_Click(object sender, EventArgs e)
         {
-            collapseAll(Log);
+            CollapseAll(Log);
         }
 
-        private void collapseBranch_Click(object sender, EventArgs e)
+        private void CollapseBranch_Click(object sender, EventArgs e)
         {
-            collapseAll(selectedLogItem);
+            CollapseAll(SelectedLogItem);
         }
 
         private void LogTree_Load(object sender, EventArgs e)
         {
-
-            if (VistaStuff.IsVistaOrNot)
-            {
+            if (OSInfo.IsWindowsVistaOrNewer)
                 VistaStuff.SetWindowTheme(treeView.Handle, "explorer", null);
-            }
         }
 
-        private void resetOverlayIcon_Click(object sender, EventArgs e)
+        private void ResetOverlayIcon_Click(object sender, EventArgs e)
         {
            MainForm.Instance.setOverlayIcon(null);
         }
 
-        private void contextMenu_Opening(object sender, CancelEventArgs e)
+        private void ContextMenu_Opening(object sender, CancelEventArgs e)
         {
             if (MainForm.Instance.IsOverlayIconActive)
                 resetOverlayIcon.Visible = true;

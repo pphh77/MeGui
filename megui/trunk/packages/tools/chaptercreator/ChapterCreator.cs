@@ -62,7 +62,7 @@ namespace MeGUI
 
         private void ChapterCreator_Load(object sender, EventArgs e)
         {
-            if (VistaStuff.IsVistaOrNot)
+            if (OSInfo.IsWindowsVistaOrNewer)
                 VistaStuff.SetWindowTheme(chapterListView.Handle, "explorer", null);
         }
 

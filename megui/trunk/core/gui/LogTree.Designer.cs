@@ -68,7 +68,7 @@ namespace MeGUI.core.gui
             this.resetOverlayIcon});
             this.contextMenu.Name = "contextMenuStrip1";
             this.contextMenu.Size = new System.Drawing.Size(200, 136);
-            this.contextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_Opening);
+            this.contextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.ContextMenu_Opening);
             // 
             // editTextToolStripMenuItem
             // 
@@ -85,21 +85,21 @@ namespace MeGUI.core.gui
             this.editIndividualNode.Name = "editIndividualNode";
             this.editIndividualNode.Size = new System.Drawing.Size(111, 22);
             this.editIndividualNode.Text = "node";
-            this.editIndividualNode.Click += new System.EventHandler(this.ofIndividualNodeToolStripMenuItem_Click);
+            this.editIndividualNode.Click += new System.EventHandler(this.OfIndividualNodeToolStripMenuItem_Click);
             // 
             // editBranch
             // 
             this.editBranch.Name = "editBranch";
             this.editBranch.Size = new System.Drawing.Size(111, 22);
             this.editBranch.Text = "branch";
-            this.editBranch.Click += new System.EventHandler(this.ofBranchToolStripMenuItem_Click);
+            this.editBranch.Click += new System.EventHandler(this.OfBranchToolStripMenuItem_Click);
             // 
             // editLog
             // 
             this.editLog.Name = "editLog";
             this.editLog.Size = new System.Drawing.Size(111, 22);
             this.editLog.Text = "log";
-            this.editLog.Click += new System.EventHandler(this.editLog_Click);
+            this.editLog.Click += new System.EventHandler(this.EditLog_Click);
             // 
             // saveToolStripMenuItem
             // 
@@ -115,14 +115,14 @@ namespace MeGUI.core.gui
             this.saveBranch.Name = "saveBranch";
             this.saveBranch.Size = new System.Drawing.Size(111, 22);
             this.saveBranch.Text = "branch";
-            this.saveBranch.Click += new System.EventHandler(this.saveBranch_Click);
+            this.saveBranch.Click += new System.EventHandler(this.SaveBranch_Click);
             // 
             // saveLog
             // 
             this.saveLog.Name = "saveLog";
             this.saveLog.Size = new System.Drawing.Size(111, 22);
             this.saveLog.Text = "log";
-            this.saveLog.Click += new System.EventHandler(this.saveLog_Click);
+            this.saveLog.Click += new System.EventHandler(this.SaveLog_Click);
             // 
             // expandAllSubitemsToolStripMenuItem
             // 
@@ -138,14 +138,14 @@ namespace MeGUI.core.gui
             this.expandLog.Name = "expandLog";
             this.expandLog.Size = new System.Drawing.Size(125, 22);
             this.expandLog.Text = "of log";
-            this.expandLog.Click += new System.EventHandler(this.expandLog_Click);
+            this.expandLog.Click += new System.EventHandler(this.ExpandLog_Click);
             // 
             // expandBranch
             // 
             this.expandBranch.Name = "expandBranch";
             this.expandBranch.Size = new System.Drawing.Size(125, 22);
             this.expandBranch.Text = "of branch";
-            this.expandBranch.Click += new System.EventHandler(this.expandBranch_Click);
+            this.expandBranch.Click += new System.EventHandler(this.ExpandBranch_Click);
             // 
             // collapseAllSubitemsToolStripMenuItem
             // 
@@ -161,14 +161,14 @@ namespace MeGUI.core.gui
             this.collapseLog.Name = "collapseLog";
             this.collapseLog.Size = new System.Drawing.Size(125, 22);
             this.collapseLog.Text = "of log";
-            this.collapseLog.Click += new System.EventHandler(this.collapseLog_Click);
+            this.collapseLog.Click += new System.EventHandler(this.CollapseLog_Click);
             // 
             // collapseBranch
             // 
             this.collapseBranch.Name = "collapseBranch";
             this.collapseBranch.Size = new System.Drawing.Size(125, 22);
             this.collapseBranch.Text = "of branch";
-            this.collapseBranch.Click += new System.EventHandler(this.collapseBranch_Click);
+            this.collapseBranch.Click += new System.EventHandler(this.CollapseBranch_Click);
             // 
             // saveDialog
             // 
@@ -182,7 +182,7 @@ namespace MeGUI.core.gui
             this.resetOverlayIcon.Size = new System.Drawing.Size(199, 22);
             this.resetOverlayIcon.Text = "Reset Overlay Error Icon";
             this.resetOverlayIcon.ToolTipText = "Removes the applied error or warning icon from the taskbar";
-            this.resetOverlayIcon.Click += new System.EventHandler(this.resetOverlayIcon_Click);
+            this.resetOverlayIcon.Click += new System.EventHandler(this.ResetOverlayIcon_Click);
             // 
             // LogTree
             // 

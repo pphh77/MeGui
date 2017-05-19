@@ -51,8 +51,7 @@ namespace MeGUI
 			InitializeComponent();
 			isUserClosing = true;
 
-            if ((Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor >= 1) 
-                || Environment.OSVersion.Version.Major > 6)
+            if (OSInfo.IsWindows7OrNewer)
                 taskbarProgress = (ITaskbarList3)new ProgressTaskbar();
 		}
 		/// <summary>
@@ -120,8 +119,7 @@ namespace MeGUI
 
                 progress.Value = su.PercentageDone;
 
-                if ((Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor >= 1)
-                    || Environment.OSVersion.Version.Major > 6)
+                if (OSInfo.IsWindows7OrNewer)
                     taskbarProgress.SetProgressValue(this.Handle, Convert.ToUInt64(su.PercentageDone), 100);
             }
             catch (Exception) { }

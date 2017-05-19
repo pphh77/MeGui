@@ -870,10 +870,8 @@ namespace MeGUI.core.gui
         private void JobQueue_Load(object sender, EventArgs e)
         {
 
-            if (VistaStuff.IsVistaOrNot)
-            {
+            if (OSInfo.IsWindowsVistaOrNewer)
                 VistaStuff.SetWindowTheme(queueListView.Handle, "explorer", null);
-            }
         }
 
         private void queueListView_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)

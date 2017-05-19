@@ -1,3 +1,4 @@
+2742 [Main]                 improved OS detection
 2741 [MediaInfo]            fixed chapter detection
                             prevent MediaInfo from locking the GUI
 2740 [OneClick]             disable controls while input detection is ongoing

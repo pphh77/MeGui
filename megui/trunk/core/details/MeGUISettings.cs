@@ -92,7 +92,7 @@ namespace MeGUI
             bOSx64 = true;
 #else
             bMeGUIx64 = false;
-            bOSx64 = OSInfo.isWow64();
+            bOSx64 = OSInfo.IsWow64();
 #endif
             bUsex64Tools = true;
 

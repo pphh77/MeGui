@@ -760,7 +760,7 @@ namespace MeGUI
             else if (this.Location.X + this.Size.Width > iScreenWidth)
                 this.Location = new Point(iScreenWidth - this.Size.Width, this.Location.Y);
 
-            if (VistaStuff.IsVistaOrNot)
+            if (OSInfo.IsWindowsVistaOrNewer)
                 VistaStuff.SetWindowTheme(listViewDetails.Handle, "explorer", null);
         }
         #endregion

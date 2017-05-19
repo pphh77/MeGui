@@ -20,10 +20,9 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Management;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 
 namespace MeGUI
 {
@@ -32,6 +31,7 @@ namespace MeGUI
     /// </summary>
     public class OSInfo
     {
+        #region OSInfo 
         [StructLayout(LayoutKind.Sequential)]
         private struct OSVERSIONINFOEX
         {
@@ -57,9 +57,8 @@ namespace MeGUI
 
         [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool IsWow64Process([In] IntPtr hProcess, [Out] out bool lpSystemInfo);
+        private static extern bool IsWow64Process([In] IntPtr hProcess, [Out] out bool lpSystemInfo);
 
-        #region Private Constants
         private const int VER_NT_WORKSTATION = 1;
         private const int VER_NT_DOMAIN_CONTROLLER = 2;
         private const int VER_NT_SERVER = 3;
@@ -70,57 +69,18 @@ namespace MeGUI
         private const int VER_SUITE_SINGLEUSERTS = 256;
         private const int VER_SUITE_PERSONAL = 512;
         private const int VER_SUITE_BLADE = 1024;
-        private const int PRODUCT_UNDEFINED = 0x00000000;
-        private const int PRODUCT_ULTIMATE = 0x00000001;
-        private const int PRODUCT_HOME_BASIC = 0x00000002;
-        private const int PRODUCT_HOME_PREMIUM = 0x00000003;
-        private const int PRODUCT_ENTERPRISE = 0x00000004;
-        private const int PRODUCT_ENTERPRISE_N = 0x0000001B;
-        private const int PRODUCT_HOME_BASIC_N = 0x00000005;
-        private const int PRODUCT_BUSINESS = 0x00000006;
-        private const int PRODUCT_BUSINESS_N = 0x00000010;
-        private const int PRODUCT_STARTER = 0x0000000B;
-        private const int PRODUCT_PROFESSIONAL = 0x00000030;
-        private const int PRODUCT_PROFESSIONAL_N = 0x00000031;
-        private const int PRODUCT_PROFESSIONAL_WMC = 0x00000067;
-        private const int PRODUCT_CORE = 0x00000065;
-        private const int PRODUCT_CORE_N = 0x00000062;
-        private const int PRODUCT_CORE_COUNTRYSPECIFIC = 0x00000063;
-        private const int PRODUCT_MOBILE_CORE = 0x00000068;
-        private const int PRODUCT_MOBILE_ENTERPRISE = 0x00000085;
-        private const int PRODUCT_EDUCATION = 0x00000079;
-        private const int PRODUCT_EDUCATION_N = 0x0000007A;
         #endregion
-
-        #region Public Methods
-        /// <summary>
-        /// Determines whether the specified process is running under WOW64. 
-        /// </summary>
-        /// <returns>a boolean</returns>
-        public static bool isWow64()
-        {
-            if (Environment.OSVersion.Version.Major == 5 && Environment.OSVersion.Version.Minor == 0)
-                return false;   // windows 2000
-
-            Process p = Process.GetCurrentProcess();
-            IntPtr handle = p.Handle;
-            bool isWow64;
-            bool success = IsWow64Process(handle, out isWow64);
-            if ((!success) && (IntPtr.Size != 8))
-                throw new Exception();
-            else
-                return isWow64;
-        }
 
         /// <summary>
         /// Returns the service pack information of the operating system running on this computer.
         /// </summary>
         /// <returns>A string containing the operating system service pack information.</returns>
-        public static string GetOSServicePack()
+        private static string GetOSServicePack()
         {
-            OSVERSIONINFOEX osVersionInfo = new OSVERSIONINFOEX();
-
-            osVersionInfo.dwOSVersionInfoSize = Marshal.SizeOf(typeof(OSVERSIONINFOEX));
+            OSVERSIONINFOEX osVersionInfo = new OSVERSIONINFOEX()
+            {
+                dwOSVersionInfoSize = Marshal.SizeOf(typeof(OSVERSIONINFOEX))
+            };
 
             if (!GetVersionEx(ref osVersionInfo))
             {
@@ -139,6 +99,133 @@ namespace MeGUI
             }
         }
 
+        private static string GetOSProduct(OSVERSIONINFOEX osVersionInfo)
+        {
+            Dictionary<int, string> OSProduct = new Dictionary<int, string>
+            {
+                { 0x00000000, "PRODUCT_UNDEFINED" },
+                { 0x00000001, "PRODUCT_ULTIMATE" },
+                { 0x00000002, "PRODUCT_HOME_BASIC" },
+                { 0x00000003, "PRODUCT_HOME_PREMIUM" },
+                { 0x00000004, "PRODUCT_ENTERPRISE" },
+                { 0x00000005, "PRODUCT_HOME_BASIC_N" },
+                { 0x00000006, "PRODUCT_BUSINESS" },
+                { 0x00000007, "PRODUCT_STANDARD_SERVER" },
+                { 0x00000008, "PRODUCT_DATACENTER_SERVER" },
+                { 0x00000009, "PRODUCT_SMALLBUSINESS_SERVER" },
+                { 0x0000000A, "PRODUCT_ENTERPRISE_SERVER" },
+                { 0x0000000B, "PRODUCT_STARTER" },
+                { 0x0000000C, "PRODUCT_DATACENTER_SERVER_CORE" },
+                { 0x0000000D, "PRODUCT_STANDARD_SERVER_CORE " },
+                { 0x0000000E, "PRODUCT_ENTERPRISE_SERVER_CORE" },
+                { 0x0000000F, "PRODUCT_ENTERPRISE_SERVER_IA64" },
+                { 0x00000010, "PRODUCT_BUSINESS_N" },
+                { 0x00000011, "PRODUCT_WEB_SERVER" },
+                { 0x00000012, "PRODUCT_CLUSTER_SERVER" },
+                { 0x00000013, "PRODUCT_HOME_SERVER" },
+                { 0x00000014, "PRODUCT_STORAGE_EXPRESS_SERVER" },
+                { 0x00000015, "PRODUCT_STORAGE_STANDARD_SERVER" },
+                { 0x00000016, "PRODUCT_STORAGE_WORKGROUP_SERVER" },
+                { 0x00000017, "PRODUCT_STORAGE_ENTERPRISE_SERVER" },
+                { 0x00000018, "PRODUCT_SERVER_FOR_SMALLBUSINESS" },
+                { 0x00000019, "PRODUCT_SMALLBUSINESS_SERVER_PREMIUM" },
+                { 0x0000001A, "PRODUCT_HOME_PREMIUM_N" },
+                { 0x0000001B, "PRODUCT_ENTERPRISE_N" },
+                { 0x0000001C, "PRODUCT_ULTIMATE_N" },
+                { 0x0000001D, "PRODUCT_WEB_SERVER_CORE" },
+                { 0x0000001E, "PRODUCT_MEDIUMBUSINESS_SERVER_MANAGEMENT" },
+                { 0x0000001F, "PRODUCT_MEDIUMBUSINESS_SERVER_SECURITY" },
+                { 0x00000020, "PRODUCT_MEDIUMBUSINESS_SERVER_MESSAGING" },
+                { 0x00000021, "PRODUCT_SERVER_FOUNDATION" },
+                { 0x00000022, "PRODUCT_HOME_PREMIUM_SERVER" },
+                { 0x00000023, "PRODUCT_SERVER_FOR_SMALLBUSINESS_V" },
+                { 0x00000024, "PRODUCT_STANDARD_SERVER_V" },
+                { 0x00000025, "PRODUCT_DATACENTER_SERVER_V" },
+                { 0x00000026, "PRODUCT_ENTERPRISE_SERVER_V" },
+                { 0x00000027, "PRODUCT_DATACENTER_SERVER_CORE_V" },
+                { 0x00000028, "PRODUCT_STANDARD_SERVER_CORE_V" },
+                { 0x00000029, "PRODUCT_ENTERPRISE_SERVER_CORE_V" },
+                { 0x0000002A, "PRODUCT_HYPERV" },
+                { 0x0000002B, "PRODUCT_STORAGE_EXPRESS_SERVER_CORE" },
+                { 0x0000002C, "PRODUCT_STORAGE_STANDARD_SERVER_CORE" },
+                { 0x0000002D, "PRODUCT_STORAGE_WORKGROUP_SERVER_CORE" },
+                { 0x0000002E, "PRODUCT_STORAGE_ENTERPRISE_SERVER_CORE" },
+                { 0x0000002F, "PRODUCT_STARTER_N" },
+                { 0x00000030, "PRODUCT_PROFESSIONAL" },
+                { 0x00000031, "PRODUCT_PROFESSIONAL_N" },
+                { 0x00000032, "PRODUCT_SB_SOLUTION_SERVER" },
+                { 0x00000033, "PRODUCT_SERVER_FOR_SB_SOLUTIONS" },
+                { 0x00000034, "PRODUCT_STANDARD_SERVER_SOLUTIONS" },
+                { 0x00000035, "PRODUCT_STANDARD_SERVER_SOLUTIONS_CORE" },
+                { 0x00000036, "PRODUCT_SB_SOLUTION_SERVER_EM" },
+                { 0x00000037, "PRODUCT_SERVER_FOR_SB_SOLUTIONS_EM" },
+                { 0x00000038, "PRODUCT_SOLUTION_EMBEDDEDSERVER" },
+                { 0x0000003B, "PRODUCT_ESSENTIALBUSINESS_SERVER_MGMT" },
+                { 0x0000003C, "PRODUCT_ESSENTIALBUSINESS_SERVER_ADDL" },
+                { 0x0000003D, "PRODUCT_ESSENTIALBUSINESS_SERVER_MGMTSVC" },
+                { 0x0000003E, "PRODUCT_ESSENTIALBUSINESS_SERVER_ADDLSVC" },
+                { 0x0000003F, "PRODUCT_SMALLBUSINESS_SERVER_PREMIUM_CORE" },
+                { 0x00000040, "PRODUCT_CLUSTER_SERVER_V" },
+                { 0x00000042, "PRODUCT_STARTER_E" },
+                { 0x00000043, "PRODUCT_HOME_BASIC_E" },
+                { 0x00000044, "PRODUCT_HOME_PREMIUM_E" },
+                { 0x00000045, "PRODUCT_PROFESSIONAL_E" },
+                { 0x00000046, "PRODUCT_ENTERPRISE_E" },
+                { 0x00000047, "PRODUCT_ULTIMATE_E" },
+                { 0x00000048, "PRODUCT_ENTERPRISE_EVALUATION" },
+                { 0x0000004C, "PRODUCT_MULTIPOINT_STANDARD_SERVER" },
+                { 0x0000004D, "PRODUCT_MULTIPOINT_PREMIUM_SERVER" },
+                { 0x0000004F, "PRODUCT_STANDARD_EVALUATION_SERVER" },
+                { 0x00000050, "PRODUCT_DATACENTER_EVALUATION_SERVER" },
+                { 0x00000054, "PRODUCT_ENTERPRISE_N_EVALUATION" },
+                { 0x0000005F, "PRODUCT_STORAGE_WORKGROUP_EVALUATION_SERVER" },
+                { 0x00000060, "PRODUCT_STORAGE_STANDARD_EVALUATION_SERVER" },
+                { 0x00000062, "PRODUCT_CORE_N" },
+                { 0x00000063, "PRODUCT_CORE_COUNTRYSPECIFIC" },
+                { 0x00000064, "PRODUCT_CORE_SINGLELANGUAGE" },
+                { 0x00000065, "PRODUCT_CORE" },
+                { 0x00000067, "PRODUCT_PROFESSIONAL_WMC" },
+                { 0x00000068, "PRODUCT_MOBILE_CORE" },
+                { 0x00000079, "PRODUCT_EDUCATION" },
+                { 0x0000007A, "PRODUCT_EDUCATION_N" },
+                { 0x0000007B, "PRODUCT_IOTUAP" },
+                { 0x0000007D, "PRODUCT_ENTERPRISE_S" },
+                { 0x0000007E, "PRODUCT_ENTERPRISE_S_N" },
+                { 0x00000081, "PRODUCT_ENTERPRISE_S_EVALUATION" },
+                { 0x00000082, "PRODUCT_ENTERPRISE_S_N_EVALUATION" },
+                { 0x00000083, "PRODUCT_IOTUAPCOMMERCIAL" },
+                { 0x00000085, "PRODUCT_MOBILE_ENTERPRISE" }
+            };
+
+            GetProductInfo(osVersionInfo.dwMajorVersion,
+                    osVersionInfo.dwMinorVersion,
+                    osVersionInfo.wServicePackMajor,
+                    osVersionInfo.wServicePackMinor,
+                    out uint product);
+
+            OSProduct.TryGetValue((int)product, out string strOSProduct);
+            return strOSProduct;
+        }
+
+        #region Public Methods
+        /// <summary>
+        /// Determines whether the specified process is running under WOW64. 
+        /// </summary>
+        /// <returns>a boolean</returns>
+        public static bool IsWow64()
+        {
+            if (Environment.OSVersion.Version.Major == 5 && Environment.OSVersion.Version.Minor == 0)
+                return false;   // windows 2000
+
+            Process p = Process.GetCurrentProcess();
+            IntPtr handle = p.Handle;
+            bool success = IsWow64Process(handle, out bool isWow64);
+            if ((!success) && (IntPtr.Size != 8))
+                throw new Exception();
+            else
+                return isWow64;
+        }
+
         /// <summary>
         /// Returns the name of the operating system running on this computer.
         /// </summary>
@@ -146,8 +233,11 @@ namespace MeGUI
         public static string GetOSName()
         {
             OperatingSystem osInfo = Environment.OSVersion;
-            OSVERSIONINFOEX osVersionInfo = new OSVERSIONINFOEX();
-            osVersionInfo.dwOSVersionInfoSize = Marshal.SizeOf(typeof(OSVERSIONINFOEX));
+            OSVERSIONINFOEX osVersionInfo = new OSVERSIONINFOEX()
+            {
+                dwOSVersionInfoSize = Marshal.SizeOf(typeof(OSVERSIONINFOEX))
+            };
+
             string osName = "UNKNOWN";
             bool x64Detection = true;
 
@@ -218,13 +308,13 @@ namespace MeGUI
                                         case 2: // winserver 2003
                                             {
                                                 if ((osVersionInfo.wSuiteMask & VER_SUITE_DATACENTER) == VER_SUITE_DATACENTER)
-                                                    osName = "Windows Server 2003 DataCenter Edition";
+                                                    osName = "Windows Server 2003 DataCenter";
                                                 else if ((osVersionInfo.wSuiteMask & VER_SUITE_ENTERPRISE) == VER_SUITE_ENTERPRISE)
-                                                    osName = "Windows Server 2003 Enterprise Edition";
+                                                    osName = "Windows Server 2003 Enterprise";
                                                 else if ((osVersionInfo.wSuiteMask & VER_SUITE_BLADE) == VER_SUITE_BLADE)
-                                                    osName = "Windows Server 2003 Web Edition";
+                                                    osName = "Windows Server 2003 Web";
                                                 else 
-                                                    osName = "Windows Server 2003 Standard Edition";
+                                                    osName = "Windows Server 2003 Standard";
                                                 break;
                                             }
                                     }
@@ -232,118 +322,70 @@ namespace MeGUI
                                 }
                             case 6:
                                 {
+                                    string strOSProduct = GetOSProduct(osVersionInfo);
+
                                     switch (osInfo.Version.Minor)
                                     {
-                                        case 0:
+                                        case 0: // Vista
                                             {
-                                                switch (osVersionInfo.wProductType)
+                                                if (osVersionInfo.wProductType == VER_NT_WORKSTATION)
+                                                    osName = "Windows Vista ";
+                                                else
+                                                    osName = "Windows Server 2008 ";
+                                                switch (strOSProduct)
                                                 {
-                                                    case 1: // Vista
-                                                        {
-                                                            uint edition = PRODUCT_UNDEFINED;
-                                                            if (GetProductInfo(osVersionInfo.dwMajorVersion,
-                                                                                osVersionInfo.dwMinorVersion,
-                                                                                osVersionInfo.wServicePackMajor,
-                                                                                osVersionInfo.wServicePackMinor,
-                                                                                out edition))
-                                                            {
-                                                                switch (edition)
-                                                                {
-                                                                    case PRODUCT_ULTIMATE: osName = "Windows Vista Ultimate Edition"; break;
-                                                                    case PRODUCT_HOME_BASIC:
-                                                                    case PRODUCT_HOME_BASIC_N: osName = "Windows Vista Home Basic Edition"; break;
-                                                                    case PRODUCT_HOME_PREMIUM: osName = "Windows Vista Premium Edition"; break;
-                                                                    case PRODUCT_ENTERPRISE: osName = "Windows Vista Enterprise Edition"; break;
-                                                                    case PRODUCT_BUSINESS:
-                                                                    case PRODUCT_BUSINESS_N: osName = "Windows Vista Business Edition"; break;
-                                                                    case PRODUCT_STARTER: osName = "Windows Vista Starter Edition"; break;
-                                                                    default: osName = "Windows Vista"; break;
-                                                                }
-                                                            }
-                                                            break;
-                                                        }
-                                                    case 3: // Server 2008
-                                                        {
-                                                            if ((osVersionInfo.wSuiteMask & VER_SUITE_DATACENTER) == VER_SUITE_DATACENTER)
-                                                                osName = "Windows Server 2008 Datacenter Server";
-                                                            else if ((osVersionInfo.wSuiteMask & VER_SUITE_ENTERPRISE) == VER_SUITE_ENTERPRISE)
-                                                                osName = "Windows Server 2008 Advanced Server";
-                                                            else
-                                                                osName = "Windows Server 2008";
-                                                            break;
-                                                        }
+                                                    case "PRODUCT_ULTIMATE": osName += "Ultimate"; break;
+                                                    case "PRODUCT_HOME_BASIC":
+                                                    case "PRODUCT_HOME_BASIC_N": osName += "Home Basic"; break;
+                                                    case "PRODUCT_HOME_PREMIUM": osName += "Premium"; break;
+                                                    case "PRODUCT_ENTERPRISE": osName += "Enterprise"; break;
+                                                    case "PRODUCT_BUSINESS":
+                                                    case "PRODUCT_BUSINESS_N": osName += "Business"; break;
+                                                    case "PRODUCT_STARTER": osName += "Starter"; break;
+                                                    default: osName += "(" + strOSProduct.Substring(8) + ")"; break;
                                                 }
                                                 break;
                                             }
-                                        case 1: // Se7en
+                                        case 1: // Windows 7
                                             {
-                                                uint edition = PRODUCT_UNDEFINED;
-                                                if (GetProductInfo(osVersionInfo.dwMajorVersion,
-                                                                    osVersionInfo.dwMinorVersion,
-                                                                    osVersionInfo.wServicePackMajor,
-                                                                    osVersionInfo.wServicePackMinor,
-                                                                    out edition))
+                                                if (osVersionInfo.wProductType == VER_NT_WORKSTATION)
+                                                    osName = "Windows 7 ";
+                                                else
+                                                    osName = "Windows Server 2008 R2 ";
+                                                switch (strOSProduct)
                                                 {
-                                                    switch (edition)
-                                                    {
-                                                        case PRODUCT_ULTIMATE: osName = "Windows 7 Ultimate Edition"; break;
-                                                        case PRODUCT_HOME_BASIC:
-                                                        case PRODUCT_HOME_BASIC_N: osName = "Windows 7 Home Basic Edition"; break;
-                                                        case PRODUCT_HOME_PREMIUM: osName = "Windows 7 Premium Edition"; break;
-                                                        case PRODUCT_ENTERPRISE: osName = "Windows 7 Enterprise Edition"; break;
-                                                        case PRODUCT_BUSINESS:
-                                                        case PRODUCT_BUSINESS_N: osName = "Windows 7 Professional Edition"; break;
-                                                        case PRODUCT_STARTER: osName = "Windows 7 Starter Edition"; break;
-                                                        default: osName = "Windows 7"; break;
-                                                    }
+                                                    case "PRODUCT_ULTIMATE": osName += "Ultimate"; break;
+                                                    case "PRODUCT_HOME_BASIC":
+                                                    case "PRODUCT_HOME_BASIC_N": osName += "Home Basic"; break;
+                                                    case "PRODUCT_HOME_PREMIUM": osName += "Premium"; break;
+                                                    case "PRODUCT_ENTERPRISE": osName += "Enterprise"; break;
+                                                    case "PRODUCT_PROFESSIONAL":
+                                                    case "PRODUCT_PROFESSIONAL_N":
+                                                    case "PRODUCT_BUSINESS":
+                                                    case "PRODUCT_BUSINESS_N": osName += "Professional"; break;
+                                                    case "PRODUCT_STARTER": osName += "Starter"; break;
+                                                    default: osName += "(" + strOSProduct.Substring(8) + ")"; break;
                                                 }
                                                 break;
                                             }
                                         case 2: // Windows 8
-                                            {
-                                                uint edition = PRODUCT_UNDEFINED;
-                                                if (GetProductInfo(osVersionInfo.dwMajorVersion,
-                                                                    osVersionInfo.dwMinorVersion,
-                                                                    osVersionInfo.wServicePackMajor,
-                                                                    osVersionInfo.wServicePackMinor,
-                                                                    out edition))
-                                                {
-                                                    switch (edition)
-                                                    {
-                                                        case PRODUCT_CORE:
-                                                        case PRODUCT_CORE_COUNTRYSPECIFIC:
-                                                        case PRODUCT_CORE_N: osName = "Windows 8 Standard Edition"; break;
-                                                        case PRODUCT_ENTERPRISE:
-                                                        case PRODUCT_ENTERPRISE_N: osName = "Windows 8 Enterprise Edition"; break;
-                                                        case PRODUCT_PROFESSIONAL:
-                                                        case PRODUCT_PROFESSIONAL_N: osName = "Windows 8 Professional Edition"; break;
-                                                        case PRODUCT_PROFESSIONAL_WMC: osName = "Windows 8 Professional with Media Center Edition"; break;
-                                                        default: osName = "Windows 8"; break;
-                                                    }
-                                                }
-                                                break;
-                                            }
                                         case 3: // Windows 8.1
                                             {
-                                                uint edition = PRODUCT_UNDEFINED;
-                                                if (GetProductInfo(osVersionInfo.dwMajorVersion,
-                                                                    osVersionInfo.dwMinorVersion,
-                                                                    osVersionInfo.wServicePackMajor,
-                                                                    osVersionInfo.wServicePackMinor,
-                                                                    out edition))
+                                                if (osVersionInfo.wProductType == VER_NT_WORKSTATION)
+                                                    osName = "Windows 8" + (osInfo.Version.Minor == 3 ? ".1 " : " ");
+                                                else
+                                                    osName = "Windows Server 2012" + (osInfo.Version.Minor == 3 ? " R2 " : " ");
+                                                switch (strOSProduct)
                                                 {
-                                                    switch (edition)
-                                                    {
-                                                        case PRODUCT_CORE:
-                                                        case PRODUCT_CORE_COUNTRYSPECIFIC:
-                                                        case PRODUCT_CORE_N: osName = "Windows 8.1 Standard Edition"; break;
-                                                        case PRODUCT_ENTERPRISE:
-                                                        case PRODUCT_ENTERPRISE_N: osName = "Windows 8.1 Enterprise Edition"; break;
-                                                        case PRODUCT_PROFESSIONAL:
-                                                        case PRODUCT_PROFESSIONAL_N: osName = "Windows 8.1 Professional Edition"; break;
-                                                        case PRODUCT_PROFESSIONAL_WMC: osName = "Windows 8.1 Professional with Media Center Edition"; break;
-                                                        default: osName = "Windows 8.1"; break;
-                                                    }
+                                                    case "PRODUCT_CORE":
+                                                    case "PRODUCT_CORE_COUNTRYSPECIFIC":
+                                                    case "PRODUCT_CORE_N": osName += "Standard"; break;
+                                                    case "PRODUCT_ENTERPRISE":
+                                                    case "PRODUCT_ENTERPRISE_N": osName += "Enterprise"; break;
+                                                    case "PRODUCT_PROFESSIONAL":
+                                                    case "PRODUCT_PROFESSIONAL_N": osName += "Professional"; break;
+                                                    case "PRODUCT_PROFESSIONAL_WMC": osName += "Professional with Media Center"; break;
+                                                    default: osName += "(" + strOSProduct.Substring(8) + ")"; break;
                                                 }
                                                 break;
                                             }
@@ -354,39 +396,48 @@ namespace MeGUI
                                 {
                                     switch (osInfo.Version.Minor)
                                     {
-                                        case 0:
+                                        case 0: // Windows 10
                                             {
-                                                switch (osVersionInfo.wProductType)
+                                                if (osVersionInfo.wProductType == VER_NT_WORKSTATION)
+                                                    osName = "Windows 10 ";
+                                                else
+                                                    osName = "Windows Server 2016 ";
+
+                                                string strOSProduct = GetOSProduct(osVersionInfo);
+                                                switch (strOSProduct)
                                                 {
-                                                    case 1: // X
-                                                        {
-                                                            uint edition = PRODUCT_UNDEFINED;
-                                                            if (GetProductInfo(osVersionInfo.dwMajorVersion,
-                                                                                osVersionInfo.dwMinorVersion,
-                                                                                osVersionInfo.wServicePackMajor,
-                                                                                osVersionInfo.wServicePackMinor,
-                                                                                out edition))
-                                                            {
-                                                                switch (edition)
-                                                                {
-                                                                    case PRODUCT_CORE:
-                                                                    case PRODUCT_CORE_COUNTRYSPECIFIC:
-                                                                    case PRODUCT_CORE_N: osName = "Windows 10 Home"; break;
-                                                                    case PRODUCT_ENTERPRISE:
-                                                                    case PRODUCT_ENTERPRISE_N: osName = "Windows 10 Enterprise"; break;
-                                                                    case PRODUCT_PROFESSIONAL:
-                                                                    case PRODUCT_PROFESSIONAL_N: osName = "Windows 10 Professional"; break;
-                                                                    case PRODUCT_EDUCATION:
-                                                                    case PRODUCT_EDUCATION_N: osName = "Windows 10 Education"; break;
-                                                                    case PRODUCT_MOBILE_CORE:
-                                                                    case PRODUCT_MOBILE_ENTERPRISE: osName = "Windows 10 Mobile"; break;
-                                                                    default: osName = "Windows 10"; break;
-                                                                }
-                                                            }
-                                                            break;
-                                                        }
+                                                    case "PRODUCT_CORE":
+                                                    case "PRODUCT_CORE_COUNTRYSPECIFIC":
+                                                    case "PRODUCT_CORE_N": osName += "Home"; break;
+                                                    case "PRODUCT_ENTERPRISE":
+                                                    case "PRODUCT_ENTERPRISE_N": osName += "Enterprise"; break;
+                                                    case "PRODUCT_PROFESSIONAL":
+                                                    case "PRODUCT_PROFESSIONAL_N": osName += "Professional"; break;
+                                                    case "PRODUCT_EDUCATION":
+                                                    case "PRODUCT_EDUCATION_N": osName += "Education"; break;
+                                                    case "PRODUCT_MOBILE_CORE":
+                                                    case "PRODUCT_MOBILE_ENTERPRISE": osName += "Mobile"; break;
+                                                    default: osName += "(" + strOSProduct.Substring(8) + ")"; break;
+                                                }
+
+                                                // get release id if available
+                                                string release = string.Empty;
+                                                try
+                                                {
+                                                    release = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", string.Empty);
+                                                }
+                                                catch { }
+
+                                                switch (osVersionInfo.dwBuildNumber)
+                                                {
+                                                    case 10240: osName += " 1507"; break;
+                                                    case 10586: osName += " 1511"; break;
+                                                    case 14393: osName += " 1607"; break;
+                                                    case 15063: osName += " 1703"; break;
+                                                    default: osName += string.IsNullOrEmpty(release) ? string.Empty : " " + release; break;
                                                 }
                                                 break;
+
                                             }
                                     }
                                 }
@@ -400,7 +451,7 @@ namespace MeGUI
             {
                 if (x64Detection)
                 {
-                    if (!isWow64())
+                    if (!IsWow64())
                         osName += " x86";
                     else
                         osName += " x64";
@@ -409,18 +460,29 @@ namespace MeGUI
             else
                 osName += " x64";
 
-            return osName;
+            // get update revision if available
+            int ubr = 0;
+            try
+            {
+                ubr = (int)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ubr", 0);
+            }
+            catch { }
+
+            if (ubr > 0)
+                return string.Format("{0}{1} ({2}.{3}.{4}.{5})", osName, OSInfo.GetOSServicePack(), osInfo.Version.Major, osInfo.Version.Minor, osInfo.Version.Build, ubr);
+            else
+                return string.Format("{0}{1} ({2}.{3}.{4}.{5})", osName, OSInfo.GetOSServicePack(), osInfo.Version.Major, osInfo.Version.Minor, osInfo.Version.Revision, osInfo.Version.Build);
         }
 
+        /// <summary>
+        /// Returns the build number of the OS
+        /// </summary>
+        /// <returns>A decimal conatining the version e.g. 10.0</returns>
         public static decimal GetOSBuild()
         {
             OperatingSystem osInfo = Environment.OSVersion;
-            if (osInfo.Platform == PlatformID.Win32Windows)
-                return 0;
-
             if (osInfo.Platform != PlatformID.Win32NT)
                 return 0;
-
             return osInfo.Version.Major + osInfo.Version.Minor / 10;
         }
 
@@ -657,107 +719,43 @@ namespace MeGUI
             }
             return dnvf;
         }
-
-        /// <summary>
-        /// Get some stuff from the Management Object Queries
-        /// </summary>
-        /// <returns>A string containing the result of the MO query.</returns>
-        /// 
-        public static string GetMOStuff(string queryObject)
-        {
-            ManagementObjectSearcher searcher = null;
-            string res = "";
-            try
-            {
-               searcher = new ManagementObjectSearcher("SELECT * FROM " + queryObject);
-               foreach (ManagementObject mo in searcher.Get())
-                {
-                    if (queryObject == "Win32_OperatingSystem")
-                    {
-                        res = mo["Caption"].ToString();
-                    }
-                    else if (queryObject == "Win32_Processor")
-                    {
-                        res = mo["Name"].ToString();
-                    }
-                    else if (queryObject == "Win32_LogicalDisk")
-                    {
-                        if (mo["DriveType"].ToString() == "3") // HDD
-                        {
-                            long freespace = long.Parse(mo["FreeSpace"].ToString()) / 1073741824;
-                            long totalsize = long.Parse(mo["Size"].ToString()) / 1073741824;
-
-                            if (mo["VolumeName"].ToString() == "")
-                                mo["VolumeName"] = "Local Disk";
-
-                            res += mo["VolumeName"].ToString() + " (" + mo["Name"].ToString() + ")  -  " + Convert.ToString(freespace) + " Go free of " + Convert.ToString(totalsize) + " Go\n";
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-            return res;
-        }
         #endregion
 
-        #region Public Properties
-        /// <summary>
-        /// Gets the full version of the operating system running on this computer.
-        /// </summary>
-        public static string OSVersion
+        /// <value>
+        /// Returns true on Windows XP or newer operating systems; otherwise, false.
+        /// </value>
+        public static bool IsWindowsXPOrNewer
         {
             get
             {
-                return Environment.OSVersion.Version.ToString();
+                return Environment.OSVersion.Platform == PlatformID.Win32NT
+                    && ((Environment.OSVersion.Version.Major == 5 && Environment.OSVersion.Version.Minor >= 1)
+                        || Environment.OSVersion.Version.Major > 5);
             }
         }
 
-        /// <summary>
-        /// Gets the major version of the operating system running on this computer.
-        /// </summary>
-        public static int OSMajorVersion
+        /// <value>
+        /// Returns true on Windows Vista or newer operating systems; otherwise, false.
+        /// </value>
+        public static bool IsWindowsVistaOrNewer
         {
             get
             {
-                return Environment.OSVersion.Version.Major;
+                return Environment.OSVersion.Platform == PlatformID.Win32NT && Environment.OSVersion.Version.Major >= 6;
             }
         }
 
-        /// <summary>
-        /// Gets the minor version of the operating system running on this computer.
-        /// </summary>
-        public static int OSMinorVersion
+        /// <value>
+        /// Returns true on Windows 7 or newer operating systems; otherwise, false.
+        /// </value>
+        public static bool IsWindows7OrNewer
         {
             get
             {
-                return Environment.OSVersion.Version.Minor;
+                return Environment.OSVersion.Platform == PlatformID.Win32NT
+                    && ((Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor >= 1)
+                        || Environment.OSVersion.Version.Major > 6);
             }
         }
-
-        /// <summary>
-        /// Gets the build version of the operating system running on this computer.
-        /// </summary>
-        public static int OSBuildVersion
-        {
-            get
-            {
-                return Environment.OSVersion.Version.Build;
-            }
-        }
-
-        /// <summary>
-        /// Gets the revision version of the operating system running on this computer.
-        /// </summary>
-        public static int OSRevisionVersion
-        {
-            get
-            {
-                return Environment.OSVersion.Version.Revision;
-            }
-        }
-        #endregion
     }
 }

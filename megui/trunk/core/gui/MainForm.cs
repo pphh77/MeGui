@@ -1314,7 +1314,7 @@ namespace MeGUI
         {
             this.ClientSize = settings.MainFormSize;
 
-            if ((Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor >= 1) || Environment.OSVersion.Version.Major > 6)
+            if (OSInfo.IsWindows7OrNewer)
                 taskbarItem = (ITaskbarList3)new ProgressTaskbar();
 
             if (settings.AutoStartQueueStartup)
@@ -1328,38 +1328,43 @@ namespace MeGUI
         {
             LogItem i = Log.Info("Versions");
             if (!MainForm.Instance.Settings.IsMeGUIx64)
-                i.LogValue("MeGUI", new System.Version(Application.ProductVersion).Build);
+                i.LogValue("MeGUI", new System.Version(Application.ProductVersion).Build + " x86", false);
             else
-                i.LogValue("MeGUI", new System.Version(Application.ProductVersion).Build + " x64");
-            i.LogValue("Operating System", string.Format("{0}{1} ({2}.{3}.{4}.{5})", OSInfo.GetOSName(), OSInfo.GetOSServicePack(), OSInfo.OSMajorVersion, OSInfo.OSMinorVersion, OSInfo.OSRevisionVersion, OSInfo.OSBuildVersion));
+                i.LogValue("MeGUI", new System.Version(Application.ProductVersion).Build + " x64", false);
 
+            LogItem s = new LogItem("System Information");
+            s.LogValue("Operating System", OSInfo.GetOSName(), false);
             string version40 = OSInfo.GetDotNetVersion("4.0");
             if (String.IsNullOrEmpty(version40))
-                i.LogEvent(".NET Framework 4.0 not installed", ImageType.Warning);
+                s.LogValue(".NET Framework 4.0", "not installed", ImageType.Warning, false);
             else
-                i.LogValue(".NET Framework", string.Format("{0}", version40));
-
+                s.LogValue(".NET Framework", string.Format("{0}", version40), false);
             string version = OSInfo.GetDotNetVersion();
             if (!String.IsNullOrEmpty(version) && !version40.Equals(version))
-                i.LogValue(".NET Framework", string.Format("{0}", version));
+                s.LogValue(".NET Framework", string.Format("{0}", version), false);
+            i.Add(s);
 
             this.UpdateHandler = new UpdateHandler();
 
+            LogItem v = new LogItem("Component Information");
             string haaliPath = FileUtil.GetHaaliInstalledPath();
-            FileUtil.GetFileInformation("Haali Media Splitter", Path.Combine(haaliPath, "splitter.ax"), ref i);
-            FileUtil.GetFileInformation("Haali DSS2", Path.Combine(haaliPath, "avss.dll"), ref i);
-            FileUtil.GetFileInformation("ICSharpCode.SharpZipLib", Path.GetDirectoryName(Application.ExecutablePath) + @"\ICSharpCode.SharpZipLib.dll", ref i);
-            FileUtil.GetFileInformation("MediaInfo", Path.GetDirectoryName(Application.ExecutablePath) + @"\MediaInfo.dll", ref i);
-            FileUtil.GetFileInformation("MessageBoxExLib", Path.GetDirectoryName(Application.ExecutablePath) + @"\MessageBoxExLib.dll", ref i);
-            FileUtil.GetFileInformation("SevenZipSharp", Path.GetDirectoryName(Application.ExecutablePath) + @"\SevenZipSharp.dll", ref i);
-            FileUtil.GetFileInformation("7z", Path.GetDirectoryName(Application.ExecutablePath) + @"\7z.dll", ref i);
-            FileUtil.CheckAviSynth(ref i);
+            FileUtil.GetFileInformation("Haali Media Splitter", Path.Combine(haaliPath, "splitter.ax"), ref v);
+            FileUtil.GetFileInformation("Haali DSS2", Path.Combine(haaliPath, "avss.dll"), ref v);
+            FileUtil.GetFileInformation("ICSharpCode.SharpZipLib", Path.GetDirectoryName(Application.ExecutablePath) + @"\ICSharpCode.SharpZipLib.dll", ref v);
+            FileUtil.GetFileInformation("MediaInfo", Path.GetDirectoryName(Application.ExecutablePath) + @"\MediaInfo.dll", ref v);
+            FileUtil.GetFileInformation("MessageBoxExLib", Path.GetDirectoryName(Application.ExecutablePath) + @"\MessageBoxExLib.dll", ref v);
+            FileUtil.GetFileInformation("SevenZipSharp", Path.GetDirectoryName(Application.ExecutablePath) + @"\SevenZipSharp.dll", ref v);
+            FileUtil.GetFileInformation("7z", Path.GetDirectoryName(Application.ExecutablePath) + @"\7z.dll", ref v);
+            i.Add(v);
+
+            LogItem a = new LogItem("AviSynth Information");
+            FileUtil.CheckAviSynth(ref a);
+            i.Add(a);
         }
 
         public void setOverlayIcon(Icon oIcon)
         {
-            if ((Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor == 0)
-                || Environment.OSVersion.Version.Major < 6)
+            if (!OSInfo.IsWindows7OrNewer)
                 return;
 
             if (oIcon == null)

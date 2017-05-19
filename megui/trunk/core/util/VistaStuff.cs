@@ -31,18 +31,6 @@ namespace MeGUI.core.util
     class VistaStuff
     {
         /// <value>
-        /// Returns true on Windows Vista or newer operating systems; otherwise, false.
-        /// </value>
-        [Browsable(false)]
-        public static bool IsVistaOrNot
-        {
-            get
-            {
-                return Environment.OSVersion.Platform == PlatformID.Win32NT && Environment.OSVersion.Version.Major >= 6;
-            }
-        }
-
-        /// <value>
         /// Sets the process, memory and I/O priority on Windows Vista or newer operating systems
         /// </value>
         [Browsable(false)]
@@ -84,7 +72,7 @@ namespace MeGUI.core.util
                     // set process priority
                     oProc.PriorityClass = priority;
 
-                    if (!IsVistaOrNot)
+                    if (!OSInfo.IsWindowsVistaOrNewer)
                         continue;
 
                     int prioIO = VistaStuff.PRIORITY_IO_NORMAL;
@@ -126,13 +114,13 @@ namespace MeGUI.core.util
         [Browsable(false)]
         public static void SetThreadPriority(IntPtr handle, ThreadPriority priority)
         {
-            if (IsVistaOrNot)
-            {
-                if (priority == ThreadPriority.Lowest || priority == ThreadPriority.BelowNormal)
-                    SetThreadPriority(handle, THREAD_MODE_BACKGROUND_BEGIN);
-                else
-                    SetThreadPriority(handle, THREAD_MODE_BACKGROUND_END);
-            }
+            if (!OSInfo.IsWindowsVistaOrNewer)
+                return;
+
+            if (priority == ThreadPriority.Lowest || priority == ThreadPriority.BelowNormal)
+                SetThreadPriority(handle, THREAD_MODE_BACKGROUND_BEGIN);
+            else
+                SetThreadPriority(handle, THREAD_MODE_BACKGROUND_END);
         }
         
         public const int BS_COMMANDLINK = 0x0000000E;
