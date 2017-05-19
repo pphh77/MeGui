@@ -761,7 +761,7 @@ namespace MeGUI
                 this.Location = new Point(iScreenWidth - this.Size.Width, this.Location.Y);
 
             if (OSInfo.IsWindowsVistaOrNewer)
-                VistaStuff.SetWindowTheme(listViewDetails.Handle, "explorer", null);
+                OSInfo.SetWindowTheme(listViewDetails.Handle, "explorer", null);
         }
         #endregion
         #region GUI

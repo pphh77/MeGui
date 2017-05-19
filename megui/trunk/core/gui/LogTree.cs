@@ -194,7 +194,7 @@ namespace MeGUI.core.gui
         private void LogTree_Load(object sender, EventArgs e)
         {
             if (OSInfo.IsWindowsVistaOrNewer)
-                VistaStuff.SetWindowTheme(treeView.Handle, "explorer", null);
+                OSInfo.SetWindowTheme(treeView.Handle, "explorer", null);
         }
 
         private void ResetOverlayIcon_Click(object sender, EventArgs e)

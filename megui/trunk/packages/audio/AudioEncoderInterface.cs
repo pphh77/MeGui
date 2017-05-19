@@ -2115,7 +2115,7 @@ function x_upmixC" + id + @"(clip stereo)
 							_encoderThread.Priority = ThreadPriority.Highest;
 							break;
 				    }
-                    VistaStuff.SetProcessPriority(_encoderProcess, priority);
+                    OSInfo.SetProcessPriority(_encoderProcess, priority, 0);
                     MainForm.Instance.Settings.ProcessingPriority = priority;
                     return;
                 }

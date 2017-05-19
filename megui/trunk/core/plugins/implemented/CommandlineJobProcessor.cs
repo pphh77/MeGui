@@ -53,7 +53,8 @@ namespace MeGUI
         protected bool bSecondPassNeeded = false;
         protected bool bWaitForExit = false;
         protected bool bCommandLine = true;
-        protected List<int> arrSuccessCodes = new List<int>() { 0 }; 
+        protected List<int> arrSuccessCodes = new List<int>() { 0 };
+        protected int iMinimumChildProcessCount = 0;
 
         #endregion
 
@@ -321,7 +322,7 @@ namespace MeGUI
             {
                 try
                 {
-                    VistaStuff.SetProcessPriority(proc, priority);
+                    OSInfo.SetProcessPriority(proc, priority, iMinimumChildProcessCount);
                     MainForm.Instance.Settings.ProcessingPriority = priority;
 				    return;
                 }

@@ -29,8 +29,7 @@ namespace MeGUI
 {
     class x265Encoder : CommandlineVideoEncoder
     {
-        public static readonly JobProcessorFactory Factory =
-new JobProcessorFactory(new ProcessorFactory(init), "x265Encoder");
+        public static readonly JobProcessorFactory Factory = new JobProcessorFactory(new ProcessorFactory(init), "x265Encoder");
 
         private static IJobProcessor init(MainForm mf, Job j)
         {
@@ -45,6 +44,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "x265Encoder");
         public x265Encoder(string encoderPath) : base()
         {
             executable = encoderPath;
+            iMinimumChildProcessCount = 1;
         }
 
         public override void ProcessLine(string line, StreamType stream, ImageType oType)

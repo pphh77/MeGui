@@ -22,7 +22,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Management;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace MeGUI
 {
@@ -757,5 +759,138 @@ namespace MeGUI
                         || Environment.OSVersion.Version.Major > 6);
             }
         }
+
+        [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)]
+        public static extern int SetWindowTheme(IntPtr hWnd, string pszSubAppName, string pszSubIdList);
+
+        #region process handling
+        [DllImport("ntdll", CharSet = CharSet.Unicode)]
+        private static extern int NtSetInformationProcess(IntPtr hProcess, int processInformationClass, ref int processInformation, int processInformationLength);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern bool SetPriorityClass(IntPtr handle, uint priorityClass);
+
+        [DllImport("Kernel32.dll", ExactSpelling = true)]
+        private static extern IntPtr GetCurrentThread();
+
+        [DllImport("Kernel32.dll", ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool SetThreadPriority(IntPtr hThread, int nPriority);
+
+        private const int PROCESS_INFORMATION_MEMORY_PRIORITY = 0x27;
+        private const int PROCESS_INFORMATION_IO_PRIORITY = 0x21;
+        private const int PRIORITY_MEMORY_NORMAL = 5;
+        private const int PRIORITY_MEMORY_LOW = 3;
+        private const int PRIORITY_IO_NORMAL = 2;
+        private const int PRIORITY_IO_LOW = 1;
+        private const uint PROCESS_MODE_BACKGROUND_BEGIN = 0x00100000;
+        private const uint PROCESS_MODE_BACKGROUND_END = 0x00200000;
+        private const int THREAD_MODE_BACKGROUND_BEGIN = 0x00010000;
+        private const int THREAD_MODE_BACKGROUND_END = 0x00020000;
+
+        /// <value>
+        /// Sets the process, memory and I/O priority on Windows Vista or newer operating systems
+        /// </value>
+        public static void SetProcessPriority(Process oMainProcess, ProcessPriority processPriority, int iMinimumChildProcessCount)
+        {
+            try
+            {
+                if (oMainProcess == null || oMainProcess.HasExited)
+                    return;
+
+                ProcessPriorityClass priority = ProcessPriorityClass.Idle;
+                switch (processPriority)
+                {
+                    case ProcessPriority.IDLE:
+                        priority = ProcessPriorityClass.Idle;
+                        break;
+                    case ProcessPriority.BELOW_NORMAL:
+                        priority = ProcessPriorityClass.BelowNormal;
+                        break;
+                    case ProcessPriority.NORMAL:
+                        priority = ProcessPriorityClass.Normal;
+                        break;
+                    case ProcessPriority.ABOVE_NORMAL:
+                        priority = ProcessPriorityClass.AboveNormal;
+                        break;
+                    case ProcessPriority.HIGH:
+                        priority = ProcessPriorityClass.RealTime;
+                        break;
+                }
+
+                // get the list of child processes
+                // make sure that the required child processes have been started already
+                List<Process> arrProc = new List<Process>();
+                do {
+                    arrProc = GetChildProcesses(oMainProcess);
+                    int iCount = 0;
+                    foreach (Process oProc in arrProc)
+                        if (oProc.ProcessName != "conhost")
+                            iCount++;
+                    if (iCount >= iMinimumChildProcessCount)
+                        break;
+                    System.Windows.Forms.Application.DoEvents();
+                    System.Threading.Thread.Sleep(500);
+                } while (true);
+                arrProc.Insert(0, oMainProcess);
+
+                foreach (Process oProc in arrProc)
+                {
+                    if (oProc == null || oProc.HasExited)
+                        continue;
+
+                    // set process priority
+                    oProc.PriorityClass = priority;
+
+                    if (!OSInfo.IsWindowsVistaOrNewer)
+                        continue;
+
+                    int prioIO = PRIORITY_IO_NORMAL;
+                    int prioMemory = PRIORITY_MEMORY_NORMAL;
+                    if (priority == ProcessPriorityClass.Idle || priority == ProcessPriorityClass.BelowNormal)
+                    {
+                        prioIO = PRIORITY_IO_LOW;
+                        prioMemory = PRIORITY_MEMORY_LOW;
+                        SetPriorityClass(oProc.Handle, PROCESS_MODE_BACKGROUND_BEGIN);
+                    }
+                    else
+                        SetPriorityClass(oProc.Handle, PROCESS_MODE_BACKGROUND_END);
+                    NtSetInformationProcess(oProc.Handle, PROCESS_INFORMATION_IO_PRIORITY, ref prioIO, Marshal.SizeOf(prioIO));
+                    NtSetInformationProcess(oProc.Handle, PROCESS_INFORMATION_MEMORY_PRIORITY, ref prioMemory, Marshal.SizeOf(prioMemory));
+                }
+            }
+            catch { }
+        }
+
+
+        public static List<Process> GetChildProcesses(Process process)
+        {
+            List<Process> children = new List<Process>();
+            ManagementObjectSearcher mos = new ManagementObjectSearcher(String.Format("Select * From Win32_Process Where ParentProcessID={0}", process.Id));
+
+            foreach (ManagementObject mo in mos.Get())
+            {
+                Process oProc = Process.GetProcessById(Convert.ToInt32(mo["ProcessID"]));
+                children.Add(oProc);
+                children.AddRange(GetChildProcesses(oProc));
+            }
+
+            return children;
+        }
+
+        /// <value>
+        /// Sets the memory and I/O priority on Windows Vista or newer operating systems
+        /// </value>
+        public static void SetThreadPriority(IntPtr handle, ThreadPriority priority)
+        {
+            if (!OSInfo.IsWindowsVistaOrNewer)
+                return;
+
+            if (priority == ThreadPriority.Lowest || priority == ThreadPriority.BelowNormal)
+                SetThreadPriority(handle, THREAD_MODE_BACKGROUND_BEGIN);
+            else
+                SetThreadPriority(handle, THREAD_MODE_BACKGROUND_END);
+        }
+#endregion
     }
 }

@@ -54,6 +54,8 @@ namespace MeGUI
         public x264Encoder(string encoderPath) : base()
         {
             executable = encoderPath;
+            if (!MainForm.Instance.Settings.IsMeGUIx64 && MainForm.Instance.Settings.Usex64Tools)
+                iMinimumChildProcessCount = 1;
         }
 
         public override void ProcessLine(string line, StreamType stream, ImageType oType)

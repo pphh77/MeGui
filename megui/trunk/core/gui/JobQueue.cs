@@ -871,7 +871,7 @@ namespace MeGUI.core.gui
         {
 
             if (OSInfo.IsWindowsVistaOrNewer)
-                VistaStuff.SetWindowTheme(queueListView.Handle, "explorer", null);
+                OSInfo.SetWindowTheme(queueListView.Handle, "explorer", null);
         }
 
         private void queueListView_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
