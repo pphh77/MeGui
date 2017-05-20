@@ -253,7 +253,6 @@ namespace MeGUI
                     readFromStdErrThread.Start();
                 }
                 new System.Windows.Forms.MethodInvoker(this.RunStatusCycle).BeginInvoke(null, null);
-                this.changePriority(MainForm.Instance.Settings.ProcessingPriority);
 
                 if (hideProcess)
                 {
@@ -263,6 +262,8 @@ namespace MeGUI
                     if (!proc.HasExited)
                         WindowUtil.HideWindow(proc.MainWindowHandle);
                 }
+
+                this.changePriority(MainForm.Instance.Settings.ProcessingPriority);
             }
             catch (Exception e)
             {

@@ -820,6 +820,7 @@ namespace MeGUI
 
                 // get the list of child processes
                 // make sure that the required child processes have been started already
+                DateTime oCheckStarted = DateTime.Now;
                 List<Process> arrProc = new List<Process>();
                 do {
                     arrProc = GetChildProcesses(oMainProcess);
@@ -831,7 +832,7 @@ namespace MeGUI
                         break;
                     System.Windows.Forms.Application.DoEvents();
                     System.Threading.Thread.Sleep(500);
-                } while (true);
+                } while (oCheckStarted.AddSeconds(60) > DateTime.Now); // wait max. 60 seconds to find all child processes
                 arrProc.Insert(0, oMainProcess);
 
                 foreach (Process oProc in arrProc)

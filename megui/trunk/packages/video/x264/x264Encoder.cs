@@ -38,7 +38,7 @@ namespace MeGUI
                 UpdateCacher.CheckPackage("x264");
 
                 string encoderPath = mf.Settings.X264.Path;
-                if (MainForm.Instance.Settings.IsMeGUIx64 || !MainForm.Instance.Settings.Usex64Tools)
+                if (!UseAvs4x26x())
                 {
                     x264Settings xs = (x264Settings)((j as VideoJob).Settings);
                     if (xs.X26410Bits)
@@ -51,10 +51,15 @@ namespace MeGUI
             return null;
         }
 
+        private static bool UseAvs4x26x()
+        {
+            return (!MainForm.Instance.Settings.IsMeGUIx64 && MainForm.Instance.Settings.Usex64Tools);
+        }
+
         public x264Encoder(string encoderPath) : base()
         {
             executable = encoderPath;
-            if (!MainForm.Instance.Settings.IsMeGUIx64 && MainForm.Instance.Settings.Usex64Tools)
+            if (UseAvs4x26x())
                 iMinimumChildProcessCount = 1;
         }
 
@@ -94,7 +99,7 @@ namespace MeGUI
                 if (!String.IsNullOrEmpty(xs.CustomEncoderOptions))
                     log.LogEvent("custom command line: " + xs.CustomEncoderOptions);
 
-                if (!MainForm.Instance.Settings.IsMeGUIx64 && MainForm.Instance.Settings.Usex64Tools)
+                if (UseAvs4x26x())
                 {
                     // add executable
                     if (xs.X26410Bits)
