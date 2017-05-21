@@ -162,11 +162,9 @@ namespace MeGUI
         private AviSynthColorspace _colorSpace;
         private AudioSampleType _sampleType;
         private static object _locker = new object();
-#if DEBUG
         private int _random;
         private static object _lockerDLL = new object();
         private static int _countDLL = 0;
-#endif
 
 #if dimzon
 
@@ -536,11 +534,12 @@ namespace MeGUI
 
             lock (_locker)
             {
-#if DEBUG
                 Random rnd = new Random();
                 _random = rnd.Next(1, 1000000);
-                HandleAviSynthWrapperDLL(false, arg);
-#endif
+
+                if (MainForm.Instance.Settings.ShowDebugInformation)
+                    HandleAviSynthWrapperDLL(false, arg);
+
                 if (MainForm.Instance.Settings.OpenAVSInThreadDuringSession)
                 {
                     Thread t = new Thread(new ThreadStart(delegate
@@ -593,26 +592,29 @@ namespace MeGUI
                 _avs = IntPtr.Zero;
                 if (disposing)
                     GC.SuppressFinalize(this);
-#if DEBUG
-                HandleAviSynthWrapperDLL(true, String.Empty);
-#endif
+                if (MainForm.Instance.Settings.ShowDebugInformation)
+                    HandleAviSynthWrapperDLL(true, String.Empty);
             }
         }
 
-#if DEBUG
         private void HandleAviSynthWrapperDLL(bool bUnload, string script)
         {
             lock (_lockerDLL)
             {
                 if (MainForm.Instance.AviSynthWrapperLog == null)
-                    MainForm.Instance.AviSynthWrapperLog = MainForm.Instance.Log.Info("AviSynth");
+                    MainForm.Instance.AviSynthWrapperLog = MainForm.Instance.Log.Info("AviSynthWrapper");
+
+                bool bDebug = false;
+#if DEBUG
+                bDebug = true;
+#endif
 
                 if (bUnload)
                 {
                     _countDLL--;
                     if (_countDLL > 0)
                     {
-                        MainForm.Instance.AviSynthWrapperLog.LogValue("sessions open: " + _countDLL + ", id: " + _random, script + Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.StackTrace);
+                        MainForm.Instance.AviSynthWrapperLog.LogValue("sessions open: " + _countDLL + ", id: " + _random, script + (bDebug ? Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.StackTrace : String.Empty));
                         return;
                     }
 
@@ -623,18 +625,17 @@ namespace MeGUI
                         if (mod.FileName.ToLowerInvariant().Equals(strFile.ToLowerInvariant()))
                             bResult = FreeLibrary(mod.BaseAddress);
                     }
-                    MainForm.Instance.AviSynthWrapperLog.LogValue("sessions open: " + _countDLL + ", id: " + _random + ", close: " + bResult, script + Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.StackTrace);
+                    MainForm.Instance.AviSynthWrapperLog.LogValue("sessions open: " + _countDLL + ", id: " + _random + ", close: " + bResult, script + (bDebug ? Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.StackTrace : String.Empty));
                 }
                 else
                 {
                     if (_countDLL == 0)
                         LoadLibraryA("avisynthwrapper.dll");
                     _countDLL++;
-                    MainForm.Instance.AviSynthWrapperLog.LogValue("sessions open: " + _countDLL + ", id: " + _random, script + Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.StackTrace);
+                    MainForm.Instance.AviSynthWrapperLog.LogValue("sessions open: " + _countDLL + ", id: " + _random, script + (bDebug ? Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.StackTrace : String.Empty));
                 }
             }
         }
-#endif
 
         public short BitsPerSample
 		{

@@ -53,10 +53,6 @@ namespace MeGUI
         private ITaskbarList3 taskbarItem;
         private Icon taskbarIcon;
         private string strLogFile;
-        private LogItem _oneClickLog;
-        private LogItem _aVSScriptCreatorLog;
-        private LogItem _fileIndexerLog;
-        private LogItem _eac3toLog;
         private UpdateHandler _updateHandler;
         private List<ProgramSettings> _programsettings;
         private bool restart = false;
@@ -72,16 +68,22 @@ namespace MeGUI
         public bool IsHiddenMode { get { return trayIcon.Visible; } }
         public bool IsOverlayIconActive { get { return taskbarIcon != null; } }
         public string LogFile { get { return strLogFile; } }
+        public UpdateHandler UpdateHandler { get { return _updateHandler; } set { _updateHandler = value; } }
+        public MuxProvider MuxProvider { get { return muxProvider; } }
+
+        private LogItem _oneClickLog;
+        private LogItem _aVSScriptCreatorLog;
+        private LogItem _fileIndexerLog;
+        private LogItem _eac3toLog;
+        private LogItem _avisynthWrapperLog;
+        private LogItem _mediaInfoWrapperLog;
         public LogItem OneClickLog { get { return _oneClickLog; } set { _oneClickLog = value; } }
         public LogItem AVSScriptCreatorLog { get { return _aVSScriptCreatorLog; } set { _aVSScriptCreatorLog = value; } }
         public LogItem FileIndexerLog { get { return _fileIndexerLog; } set { _fileIndexerLog = value; } }
         public LogItem Eac3toLog { get { return _eac3toLog; } set { _eac3toLog = value; } }
-#if DEBUG
-        private LogItem _avisynthWrapperLog;
         public LogItem AviSynthWrapperLog { get { return _avisynthWrapperLog; } set { _avisynthWrapperLog = value; } }
-#endif
-        public UpdateHandler UpdateHandler { get { return _updateHandler; } set { _updateHandler = value; } }
-        public MuxProvider MuxProvider { get { return muxProvider; } }
+        public LogItem MediaInfoWrapperLog { get { return _mediaInfoWrapperLog; } set { _mediaInfoWrapperLog = value; } }
+
         #endregion
 
         public void RegisterForm(Form f)
@@ -1059,14 +1061,25 @@ namespace MeGUI
             }
 
 #if !DEBUG
+            // catch uncatched errors
             Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
-            string strDebugFile = Path.ChangeExtension(Application.ExecutablePath, ".pdb");
-            if (File.Exists(strDebugFile))
-            {
-                try { File.Delete(strDebugFile); } catch { }
-            } 
 #endif
+
+            // delete PDB file if outdated
+            try
+            {
+                string strDebugFile = Path.ChangeExtension(Application.ExecutablePath, ".pdb");
+                if (File.Exists(strDebugFile))
+                {
+                    DateTime creationAPP = File.GetLastWriteTime(Application.ExecutablePath);
+                    DateTime creationPDB = File.GetLastWriteTime(strDebugFile);
+                    double difference = (creationAPP < creationPDB) ? (creationPDB - creationAPP).TotalSeconds : (creationAPP - creationPDB).TotalSeconds;
+                    if (difference > 60)
+                        File.Delete(strDebugFile);
+                }
+            } catch { }
+
             Application.EnableVisualStyles();
 
             MainForm mainForm = new MainForm();
@@ -1089,12 +1102,15 @@ namespace MeGUI
 
         static void HandleUnhandledException(Exception e)
         {
-            LogItem i = MainForm.Instance.Log.Error("Unhandled error");
-            i.LogValue("Exception message", e.Message);
-            i.LogValue("Stacktrace", e.StackTrace);
-            i.LogValue("Inner exception", e.InnerException);
-            foreach (System.Collections.DictionaryEntry info in e.Data)
-                i.LogValue(info.Key.ToString(), info.Value);
+            if (MainForm.Instance != null)
+            {
+                LogItem i = MainForm.Instance.Log.Error("Unhandled error");
+                i.LogValue("Exception message", e.Message);
+                i.LogValue("Stacktrace", e.StackTrace);
+                i.LogValue("Inner exception", e.InnerException);
+                foreach (System.Collections.DictionaryEntry info in e.Data)
+                    i.LogValue(info.Key.ToString(), info.Value);
+            }
 
             MessageBox.Show("MeGUI encountered a fatal error and may not be able to proceed. Reason: " + e.Message
                 , "Fatal error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1326,11 +1342,17 @@ namespace MeGUI
 
         private void getVersionInformation()
         {
+            bool bDebug = false;
+#if DEBUG
+            bDebug = true;
+#endif
             LogItem i = Log.Info("Versions");
             if (!MainForm.Instance.Settings.IsMeGUIx64)
-                i.LogValue("MeGUI", new System.Version(Application.ProductVersion).Build + " x86", false);
+                i.LogValue("MeGUI", new System.Version(Application.ProductVersion).Build + " x86" + (bDebug ? " (DEBUG)" : string.Empty), false);
             else
-                i.LogValue("MeGUI", new System.Version(Application.ProductVersion).Build + " x64", false);
+                i.LogValue("MeGUI", new System.Version(Application.ProductVersion).Build + " x64" + (bDebug ? " (DEBUG)" : string.Empty), false);
+            if (File.Exists(Path.ChangeExtension(Application.ExecutablePath, ".pdb")))
+                i.LogValue("MeGUI Debug Data", "available", false);
 
             LogItem s = new LogItem("System Information");
             s.LogValue("Operating System", OSInfo.GetOSName(), false);

@@ -265,6 +265,7 @@ namespace MeGUI
                 settings.AlwaysUsePortableAviSynth = cbUseIncludedAviSynth.Checked;
                 settings.ChapterCreatorMinimumLength = (int)minimumTitleLength.Value;
                 settings.Usex64Tools = chk64Bit.Checked;
+                settings.ShowDebugInformation = chkDebugInformation.Checked;
 
 				return settings;
 			}
@@ -336,6 +337,7 @@ namespace MeGUI
                 cbUseIncludedAviSynth.Checked = settings.AlwaysUsePortableAviSynth;
                 minimumTitleLength.Value = settings.ChapterCreatorMinimumLength;
                 chk64Bit.Checked = settings.Usex64Tools;
+                chkDebugInformation.Checked = settings.ShowDebugInformation;
             }
 		}
 		#endregion

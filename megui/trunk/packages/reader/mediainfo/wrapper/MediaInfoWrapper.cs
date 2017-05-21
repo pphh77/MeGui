@@ -22,7 +22,8 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.IO;
-using System.Reflection;
+
+using MeGUI;
 
 namespace MediaInfoWrapper
 {
@@ -134,10 +135,29 @@ namespace MediaInfoWrapper
 
         private IntPtr Handle;
         private bool MustUseAnsi;
+        private bool bSuccess;
+
+        #region Handle DLL
+        [DllImport("kernel32", SetLastError = true)]
+        private static extern bool FreeLibrary(IntPtr hModule);
+        [DllImport("kernel32", SetLastError = true)]
+        private static extern bool LoadLibraryA(string hModule);
+
+        private static object _locker = new object();
+        private int _random;
+        private static object _lockerDLL = new object();
+        private static int _countDLL = 0;
+        #endregion
+
+        public bool OpenSuccess { get => bSuccess; }
 
         //MediaInfo class
         public MediaInfo()
         {
+            Random rnd = new Random();
+            _random = rnd.Next(1, 1000000);
+            bSuccess = false;
+
             try
             {
                 Handle = MediaInfo_New();
@@ -162,52 +182,91 @@ namespace MediaInfoWrapper
             if (Handle == (IntPtr)0)
                 return;
 
-            if (!CheckFileExistence(path))
-                return;
             _FileName = path;
+            if (MainForm.Instance.Settings.ShowDebugInformation)
+                HandleMediaInfoWrapperDLL(false);
 
-            Open(path);
-            try
-            {
-                getStreamCount();
-                getAllInfos();
-            }
-            finally //ensure MediaInfo_Close is called even if something goes wrong 
+            if (!File.Exists(path))
             {
                 Close();
+                return;
+            }
+            
+            Open(path);
+            getStreamCount();
+            getAllInfos();
+            Close();
+            bSuccess = true;
+        }
+
+        private void HandleMediaInfoWrapperDLL(bool bUnload)
+        {
+            lock (_lockerDLL)
+            {
+                if (MainForm.Instance.MediaInfoWrapperLog == null)
+                    MainForm.Instance.MediaInfoWrapperLog = MainForm.Instance.Log.Info("MediaInfoWrapper");
+
+                bool bDebug = false;
+#if DEBUG
+                bDebug = true;
+#endif
+
+                if (bUnload)
+                {
+                    _countDLL--;
+                    if (_countDLL > 0)
+                    {
+                        MainForm.Instance.MediaInfoWrapperLog.LogValue("sessions open: " + _countDLL + ", id: " + _random, "File: " + _FileName + (bDebug ? Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.StackTrace : String.Empty));
+                        return;
+                    }
+
+                    bool bResult = false;
+                    string strFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), "mediainfo.dll");
+                    foreach (System.Diagnostics.ProcessModule mod in System.Diagnostics.Process.GetCurrentProcess().Modules)
+                    {
+                        if (mod.FileName.ToLowerInvariant().Equals(strFile.ToLowerInvariant()))
+                            bResult = FreeLibrary(mod.BaseAddress);
+                    }
+                    MainForm.Instance.MediaInfoWrapperLog.LogValue("sessions open: " + _countDLL + ", id: " + _random + ", close: " + bResult, "File: " + _FileName + (bDebug ? Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.StackTrace : String.Empty));
+                }
+                else
+                {
+                    if (_countDLL == 0)
+                        LoadLibraryA("mediainfo.dll");
+                    _countDLL++;
+                    MainForm.Instance.MediaInfoWrapperLog.LogValue("sessions open: " + _countDLL + ", id: " + _random, "File: " + "File: " + _FileName + (bDebug ? Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.StackTrace : String.Empty));
+                }
             }
         }
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
-
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
                 if (disposing)
                 {
-                    // TODO: dispose managed state (managed objects).
+                    // dispose managed state (managed objects).
                 }
 
                 if (Handle == (IntPtr)0)
                     return;
                 MediaInfo_Delete(Handle);
-
                 disposedValue = true;
+
+                if (MainForm.Instance.Settings.ShowDebugInformation)
+                    HandleMediaInfoWrapperDLL(true);
             }
         }
 
          ~MediaInfo()
         {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(false);
         }
 
-        // This code added to correctly implement the disposable pattern.
         public void Dispose()
         {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -355,10 +414,6 @@ namespace MediaInfoWrapper
         }
 
 
-
-
-
-
         private List<VideoTrack> _Video;
         private List<GeneralTrack> _General;
         private List<AudioTrack> _Audio;
@@ -371,17 +426,6 @@ namespace MediaInfoWrapper
         private Int32 _ChaptersCount;
         private string _FileName;
 
-
-        /// <summary>
-        /// Simply checks file presence else throws a FileNotFoundException
-        /// </summary>
-        protected bool CheckFileExistence(string filepath)
-        {
-            if (!File.Exists(filepath))
-                throw new FileNotFoundException("File not found: " + filepath, filepath);
-            else 
-                return true;
-        }
 
         private string GetSpecificMediaInfo(StreamKind KindOfStream, int trackindex, string NameOfParameter)
         {

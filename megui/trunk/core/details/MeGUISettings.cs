@@ -58,7 +58,7 @@ namespace MeGUI
                      alwaysOnTop, addTimePosition, alwaysbackupfiles, bUseITU, bEac3toLastUsedFileMode, bMeGUIx64,
                      bAutoLoadDG, bAutoStartQueueStartup, bAlwayUsePortableAviSynth, bVobSubberSingleFileExport,
                      bEnsureCorrectPlaybackSpeed, bOpenAVSInThread, bExternalMuxerX264, bUseNeroAacEnc, bOSx64,
-                     bVobSubberExtractForced, bVobSubberShowAll, bUsex64Tools;
+                     bVobSubberExtractForced, bVobSubberShowAll, bUsex64Tools, bShowDebugInformation;
         private decimal forceFilmThreshold, acceptableFPSError;
         private int nbPasses, autoUpdateServerSubList, minComplexity, updateFormSplitter,
                     maxComplexity, jobColumnWidth, inputColumnWidth, outputColumnWidth, codecColumnWidth,
@@ -184,6 +184,7 @@ namespace MeGUI
             bVobSubberExtractForced = false;
             bVobSubberShowAll = false;
             chapterCreatorSortString = "duration";
+            bShowDebugInformation = false;
         }
 
         #region properties
@@ -211,6 +212,12 @@ namespace MeGUI
                 return bUsex64Tools;
             }
             set { bUsex64Tools = value; }
+        }
+
+        public bool ShowDebugInformation
+        {
+            get { return bShowDebugInformation; }
+            set { bShowDebugInformation = value; }
         }
 
         public Point MainFormLocation

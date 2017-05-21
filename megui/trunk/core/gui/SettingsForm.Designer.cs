@@ -154,6 +154,7 @@ namespace MeGUI
             this.autoEncodeDefaultsButton = new System.Windows.Forms.Button();
             this.toolTipHelp = new System.Windows.Forms.ToolTip(this.components);
             this.helpButton1 = new MeGUI.core.gui.HelpButton();
+            this.chkDebugInformation = new System.Windows.Forms.CheckBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
             groupBox1.SuspendLayout();
             this.otherGroupBox.SuspendLayout();
@@ -268,6 +269,7 @@ namespace MeGUI
             // 
             // otherGroupBox
             // 
+            this.otherGroupBox.Controls.Add(this.chkDebugInformation);
             this.otherGroupBox.Controls.Add(this.lblMinimumLength);
             this.otherGroupBox.Controls.Add(this.minimumTitleLength);
             this.otherGroupBox.Controls.Add(this.cbUseIncludedAviSynth);
@@ -1353,6 +1355,17 @@ namespace MeGUI
             this.helpButton1.Size = new System.Drawing.Size(38, 23);
             this.helpButton1.TabIndex = 1;
             // 
+            // chkDebugInformation
+            // 
+            this.chkDebugInformation.AutoSize = true;
+            this.chkDebugInformation.Checked = true;
+            this.chkDebugInformation.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkDebugInformation.Location = new System.Drawing.Point(309, 141);
+            this.chkDebugInformation.Name = "chkDebugInformation";
+            this.chkDebugInformation.Size = new System.Drawing.Size(133, 17);
+            this.chkDebugInformation.TabIndex = 25;
+            this.chkDebugInformation.Text = "Log debug information";
+            // 
             // SettingsForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 14);
@@ -1512,5 +1525,6 @@ namespace MeGUI
         private System.Windows.Forms.Label lblMinimumLength;
         private System.Windows.Forms.NumericUpDown minimumTitleLength;
         private System.Windows.Forms.CheckBox chk64Bit;
+        private System.Windows.Forms.CheckBox chkDebugInformation;
     }
 }

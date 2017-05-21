@@ -265,10 +265,23 @@ namespace MeGUI
                     info = new MediaInfo(file);
                 }));
                 processMediaInfo.Start();
-                while (processMediaInfo.ThreadState == ThreadState.Running)
+                while (processMediaInfo.ThreadState == ThreadState.Running || processMediaInfo.ThreadState == ThreadState.WaitSleepJoin)
                 {
                     System.Windows.Forms.Application.DoEvents();
                     Thread.Sleep(100);
+                }
+
+                if (info == null || !info.OpenSuccess)
+                {
+                    if (oLog != null)
+                        infoLog.LogEvent("The file cannot be opened", ImageType.Warning);
+                    else
+                    {
+                        oLog = MainForm.Instance.Log.Info("MediaInfo");
+                        oLog.LogEvent("File: " + _file);
+                        oLog.LogEvent("The file cannot be opened", ImageType.Warning);
+                    }
+                    return;
                 }
 
                 CorrectSourceInformation(ref info, file, infoLog, iPGCNumber, iAngleNumber);
@@ -360,14 +373,14 @@ namespace MeGUI
                     }
                     else
                         ati.Codec = atrack.Format;
-#if DEBUG
-                    if (String.IsNullOrEmpty(ati.Codec))
+
+                    if (MainForm.Instance.Settings.ShowDebugInformation && String.IsNullOrEmpty(ati.Codec))
                     {
                         if (_Log == null)
                             _Log = MainForm.Instance.Log.Info("MediaInfo");
                         _Log.LogEvent("Unknown audio codec found: " + atrack.FormatProfile + " / " + atrack.Format, ImageType.Warning);
                     }
-#endif
+
                     ati.NbChannels = atrack.ChannelsString;
                     ati.ChannelPositions = atrack.ChannelPositionsString2;
                     ati.SamplingRate = atrack.SamplingRateString;
@@ -462,14 +475,12 @@ namespace MeGUI
                         _VideoInfo.Codec = getVideoCodec(track.Codec);
                         if (_VideoInfo.Codec == null)
                             _VideoInfo.Codec = getVideoCodec(track.Format); // sometimes codec info is not available, check the format then...
-#if DEBUG
-                        if (_VideoInfo.Codec == null && !track.Format.Equals("AVS"))
+                        if (MainForm.Instance.Settings.ShowDebugInformation && _VideoInfo.Codec == null && !track.Format.Equals("AVS"))
                         {
                             if (_Log == null)
                                 _Log = MainForm.Instance.Log.Info("MediaInfo");
                             _Log.LogEvent("Unknown video codec found: " + track.Codec + " / " + track.Format, ImageType.Warning);
                         }
-#endif
                         _VideoInfo.Type = getVideoType(_VideoInfo.Codec, cType, file);
                         _VideoInfo.DAR = Resolution.GetDAR((int)_VideoInfo.Width, (int)_VideoInfo.Height, track.AspectRatio, easyParseDecimal(track.PixelAspectRatio), track.AspectRatioString);
 
