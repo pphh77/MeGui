@@ -20,16 +20,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Text;
-using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using System.Text.RegularExpressions;
 
 using MeGUI.core.util;
 using MeGUI.core.gui;
@@ -43,7 +37,7 @@ namespace MeGUI.core.details
         private MainForm mainForm;
         private WorkerSummary summary;
         private AfterEncoding currentAfterEncoding;
-        private Semaphore resourceLock;
+        static readonly object resourceLock = new object();
 
         #region public interface: process windows, start/stop/abort
         public void ShowAllProcessWindows()
@@ -99,13 +93,11 @@ namespace MeGUI.core.details
             addSendToTemporaryWorkerMenuItem();
             jobQueue.RequestJobDeleted = new RequestJobDeleted(this.DeleteJob);
             summary = new WorkerSummary(this);
-            resourceLock = new Semaphore(1, 1);
         }
 
-        public Semaphore ResourceLock
+        public object ResourceLock
         {
             get { return resourceLock; }
-            set { resourceLock = value; }
         }
 
         private void addSendToTemporaryWorkerMenuItem()
@@ -334,26 +326,27 @@ namespace MeGUI.core.details
                 }
             }
 
-            mainForm.Jobs.ResourceLock.WaitOne(10000, false);
-            if (job.OwningWorker != null && workers.ContainsKey(job.OwningWorker))
-                workers[job.OwningWorker].RemoveJobFromQueue(job);
+            lock (mainForm.Jobs.ResourceLock)
+            {
+                if (job.OwningWorker != null && workers.ContainsKey(job.OwningWorker))
+                    workers[job.OwningWorker].RemoveJobFromQueue(job);
 
-            if (jobQueue.HasJob(job))
-                jobQueue.removeJobFromQueue(job);
+                if (jobQueue.HasJob(job))
+                    jobQueue.removeJobFromQueue(job);
 
-            foreach (TaggedJob p in job.RequiredJobs)
-                p.EnabledJobs.Remove(job);
+                foreach (TaggedJob p in job.RequiredJobs)
+                    p.EnabledJobs.Remove(job);
 
-            foreach (TaggedJob j in job.EnabledJobs)
-                j.RequiredJobs.Remove(job);
+                foreach (TaggedJob j in job.EnabledJobs)
+                    j.RequiredJobs.Remove(job);
 
-            string fileName = Path.Combine(mainForm.MeGUIPath, "jobs");
-                   fileName = Path.Combine(fileName, job.Name + ".xml");
-            if (File.Exists(fileName))
-                File.Delete(fileName);
-            
-            allJobs.Remove(job.Name);
-            mainForm.Jobs.ResourceLock.Release();
+                string fileName = Path.Combine(mainForm.MeGUIPath, "jobs");
+                fileName = Path.Combine(fileName, job.Name + ".xml");
+                if (File.Exists(fileName))
+                    File.Delete(fileName);
+
+                allJobs.Remove(job.Name);
+            }
         }
 
         private void deleteAllDependantJobs(TaggedJob job)
@@ -402,15 +395,16 @@ namespace MeGUI.core.details
         /// </summary>
         public void saveJobs()
         {
-            mainForm.Jobs.ResourceLock.WaitOne(10000, false);
-            foreach (TaggedJob job in allJobs.Values)
+            lock (mainForm.Jobs.ResourceLock)
             {
-                job.EnabledJobNames = toStringList(job.EnabledJobs);
-                job.RequiredJobNames = toStringList(job.RequiredJobs);
-                saveJob(job, mainForm.MeGUIPath);
+                foreach (TaggedJob job in allJobs.Values)
+                {
+                    job.EnabledJobNames = toStringList(job.EnabledJobs);
+                    job.RequiredJobNames = toStringList(job.RequiredJobs);
+                    saveJob(job, mainForm.MeGUIPath);
+                }
+                saveJobLists();
             }
-            mainForm.Jobs.ResourceLock.Release();
-            saveJobLists();
         }
 
         public class JobListSerializer
@@ -422,8 +416,6 @@ namespace MeGUI.core.details
         private void saveJobLists()
         {
             JobListSerializer s = new JobListSerializer();
-
-            mainForm.Jobs.ResourceLock.WaitOne(10000, false);
             s.mainJobList = toStringList(jobQueue.JobList);
 
             foreach (JobWorker w in workers.Values)
@@ -433,7 +425,6 @@ namespace MeGUI.core.details
             string path = Path.Combine(mainForm.MeGUIPath, "joblists.xml");
 
             Util.XmlSerialize(s, path);
-            mainForm.Jobs.ResourceLock.Release();
         }
 
         private void loadJobLists()
@@ -629,11 +620,12 @@ namespace MeGUI.core.details
 
         private void addJob(TaggedJob job)
         {
-            mainForm.Jobs.ResourceLock.WaitOne(10000, false);
-            job.Name = getFreeJobName();
-            allJobs[job.Name] = job;
-            jobQueue.queueJob(job);
-            mainForm.Jobs.ResourceLock.Release();
+            lock (mainForm.Jobs.ResourceLock)
+            {
+                job.Name = getFreeJobName();
+                allJobs[job.Name] = job;
+                jobQueue.queueJob(job);
+            }
         }
         #endregion
 

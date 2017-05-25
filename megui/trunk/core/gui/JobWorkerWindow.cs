@@ -21,12 +21,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Threading;
-using System.Text;
 using System.Windows.Forms;
 
 using MeGUI.core.details;
@@ -403,7 +400,11 @@ namespace MeGUI.core.gui
         public void StartEncoding(bool showMessageBoxes)
         {
             status = JobWorkerStatus.Idle;
-            JobStartInfo retval = startNextJobInQueue();            
+            JobStartInfo retval = JobStartInfo.COULDNT_START;
+            lock (mainForm.Jobs.ResourceLock)
+            {
+                retval = startNextJobInQueue();
+            }
             if (showMessageBoxes)
             {
                 if (retval == JobStartInfo.COULDNT_START)
@@ -497,7 +498,10 @@ namespace MeGUI.core.gui
                     }
                     else
                     {
-                        JobInfo = startNextJobInQueue();
+                        lock (mainForm.Jobs.ResourceLock)
+                        {
+                            JobInfo = startNextJobInQueue();
+                        }
                         switch (JobInfo)
                         {
                             case JobStartInfo.JOB_STARTED:
@@ -679,14 +683,11 @@ namespace MeGUI.core.gui
 
         private JobStartInfo startNextJobInQueue()
         {
-            mainForm.Jobs.ResourceLock.WaitOne(10000, false);
-
             TaggedJob job = getNextJob();
 
             if (job == null)
             {
                 status = JobWorkerStatus.Idle;
-                mainForm.Jobs.ResourceLock.Release();
                 return JobStartInfo.NO_JOBS_WAITING;
             }
 
@@ -696,19 +697,16 @@ namespace MeGUI.core.gui
                 {
                     // another audio encoding is already in process. postpone the worker
                     status = JobWorkerStatus.Postponed;
-                    mainForm.Jobs.ResourceLock.Release();
                     return JobStartInfo.NO_JOBS_WAITING;
                 }
 
                 if (startEncoding(job)) // successful
                 {
-                    mainForm.Jobs.ResourceLock.Release();
                     return JobStartInfo.JOB_STARTED;
                 }
                 job = getNextJob();
             }
             status = JobWorkerStatus.Idle;
-            mainForm.Jobs.ResourceLock.Release();
             return JobStartInfo.COULDNT_START;
         }
         #endregion
