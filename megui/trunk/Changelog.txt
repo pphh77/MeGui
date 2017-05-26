@@ -1,3 +1,4 @@
+2747 [Worker]               improved handling of multiple worker instances. part II
 2746 [Worker]               improved handling of multiple worker instances
 2745 [Main]                 added option to extend logging
 2744 [Worker]               improved child process priority handling. part II

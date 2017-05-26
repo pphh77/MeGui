@@ -401,10 +401,7 @@ namespace MeGUI.core.gui
         {
             status = JobWorkerStatus.Idle;
             JobStartInfo retval = JobStartInfo.COULDNT_START;
-            lock (mainForm.Jobs.ResourceLock)
-            {
-                retval = startNextJobInQueue();
-            }
+            retval = startNextJobInQueue();
             if (showMessageBoxes)
             {
                 if (retval == JobStartInfo.COULDNT_START)
@@ -498,10 +495,7 @@ namespace MeGUI.core.gui
                     }
                     else
                     {
-                        lock (mainForm.Jobs.ResourceLock)
-                        {
-                            JobInfo = startNextJobInQueue();
-                        }
+                        JobInfo = startNextJobInQueue();
                         switch (JobInfo)
                         {
                             case JobStartInfo.JOB_STARTED:
@@ -527,7 +521,7 @@ namespace MeGUI.core.gui
                     }
 
                     if (JobInfo == JobStartInfo.JOB_STARTED)
-                        Util.ThreadSafeRun(mainForm.Jobs, delegate { mainForm.Jobs.StartIdleWorkers(); });
+                        mainForm.Jobs.StartIdleWorkers();
 
                     refreshAll();
                 }));
@@ -683,31 +677,34 @@ namespace MeGUI.core.gui
 
         private JobStartInfo startNextJobInQueue()
         {
-            TaggedJob job = getNextJob();
-
-            if (job == null)
+            lock (mainForm.Jobs.ResourceLock)
             {
-                status = JobWorkerStatus.Idle;
-                return JobStartInfo.NO_JOBS_WAITING;
-            }
+                TaggedJob job = getNextJob();
 
-            while (job != null)
-            {
-                if (job.Job.EncodingMode.Equals("audio") && mainForm.Jobs.IsAnyWorkerEncodingAudio)
+                if (job == null)
                 {
-                    // another audio encoding is already in process. postpone the worker
-                    status = JobWorkerStatus.Postponed;
+                    status = JobWorkerStatus.Idle;
                     return JobStartInfo.NO_JOBS_WAITING;
                 }
 
-                if (startEncoding(job)) // successful
+                while (job != null)
                 {
-                    return JobStartInfo.JOB_STARTED;
+                    if (job.Job.EncodingMode.Equals("audio") && mainForm.Jobs.IsAnyWorkerEncodingAudio)
+                    {
+                        // another audio encoding is already in process. postpone the worker
+                        status = JobWorkerStatus.Postponed;
+                        return JobStartInfo.NO_JOBS_WAITING;
+                    }
+
+                    if (startEncoding(job)) // successful
+                    {
+                        return JobStartInfo.JOB_STARTED;
+                    }
+                    job = getNextJob();
                 }
-                job = getNextJob();
+                status = JobWorkerStatus.Idle;
+                return JobStartInfo.COULDNT_START;
             }
-            status = JobWorkerStatus.Idle;
-            return JobStartInfo.COULDNT_START;
         }
         #endregion
         #endregion
