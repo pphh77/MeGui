@@ -105,7 +105,7 @@ namespace MeGUI
                             stdoutLog.LogEvent(line, ImageType.Error);
                         if (line.Contains("Getting \"Haali Matroska Muxer\" instance failed"))
                         {
-                            // haalo media plitter is missing ==> try to (re)install it
+                            // haali media plitter is missing ==> try to (re)install it
                             if (!su.WasAborted && FileUtil.InstallHaali(ref log))
                                 base.bSecondPassNeeded = true;
                         }
@@ -133,18 +133,25 @@ namespace MeGUI
                 su.PercentageDoneExact = getPercentage(line);
                 su.Status = "Analyzing...";
             }
-            else if (line.ToLowerInvariant().Contains("2nd"))
+            else if (line.ToLowerInvariant().Contains("starting 2nd pass"))
             {
+                su.PercentageDoneExact = 0;
                 startTime = DateTime.Now;
                 su.TimeElapsed = TimeSpan.Zero;
                 base.bFirstPass = false;
                 su.Status = "Fixing audio gaps/overlaps...";
                 base.ProcessLine(line, stream, oType);
             }
-            else if (line.ToLowerInvariant().Contains("without making use of the gap/overlap information"))
+            else if (line.ToLowerInvariant().Contains("without making use of the gap/overlap information") 
+                || line.ToLowerInvariant().Contains("2nd"))  // "catch all" for all lines with "2nd"
             {
-                log.LogEvent("Job will be executed a second time to make use of the gap/overlap information");
-                base.bSecondPassNeeded = true;
+                // "2nd pass will be necessary"
+                // "will be stripped in 2nd pass"
+                if (!base.bSecondPassNeeded)
+                {
+                    log.LogEvent("Job will be executed a second time to make use of the gap/overlap information");
+                    base.bSecondPassNeeded = true;
+                }
                 base.ProcessLine(line, stream, oType);
             }
             else if (line.ToLowerInvariant().Contains("<error>"))
@@ -152,9 +159,14 @@ namespace MeGUI
                 base.ProcessLine(line, stream, ImageType.Error);
             }
             else if (line.ToLowerInvariant().Contains("<warning>")
-                || (su.PercentageDoneExact > 0 && su.PercentageDoneExact < 100
+                || line.ToLowerInvariant().Contains("the wav file is bigger than 4gb")
+                || line.ToLowerInvariant().Contains("some wav readers might not be able to handle this file correctly"))
+            {
+                base.ProcessLine(line, stream, ImageType.Warning);
+            }
+            else if (su.PercentageDoneExact > 0 && su.PercentageDoneExact < 100
                 && !line.ToLowerInvariant().Contains("creating file ") 
-                && !line.ToLowerInvariant().Contains("(seamless branching)...")))
+                && !line.ToLowerInvariant().Contains("(seamless branching)..."))
             {
                 base.ProcessLine(line, stream, ImageType.Warning);
             }

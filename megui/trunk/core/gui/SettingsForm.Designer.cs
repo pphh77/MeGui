@@ -59,6 +59,7 @@ namespace MeGUI
             this.saveButton = new System.Windows.Forms.Button();
             this.cancelButton = new System.Windows.Forms.Button();
             this.otherGroupBox = new System.Windows.Forms.GroupBox();
+            this.chkDebugInformation = new System.Windows.Forms.CheckBox();
             this.lblMinimumLength = new System.Windows.Forms.Label();
             this.minimumTitleLength = new System.Windows.Forms.NumericUpDown();
             this.cbUseIncludedAviSynth = new System.Windows.Forms.CheckBox();
@@ -134,7 +135,6 @@ namespace MeGUI
             this.txtForcedName = new System.Windows.Forms.TextBox();
             this.lblffmsThreads = new System.Windows.Forms.Label();
             this.ffmsThreads = new System.Windows.Forms.NumericUpDown();
-            this.chkSelectHDTracks = new System.Windows.Forms.CheckBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.useNeroAacEnc = new System.Windows.Forms.CheckBox();
             this.lblNero = new System.Windows.Forms.Label();
@@ -154,7 +154,6 @@ namespace MeGUI
             this.autoEncodeDefaultsButton = new System.Windows.Forms.Button();
             this.toolTipHelp = new System.Windows.Forms.ToolTip(this.components);
             this.helpButton1 = new MeGUI.core.gui.HelpButton();
-            this.chkDebugInformation = new System.Windows.Forms.CheckBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
             groupBox1.SuspendLayout();
             this.otherGroupBox.SuspendLayout();
@@ -295,6 +294,17 @@ namespace MeGUI
             this.otherGroupBox.TabStop = false;
             this.otherGroupBox.Tag = "";
             this.otherGroupBox.Text = " Main Settings ";
+            // 
+            // chkDebugInformation
+            // 
+            this.chkDebugInformation.AutoSize = true;
+            this.chkDebugInformation.Checked = true;
+            this.chkDebugInformation.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkDebugInformation.Location = new System.Drawing.Point(309, 141);
+            this.chkDebugInformation.Name = "chkDebugInformation";
+            this.chkDebugInformation.Size = new System.Drawing.Size(133, 17);
+            this.chkDebugInformation.TabIndex = 25;
+            this.chkDebugInformation.Text = "Log debug information";
             // 
             // lblMinimumLength
             // 
@@ -1043,7 +1053,6 @@ namespace MeGUI
             this.groupBox6.Controls.Add(this.txtForcedName);
             this.groupBox6.Controls.Add(this.lblffmsThreads);
             this.groupBox6.Controls.Add(this.ffmsThreads);
-            this.groupBox6.Controls.Add(this.chkSelectHDTracks);
             this.groupBox6.Location = new System.Drawing.Point(4, 264);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.Size = new System.Drawing.Size(467, 117);
@@ -1056,7 +1065,7 @@ namespace MeGUI
             this.chk64Bit.AutoSize = true;
             this.chk64Bit.Checked = true;
             this.chk64Bit.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chk64Bit.Location = new System.Drawing.Point(225, 66);
+            this.chk64Bit.Location = new System.Drawing.Point(225, 43);
             this.chk64Bit.Name = "chk64Bit";
             this.chk64Bit.Size = new System.Drawing.Size(141, 17);
             this.chk64Bit.TabIndex = 51;
@@ -1132,18 +1141,6 @@ namespace MeGUI
             0,
             0,
             0});
-            // 
-            // chkSelectHDTracks
-            // 
-            this.chkSelectHDTracks.AutoSize = true;
-            this.chkSelectHDTracks.Checked = true;
-            this.chkSelectHDTracks.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkSelectHDTracks.Location = new System.Drawing.Point(225, 43);
-            this.chkSelectHDTracks.Name = "chkSelectHDTracks";
-            this.chkSelectHDTracks.Size = new System.Drawing.Size(234, 17);
-            this.chkSelectHDTracks.TabIndex = 29;
-            this.chkSelectHDTracks.Text = "HD Streams Extractor: select default tracks";
-            this.chkSelectHDTracks.UseVisualStyleBackColor = true;
             // 
             // groupBox5
             // 
@@ -1355,17 +1352,6 @@ namespace MeGUI
             this.helpButton1.Size = new System.Drawing.Size(38, 23);
             this.helpButton1.TabIndex = 1;
             // 
-            // chkDebugInformation
-            // 
-            this.chkDebugInformation.AutoSize = true;
-            this.chkDebugInformation.Checked = true;
-            this.chkDebugInformation.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkDebugInformation.Location = new System.Drawing.Point(309, 141);
-            this.chkDebugInformation.Name = "chkDebugInformation";
-            this.chkDebugInformation.Size = new System.Drawing.Size(133, 17);
-            this.chkDebugInformation.TabIndex = 25;
-            this.chkDebugInformation.Text = "Log debug information";
-            // 
             // SettingsForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 14);
@@ -1499,7 +1485,6 @@ namespace MeGUI
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.ComboBox defaultLanguage2;
         private System.Windows.Forms.ComboBox defaultLanguage1;
-        private System.Windows.Forms.CheckBox chkSelectHDTracks;
         private System.Windows.Forms.Button btnClearOutputDirecoty;
         private System.Windows.Forms.NumericUpDown ffmsThreads;
         private System.Windows.Forms.Label lblffmsThreads;

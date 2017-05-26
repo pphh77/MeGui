@@ -19,6 +19,10 @@
 // ****************************************************************************
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using MeGUI;
 using MeGUI.core.util;
 
 namespace eac3to
@@ -28,44 +32,91 @@ namespace eac3to
     {
         public AudioStreamType AudioType { get; set; }
         public override string Language { get; set; }
+        public string TypeCore;
 
         public override object[] ExtractTypes
         {
             get
             {
+                bool bDefaultToHD = MainForm.Instance.Settings.Eac3toDefaultToHD;
+                bool bEnableEncoder = MainForm.Instance.Settings.Eac3toEnableEncoder;
+                bool bEnableDecoder = MainForm.Instance.Settings.Eac3toEnableDecoder;
+
+                List<string> arrType = new List<string>();
+
                 switch (AudioType)
                 {
                     case AudioStreamType.AAC:
-                        return new object[] { "AAC", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
+                        arrType.Add("AAC"); break;
                     case AudioStreamType.AC3:
+                        arrType.Add("AC3"); break;
                     case AudioStreamType.PCM:
                     case AudioStreamType.RAW:
                     case AudioStreamType.WAV:
                     case AudioStreamType.WAVS:
-                        return new object[] { "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
+                        arrType.Add("W64");
+                        if (bEnableDecoder)
+                            arrType.AddRange(new string[] { "WAV", "WAVS", "RAW", "RF64" });
+                        break;
                     case AudioStreamType.DTS:
-                        return new object[] { "DTS", "DTSHD", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
+                        if (!String.IsNullOrEmpty(TypeCore))
+                        {
+                            if (bDefaultToHD)
+                                arrType.AddRange(new string[] { "DTS", "DTS_CORE" });
+                            else
+                                arrType.AddRange(new string[] { "DTS_CORE", "DTS" });
+                        }
+                        else
+                            arrType.Add("DTS");
+                        break;
                     case AudioStreamType.EAC3:
-                        return new object[] { "EAC3_CORE", "EAC3", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
+                        arrType.AddRange(new string[] { "EAC3_CORE", "EAC3" }); break;
                     case AudioStreamType.FLAC:
-                        return new object[] { "FLAC", "AC3", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
+                        arrType.Add("FLAC"); break;
                     case AudioStreamType.MP2:
-                        return new object[] { "MP2", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
+                        arrType.Add("MP2"); break;
                     case AudioStreamType.MP3:
-                        return new object[] { "MP3", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
+                        arrType.Add("MP3"); break;
                     case AudioStreamType.TrueHD:
-                        return new object[] { "THD", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
-                    case AudioStreamType.TrueHD_AC3:
-                        return new object[] { "THD+AC3", "THD", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
+                        if (!String.IsNullOrEmpty(TypeCore))
+                        {
+                            if (bDefaultToHD)
+                                arrType.AddRange(new string[] { "THD", "THD+AC3", "AC3" });
+                            else
+                                arrType.AddRange(new string[] { "AC3", "THD", "THD+AC3" });
+                        }
+                        else
+                        {
+                            arrType.Add("THD");
+                            if (bEnableEncoder)
+                                arrType.Add("THD+AC3");
+                        }
+                        break;
                     case AudioStreamType.TTA:
-                        return new object[] { "TTA", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
+                        arrType.Add("TTA"); break;
                     case AudioStreamType.VORBIS:
-                        return new object[] { "OGG", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
+                        arrType.Add("OGG"); break;
                     case AudioStreamType.WAVPACK:
-                        return new object[] { "WV", "AC3", "FLAC", "AAC", "WAV", "WAVS", "RAW", "W64", "RF64", "AGM" };
+                        arrType.Add("WV"); break;
                     default:
                         return new object[] { "UNKNOWN" };
                 }
+
+                if (bEnableEncoder)
+                {
+                    if (!arrType.Contains("AC3"))
+                        arrType.Add("AC3");
+                    if (!arrType.Contains("FLAC"))
+                        arrType.Add("FLAC");
+                    if (!arrType.Contains("AAC") 
+                        && System.IO.File.Exists(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(MainForm.Instance.Settings.Eac3to.Path), "neroaacenc.exe")))
+                        arrType.Add("AAC");
+                }
+
+                if (bEnableDecoder && !arrType.Contains("W64"))
+                    arrType.AddRange(new string[] { "W64", "WAV", "WAVS", "RAW", "RF64" });
+
+                return arrType.Cast<object>().ToArray();
             }
         }
 
@@ -73,6 +124,7 @@ namespace eac3to
         {
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
+            TypeCore = string.Empty;
         }
 
         new public static Stream Parse(string s, LogItem _log)
@@ -105,11 +157,9 @@ namespace eac3to
                     break;
                 case "TRUEHD":
                 case "TRUEHD (ATMOS)":
-                    audioStream.AudioType = AudioStreamType.TrueHD;
-                    break;
                 case "TRUEHD/AC3":
                 case "TRUEHD/AC3 (ATMOS)":
-                    audioStream.AudioType = AudioStreamType.TrueHD_AC3;
+                    audioStream.AudioType = AudioStreamType.TrueHD;
                     break;
                 case "PCM":
                     audioStream.AudioType = AudioStreamType.PCM;

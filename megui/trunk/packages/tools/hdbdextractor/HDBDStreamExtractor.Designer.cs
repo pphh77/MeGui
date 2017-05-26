@@ -87,6 +87,12 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.extractTypesBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.closeOnQueue = new System.Windows.Forms.CheckBox();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
             this.StatusStrip.SuspendLayout();
             this.InputGroupBox.SuspendLayout();
             this.FeatureGroupBox.SuspendLayout();
@@ -97,6 +103,7 @@ namespace MeGUI.packages.tools.hdbdextractor
             ((System.ComponentModel.ISupportInitialize)(this.StreamsBindingSource)).BeginInit();
             this.OutputGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.extractTypesBindingSource)).BeginInit();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // StatusStrip
@@ -104,7 +111,7 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.StatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ToolStripStatusLabel,
             this.ToolStripProgressBar});
-            this.StatusStrip.Location = new System.Drawing.Point(0, 421);
+            this.StatusStrip.Location = new System.Drawing.Point(0, 433);
             this.StatusStrip.Name = "StatusStrip";
             this.StatusStrip.ShowItemToolTips = true;
             this.StatusStrip.Size = new System.Drawing.Size(759, 22);
@@ -141,7 +148,7 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.HelpButton2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.HelpButton2.AutoSize = true;
             this.HelpButton2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.HelpButton2.Location = new System.Drawing.Point(12, 390);
+            this.HelpButton2.Location = new System.Drawing.Point(12, 402);
             this.HelpButton2.Name = "HelpButton2";
             this.HelpButton2.Size = new System.Drawing.Size(38, 23);
             this.HelpButton2.TabIndex = 8;
@@ -152,7 +159,7 @@ namespace MeGUI.packages.tools.hdbdextractor
             // QueueButton
             // 
             this.QueueButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.QueueButton.Location = new System.Drawing.Point(593, 390);
+            this.QueueButton.Location = new System.Drawing.Point(593, 402);
             this.QueueButton.Name = "QueueButton";
             this.QueueButton.Size = new System.Drawing.Size(75, 23);
             this.QueueButton.TabIndex = 4;
@@ -164,7 +171,7 @@ namespace MeGUI.packages.tools.hdbdextractor
             // 
             this.CancelButton2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.CancelButton2.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.CancelButton2.Location = new System.Drawing.Point(674, 390);
+            this.CancelButton2.Location = new System.Drawing.Point(674, 402);
             this.CancelButton2.Name = "CancelButton2";
             this.CancelButton2.Size = new System.Drawing.Size(75, 23);
             this.CancelButton2.TabIndex = 10;
@@ -178,7 +185,7 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.InputGroupBox.Controls.Add(this.FolderSelection);
             this.InputGroupBox.Controls.Add(this.FolderInputSourceButton);
             this.InputGroupBox.Controls.Add(this.FolderInputTextBox);
-            this.InputGroupBox.Location = new System.Drawing.Point(10, 12);
+            this.InputGroupBox.Location = new System.Drawing.Point(10, 24);
             this.InputGroupBox.Name = "InputGroupBox";
             this.InputGroupBox.Size = new System.Drawing.Size(365, 74);
             this.InputGroupBox.TabIndex = 0;
@@ -223,7 +230,7 @@ namespace MeGUI.packages.tools.hdbdextractor
             // 
             this.Eac3toLinkLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.Eac3toLinkLabel.AutoSize = true;
-            this.Eac3toLinkLabel.Location = new System.Drawing.Point(57, 395);
+            this.Eac3toLinkLabel.Location = new System.Drawing.Point(57, 407);
             this.Eac3toLinkLabel.Name = "Eac3toLinkLabel";
             this.Eac3toLinkLabel.Size = new System.Drawing.Size(40, 13);
             this.Eac3toLinkLabel.TabIndex = 13;
@@ -236,7 +243,7 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.FeatureGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.FeatureGroupBox.Controls.Add(this.FeatureDataGridView);
-            this.FeatureGroupBox.Location = new System.Drawing.Point(10, 92);
+            this.FeatureGroupBox.Location = new System.Drawing.Point(10, 104);
             this.FeatureGroupBox.Name = "FeatureGroupBox";
             this.FeatureGroupBox.Size = new System.Drawing.Size(737, 110);
             this.FeatureGroupBox.TabIndex = 2;
@@ -332,7 +339,7 @@ namespace MeGUI.packages.tools.hdbdextractor
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.StreamGroupBox.Controls.Add(this.StreamDataGridView);
-            this.StreamGroupBox.Location = new System.Drawing.Point(10, 208);
+            this.StreamGroupBox.Location = new System.Drawing.Point(10, 220);
             this.StreamGroupBox.Name = "StreamGroupBox";
             this.StreamGroupBox.Size = new System.Drawing.Size(737, 176);
             this.StreamGroupBox.TabIndex = 3;
@@ -455,7 +462,7 @@ namespace MeGUI.packages.tools.hdbdextractor
             | System.Windows.Forms.AnchorStyles.Right)));
             this.OutputGroupBox.Controls.Add(this.FolderOutputSourceButton);
             this.OutputGroupBox.Controls.Add(this.FolderOutputTextBox);
-            this.OutputGroupBox.Location = new System.Drawing.Point(381, 12);
+            this.OutputGroupBox.Location = new System.Drawing.Point(381, 24);
             this.OutputGroupBox.Name = "OutputGroupBox";
             this.OutputGroupBox.Size = new System.Drawing.Size(366, 74);
             this.OutputGroupBox.TabIndex = 1;
@@ -498,17 +505,71 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.closeOnQueue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.closeOnQueue.Checked = true;
             this.closeOnQueue.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.closeOnQueue.Location = new System.Drawing.Point(514, 390);
+            this.closeOnQueue.Location = new System.Drawing.Point(514, 402);
             this.closeOnQueue.Name = "closeOnQueue";
             this.closeOnQueue.Size = new System.Drawing.Size(74, 24);
             this.closeOnQueue.TabIndex = 19;
             this.closeOnQueue.Text = "and close";
             // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem1});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.menuStrip1.Size = new System.Drawing.Size(759, 24);
+            this.menuStrip1.TabIndex = 20;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem2,
+            this.toolStripMenuItem3,
+            this.toolStripMenuItem4,
+            this.toolStripMenuItem5});
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(61, 20);
+            this.toolStripMenuItem1.Text = "&Settings";
+            // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.CheckOnClick = true;
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(311, 22);
+            this.toolStripMenuItem2.Text = "Preselect tracks based on default language(s)";
+            this.toolStripMenuItem2.Click += new System.EventHandler(this.toolStripMenuItem2_Click);
+            // 
+            // toolStripMenuItem3
+            // 
+            this.toolStripMenuItem3.CheckOnClick = true;
+            this.toolStripMenuItem3.Name = "toolStripMenuItem3";
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(311, 22);
+            this.toolStripMenuItem3.Text = "Extract As: default to HD option";
+            this.toolStripMenuItem3.Click += new System.EventHandler(this.toolStripMenuItem3_Click);
+            // 
+            // toolStripMenuItem4
+            // 
+            this.toolStripMenuItem4.CheckOnClick = true;
+            this.toolStripMenuItem4.Name = "toolStripMenuItem4";
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(311, 22);
+            this.toolStripMenuItem4.Text = "Extract As: show encoding option(s)";
+            this.toolStripMenuItem4.Click += new System.EventHandler(this.toolStripMenuItem4_Click);
+            // 
+            // toolStripMenuItem5
+            // 
+            this.toolStripMenuItem5.CheckOnClick = true;
+            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(311, 22);
+            this.toolStripMenuItem5.Text = "Extract As: show all demux options";
+            this.toolStripMenuItem5.Click += new System.EventHandler(this.toolStripMenuItem5_Click);
+            // 
             // HdBdStreamExtractor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(759, 443);
+            this.ClientSize = new System.Drawing.Size(759, 455);
             this.Controls.Add(this.closeOnQueue);
             this.Controls.Add(this.OutputGroupBox);
             this.Controls.Add(this.StreamGroupBox);
@@ -519,10 +580,12 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.Controls.Add(this.QueueButton);
             this.Controls.Add(this.HelpButton2);
             this.Controls.Add(this.StatusStrip);
+            this.Controls.Add(this.menuStrip1);
             this.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MainMenuStrip = this.menuStrip1;
             this.MaximizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(775, 482);
+            this.MinimumSize = new System.Drawing.Size(775, 494);
             this.Name = "HdBdStreamExtractor";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
@@ -541,6 +604,8 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.OutputGroupBox.ResumeLayout(false);
             this.OutputGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.extractTypesBindingSource)).EndInit();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -585,5 +650,11 @@ namespace MeGUI.packages.tools.hdbdextractor
         private System.Windows.Forms.DataGridViewTextBoxColumn StreamAddOptionsTextBox;
         private System.Windows.Forms.DataGridViewTextBoxColumn languageDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn nameDataGridViewTextBoxColumn;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem4;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
     }
 }

@@ -62,7 +62,8 @@ namespace MeGUI.packages.tools.hdbdextractor
         private MediaInfoFile iFile;
         private bool bFetchAll;
         private int iFeatureToFetch;
-        
+        private Stream lastStream;
+
         private enum OperatingMode
         {
             FileBased,
@@ -95,6 +96,7 @@ namespace MeGUI.packages.tools.hdbdextractor
                 oMode = OperatingMode.FileBased;
             this.input = input;
             this.iFile = iFile;
+            lastStream = null;
         }
 
         public bool IsBusy()
@@ -291,260 +293,279 @@ namespace MeGUI.packages.tools.hdbdextractor
 
         void backgroundWorker_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-            string data;
+            if (string.IsNullOrEmpty(e.Data))
+                return;
 
-            if (!string.IsNullOrEmpty(e.Data))
+            string data = e.Data.TrimStart('\b').Trim();
+
+            if (string.IsNullOrEmpty(data))
+                return;
+
+            bool bStreamFound = false;
+
+            // Analyzing
+            // analyze: 100%
+            if (Regex.IsMatch(data, "^analyze: [0-9]{1,3}%$", RegexOptions.Compiled))
             {
-                data = e.Data.TrimStart('\b').Trim();
+                if (backgroundWorker.IsBusy)
+                    backgroundWorker.ReportProgress(int.Parse(Regex.Match(data, "[0-9]{1,3}").Value),
+                        string.Format("Analyzing ({0}%)", int.Parse(Regex.Match(data, "[0-9]{1,3}").Value)));
+                return;
+            }
 
-                if (!string.IsNullOrEmpty(data))
+            // Feature line
+            // 2) 00216.mpls, 0:50:19
+            if (Regex.IsMatch(data, @"^[0-99]+\).+$", RegexOptions.Compiled))
+            {
+                if (_log != null)
+                    _log.LogEvent(data);
+
+                try
                 {
-                    // Feature line
-                    // 2) 00216.mpls, 0:50:19
-                    if (Regex.IsMatch(data, @"^[0-99]+\).+$", RegexOptions.Compiled))
-                    {
-                        if (_log != null)
-                            _log.LogEvent(data);
+                    features.Add(eac3to.Feature.Parse(data));
+                }
+                catch (Exception ex)
+                {
+                    if (_log != null)
+                        _log.LogValue("Error receiving output data", ex);
+                }
+                return;
+            }
 
-                        try
+            // Feature name
+            // "Feature Name"
+            else if (Regex.IsMatch(data, "^\".+\"$", RegexOptions.Compiled))
+            {
+                if (_log != null)
+                    _log.LogEvent(data);
+
+                if (oMode == OperatingMode.FileBased)
+                    features[0].Streams[features[0].Streams.Count - 1].Name = Extensions.CapitalizeAll(data.Trim("\" .".ToCharArray()));
+                else
+                    features[features.Count - 1].Name = Extensions.CapitalizeAll(data.Trim("\" .".ToCharArray()));
+                return;
+            }
+
+            // Stream line on feature listing
+            // - h264/AVC, 1080p24 /1.001 (16:9)
+            else if (Regex.IsMatch(data, "^-.+$", RegexOptions.Compiled))
+            {
+                if (_log != null)
+                    _log.LogEvent(data);
+                return;
+            }
+
+            // Playlist file listing
+            // [99+100+101+102+103+104+105+106+114].m2ts (blueray playlist *.mpls)
+            else if (Regex.IsMatch(data, @"^\[.+\].m2ts$", RegexOptions.Compiled))
+            {
+                if (_log != null)
+                    _log.LogEvent(data);
+
+                foreach (string file in Regex.Match(data, @"\[.+\]").Value.Trim("[]".ToCharArray()).Split("+".ToCharArray()))
+                    features[features.Count - 1].Files.Add(new File(file.PadLeft(5,'0') + ".m2ts", features[features.Count - 1].Files.Count + 1));
+                return;
+            }
+
+            // Stream listing feature header
+            // M2TS, 1 video track, 6 audio tracks, 9 subtitle tracks, 1:53:06
+            // EVO, 2 video tracks, 4 audio tracks, 8 subtitle tracks, 2:20:02
+            else if (Regex.IsMatch(data, "^M2TS, .+$", RegexOptions.Compiled) ||
+                        Regex.IsMatch(data, "^EVO, .+$", RegexOptions.Compiled) ||
+                        Regex.IsMatch(data, "^TS, .+$", RegexOptions.Compiled) ||
+                        Regex.IsMatch(data, "^VOB, .+$", RegexOptions.Compiled) ||
+                        Regex.IsMatch(data, "^MKV, .+$", RegexOptions.Compiled) ||
+                        Regex.IsMatch(data, "^MKA, .+$", RegexOptions.Compiled)
+                        )
+            {
+                if (_log != null)
+                    _log.LogEvent(data);
+                return;
+            }
+
+            // Stream line
+            // 8: AC3, English, 2.0 channels, 192kbps, 48khz, dialnorm: -27dB
+            else if (Regex.IsMatch(data, "^[0-99]+:.+$", RegexOptions.Compiled))
+            {
+                if (_log != null)
+                    _log.LogEvent(data);
+
+                if (oMode == OperatingMode.FileBased)
+                {
+                    try
+                    {
+                        if (features.Count == 0)
                         {
-                            features.Add(eac3to.Feature.Parse(data));
-                        }
-                        catch (Exception ex)
-                        {
-                            if (_log != null)
-                                _log.LogValue("Error receiving output data", ex);
-                        }
-                        return;
-                    }
-
-                    // Feature name
-                    // "Feature Name"
-                    else if (Regex.IsMatch(data, "^\".+\"$", RegexOptions.Compiled))
-                    {
-                        if (_log != null)
-                            _log.LogEvent(data);
-
-                        if (oMode == OperatingMode.FileBased)
-                            features[0].Streams[features[0].Streams.Count - 1].Name = Extensions.CapitalizeAll(data.Trim("\" .".ToCharArray()));
-                        else
-                            features[features.Count - 1].Name = Extensions.CapitalizeAll(data.Trim("\" .".ToCharArray()));
-                        return;
-                    }
-
-                    // Stream line on feature listing
-                    // - h264/AVC, 1080p24 /1.001 (16:9)
-                    else if (Regex.IsMatch(data, "^-.+$", RegexOptions.Compiled))
-                    {
-                        if (_log != null)
-                            _log.LogEvent(data);
-                        return;
-                    }
-
-                    // Playlist file listing
-                    // [99+100+101+102+103+104+105+106+114].m2ts (blueray playlist *.mpls)
-                    else if (Regex.IsMatch(data, @"^\[.+\].m2ts$", RegexOptions.Compiled))
-                    {
-                        if (_log != null)
-                            _log.LogEvent(data);
-
-                        foreach (string file in Regex.Match(data, @"\[.+\]").Value.Trim("[]".ToCharArray()).Split("+".ToCharArray()))
-                            features[features.Count - 1].Files.Add(new File(file.PadLeft(5,'0') + ".m2ts", features[features.Count - 1].Files.Count + 1));
-                        return;
-                    }
-
-                    // Stream listing feature header
-                    // M2TS, 1 video track, 6 audio tracks, 9 subtitle tracks, 1:53:06
-                    // EVO, 2 video tracks, 4 audio tracks, 8 subtitle tracks, 2:20:02
-                    else if (Regex.IsMatch(data, "^M2TS, .+$", RegexOptions.Compiled) ||
-                             Regex.IsMatch(data, "^EVO, .+$", RegexOptions.Compiled) ||
-                             Regex.IsMatch(data, "^TS, .+$", RegexOptions.Compiled) ||
-                             Regex.IsMatch(data, "^VOB, .+$", RegexOptions.Compiled) ||
-                             Regex.IsMatch(data, "^MKV, .+$", RegexOptions.Compiled) ||
-                             Regex.IsMatch(data, "^MKA, .+$", RegexOptions.Compiled)
-                             )
-                    {
-                        if (_log != null)
-                            _log.LogEvent(data);
-                        return;
-                    }
-
-                    // Stream line
-                    // 8: AC3, English, 2.0 channels, 192kbps, 48khz, dialnorm: -27dB
-                    else if (Regex.IsMatch(data, "^[0-99]+:.+$", RegexOptions.Compiled))
-                    {
-                        if (_log != null)
-                            _log.LogEvent(data);
-
-                        if (oMode == OperatingMode.FileBased)
-                        {
-                            try
+                            Feature dummyFeature = new Feature();
+                            for (int i = 0; i < input.Count; i++)
                             {
-                                if (features.Count == 0)
+                                if (System.IO.File.Exists(input[i]) && iFile == null)
+                                    iFile = new MediaInfoFile(input[i], ref _log);
+                                if (iFile != null)
                                 {
-                                    Feature dummyFeature = new Feature();
-                                    for (int i = 0; i < input.Count; i++)
-                                    {
-                                        if (System.IO.File.Exists(input[i]) && iFile == null)
-                                            iFile = new MediaInfoFile(input[i], ref _log);
-                                        if (iFile != null)
-                                        {
-                                            dummyFeature.Duration += TimeSpan.FromSeconds(Math.Ceiling(iFile.VideoInfo.FrameCount / iFile.VideoInfo.FPS));
-                                            iFile = null;
-                                        }
-                                        dummyFeature.Files.Add(new File(System.IO.Path.GetFileName(input[i]), i + 1));
-                                    }
-                                    dummyFeature.Name = System.IO.Path.GetFileName(input[0]);
-                                    dummyFeature.Description = dummyFeature.Name + ", " + dummyFeature.Duration.ToString();
-                                    features.Add(dummyFeature);
+                                    dummyFeature.Duration += TimeSpan.FromSeconds(Math.Ceiling(iFile.VideoInfo.FrameCount / iFile.VideoInfo.FPS));
+                                    iFile = null;
                                 }
-                                features[0].Streams.Add(eac3to.Stream.Parse(data, _log));
+                                dummyFeature.Files.Add(new File(System.IO.Path.GetFileName(input[i]), i + 1));
                             }
-                            catch (Exception ex)
-                            {
-                                if (_log != null)
-                                    _log.LogValue("Error receiving output data", ex);
-                            }
+                            dummyFeature.Name = System.IO.Path.GetFileName(input[0]);
+                            dummyFeature.Description = dummyFeature.Name + ", " + dummyFeature.Duration.ToString();
+                            features.Add(dummyFeature);
                         }
-                        else
-                        {
-                            try
-                            {
-                                features[Int32.Parse(args.featureNumber) - 1].Streams.Add(Stream.Parse(data, _log));
-                            }
-                            catch (Exception ex)
-                            {
-                                if (_log != null)
-                                    _log.LogValue("Error receiving output data", ex);
-                            }
-                        }
-                        return;
+                        lastStream = eac3to.Stream.Parse(data, _log);
+                        features[0].Streams.Add(lastStream);
+                        bStreamFound = true;
                     }
-
-                    // Analyzing
-                    // analyze: 100%
-                    else if (Regex.IsMatch(data, "^analyze: [0-9]{1,3}%$", RegexOptions.Compiled))
-                    {
-                        if (backgroundWorker.IsBusy)
-                            backgroundWorker.ReportProgress(int.Parse(Regex.Match(data, "[0-9]{1,3}").Value),
-                                string.Format("Analyzing ({0}%)", int.Parse(Regex.Match(data, "[0-9]{1,3}").Value)));
-                        return;
-                    }
-
-                    // Information line
-                    // [a03] Creating file "audio.ac3"...
-                    else if (Regex.IsMatch(data, @"^\[.+\] .+\.{3}$", RegexOptions.Compiled))
+                    catch (Exception ex)
                     {
                         if (_log != null)
-                            _log.LogEvent(data);
-                        return;
-                    }
-
-                    else if (Regex.IsMatch(data, @"^\v .*...", RegexOptions.Compiled))
-                    {
-                        if (_log != null)
-                            _log.LogEvent(data);
-                        return;
-                    }
-
-                    else if (Regex.IsMatch(data, @"(core: .*)", RegexOptions.Compiled))
-                    {
-                        if (_log != null)
-                            _log.LogEvent(data);
-                        return;
-                    }
-
-                    else if (Regex.IsMatch(data, @"(embedded: .*)", RegexOptions.Compiled))
-                    {
-                        if (_log != null)
-                            _log.LogEvent(data);
-                        return;
-                    }
-
-                    // Creating file
-                    // Creating file "C:\1_1_chapter.txt"...
-                    else if (Regex.IsMatch(data, "^Creating file \".+\"\\.{3}$", RegexOptions.Compiled))
-                    {
-                        if (_log != null)
-                            _log.LogEvent(data);
-                        return;
-                    }
-
-                    // Processing
-                    // process: 100%
-                    else if (Regex.IsMatch(data, "^process: [0-9]{1,3}%$", RegexOptions.Compiled))
-                    {
-                        if (backgroundWorker.IsBusy)
-                            backgroundWorker.ReportProgress(int.Parse(Regex.Match(data, "[0-9]{1,3}").Value),
-                                string.Format("Processing ({0}%)", int.Parse(Regex.Match(data, "[0-9]{1,3}").Value)));
-                        return;
-                    }
-
-                    // Progress
-                    // progress: 100%
-                    else if (Regex.IsMatch(data, "^progress: [0-9]{1,3}%$", RegexOptions.Compiled))
-                    {
-                        if (backgroundWorker.IsBusy)
-                            backgroundWorker.ReportProgress(int.Parse(Regex.Match(data, "[0-9]{1,3}").Value),
-                                string.Format("Progress ({0}%)", int.Parse(Regex.Match(data, "[0-9]{1,3}").Value)));
-                        return;
-                    }
-
-                    // Done
-                    // Done.
-                    else if (data.Equals("Done."))
-                    {
-                        if (_log != null)
-                            _log.LogEvent(data);
-                        return;
-                    }
-
-                    // unusual video framerate
-                    // v02 The video framerate is correct, but rather unusual.
-                    else if (data.Contains("The video framerate is correct, but rather unusual"))
-                    {
-                        if (_log != null)
-                            _log.LogEvent(data);
-                        return;
-                    }
-
-                    #region Errors
-                    // Source file not found
-                    // Source file "x:\" not found.
-                    else if (Regex.IsMatch(data, "^Source file \".*\" not found.$", RegexOptions.Compiled))
-                    {
-                        if (_log != null)
-                            _log.Error(data);
-                        return;
-                    }
-
-                    // Format of Source file not detected
-                    // The format of the source file could not be detected.
-                    else if (data.Equals("The format of the source file could not be detected."))
-                    {
-                        if (_log != null)
-                            _log.Error(data);
-                        return;
-                    }
-
-                    // Audio conversion not supported
-                    // This audio conversion is not supported.
-                    else if (data.Equals("This audio conversion is not supported."))
-                    {
-                        if (_log != null)
-                            _log.Error(data);
-                        return;
-                    }
-                    #endregion
-
-                    // Unknown line
-                    else
-                    {
-                        if (_log != null)
-                            _log.Warn(string.Format("Unknown line: \"{0}\"", data));
+                            _log.LogValue("Error receiving output data", ex);
                     }
                 }
+                else
+                {
+                    try
+                    {
+                        lastStream = Stream.Parse(data, _log);
+                        features[Int32.Parse(args.featureNumber) - 1].Streams.Add(lastStream);
+                        bStreamFound = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        if (_log != null)
+                            _log.LogValue("Error receiving output data", ex);
+                    }
+                }
+                return;
             }
+
+            // Information line
+            // [a03] Creating file "audio.ac3"...
+            else if (Regex.IsMatch(data, @"^\[.+\] .+\.{3}$", RegexOptions.Compiled))
+            {
+                if (_log != null)
+                    _log.LogEvent(data);
+                return;
+            }
+
+            else if (Regex.IsMatch(data, @"^\v .*...", RegexOptions.Compiled))
+            {
+                if (_log != null)
+                    _log.LogEvent(data);
+                return;
+            }
+
+            // Core/Embedded track information
+            // (core: AC3, 5.1 channels, 512kbps, 48kHz)
+            else if (Regex.IsMatch(data, @"(core: .*)", RegexOptions.Compiled))
+            {
+                if (_log != null)
+                    _log.LogEvent(data);
+
+                if (lastStream != null && lastStream is AudioStream)
+                    ((AudioStream)lastStream).TypeCore = data.Substring(7, data.IndexOf(',') - 7);
+
+                return;
+            }
+
+            // Core/Embedded track information
+            // (embedded: AC3, 5.1 channels, 640kbps, 48kHz)
+            else if (Regex.IsMatch(data, @"(embedded: .*)", RegexOptions.Compiled))
+            {
+                if (_log != null)
+                    _log.LogEvent(data);
+
+                if (lastStream != null && lastStream is AudioStream)
+                    ((AudioStream)lastStream).TypeCore = data.Substring(11, data.IndexOf(',') - 11);
+
+                return;
+            }
+
+            // Creating file
+            // Creating file "C:\1_1_chapter.txt"...
+            else if (Regex.IsMatch(data, "^Creating file \".+\"\\.{3}$", RegexOptions.Compiled))
+            {
+                if (_log != null)
+                    _log.LogEvent(data);
+                return;
+            }
+
+            // Processing
+            // process: 100%
+            else if (Regex.IsMatch(data, "^process: [0-9]{1,3}%$", RegexOptions.Compiled))
+            {
+                if (backgroundWorker.IsBusy)
+                    backgroundWorker.ReportProgress(int.Parse(Regex.Match(data, "[0-9]{1,3}").Value),
+                        string.Format("Processing ({0}%)", int.Parse(Regex.Match(data, "[0-9]{1,3}").Value)));
+                return;
+            }
+
+            // Progress
+            // progress: 100%
+            else if (Regex.IsMatch(data, "^progress: [0-9]{1,3}%$", RegexOptions.Compiled))
+            {
+                if (backgroundWorker.IsBusy)
+                    backgroundWorker.ReportProgress(int.Parse(Regex.Match(data, "[0-9]{1,3}").Value),
+                        string.Format("Progress ({0}%)", int.Parse(Regex.Match(data, "[0-9]{1,3}").Value)));
+                return;
+            }
+
+            // Done
+            // Done.
+            else if (data.Equals("Done."))
+            {
+                if (_log != null)
+                    _log.LogEvent(data);
+                return;
+            }
+
+            // unusual video framerate
+            // v02 The video framerate is correct, but rather unusual.
+            else if (data.Contains("The video framerate is correct, but rather unusual"))
+            {
+                if (_log != null)
+                    _log.LogEvent(data);
+                return;
+            }
+
+            #region Errors
+            // Source file not found
+            // Source file "x:\" not found.
+            else if (Regex.IsMatch(data, "^Source file \".*\" not found.$", RegexOptions.Compiled))
+            {
+                if (_log != null)
+                    _log.Error(data);
+                return;
+            }
+
+            // Format of Source file not detected
+            // The format of the source file could not be detected.
+            else if (data.Equals("The format of the source file could not be detected."))
+            {
+                if (_log != null)
+                    _log.Error(data);
+                return;
+            }
+
+            // Audio conversion not supported
+            // This audio conversion is not supported.
+            else if (data.Equals("This audio conversion is not supported."))
+            {
+                if (_log != null)
+                    _log.Error(data);
+                return;
+            }
+            #endregion
+
+            // Unknown line
+            else
+            {
+                if (_log != null)
+                    _log.Warn(string.Format("Unknown line: \"{0}\"", data));
+            }
+
+            if (!bStreamFound)
+                lastStream = null;
         }
         #endregion
     }

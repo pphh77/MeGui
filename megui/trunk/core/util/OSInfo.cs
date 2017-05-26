@@ -344,6 +344,8 @@ namespace MeGUI
                                                     case "PRODUCT_BUSINESS":
                                                     case "PRODUCT_BUSINESS_N": osName += "Business"; break;
                                                     case "PRODUCT_STARTER": osName += "Starter"; break;
+                                                    case "PRODUCT_ENTERPRISE_SERVER": osName += "Enterprise"; break;
+                                                    case "PRODUCT_STANDARD_SERVER": osName += "Standard"; break;
                                                     default: osName += "(" + strOSProduct.Substring(8) + ")"; break;
                                                 }
                                                 break;
@@ -366,6 +368,8 @@ namespace MeGUI
                                                     case "PRODUCT_BUSINESS":
                                                     case "PRODUCT_BUSINESS_N": osName += "Professional"; break;
                                                     case "PRODUCT_STARTER": osName += "Starter"; break;
+                                                    case "PRODUCT_ENTERPRISE_SERVER": osName += "Enterprise"; break;
+                                                    case "PRODUCT_STANDARD_SERVER": osName += "Standard"; break;
                                                     default: osName += "(" + strOSProduct.Substring(8) + ")"; break;
                                                 }
                                                 break;
@@ -387,6 +391,8 @@ namespace MeGUI
                                                     case "PRODUCT_PROFESSIONAL":
                                                     case "PRODUCT_PROFESSIONAL_N": osName += "Professional"; break;
                                                     case "PRODUCT_PROFESSIONAL_WMC": osName += "Professional with Media Center"; break;
+                                                    case "PRODUCT_ENTERPRISE_SERVER": osName += "Enterprise"; break;
+                                                    case "PRODUCT_STANDARD_SERVER": osName += "Standard"; break;
                                                     default: osName += "(" + strOSProduct.Substring(8) + ")"; break;
                                                 }
                                                 break;
@@ -419,6 +425,8 @@ namespace MeGUI
                                                     case "PRODUCT_EDUCATION_N": osName += "Education"; break;
                                                     case "PRODUCT_MOBILE_CORE":
                                                     case "PRODUCT_MOBILE_ENTERPRISE": osName += "Mobile"; break;
+                                                    case "PRODUCT_ENTERPRISE_SERVER": osName += "Enterprise"; break;
+                                                    case "PRODUCT_STANDARD_SERVER": osName += "Standard"; break;
                                                     default: osName += "(" + strOSProduct.Substring(8) + ")"; break;
                                                 }
 

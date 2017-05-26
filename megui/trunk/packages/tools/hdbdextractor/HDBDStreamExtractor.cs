@@ -41,6 +41,11 @@ namespace MeGUI.packages.tools.hdbdextractor
             InitializeComponent();
             if (MainForm.Instance.Settings.Eac3toLastUsedFileMode)
                 FileSelection.Select();
+
+            toolStripMenuItem2.Checked = MainForm.Instance.Settings.Eac3toAutoSelectStreams;
+            toolStripMenuItem3.Checked = MainForm.Instance.Settings.Eac3toDefaultToHD;
+            toolStripMenuItem4.Checked = MainForm.Instance.Settings.Eac3toEnableEncoder;
+            toolStripMenuItem5.Checked = MainForm.Instance.Settings.Eac3toEnableDecoder;
         }
 
         #region backgroundWorker
@@ -230,6 +235,11 @@ namespace MeGUI.packages.tools.hdbdextractor
             {
                 Stream s = row.DataBoundItem as Stream;
                 DataGridViewComboBoxCell comboBox = row.Cells["StreamExtractAsComboBox"] as DataGridViewComboBoxCell;
+                if (comboBox.IsInEditMode)
+                {
+                    comboBox.ReadOnly = true;
+                    comboBox.ReadOnly = false;
+                }
                 comboBox.Items.Clear();
                 if (s == null || s.Type == eac3to.StreamType.Unknown)
                 {
@@ -240,24 +250,14 @@ namespace MeGUI.packages.tools.hdbdextractor
 
                 switch (s.Type)
                 {
-                    case eac3to.StreamType.Chapter:
-                        comboBox.Value = comboBox.Items[0];
-                        break;
                     case eac3to.StreamType.Join:
                         if (s.Name == "Joined EVO")
                             comboBox.Value = "EVO";
                         else 
                             comboBox.Value = "VOB";
                         break;
-                    case eac3to.StreamType.Subtitle:
-                        comboBox.Value = comboBox.Items[0];
-                        break;
-                    case eac3to.StreamType.Video:
-                        comboBox.Value = comboBox.Items[0];
-                        break;
-                    case eac3to.StreamType.Audio:
-                        comboBox.Value = comboBox.Items[0];
-                        break;
+                    default:
+                        comboBox.Value = comboBox.Items[0]; break;
                 }
             }
         }
@@ -340,8 +340,8 @@ namespace MeGUI.packages.tools.hdbdextractor
                     continue;
 
                 string strExtension = row.Cells["StreamExtractAsComboBox"].Value.ToString().ToLowerInvariant();
-                if (strExtension.ToUpperInvariant().Equals("EAC3_CORE"))
-                    strExtension = "eac3";
+                if (strExtension.ToUpperInvariant().EndsWith("_CORE"))
+                    strExtension = strExtension.Substring(0, strExtension.Length - 5);
                 if (row.Cells["StreamExtractAsComboBox"].Value == null)
                     throw new ApplicationException(string.Format("Specify an extraction type for stream:\r\n\n\t{0}: {1}", stream.Number, stream.Description));
 
@@ -356,9 +356,7 @@ namespace MeGUI.packages.tools.hdbdextractor
                         Extensions.GetStringValue(stream.Type), row.Cells["languageDataGridViewTextBoxColumn"].Value, strExtension)),
                         row.Cells["StreamAddOptionsTextBox"].Value).Trim());
 
-                if (stream.Type == eac3to.StreamType.Audio && 
-                    (row.Cells["StreamExtractAsComboBox"].Value.Equals(AudioCodec.DTS.ID) || 
-                    (((AudioStream)stream).AudioType == AudioStreamType.EAC3 && row.Cells["StreamExtractAsComboBox"].Value.Equals("EAC3_CORE"))))
+                if (stream.Type == eac3to.StreamType.Audio && ((string)row.Cells["StreamExtractAsComboBox"].Value).EndsWith("_CORE"))
                     sb.Append(" -core");
 
                 sb.Append(" ");
@@ -547,6 +545,29 @@ namespace MeGUI.packages.tools.hdbdextractor
                 path = pathInfo.Parent.FullName;
             }
             return file;
+        }
+
+        private void toolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            MainForm.Instance.Settings.Eac3toAutoSelectStreams = toolStripMenuItem2.Checked;
+        }
+
+        private void toolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            MainForm.Instance.Settings.Eac3toDefaultToHD = toolStripMenuItem3.Checked;
+            StreamDataGridView_DataSourceChanged(null, null);
+        }
+
+        private void toolStripMenuItem4_Click(object sender, EventArgs e)
+        {
+            MainForm.Instance.Settings.Eac3toEnableEncoder = toolStripMenuItem4.Checked;
+            StreamDataGridView_DataSourceChanged(null, null);
+        }
+
+        private void toolStripMenuItem5_Click(object sender, EventArgs e)
+        {
+            MainForm.Instance.Settings.Eac3toEnableDecoder = toolStripMenuItem5.Checked;
+            StreamDataGridView_DataSourceChanged(null, null);
         }
     }
 

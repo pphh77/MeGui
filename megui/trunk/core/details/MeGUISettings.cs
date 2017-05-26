@@ -58,7 +58,8 @@ namespace MeGUI
                      alwaysOnTop, addTimePosition, alwaysbackupfiles, bUseITU, bEac3toLastUsedFileMode, bMeGUIx64,
                      bAutoLoadDG, bAutoStartQueueStartup, bAlwayUsePortableAviSynth, bVobSubberSingleFileExport,
                      bEnsureCorrectPlaybackSpeed, bOpenAVSInThread, bExternalMuxerX264, bUseNeroAacEnc, bOSx64,
-                     bVobSubberExtractForced, bVobSubberShowAll, bUsex64Tools, bShowDebugInformation;
+                     bVobSubberExtractForced, bVobSubberShowAll, bUsex64Tools, bShowDebugInformation, bEac3toDefaultToHD,
+                     bEac3toEnableEncoder, bEac3toEnableDecoder;
         private decimal forceFilmThreshold, acceptableFPSError;
         private int nbPasses, autoUpdateServerSubList, minComplexity, updateFormSplitter,
                     maxComplexity, jobColumnWidth, inputColumnWidth, outputColumnWidth, codecColumnWidth,
@@ -128,6 +129,7 @@ namespace MeGUI
             bEac3toAutoSelectStreams = true;
             strEac3toLastFolderPath = strEac3toLastFilePath = strEac3toLastDestinationPath = "";
             bEac3toLastUsedFileMode = false;
+            bEac3toDefaultToHD = bEac3toEnableEncoder = bEac3toEnableDecoder = false;
             openProgressWindow = true;
             videoExtension = "";
             audioExtension = "";
@@ -404,6 +406,24 @@ namespace MeGUI
         {
             get { return bEac3toLastUsedFileMode; }
             set { bEac3toLastUsedFileMode = value; }
+        }
+
+        public bool Eac3toDefaultToHD
+        {
+            get { return bEac3toDefaultToHD; }
+            set { bEac3toDefaultToHD = value; }
+        }
+
+        public bool Eac3toEnableEncoder
+        {
+            get { return bEac3toEnableEncoder; }
+            set { bEac3toEnableEncoder = value; }
+        }
+
+        public bool Eac3toEnableDecoder
+        {
+            get { return bEac3toEnableDecoder; }
+            set { bEac3toEnableDecoder = value; }
         }
 
         /// <summary>
