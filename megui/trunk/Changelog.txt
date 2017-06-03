@@ -1,3 +1,4 @@
+2749 [Update]               fixed a rare crash when a restart is required and MeGUI is already closed
 2748 [HD Streams Extractor] added detection of "core/embedded" tracks
                             removed the DTSHD "extract as" option
                             added the DTS_CORE "extract as" option

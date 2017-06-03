@@ -683,7 +683,8 @@ namespace MeGUI
                         _updateWindow.CloseWindow();
                     _updateRunning = false;
                     MainForm.Instance.Restart = true;
-                    MainForm.Instance.Invoke(new MethodInvoker(delegate { MainForm.Instance.Close(); }));
+                    if (MainForm.Instance.IsHandleCreated)
+                        MainForm.Instance.Invoke(new MethodInvoker(delegate { MainForm.Instance.Close(); }));
                     return;
                 }
             }
