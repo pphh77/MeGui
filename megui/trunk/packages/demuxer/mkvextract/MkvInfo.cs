@@ -21,7 +21,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Text.RegularExpressions;
 
 using MeGUI.core.util;
@@ -30,7 +29,7 @@ namespace MeGUI
 {
     class MkvInfo
     {
-        private bool _bHasChapters, _bMuxable;
+        private bool _bMuxable;
         private String _strResult, _strFile;
         private List<TrackInfo> _oTracks = new List<TrackInfo>();
         private LogItem _oLog;
@@ -42,13 +41,8 @@ namespace MeGUI
             else
                 this._oLog = oLog;
             this._strFile = strFile;
-            _bMuxable = true;
+            _bMuxable = false;
             getInfo();
-        }
-
-        public bool HasChapters
-        {
-            get { return _bHasChapters; }
         }
 
         public bool IsMuxable
@@ -63,7 +57,7 @@ namespace MeGUI
             {
                 UpdateCacher.CheckPackage("mkvmerge");
                 mkvinfo.StartInfo.FileName = MainForm.Instance.Settings.MkvMerge.Path;
-                mkvinfo.StartInfo.Arguments = string.Format("--ui-language en --identify-verbose \"{0}\"", _strFile);
+                mkvinfo.StartInfo.Arguments = string.Format("--ui-language en --identification-format json --identify \"{0}\"", _strFile);
                 mkvinfo.StartInfo.CreateNoWindow = true;
                 mkvinfo.StartInfo.UseShellExecute = false;
                 mkvinfo.StartInfo.RedirectStandardOutput = true;
@@ -85,13 +79,11 @@ namespace MeGUI
                     mkvinfo.WaitForExit();
 
                     _oLog.LogValue("MkvInfo", _strResult);
-                    if (mkvinfo.ExitCode != 0)
+                    if (mkvinfo.ExitCode == 0 || mkvinfo.ExitCode == 1)
                     {
-                        _bMuxable = false;
-                        _bHasChapters = false;
-                    }
-                    else
+                        _bMuxable = true;
                         parseResult();
+                    }                        
                 }
                 catch (Exception ex)
                 {
@@ -105,77 +97,15 @@ namespace MeGUI
             } 
         }
 
-        public bool extractChapters(String strChapterFile)
-        {
-            _strResult = null;
-            bool bResult = false;
-            using (Process mkvinfo = new Process())
-            {
-                UpdateCacher.CheckPackage("mkvmerge");
-                mkvinfo.StartInfo.FileName = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.MkvMerge.Path), "mkvextract.exe");
-                mkvinfo.StartInfo.Arguments = string.Format("chapters \"{0}\" --ui-language en --simple", _strFile);
-                mkvinfo.StartInfo.CreateNoWindow = true;
-                mkvinfo.StartInfo.UseShellExecute = false;
-                mkvinfo.StartInfo.RedirectStandardOutput = true;
-                mkvinfo.StartInfo.RedirectStandardError = true;
-                mkvinfo.StartInfo.ErrorDialog = false;
-                mkvinfo.EnableRaisingEvents = true;
-                mkvinfo.ErrorDataReceived += new DataReceivedEventHandler(backgroundWorker_ErrorDataReceived);
-                mkvinfo.OutputDataReceived += new DataReceivedEventHandler(backgroundWorker_OutputDataReceived);
-                try
-                {
-                    mkvinfo.Start();
-                    mkvinfo.BeginErrorReadLine();
-                    mkvinfo.BeginOutputReadLine();
-                    while (!mkvinfo.HasExited) // wait until the process has terminated without locking the GUI
-                    {
-                        System.Windows.Forms.Application.DoEvents();
-                        System.Threading.Thread.Sleep(100);
-                    }
-                    mkvinfo.WaitForExit();
-
-                    if (mkvinfo.ExitCode != 0)
-                        _oLog.LogValue("MkvExtract", _strResult, ImageType.Error);
-                    else
-                    {
-                        _oLog.LogValue("MkvExtract", _strResult);
-                        try
-                        {
-                            StreamWriter sr = new StreamWriter(strChapterFile, false);
-                            sr.Write(_strResult);
-                            sr.Close();
-                            bResult = true;
-                        }
-                        catch (Exception e)
-                        {
-                            _oLog.LogValue("MkvExtract - Unhandled Error", e, ImageType.Error);
-                        }
-                    }
-                    parseResult();
-                }
-                catch (Exception ex)
-                {
-                    _oLog.LogValue("MkvExtract - Unhandled Error", ex, ImageType.Error);
-                }
-                finally
-                {
-                    mkvinfo.ErrorDataReceived -= new DataReceivedEventHandler(backgroundWorker_ErrorDataReceived);
-                    mkvinfo.OutputDataReceived -= new DataReceivedEventHandler(backgroundWorker_OutputDataReceived);
-                }
-                return bResult;
-            }
-        }
-
         private void parseResult()
         {
             foreach (String Line in Regex.Split(_strResult, "\r\n"))
             {
-                if (Line.StartsWith("Chapters:"))
-                    _bHasChapters = true;
-                else if (Line.Contains("(unsupported "))
+                if (Line.Contains("\"supported\": false"))
+                {
                     _bMuxable = false;
-                else if (Line.Contains("unsupported container"))
-                    _bMuxable = false;
+                    break;
+                }
             }
         }
 
