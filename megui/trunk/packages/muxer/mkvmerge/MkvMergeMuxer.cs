@@ -20,6 +20,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 using MeGUI.core.details;
@@ -214,7 +215,14 @@ namespace MeGUI
                     {
                         MediaInfoFile oSubtitleInfo = new MediaInfoFile(stream.path, ref log);
                         if (oSubtitleInfo.ContainerFileType == ContainerType.MP4 || oSubtitleInfo.ContainerFileType == ContainerType.MKV)
-                            trackID = oSubtitleInfo.SubtitleInfo.GetFirstTrackID();      
+                            trackID = oSubtitleInfo.SubtitleInfo.GetFirstTrackID();
+
+                        FileInfo oFileInfo = new FileInfo(stream.path);
+                        if (oFileInfo.Length < 20)
+                        {
+                            log.LogEvent("Ignoring subtitle track as it is too small: " + stream.path, ImageType.Warning);
+                            break;
+                        }
                     }
 
                     if (stream.MuxOnlyInfo != null)

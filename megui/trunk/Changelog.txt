@@ -1,3 +1,4 @@
+2752 [MKV Muxer]            ignore invalid subtitle files
 2751 [HD Streams Extractor] improved handling of audio tracks with unknown parameters
 2750 [Worker]               fixed rare invisible progress window (regression of 2743)
 2749 [Update]               fixed a rare crash when a restart is required and MeGUI is already closed
