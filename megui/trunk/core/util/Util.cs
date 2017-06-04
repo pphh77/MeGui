@@ -450,13 +450,13 @@ namespace MeGUI.core.util
         /// <param name="timeCode">position in the movie in milliseconds</param>
         /// <param name="framerate">framerate of the movie</param>
         /// <returns>the frame corresponding to the timecode</returns>
-        public static int convertTimecodeToFrameNumber(int timeCode, double framerate)
+        public static int convertTimecodeToFrameNumber(double timeCode, double framerate)
         {
             double millisecondsPerFrame = (double)(1000 / framerate);
             double frameNumber = (double)timeCode / millisecondsPerFrame;
             return (int)frameNumber;
-
         }
+
         /// <summary>
         /// converts a framenumber into a chapter format compatible timecode given the framerate of the video
         /// </summary>
@@ -489,53 +489,6 @@ namespace MeGUI.core.util
                 retval += "0";
             retval += milliseconds;
             return retval;
-        }
-        /// <summary>
-        /// converts a string timecode into number of milliseconds
-        /// </summary>
-        /// <param name="timecode">the time string to be analyzed</param>
-        /// <returns>the time in milliseconds from the string or -1 if there was an error parsing</returns>
-        public static int getTimeCode(string timecode)
-        {
-            if (timecode.Equals(""))
-                return -1;
-            else if (timecode.Length == 12) // must be 12 chars
-            {
-                char[] separator = new char[] { ':' };
-                string[] subItems = timecode.Split(separator);
-                if (subItems.Length == 3)
-                {
-                    int hours, minutes, seconds, milliseconds;
-                    try
-                    {
-                        hours = Int32.Parse(subItems[0]);
-                        minutes = Int32.Parse(subItems[1]);
-                        separator = new char[] { '.' };
-                        string[] str = subItems[2].Split(separator);
-                        if (str.Length == 2)
-                        {
-                            seconds = Int32.Parse(str[0]);
-                            milliseconds = Int32.Parse(str[1]);
-                        }
-                        else
-                            return -1;
-                        if (hours > 24 || minutes > 59 || seconds > 59)
-                            return -1;
-                        int retval = milliseconds + seconds * 1000 + minutes * 60 * 1000 + hours * 60 * 60 * 1000;
-                        return retval;
-                    }
-                    catch (Exception e) // integer parsing error
-                    {
-                        LogItem _oLog = MainForm.Instance.Log.Info("Error");
-                        _oLog.LogValue("getTimeCode: " + timecode, e, ImageType.Error);
-                        return -1;
-                    }
-                }
-                else
-                    return -1;
-            }
-            else // incorrect length
-                return -1;
         }
         #endregion
     }

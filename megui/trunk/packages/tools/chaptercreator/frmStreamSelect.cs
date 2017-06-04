@@ -97,10 +97,10 @@ namespace MeGUI
                 ex = new MplsExtractor();
             else if (!String.IsNullOrEmpty(MeGUI.core.util.FileUtil.GetBlurayPath(strFileOrInputFolder)))
                 ex = new BlurayExtractor();
-            else if (strFileOrInputFolder.ToLowerInvariant().EndsWith(".txt"))
+            else if (strFileOrInputFolder.ToLowerInvariant().EndsWith(".txt") || strFileOrInputFolder.ToLowerInvariant().EndsWith(".xml"))
                 ex = new TextExtractor();
-            else if (strFileOrInputFolder.ToLowerInvariant().EndsWith(".mkv"))
-                ex = new MkvExtractor();
+            else
+                ex = new MediaInfoExtractor();
 
             return ex;
         }

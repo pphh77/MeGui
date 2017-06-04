@@ -19,13 +19,8 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 
 using MeGUI.core.util;
@@ -152,12 +147,13 @@ namespace MeGUI
         protected virtual MuxJob generateMuxJob()
         {
             MuxJob job = new MuxJob();
-            string chapters;
+            ChapterInfo chapters;
             MuxStream[] aStreams, sStreams;
             getAdditionalStreams(out aStreams, out sStreams, out chapters);
+
             job.Settings.AudioStreams.AddRange(aStreams);
             job.Settings.SubtitleStreams.AddRange(sStreams);
-            job.Settings.ChapterFile = this.chapters.Filename;
+            job.Settings.ChapterInfo = chapters;
             job.Settings.VideoName = this.videoName.Text;
             job.Settings.VideoInput = vInput.Filename;
             job.Settings.MuxedOutput = output.Filename;
@@ -187,15 +183,15 @@ namespace MeGUI
             {
                 setConfig(value.Settings.VideoInput, value.Settings.VideoName, value.Settings.MuxedInput, value.Settings.Framerate,
                     value.Settings.AudioStreams.ToArray(), value.Settings.SubtitleStreams.ToArray(),
-                    value.Settings.ChapterFile, value.Settings.MuxedOutput, value.Settings.SplitSize,
+                    value.Settings.ChapterInfo, value.Settings.MuxedOutput, value.Settings.SplitSize,
                     value.Settings.DAR, value.Settings.DeviceType);
             }
         }
 
         private void setConfig(string videoInput, string videoName, string muxedInput, decimal? framerate, MuxStream[] audioStreams,
-            MuxStream[] subtitleStreams, string chapterFile, string output, FileSize? splitSize, Dar? dar, string deviceType)
+            MuxStream[] subtitleStreams, ChapterInfo chapterInfo, string output, FileSize? splitSize, Dar? dar, string deviceType)
         {
-            base.setConfig(videoInput, videoName, framerate, audioStreams, subtitleStreams, chapterFile, output, splitSize, dar, deviceType);
+            base.setConfig(videoInput, videoName, framerate, audioStreams, subtitleStreams, chapterInfo, output, splitSize, dar, deviceType);
             this.muxedInput.Filename = muxedInput;
             this.checkIO();
         }

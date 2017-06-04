@@ -719,7 +719,7 @@
     </Compile>
     <Compile Include="packages\tools\chaptercreator\IfoExtractor.cs" />
     <Compile Include="packages\tools\chaptercreator\MplsExtractor.cs" />
-    <Compile Include="packages\tools\chaptercreator\MkvExtractor.cs" />
+    <Compile Include="packages\tools\chaptercreator\MediaInfoExtractor.cs" />
     <Compile Include="packages\tools\chaptercreator\TextExtractor.cs" />
     <Compile Include="packages\tools\cqmeditor\QuantizerMatrixDialog.cs">
       <SubType>Form</SubType>

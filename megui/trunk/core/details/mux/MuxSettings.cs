@@ -33,20 +33,20 @@ namespace MeGUI
 	{
 		private List<MuxStream> audioStreams, subtitleStreams;
 		private decimal? framerate;
-		private string chapterFile, videoName;
+		private string videoName;
         private string muxedInput, videoInput, muxedOutput, deviceType;
         private bool muxAll;
         private Dar? dar;
-
+        private ChapterInfo chapterInfo;
         private FileSize? splitSize;
 
 		public MuxSettings()
 		{
 			audioStreams = new List<MuxStream>();
 			subtitleStreams = new List<MuxStream>();
+            chapterInfo = new ChapterInfo();
             framerate = null;
             muxedInput = "";
-			chapterFile = "";
             videoName = "";
             videoInput = "";
             muxedOutput = "";
@@ -103,10 +103,10 @@ namespace MeGUI
 		/// <summary>
 		/// the file containing the chapter information
 		/// </summary>
-		public string ChapterFile
+		public ChapterInfo ChapterInfo
 		{
-			get {return chapterFile;}
-			set {chapterFile = value;}
+			get {return chapterInfo;}
+			set {chapterInfo = value;}
 		}
 
 		/// <summary>
@@ -147,6 +147,5 @@ namespace MeGUI
             get { return muxAll; }
             set { muxAll = value; }
         }
-	
 	}
 }

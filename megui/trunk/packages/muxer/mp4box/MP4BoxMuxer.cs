@@ -394,18 +394,24 @@ namespace MeGUI
                     trackCount++;
                 }
 
-                if (!string.IsNullOrEmpty(settings.ChapterFile))
+                if (settings.ChapterInfo.HasChapters)
                 {
-                    // Add Apple Devices Chapter format
+                    string strChapterFile = Path.Combine(Path.GetDirectoryName(settings.MuxedOutput), Path.GetFileNameWithoutExtension(settings.MuxedOutput) + "_chptmp.txt");
                     if (settings.DeviceType == "iPod" || settings.DeviceType == "iPhone" || settings.DeviceType == "iPad" || settings.DeviceType == "Apple TV")
                     {
-                        FileUtil.CreateXMLFromOGGChapFile(settings.ChapterFile);
-                        sb.Append(" -add \"" + Path.Combine(Path.GetDirectoryName(settings.ChapterFile), Path.GetFileNameWithoutExtension(settings.ChapterFile) + ".xml:name=:chap") + "\"");
-                        job.FilesToDelete.Add(Path.Combine(Path.GetDirectoryName(settings.ChapterFile), Path.GetFileNameWithoutExtension(settings.ChapterFile) + ".xml"));
+                        // Add Apple Devices Chapter format
+                        strChapterFile = Path.ChangeExtension(strChapterFile, ".xml");
+                        settings.ChapterInfo.SaveAppleXML(strChapterFile);
+                        sb.Append(" -add \"" + Path.Combine(Path.GetDirectoryName(strChapterFile), Path.GetFileNameWithoutExtension(strChapterFile) + ".xml:name=:chap") + "\"");
                     }
                     else
+                    {                   
+                        settings.ChapterInfo.SaveText(strChapterFile);
+
                         // Add Nero Style Chapters - this doesn't break Apple Devices playback  - just for better interoperability with other tools
-                        sb.Append(" -chap \"" + settings.ChapterFile + "\"");
+                        sb.Append(" -chap \"" + strChapterFile + "\"");
+                    }
+                    job.FilesToDelete.Add(strChapterFile);
                 }
 
                 if (settings.SplitSize.HasValue)

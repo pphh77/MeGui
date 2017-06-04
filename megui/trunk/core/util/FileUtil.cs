@@ -984,59 +984,6 @@ namespace MeGUI.core.util
             return tracknameFilePath;
         }
 
-        /// <summary>
-        /// Create Chapters XML File from OGG Chapters File
-        /// </summary>
-        /// <param name="inFile">input</inFile>
-        public static void CreateXMLFromOGGChapFile(string inFile)
-        {
-            try
-            {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendLine("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
-                sb.AppendLine("<!-- GPAC 3GPP Text Stream -->");
-                sb.AppendLine("<TextStream version=\"1.1\">");
-                sb.AppendLine("<TextStreamHeader>");
-                sb.AppendLine("<TextSampleDescription>");
-                sb.AppendLine("</TextSampleDescription>");
-                sb.AppendLine("</TextStreamHeader>");
-                string lastTime = null;
-
-                using (StreamReader sr = new StreamReader(inFile))
-                {
-                    string line = null;
-                    string chapTitle = null;
-                    int i = 0;
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        i++;
-                        if (i % 2 == 1)
-                        {
-                            lastTime = line.Substring(line.IndexOf("=") + 1);
-                            sb.Append("<TextSample sampleTime=\"" + lastTime + "\"");
-                        }
-                        else
-                        {
-                            chapTitle = System.Text.RegularExpressions.Regex.Replace(line.Substring(line.IndexOf("=") + 1), "\"", "&quot;");
-                            sb.Append(" text=\"" + chapTitle + "\" />" + Environment.NewLine);
-                        }
-                    }
-                }
-                sb.AppendLine("<TextSample sampleTime=\"" + (TimeSpan.Parse(lastTime) + new TimeSpan(0, 0, 0, 0, 500)).ToString(@"hh\:mm\:ss\.fff") + "\" xml:space=\"preserve\" />");
-                sb.AppendLine("</TextStream>");
-
-                using (StreamWriter sw = new StreamWriter(Path.Combine(Path.GetDirectoryName(inFile), Path.GetFileNameWithoutExtension(inFile) + ".xml")))
-                {
-                    sw.Write(sb.ToString());
-                    sw.Close();
-                }
-            }
-            catch (Exception e)
-            {
-                e.Message.ToString();
-            }
-        }
-
         private static object _locker = new object();
         public static void WriteToFile(string fileName, string text, bool append)
         {

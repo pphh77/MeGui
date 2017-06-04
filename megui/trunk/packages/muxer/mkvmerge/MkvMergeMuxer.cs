@@ -324,8 +324,13 @@ namespace MeGUI
                         sb.Append(" -s " + trackID + " -D -A \"" + stream.path + "\"");
                     }
                 }
-                if (!string.IsNullOrEmpty(settings.ChapterFile)) // a chapter file is defined
-                    sb.Append(" --chapters \"" + settings.ChapterFile + "\"");
+                if (settings.ChapterInfo.HasChapters) // chapters are defined
+                {
+                    string strChapterFile = Path.Combine(Path.GetDirectoryName(settings.MuxedOutput), Path.GetFileNameWithoutExtension(settings.MuxedOutput) + "_chptmp.txt");
+                    settings.ChapterInfo.SaveText(strChapterFile);
+                    job.FilesToDelete.Add(strChapterFile);
+                    sb.Append(" --chapters \"" + strChapterFile + "\"");
+                }
 
                 if (settings.SplitSize.HasValue)
                     sb.Append(" --split " + (settings.SplitSize.Value.MB) + "M");

@@ -86,6 +86,7 @@ namespace MeGUI
         private VideoInformation _VideoInfo;
         private AudioInformation _AudioInfo;
         private SubtitleInformation _SubtitleInfo;
+        private ChapterInfo _ChapterInfo;
         private MkvInfo _MkvInfo;
         private Eac3toInfo _Eac3toInfo;
         private LogItem _Log;
@@ -94,6 +95,11 @@ namespace MeGUI
         public AudioInformation AudioInfo
         {
             get { return _AudioInfo; }
+        }
+
+        public ChapterInfo ChapterInfo
+        {
+            get { return _ChapterInfo; }
         }
 
         public SubtitleInformation SubtitleInfo
@@ -150,6 +156,7 @@ namespace MeGUI
             this._AudioInfo = new AudioInformation();
             this._SubtitleInfo = new SubtitleInformation();
             this._VideoInfo = new VideoInformation(false, 0, 0, Dar.A1x1, 0, 0, 0, 1);
+            this._ChapterInfo = new ChapterInfo();
 
             MediaInfo info = null;
 
@@ -501,6 +508,32 @@ namespace MeGUI
                         _VideoInfo.FPS = (double)fps;
 
                         Int32.TryParse(track.BitDepth, out _VideoInfo.BitDepth);
+                    }
+                }
+
+                // chapter detection
+                foreach (MediaInfoWrapper.ChaptersTrack t in info.Chapters)
+                {
+                    if (_ChapterInfo.HasChapters)
+                        break;
+
+                    _ChapterInfo.SourceName = _file;
+                    _ChapterInfo.FramesPerSecond = _VideoInfo.FPS;
+                    _ChapterInfo.Title = Path.GetFileNameWithoutExtension(_file);
+                    if (info.General.Count > 0)
+                    {
+                        if (TimeSpan.TryParse(info.General[0].PlayTimeString3, new System.Globalization.CultureInfo("en-US"), out TimeSpan result))
+                            _ChapterInfo.Duration = result;
+                    }
+                    foreach (KeyValuePair<string, string> ChapterKeyPair in t.Chapters)
+                    {
+                        string chapterName = ChapterKeyPair.Value;
+                        if (chapterName.Contains(":"))
+                            chapterName = chapterName.Substring(chapterName.IndexOf(":") + 1);
+                        Chapter oChapter = new Chapter();
+                        oChapter.Name = chapterName;
+                        oChapter.SetTimeBasedOnString(ChapterKeyPair.Key);
+                        _ChapterInfo.Chapters.Add(oChapter);
                     }
                 }
             }
@@ -876,19 +909,6 @@ namespace MeGUI
         }
 
         #region methods
-        /// <summary>checks if the file is a MKV file and has chapters</summary>
-        /// <returns>true if MKV has chapters, false if not</returns>
-        public bool hasMKVChapters()
-        {
-            if (cType != ContainerType.MKV)
-                return false;
-
-            if (_MkvInfo == null)
-                _MkvInfo = new MkvInfo(_file, ref _Log);
-
-            return _MkvInfo.HasChapters;
-        }
-
         /// <summary>checks if the input file can be muxed to MKV</summary>
         /// <returns>true if MKV can be created</returns>
         public bool MuxableToMKV()
@@ -920,19 +940,6 @@ namespace MeGUI
             }
 
             return iTrack;
-        }
-
-        /// <summary>extracts the MKV chapters</summary>
-        /// <returns>true if chapters have been extracted, false if not</returns>
-        public bool extractMKVChapters(string strChapterFile)
-        {
-            if (cType != ContainerType.MKV)
-                return false;
-
-            if (_MkvInfo == null)
-                return false;
-
-            return _MkvInfo.extractChapters(strChapterFile);
         }
 
         /// <summary>checks if the file is indexable by DGIndexNV</summary>
@@ -1383,6 +1390,11 @@ namespace MeGUI
         public bool HasAudio
         {
             get { return (_AudioInfo.HasAudio()); }
+        }
+
+        public bool HasChapters
+        {
+            get { return (_ChapterInfo.HasChapters); }
         }
 
         public bool HasVideo

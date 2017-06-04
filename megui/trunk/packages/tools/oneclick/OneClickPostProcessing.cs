@@ -53,7 +53,6 @@ namespace MeGUI
         private bool finished = false;
         private bool interlaced = false;
         private DeinterlaceFilter[] filters;
-        string qpfile = string.Empty;
         #endregion
 
         internal OneClickPostProcessing() { }
@@ -219,60 +218,7 @@ namespace MeGUI
                 _log.LogEvent("Split size: " + job.PostprocessingProperties.Splitting);
 
 
-                // chapter file handling
-                if (String.IsNullOrEmpty(job.PostprocessingProperties.ChapterFile))
-                {
-                    job.PostprocessingProperties.ChapterFile = null;
-                }
-                else if (job.PostprocessingProperties.Container == ContainerType.AVI)
-                {
-                    _log.LogEvent("Chapter handling disabled because of the AVI target container");
-                    job.PostprocessingProperties.ChapterFile = null;
-                }
-                else if (!File.Exists(job.PostprocessingProperties.ChapterFile))
-                {
-                    if (job.PostprocessingProperties.ChapterFile.StartsWith("<") || job.PostprocessingProperties.ChapterExtracted)
-                    {
-                        // internal chapter file
-                        string strTempFile = job.PostprocessingProperties.ChapterFile;
-                        if (File.Exists(job.PostprocessingProperties.IFOInput))
-                        {
-                            job.PostprocessingProperties.ChapterFile = VideoUtil.getChaptersFromIFO(job.PostprocessingProperties.IFOInput, false, job.PostprocessingProperties.WorkingDirectory, job.PostprocessingProperties.TitleNumberToProcess);
-                            if (!String.IsNullOrEmpty(job.PostprocessingProperties.ChapterFile))
-                            {
-                                intermediateFiles.Add(job.PostprocessingProperties.ChapterFile);
-                                job.PostprocessingProperties.ChapterExtracted = true;
-                            }
-                            else
-                                job.PostprocessingProperties.ChapterFile = strTempFile;
-                        }
-                        else if (Path.GetExtension(job.PostprocessingProperties.VideoInput).ToLowerInvariant().Equals(".mkv"))
-                        {
-                            MediaInfoFile oInfo = new MediaInfoFile(job.PostprocessingProperties.VideoInput, ref _log);
-                            if (oInfo.hasMKVChapters())
-                            {
-                                job.PostprocessingProperties.ChapterFile = Path.Combine(job.PostprocessingProperties.WorkingDirectory, Path.GetFileNameWithoutExtension(job.IndexFile) + " - Chapter Information.txt");
-                                if (oInfo.extractMKVChapters(job.PostprocessingProperties.ChapterFile))
-                                {
-                                    intermediateFiles.Add(job.PostprocessingProperties.ChapterFile);
-                                    job.PostprocessingProperties.ChapterExtracted = true;
-                                }
-                                else
-                                    job.PostprocessingProperties.ChapterFile = strTempFile;
-                            }
-                        }
-                    }
-                    if (!File.Exists(job.PostprocessingProperties.ChapterFile))
-                    {
-                        _log.LogEvent("File not found: " + job.PostprocessingProperties.ChapterFile, ImageType.Error);
-                        job.PostprocessingProperties.ChapterFile = null;
-                    }
-                }
-                else if (job.PostprocessingProperties.ChapterExtracted)
-                {
-                    intermediateFiles.Add(job.PostprocessingProperties.ChapterFile);
-                }
-
+                // video file handling
                 string avsFile = String.Empty;
                 VideoStream myVideo = new VideoStream();
                 VideoCodecSettings videoSettings = job.PostprocessingProperties.VideoSettings;
@@ -332,8 +278,6 @@ namespace MeGUI
                 intermediateFiles.Add(avsFile);
                 intermediateFiles.Add(job.IndexFile);
                 intermediateFiles.AddRange(audioFiles.Values);
-                if (!string.IsNullOrEmpty(qpfile))
-                    intermediateFiles.Add(qpfile);
                 foreach (string file in arrAudioFilesDelete)
                     intermediateFiles.Add(file);
                 if (File.Exists(Path.Combine(Path.GetDirectoryName(job.Input), Path.GetFileNameWithoutExtension(job.Input) + "._log")))
@@ -402,7 +346,7 @@ namespace MeGUI
                     }
 
                     JobChain c = VideoUtil.GenerateJobSeries(myVideo, job.PostprocessingProperties.FinalOutput, arrAudioJobs.ToArray(), 
-                        subtitles.ToArray(), job.PostprocessingProperties.ChapterFile, job.PostprocessingProperties.OutputSize,
+                        subtitles.ToArray(), job.PostprocessingProperties.ChapterInfo, job.PostprocessingProperties.OutputSize,
                         job.PostprocessingProperties.Splitting, job.PostprocessingProperties.Container,
                         job.PostprocessingProperties.PrerenderJob, arrMuxStreams.ToArray(),
                         _log, job.PostprocessingProperties.DeviceOutputType, null, job.PostprocessingProperties.VideoFileToMux, 
@@ -608,19 +552,6 @@ namespace MeGUI
                 x264Settings xs = (x264Settings)settings;
                 xTargetDevice = xs.TargetDevice;
                 _log.LogValue("Target device", xTargetDevice.Name);
-
-                // create qpf file if necessary
-                if (!String.IsNullOrEmpty(job.PostprocessingProperties.ChapterFile) && useChaptersMarks)
-                {
-                    qpfile = job.PostprocessingProperties.ChapterFile;
-                    if ((Path.GetExtension(qpfile).ToLowerInvariant()) == ".txt")
-                        qpfile = VideoUtil.convertChaptersTextFileTox264QPFile(job.PostprocessingProperties.ChapterFile, iMediaFile.VideoInfo.FPS);
-                    if (File.Exists(qpfile))
-                    {
-                        xs.UseQPFile = true;
-                        xs.QPFile = qpfile;
-                    }
-                }
             }
 
             // get mod value for resizing
@@ -798,7 +729,28 @@ namespace MeGUI
                 _log.LogValue("Error saving AviSynth script", i, ImageType.Error);
                 return "";
             }
-            
+
+            // create qpf file if necessary and possible 
+            if (job.PostprocessingProperties.ChapterInfo.HasChapters && useChaptersMarks && settings != null && settings is x264Settings)
+            {
+                JobUtil.GetAllInputProperties(strOutputAVSFile, out ulong numberOfFrames, out double fps, out int fps_n, out int fps_d, out int hres, out int vres, out Dar d);
+                _log.LogEvent("frame rate: " + fps_n + "/" + fps_d);
+                _log.LogEvent("frames: " + numberOfFrames);
+                _log.LogValue("aspect ratio", d);
+
+                fps = (double)fps_n / fps_d;
+                string strChapterFile = Path.ChangeExtension(strOutputAVSFile, ".qpf");
+                job.PostprocessingProperties.ChapterInfo.ChangeFps(fps);
+                if (job.PostprocessingProperties.ChapterInfo.SaveQpfile(strChapterFile))
+                {
+                    job.PostprocessingProperties.FilesToDelete.Add(strChapterFile);
+                    _log.LogValue("qpf file created", strChapterFile);
+                    x264Settings xs = (x264Settings)settings;
+                    xs.UseQPFile = true;
+                    xs.QPFile = strChapterFile;
+                }
+            }
+
             return strOutputAVSFile;
         }
 

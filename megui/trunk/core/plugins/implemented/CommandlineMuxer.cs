@@ -62,9 +62,10 @@ namespace MeGUI
         {
             Util.ensureExistsIfNeeded(settings.MuxedInput);
             Util.ensureExistsIfNeeded(settings.VideoInput);
-            Util.ensureExistsIfNeeded(settings.ChapterFile);
+
             foreach (MuxStream s in settings.AudioStreams)
                 Util.ensureExistsIfNeeded(s.path);
+
             foreach (MuxStream s in settings.SubtitleStreams)
             {
                 if (s.MuxOnlyInfo != null)

@@ -1,3 +1,8 @@
+2753 [Chapter]              improved chapter handling
+                            all MediaInfo supported files and TXT/XML files can be used as chapter files
+                            !!! existing jobs have to be recreated as otherwise the chapter information will not be added !!!
+     [Muxer]                use chapter information from the input video file if available
+                            disable/enable the chapter selection box based upon the selected container and device type
 2752 [MKV Muxer]            ignore invalid subtitle files
 2751 [HD Streams Extractor] improved handling of audio tracks with unknown parameters
 2750 [Worker]               fixed rare invisible progress window (regression of 2743)

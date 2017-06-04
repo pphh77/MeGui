@@ -102,7 +102,7 @@ namespace MeGUI
 
         public static JobChain GenerateMuxJobs(VideoStream video, decimal? framerate, MuxStream[] audioStreamsArray, 
             MuxableType[] audioTypes, MuxStream[] subtitleStreamsArray, MuxableType[] subTypes,
-            string chapterFile, MuxableType chapterInputType, ContainerType container, string output, 
+            ChapterInfo chapterInfo, MuxableType chapterInputType, ContainerType container, string output, 
             FileSize? splitSize, List<string> inputsToDelete, string deviceType, MuxableType deviceOutputType, bool alwaysMuxOutput)
         {
             Debug.Assert(splitSize == null || splitSize.Value != FileSize.Empty);
@@ -230,10 +230,7 @@ namespace MeGUI
                     }
                     else if (o.outputType is ChapterType)
                     {
-                        if ((VideoUtil.guessChapterType(chapterFile) == o.outputType))
-                            mjob.Settings.ChapterFile = chapterFile;
-                        if (inputsToDelete.Contains(chapterFile))
-                            filesToDeleteThisJob.Add(chapterFile);
+                        mjob.Settings.ChapterInfo = chapterInfo;
                     }
                     else if (o.outputType is DeviceType)
                     {

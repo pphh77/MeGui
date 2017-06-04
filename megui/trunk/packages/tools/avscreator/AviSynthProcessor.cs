@@ -44,7 +44,6 @@ namespace MeGUI
 
         #region variables
         protected System.Threading.ManualResetEvent mre = new System.Threading.ManualResetEvent(true); // lock used to pause encoding
-#warning AvsFile should be refactored to IMediaFile once fast frame reading is supported
         private AvsFile file;
         private IVideoReader reader;
         private bool aborted;

@@ -32,7 +32,7 @@ namespace MeGUI
 	public class OneClickPostprocessingProperties
 	{
 		private bool autoDeint, autoCrop, keepInputResolution, prerenderJob, 
-            useChapterMarks, chapterExtracted, eac3toDemux, applyDelayCorrection;
+            useChapterMarks, eac3toDemux, applyDelayCorrection;
         private int horizontalOutputResolution, _titleNumberToProcess;
         private FileSize? splitSize;
         private ContainerType container;
@@ -41,7 +41,7 @@ namespace MeGUI
         private VideoCodecSettings videoSettings;
         private AviSynthSettings avsSettings;
 		private double customAR;
-        private string chapterFile, finalOutput, aviSynthScript, deviceType, inputFile,
+        private string finalOutput, aviSynthScript, deviceType, inputFile,
             workingDirectory, _videoFileToMux, ifoFile, _intermediateMKVFile;
         private List<string> filesToDelete;
         private List<OneClickAudioTrack> _audioTracks;
@@ -49,6 +49,7 @@ namespace MeGUI
         private FileIndexerWindow.IndexType _indexType;
         private OneClickSettings _oneClickSettings;
         private List<OneClickFilesToProcess> _filesToProcess;
+        private ChapterInfo chapterInfo;
 
 		public OneClickPostprocessingProperties()
 		{
@@ -72,26 +73,17 @@ namespace MeGUI
             _intermediateMKVFile = null;
             _oneClickSettings = null;
             _filesToProcess = new List<OneClickFilesToProcess>();
-            chapterExtracted = false;
             _titleNumberToProcess = 1;
             eac3toDemux = false;
             ifoFile = string.Empty;
             applyDelayCorrection = false;
+            chapterInfo = new ChapterInfo();
 		}
 
         public bool AutoDeinterlace
         {
             get { return autoDeint; }
             set { autoDeint = value; }
-        }
-
-        /// <summary>
-        /// gets / sets whether the chapter file has been created automatically
-        /// </summary>
-        public bool ChapterExtracted
-        {
-            get { return chapterExtracted; }
-            set { chapterExtracted = value; }
         }
 
         /// <summary>
@@ -217,10 +209,10 @@ namespace MeGUI
 		/// <summary>
 		/// gets / sets the chapter file for the output
 		/// </summary>
-		public string ChapterFile
+		public ChapterInfo ChapterInfo
 		{
-			get { return chapterFile; }
-			set { chapterFile = value; }
+			get { return chapterInfo; }
+			set { chapterInfo = value; }
 		}
 
 		/// <summary>

@@ -152,11 +152,8 @@ namespace MeGUI
                         case "AVCHD": sw.Write(" --avchd"); break;
                     }
 
-                    if (!string.IsNullOrEmpty(settings.ChapterFile)) // a chapter file is defined
-                    {
-                        string chapterTimeLine = VideoUtil.getChapterTimeLine(settings.ChapterFile);
-                        sw.Write(" --custom-chapters" + chapterTimeLine);
-                    }
+                    if (settings.ChapterInfo.HasChapters) // chapters are defined
+                        sw.Write(" --custom-chapters" + settings.ChapterInfo.GetChapterTimeLine());
 
                     job.Output = Path.GetDirectoryName(job.Output) + "\\" + Path.GetFileNameWithoutExtension(job.Output); // remove m2ts file extension - use folder name only with this mode
                 }
@@ -164,6 +161,7 @@ namespace MeGUI
                 if (settings.SplitSize.HasValue)
                     sw.Write(" --split-size=" + settings.SplitSize.Value.MB + "MB");
 
+                string fpsString = null;
                 string videoFile = null;
                 if (!string.IsNullOrEmpty(settings.VideoInput))
                     videoFile = settings.VideoInput;
@@ -197,7 +195,7 @@ namespace MeGUI
                         if (settings.DAR.HasValue)
                             sw.Write(", ar=" + settings.DAR.Value.X + ":" + settings.DAR.Value.Y);
 
-                        string fpsString = oVideoInfo.VideoInfo.FPS.ToString(ci);
+                        fpsString = oVideoInfo.VideoInfo.FPS.ToString(ci);
                         if (settings.Framerate.HasValue)
                             fpsString = settings.Framerate.Value.ToString(ci);
                         sw.Write(", fps=" + fpsString);
@@ -269,8 +267,8 @@ namespace MeGUI
                     if (stream.delay != 0)
                         sw.Write(", timeshift={0}ms", stream.delay);
 
-                    if (stream.path.ToLowerInvariant().EndsWith(".srt") && oVideoInfo != null)
-                        sw.Write(", video-width={0}, video-height={1}, fps={2}", oVideoInfo.VideoInfo.Width, oVideoInfo.VideoInfo.Height, settings.Framerate.Value.ToString(ci));
+                    if (stream.path.ToLowerInvariant().EndsWith(".srt") && oVideoInfo != null && !String.IsNullOrEmpty(fpsString))
+                        sw.Write(", video-width={0}, video-height={1}, fps={2}", oVideoInfo.VideoInfo.Width, oVideoInfo.VideoInfo.Height, fpsString);
 
                     if (!String.IsNullOrEmpty(stream.language))
                     {

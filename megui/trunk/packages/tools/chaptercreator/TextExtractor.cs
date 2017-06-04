@@ -26,49 +26,15 @@ namespace MeGUI
 
         public override List<ChapterInfo> GetStreams(string location)
         {
-            List<Chapter> list = new List<Chapter>();
-            List<ChapterInfo> pgcs = new List<ChapterInfo>();
-
-            try
-            {
-                int num = 0;
-                TimeSpan ts = new TimeSpan(0);
-                string time = String.Empty;
-                string name = String.Empty;
-                bool onTime = true;
-                string[] lines = File.ReadAllLines(location);
-                foreach (string line in lines)
-                {
-                    if (onTime)
-                    {
-                        num++;
-                        //read time
-                        time = line.Replace("CHAPTER" + num.ToString("00") + "=", "");
-                        ts = TimeSpan.Parse(time);
-                    }
-                    else
-                    {
-                        //read name
-                        name = line.Replace("CHAPTER" + num.ToString("00") + "NAME=", "");
-                        //add it to list
-                        list.Add(new Chapter() { Name = name, Time = ts });
-                    }
-                    onTime = !onTime;
-                }
-            }
-            catch (Exception)
+            ChapterInfo oChapterInfo = new ChapterInfo();
+            if (!oChapterInfo.LoadFile(location))
             {
                 OnExtractionComplete();
                 return new List<ChapterInfo>();
             }
 
-            pgcs.Add(new ChapterInfo()
-            {
-                Chapters = list,
-                SourceName = location,
-                FramesPerSecond = 0,
-                Title = Path.GetFileNameWithoutExtension(location)
-            });
+            List<ChapterInfo> pgcs = new List<ChapterInfo>();
+            pgcs.Add(oChapterInfo);
 
             OnStreamDetected(pgcs[0]);
             OnChaptersLoaded(pgcs[0]);

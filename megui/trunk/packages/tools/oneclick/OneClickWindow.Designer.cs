@@ -467,7 +467,7 @@ namespace MeGUI
             // keepInputResolution
             // 
             this.keepInputResolution.AutoSize = true;
-            this.keepInputResolution.Location = new System.Drawing.Point(119, 19);
+            this.keepInputResolution.Location = new System.Drawing.Point(120, 19);
             this.keepInputResolution.Name = "keepInputResolution";
             this.keepInputResolution.Size = new System.Drawing.Size(241, 17);
             this.keepInputResolution.TabIndex = 25;
@@ -492,13 +492,13 @@ namespace MeGUI
             this.avsProfile.Location = new System.Drawing.Point(120, 69);
             this.avsProfile.Name = "avsProfile";
             this.avsProfile.ProfileSet = "AviSynth";
-            this.avsProfile.Size = new System.Drawing.Size(330, 22);
+            this.avsProfile.Size = new System.Drawing.Size(326, 22);
             this.avsProfile.TabIndex = 23;
             // 
             // autoDeint
             // 
             this.autoDeint.AutoSize = true;
-            this.autoDeint.Location = new System.Drawing.Point(119, 97);
+            this.autoDeint.Location = new System.Drawing.Point(120, 97);
             this.autoDeint.Name = "autoDeint";
             this.autoDeint.Size = new System.Drawing.Size(139, 17);
             this.autoDeint.TabIndex = 20;
@@ -591,14 +591,14 @@ namespace MeGUI
             this.chapterFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chapterFile.Filename = "";
-            this.chapterFile.Filter = "Chapter files (*.txt)|*.txt";
+            this.chapterFile.Filter = "Chapter files (*.txt, *.xml)|*.txt;*.xml";
             this.chapterFile.FilterIndex = 0;
             this.chapterFile.FolderMode = false;
-            this.chapterFile.Location = new System.Drawing.Point(124, 47);
+            this.chapterFile.Location = new System.Drawing.Point(120, 47);
             this.chapterFile.Name = "chapterFile";
             this.chapterFile.ReadOnly = true;
             this.chapterFile.SaveMode = false;
-            this.chapterFile.Size = new System.Drawing.Size(290, 26);
+            this.chapterFile.Size = new System.Drawing.Size(294, 26);
             this.chapterFile.TabIndex = 39;
             this.chapterFile.Title = null;
             // 
@@ -639,9 +639,9 @@ namespace MeGUI
             // 
             this.workingName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.workingName.Location = new System.Drawing.Point(119, 79);
+            this.workingName.Location = new System.Drawing.Point(120, 79);
             this.workingName.Name = "workingName";
-            this.workingName.Size = new System.Drawing.Size(329, 21);
+            this.workingName.Size = new System.Drawing.Size(326, 21);
             this.workingName.TabIndex = 30;
             this.workingName.TextChanged += new System.EventHandler(this.workingName_TextChanged);
             // 
@@ -701,6 +701,7 @@ namespace MeGUI
             this.devicetype.Name = "devicetype";
             this.devicetype.Size = new System.Drawing.Size(95, 21);
             this.devicetype.TabIndex = 44;
+            this.devicetype.SelectedIndexChanged += new System.EventHandler(this.updateChapterSelection);
             // 
             // deviceLabel
             // 
@@ -776,18 +777,18 @@ namespace MeGUI
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ar.CustomDARs = new MeGUI.core.util.Dar[0];
             this.ar.HasLater = true;
-            this.ar.Location = new System.Drawing.Point(119, 83);
+            this.ar.Location = new System.Drawing.Point(120, 83);
             this.ar.MaximumSize = new System.Drawing.Size(1000, 29);
             this.ar.MinimumSize = new System.Drawing.Size(64, 29);
             this.ar.Name = "ar";
             this.ar.SelectedIndex = 0;
-            this.ar.Size = new System.Drawing.Size(327, 29);
+            this.ar.Size = new System.Drawing.Size(326, 29);
             this.ar.TabIndex = 41;
             // 
             // chkDontEncodeVideo
             // 
             this.chkDontEncodeVideo.AutoSize = true;
-            this.chkDontEncodeVideo.Location = new System.Drawing.Point(119, 16);
+            this.chkDontEncodeVideo.Location = new System.Drawing.Point(120, 16);
             this.chkDontEncodeVideo.Name = "chkDontEncodeVideo";
             this.chkDontEncodeVideo.Size = new System.Drawing.Size(118, 17);
             this.chkDontEncodeVideo.TabIndex = 40;

@@ -19,120 +19,10 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using System.Text;
-
-using MeGUI.core.details;
-using MeGUI.core.util;
 
 namespace MeGUI
 {
-    public sealed class MediaFile
-    {
-        public ContainerType Container;
-
-        public List<MediaTrack> Tracks;
-        
-        public VideoTrack VideoTrack;
-        public List<AudioTrack> AudioTracks;
-        public List<SubtitleTrack> SubtitleTracks;
-        public Chapters Chapters;
-
-        public TimeSpan PlayTime;
-
-        public MediaFile(List<MediaTrack> tracks, Chapters chapters, TimeSpan playTime, ContainerType container)
-        {
-            this.Container = container;
-
-            AudioTracks = new List<AudioTrack>();
-            SubtitleTracks = new List<SubtitleTrack>();
-
-            foreach (MediaTrack m in tracks)
-            {
-                if (m is VideoTrack)
-                {
-                    Debug.Assert(VideoTrack == null, "Only one video track per file supported");
-                    VideoTrack = (VideoTrack)m;
-                }
-                if (m is AudioTrack)
-                    AudioTracks.Add((AudioTrack)m);
-                if (m is SubtitleTrack)
-                    SubtitleTracks.Add((SubtitleTrack)m);
-            }
-
-            tracks.Sort(
-                delegate(MediaTrack a, MediaTrack b)
-                {
-                    return (int)a.TrackNumber - (int)b.TrackNumber;
-                });
-
-            Tracks = tracks;
-
-            Chapters = chapters;
-            PlayTime = playTime;
-        }
-    }
-
-    public class MediaTrack
-    {
-        public TrackInfo Info;
-        public uint TrackNumber;
-        public ICodec Codec;
-    }
-
-    public sealed class VideoTrack : MediaTrack 
-    {
-        public VideoCodec VCodec;
-        public VideoInfo2 StreamInfo;
-    }
-
-    public sealed class AudioTrack : MediaTrack 
-    {
-        public AudioCodec ACodec;
-        public AudioInfo StreamInfo;
-    }
-
-    public sealed class SubtitleTrack : MediaTrack 
-    {
-        public SubtitleCodec SCodec;
-        public SubtitleInfo2 StreamInfo;
-    }
-
-    public sealed class Chapters {
-        public List<Chapter> Data;
-    }
-
-
-    public class VideoInfo2
-    {
-        public ulong Width;
-        public ulong Height;
-        public Dar DAR;
-        public ulong FrameCount;
-        public double FPS;
-
-        public VideoInfo2() { }
-
-        public VideoInfo2(ulong width, ulong height,
-            Dar dar, ulong framecount, double fps)
-        {
-            Width = width;
-            Height = height;
-            DAR = dar;
-            FrameCount = framecount;
-            FPS = fps;
-        }
-    }
-
-    public class AudioInfo
-    { }
-
-    public class SubtitleInfo2
-    { }
-
-    #region old
     public interface IMediaFileFactory : IIDable
     {
         /// <summary>
@@ -229,5 +119,4 @@ namespace MeGUI
         /// <returns>The frame just read</returns>
         Bitmap ReadFrameBitmap(int framenumber);
     }
-    #endregion
 }

@@ -322,7 +322,7 @@ namespace MeGUI
             AudioEncoderType[] muxTypes;
 			separateEncodableAndMuxableAudioStreams(out aStreams, out audio, out muxTypes);
 			MuxStream[] subtitles = new MuxStream[0];
-			string chapters = "";
+            ChapterInfo chapters = new ChapterInfo();
 			string videoInput = vInfo.VideoInput;
             string videoOutput = vInfo.VideoOutput;
             string muxedOutput = this.muxedOutput.Filename;

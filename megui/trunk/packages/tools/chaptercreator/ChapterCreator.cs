@@ -19,11 +19,11 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 
 using MeGUI.core.util;
 
@@ -52,12 +52,7 @@ namespace MeGUI
             intIndex = 0;
 			chapters = new Chapter[0];
             this.mainForm = mainForm;
-            pgc = new ChapterInfo()
-            {
-                Chapters = new List<Chapter>(),
-                FramesPerSecond = 0,
-                LangCode = string.Empty
-            };
+            pgc = new ChapterInfo();
 		}
 
         private void ChapterCreator_Load(object sender, EventArgs e)
@@ -109,11 +104,14 @@ namespace MeGUI
 		#region buttons
 		private void removeZoneButton_Click(object sender, System.EventArgs e)
 		{
-            if (chapterListView.Items.Count < 1 || pgc.Chapters.Count < 1) return;
-            if (chapterListView.SelectedIndices.Count == 0) return;
+            if (chapterListView.Items.Count < 1 || pgc.Chapters.Count < 1)
+                return;
+            if (chapterListView.SelectedIndices.Count == 0)
+                return;
             intIndex = chapterListView.SelectedIndices[0];
             pgc.Chapters.Remove(pgc.Chapters[intIndex]);
-            if (intIndex != 0) intIndex--;
+            if (intIndex != 0)
+                intIndex--;
             FreshChapterView();
             updateTimeLine();
 		}
@@ -127,14 +125,16 @@ namespace MeGUI
 
 		private void chapterListView_SelectedIndexChanged(object sender, System.EventArgs e)
 		{
-            if (chapterListView.Items.Count < 1) return;
+            if (chapterListView.Items.Count < 1)
+                return;
 
             chapterName.TextChanged -= new System.EventHandler(this.chapterName_TextChanged);
             startTime.TextChanged -= new System.EventHandler(this.chapterName_TextChanged);            
             ListView lv = (ListView)sender;
 
-            if (lv.SelectedItems.Count == 1) intIndex = lv.SelectedItems[0].Index;
-            if (pgc.Chapters.Count > 0)
+            if (lv.SelectedItems.Count == 1)
+                intIndex = lv.SelectedItems[0].Index;
+            if (pgc.HasChapters)
             {
                 this.startTime.Text = FileUtil.ToShortString(pgc.Chapters[intIndex].Time);
                 this.chapterName.Text = pgc.Chapters[intIndex].Name;
@@ -148,8 +148,9 @@ namespace MeGUI
 		{
             Chapter c;
             if (chapterListView.Items.Count != 0)
-                 intIndex = chapterListView.Items.Count;
-            else intIndex = 0;
+                intIndex = chapterListView.Items.Count;
+            else
+                intIndex = 0;
             TimeSpan ts = new TimeSpan(0);
             try
             {//try to get a valid time input					
@@ -244,7 +245,7 @@ namespace MeGUI
         {
             if (rbFromFile.Checked)
             {
-                openFileDialog.Filter = "IFO files (*.ifo)|*.ifo|MKV files (*.mkv)|*.mkv|MPLS files (*.mpls)|*.mpls|Text files (*.txt)|*.txt|All supported files (*.ifo,*.mkv,*.mpls,*.txt)|*.ifo;*.mkv;*.mpls;*.txt";
+                openFileDialog.Filter = "IFO files (*.ifo)|*.ifo|Container files (*.mkv,*.mp4)|*.mkv;*.mp4|MPLS files (*.mpls)|*.mpls|Chapter files (*.txt,*.xml)|*.txt;*.xml|All supported files (*.ifo,*.mkv,*.mp4, *.mpls,*.txt,*.xml)|*.ifo;*.mkv;*.mp4;*.mpls;*.txt;*.xml";
                 openFileDialog.FilterIndex = 5;
 
                 if (this.openFileDialog.ShowDialog() != DialogResult.OK)
@@ -286,8 +287,6 @@ namespace MeGUI
                     MediaInfoFile oInfo = new MediaInfoFile(input.Text);
                     pgc.FramesPerSecond = oInfo.VideoInfo.FPS;
                 }
-                if (String.IsNullOrEmpty(pgc.LangCode))
-                    pgc.LangCode = "und";
             }
 
             FreshChapterView();
@@ -358,20 +357,20 @@ namespace MeGUI
                 if (chapterListView.SelectedItems.Count == 1 && chapterListView.SelectedItems[0].Tag != null) // a zone has been selected, show that zone
 				{
 					Chapter chap = (Chapter)chapterListView.SelectedItems[0].Tag;
-					int time = Util.getTimeCode(chap.timecode);
 					double framerate = player.Framerate;
-                    int frameNumber = Util.convertTimecodeToFrameNumber(time, framerate);
+                    int frameNumber = Util.convertTimecodeToFrameNumber(chap.Time.TotalMilliseconds, framerate);
 					player.CurrentFrame = frameNumber;
 
 				}
 				else // no chapter has been selected.. but if start time is configured, show the frame in the preview
 				{
-					if (!startTime.Text.Equals(""))
-					{
-						int time = Util.getTimeCode(startTime.Text);
-						double framerate = player.Framerate;
-                        int frameNumber = Util.convertTimecodeToFrameNumber(time, framerate);
-						player.CurrentFrame = frameNumber;
+                    if (!startTime.Text.Equals(""))
+                    {
+                        if (TimeSpan.TryParse(startTime.Text, new System.Globalization.CultureInfo("en-US"), out TimeSpan result))
+                        {
+                            int frameNumber = Util.convertTimecodeToFrameNumber(result.TotalMilliseconds, player.Framerate);
+                            player.CurrentFrame = frameNumber;
+                        }
 					}
 				}
 			}
@@ -443,7 +442,8 @@ namespace MeGUI
                 chapterListView.SelectedItems[0].SubItems[1].Text = chapterName.Text;
             }
             catch (Exception parse)
-            { //invalid time input
+            { 
+                //invalid time input
                 startTime.Focus();
                 startTime.SelectAll();
                 MessageBox.Show("Cannot parse the timecode you have entered.\nIt must be given in the hh:mm:ss.ccc format"
@@ -471,18 +471,32 @@ namespace MeGUI
         }
 	}
 
+    [Serializable]
 	public struct Chapter
 	{
-		public string timecode;
-
-        //add-on
-        public TimeSpan Time { get; set; }
         public string Name { get; set; }
+
+        [XmlIgnore]
+        public TimeSpan Time { get; set; }
+
+        // XmlSerializer does not support TimeSpan, so use this property for serialization instead
+        [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
+        public long TimeTicks
+        {
+            get { return Time.Ticks; }
+            set { Time = new TimeSpan(value); }
+        }
 
         //public string Lang { get; set; }
         public override string ToString()
         {
             return Time.ToString() + ": " + Name;
+        }
+
+        public void SetTimeBasedOnString(string strTimeCode)
+        {
+            if (TimeSpan.TryParse(strTimeCode, new System.Globalization.CultureInfo("en-US"), out TimeSpan result))
+                Time = result;
         }
 	}
 

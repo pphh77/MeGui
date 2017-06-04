@@ -22,7 +22,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Windows.Forms;
 
 using MeGUI.core.details;
 using MeGUI.core.util;
@@ -67,59 +66,13 @@ namespace MeGUI
 		}
 
         /// <summary>
-        /// gets chapters from IFO file and save them as Ogg Text File
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <returns>chapter file name</returns>
-        public static String getChaptersFromIFO(string fileName, bool qpfile, string outputDirectory, int iPGCNumber)
-        {
-            if (Path.GetExtension(fileName.ToLowerInvariant()) == ".vob"
-                || Path.GetExtension(fileName.ToLowerInvariant()) == ".ifo")
-            {
-                string ifoFile;
-                string fileNameNoPath = Path.GetFileName(fileName);
-                if (String.IsNullOrEmpty(outputDirectory))
-                    outputDirectory = Path.GetDirectoryName(fileName);
-
-                // we check the main IFO
-                if (fileNameNoPath.Substring(0, 4).ToUpperInvariant() == "VTS_")
-                    ifoFile = fileName.Substring(0, fileName.LastIndexOf("_")) + "_0.IFO";
-                else 
-                    ifoFile = Path.ChangeExtension(fileName, ".IFO");
-
-                if (File.Exists(ifoFile))
-                {
-                    ChapterInfo pgc;
-                    IfoExtractor ex = new IfoExtractor();
-                    pgc = ex.GetChapterInfo(ifoFile, iPGCNumber);
-                    if (pgc == null)
-                        return null;
-
-                    if (Drives.ableToWriteOnThisDrive(Path.GetPathRoot(outputDirectory)))
-                    {
-                        if (qpfile)
-                            pgc.SaveQpfile(outputDirectory + "\\" + fileNameNoPath.Substring(0, 6) + " - Chapter Information.qpf");
-
-                        // save always this format - some users want it for the mux
-                        pgc.SaveText(outputDirectory + "\\" + fileNameNoPath.Substring(0, 6) + " - Chapter Information.txt");
-                        return outputDirectory + "\\" + fileNameNoPath.Substring(0, 6) + " - Chapter Information.txt";
-                    }
-                    else
-                        MessageBox.Show("MeGUI cannot write on the disc " + Path.GetPathRoot(ifoFile) + " \n" +
-                                        "Please, select another output path to save the chapters file...", "Configuration Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-            }
-            return null;
-        }
-
-        /// <summary>
         /// checks if the input file has chapters
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns>true if the file has chapters</returns>
         public static bool HasChapters(MediaInfoFile iFile)
         {
-            if (iFile.hasMKVChapters() || iFile.getEac3toChaptersTrack() > -1)
+            if (iFile.HasChapters || iFile.getEac3toChaptersTrack() > -1)
                 return true;
 
             if (Path.GetExtension(iFile.FileName.ToLowerInvariant()) != ".vob" &&
@@ -146,36 +99,9 @@ namespace MeGUI
 
             IfoExtractor ex = new IfoExtractor();
             ChapterInfo pgc = ex.GetChapterInfo(videoIFO, iPGCNumber);
-            if (pgc != null && pgc.Chapters.Count > 0)
+            if (pgc != null && pgc.HasChapters)
                 return true;
             return false;
-        }
-
-        /// <summary>
-        /// gets Timeline from Chapters Text file (formally as Ogg Format)
-        /// </summary>
-        /// <param name="fileName">the file read</param>
-        /// <returns>chapters Timeline as string</returns>
-        public static string getChapterTimeLine(string fileName)
-        {
-            long count = 0;
-            string line;
-            string chap = "=";
-                
-            using (StreamReader r = new StreamReader(fileName))
-            {
-                while ((line = r.ReadLine()) != null)
-                {
-                    count++;
-                    if (count % 2 != 0) // odd line
-                    {
-                        if (count >= 2)
-                            chap += ";";
-                        chap += line.Substring(line.IndexOf("=") + 1, 12);
-                    }
-                }
-            }
-            return chap;
         }
 
         public static List<string> setDeviceTypes(string outputFormat)
@@ -474,7 +400,7 @@ namespace MeGUI
 
         #region new stuff
         public static JobChain GenerateJobSeries(VideoStream video, string muxedOutput, AudioJob[] audioStreams,
-            MuxStream[] subtitles, string chapters, FileSize? desiredSize, FileSize? splitSize, 
+            MuxStream[] subtitles, ChapterInfo chapterInfo, FileSize? desiredSize, FileSize? splitSize, 
             ContainerType container, bool prerender, MuxStream[] muxOnlyAudio, LogItem log, string deviceType, 
             Zone[] zones, string videoFileToMux, OneClickAudioTrack[] audioTracks, bool alwaysMuxOutput)
         {
@@ -556,12 +482,8 @@ namespace MeGUI
                     allInputSubtitleTypes.Add(new MuxableType(VideoUtil.guessSubtitleType(muxStream.path), null));
 
             MuxableType chapterInputType = null;
-            if (!String.IsNullOrEmpty(chapters))
-            {
-                ChapterType type = VideoUtil.guessChapterType(chapters);
-                if (type != null)
-                    chapterInputType = new MuxableType(type, null);
-            }
+            if (chapterInfo.HasChapters)
+                chapterInputType = new MuxableType(ChapterType.OGG_TXT, null);
 
             MuxableType deviceOutputType = null;
             if (!String.IsNullOrEmpty(deviceType))
@@ -577,7 +499,7 @@ namespace MeGUI
             inputsToDelete.AddRange(Array.ConvertAll<AudioJob, string>(audioStreams, delegate(AudioJob a) { return a.Output; }));
 
             JobChain muxJobs = JobUtil.GenerateMuxJobs(video, null, allAudioToMux.ToArray(), allInputAudioTypes.ToArray(),
-                subtitles, allInputSubtitleTypes.ToArray(), chapters, chapterInputType, container, muxedOutput, splitSize, inputsToDelete, 
+                subtitles, allInputSubtitleTypes.ToArray(), chapterInfo, chapterInputType, container, muxedOutput, splitSize, inputsToDelete, 
                 deviceType, deviceOutputType, alwaysMuxOutput);
 
             if (desiredSize.HasValue && String.IsNullOrEmpty(videoFileToMux))
@@ -754,55 +676,6 @@ namespace MeGUI
             return null;
         }
         #endregion
-
-        public static string convertChaptersTextFileTox264QPFile(string filename, double framerate)
-        {
-            StreamWriter sw = null;
-            string qpfile = "";
-            if (File.Exists(filename))
-            {
-                StreamReader sr = null;
-                string line = null;
-                qpfile = Path.ChangeExtension(filename, ".qpf");
-                sw = new StreamWriter(qpfile, false, System.Text.Encoding.Default);
-                try
-                {
-                    sr = new StreamReader(filename);
-                    Chapter chap = new Chapter();
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        if (line.IndexOf("NAME") == -1) // chapter time
-                        {
-                            string tc = line.Substring(line.IndexOf("=") + 1);
-                            chap.timecode = tc;
-                            int chapTime = Util.getTimeCode(chap.timecode);
-                            int frameNumber = Util.convertTimecodeToFrameNumber(chapTime, framerate);
-                            sw.WriteLine(frameNumber.ToString() + " K");
-                        }
-                    }
-
-                }
-                catch (Exception f)
-                {
-                    MessageBox.Show(f.Message);
-                }
-                finally
-                {
-                    if (sw != null)
-                    {
-                        try
-                        {
-                            sw.Close();
-                        }
-                        catch (Exception f)
-                        {
-                            MessageBox.Show(f.Message);
-                        }
-                    }
-                }                
-            }
-            return qpfile;
-        }
 
         public static string GenerateCombinedFilter(OutputFileType[] types)
         {

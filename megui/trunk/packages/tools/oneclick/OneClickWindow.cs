@@ -259,6 +259,16 @@ namespace MeGUI
             }
             else
                 this.devicetype.SelectedIndex = 0;
+
+            updateChapterSelection(null, null);
+        }
+
+        private void updateChapterSelection(object sender, EventArgs e)
+        {
+            if (this.containerFormat.Text == "AVI" || (this.containerFormat.Text == "M2TS" && devicetype.SelectedItem.ToString().Equals("Standard")))
+                chapterFile.Enabled = false;
+            else
+                chapterFile.Enabled = true;
         }
 
         private void updateWorkingName(String strInputFile)
@@ -772,7 +782,6 @@ namespace MeGUI
             }
             dpp.WorkingDirectory = strWorkingDirectory;
             dpp.FilesToDelete.Add(dpp.WorkingDirectory);
-            dpp.ChapterFile = chapterFile.Filename;
             dpp.AutoCrop = autoCrop.Checked;
 
             bool muxVideo = chkDontEncodeVideo.Checked;
@@ -834,17 +843,6 @@ namespace MeGUI
                 dpp.FilesToDelete.Add(dpp.VideoInput);
                 dpp.FilesToDelete.Add(dpp.VideoInput + ".gaps");
                 dpp.FilesToDelete.Add(Path.Combine(dpp.WorkingDirectory, Path.GetFileNameWithoutExtension(dpp.VideoInput) + " - Log.txt"));
-                
-                if (dpp.ChapterFile.Equals("<internal chapters>"))
-                {
-                    int iTrackNumber = _videoInputInfo.getEac3toChaptersTrack();
-                    if (iTrackNumber > -1)
-                    {
-                        dpp.ChapterFile = Path.Combine(dpp.WorkingDirectory, Path.GetFileNameWithoutExtension(dpp.VideoInput) + " - chapter.txt");
-                        sb.Append(string.Format("{0}:\"{1}\" ", iTrackNumber, dpp.ChapterFile)); 
-                        dpp.FilesToDelete.Add(dpp.ChapterFile);
-                    }
-                }
 
                 foreach (OneClickStreamControl oStreamControl in audioTracks)
                 {
@@ -976,6 +974,40 @@ namespace MeGUI
                         else
                             _oLog.LogEvent("Input file cannot not be muxed into an intermediate MKV as this is not supported. Therefore some OneClick features will be disabled.");
                     }
+                }
+            }
+
+            // chapter handling
+            if (!String.IsNullOrEmpty(chapterFile.Filename))
+            {
+                if (dpp.Container == ContainerType.AVI || (dpp.Container == ContainerType.M2TS && dpp.DeviceOutputType.Equals("Standard")))
+                {
+                    _oLog.LogEvent("Chapter handling disabled because of the selected target container");
+                    dpp.ChapterInfo = new ChapterInfo();
+                }
+                else if (!chapterFile.Filename.StartsWith("<"))
+                {
+                    // external file selected
+                    if (!dpp.ChapterInfo.LoadFile(chapterFile.Filename))
+                        _oLog.LogEvent("Chapter file cannot be imported: " + chapterFile.Filename, ImageType.Warning);
+                    else if (dpp.ChapterInfo.FramesPerSecond == 0)
+                    {
+                        dpp.ChapterInfo.FramesPerSecond = _videoInputInfo.VideoInfo.FPS;
+                    }
+                }
+                else
+                {
+                    // internal chapter processing
+                    if (File.Exists(dpp.IFOInput))
+                    {
+                        ChapterInfo pgc;
+                        IfoExtractor ex = new IfoExtractor();
+                        pgc = ex.GetChapterInfo(dpp.IFOInput, dpp.TitleNumberToProcess);
+                        if (pgc != null)
+                            dpp.ChapterInfo = pgc;
+                    }
+                    else
+                        dpp.ChapterInfo = _videoInputInfo.ChapterInfo;
                 }
             }
 
@@ -1350,39 +1382,67 @@ namespace MeGUI
         {
             if (oVideoInputInfo == null || !File.Exists(oVideoInputInfo.FileName))
             {
-                MessageBox.Show("Please select a valid input file!", "Incomplete configuration", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                if (bAutomatedProcessing)
+                    _oLog.LogEvent("invalid input file: " + oVideoInputInfo);
+                else
+                    MessageBox.Show("Please select a valid input file!", "Incomplete configuration", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 return false;
             }
 
             if (String.IsNullOrEmpty(output.Filename))
             {
-                MessageBox.Show("Please select a valid output file!", "Incomplete configuration", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                if (bAutomatedProcessing)
+                    _oLog.LogEvent("invalid output file: " + output.Filename);
+                else
+                    MessageBox.Show("Please select a valid output file!", "Incomplete configuration", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 return false;
             }
 
             if (!FileUtil.IsDirWriteable(Path.GetDirectoryName(output.Filename)))
             {
-                MessageBox.Show("MeGUI cannot write on the disc: " + Path.GetDirectoryName(output.Filename) + " \n" +
+                if (bAutomatedProcessing)
+                    _oLog.LogEvent("cannot write to the folder: " + Path.GetDirectoryName(output.Filename));
+                else
+                    MessageBox.Show("MeGUI cannot write to the folder: " + Path.GetDirectoryName(output.Filename) + " \n" +
                                  "Please select a writeable output path to save your project!", "Incomplete configuration", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 return false;
             }
 
             if (String.IsNullOrEmpty(strWorkingDirectory))
             {
-                MessageBox.Show("Please select a valid working directory!", "Incomplete configuration", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                if (bAutomatedProcessing)
+                    _oLog.LogEvent("invalid working directory: " + strWorkingDirectory);
+                else
+                    MessageBox.Show("Please select a valid working directory!", "Incomplete configuration", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 return false;
             }
 
             if (!FileUtil.IsDirWriteable(strWorkingDirectory))
             {
-                MessageBox.Show("MeGUI cannot write on the disc: " + strWorkingDirectory + " \n" +
+                if (bAutomatedProcessing)
+                    _oLog.LogEvent("cannot write to the folder: " + strWorkingDirectory);
+                else
+                    MessageBox.Show("MeGUI cannot write to the folder: " + strWorkingDirectory + " \n" +
                                  "Please select a writeable working path to save your project!", "Incomplete configuration", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 return false;
             }
 
             if ((verifyStreamSettings() != null) || (VideoSettings == null) || string.IsNullOrEmpty(workingName.Text))
             {
-                MessageBox.Show("MeGUI cannot process this job", "Wrong configuration", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                if (bAutomatedProcessing)
+                    _oLog.LogEvent("cannot process this job");
+                else
+                    MessageBox.Show("MeGUI cannot process this job", "Wrong configuration", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                return false;
+            }
+
+            ChapterInfo oChapterInfo = new ChapterInfo();
+            if (!String.IsNullOrEmpty(chapterFile.Filename) && !chapterFile.Filename.StartsWith("<") && !oChapterInfo.LoadFile(chapterFile.Filename))
+            {
+                if (bAutomatedProcessing)
+                    _oLog.LogEvent("cannot process chapter file");
+                else
+                    MessageBox.Show("The chapter file cannot be read or is unsupported", "Wrong configuration", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 return false;
             }
 
@@ -1407,7 +1467,7 @@ namespace MeGUI
                         audioTracks[i].SelectedStream.ForcedStream == audioTracks[j].SelectedStream.ForcedStream)
                     {
                         DialogResult dr = MessageBox.Show("The audio tracks " + (i + 1) + " and " + (j + 1) + " are identical. Are you sure you want to proceed?", "Duplicate audio tracks found", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                        if (dr == System.Windows.Forms.DialogResult.No)
+                        if (dr == DialogResult.No)
                             return false;
                     }  
                 }
@@ -1434,11 +1494,13 @@ namespace MeGUI
                         subtitleTracks[i].SelectedStream.ForcedStream == subtitleTracks[j].SelectedStream.ForcedStream)
                     {
                         DialogResult dr = MessageBox.Show("The subtitle tracks " + (i + 1) + " and " + (j + 1) + " are identical. Are you sure you want to proceed?", "Duplicate subtitle tracks found", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                        if (dr == System.Windows.Forms.DialogResult.No)
+                        if (dr == DialogResult.No)
                             return false;
                     }
                 }
             }
+
+
 
             return true;
         }

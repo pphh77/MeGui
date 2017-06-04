@@ -233,18 +233,12 @@ namespace MeGUI
                 AudioEncoderType[] audioCodecs;
                 MuxStream[] audioStreams, subtitleStreams;
                 getTypes(out audioCodecs, out audioTypes, out subtitleTypes);
-                string chapters;
-                getAdditionalStreams(out audioStreams, out subtitleStreams, out chapters);
+                ChapterInfo chapterInfo;
+                getAdditionalStreams(out audioStreams, out subtitleStreams, out chapterInfo);
 
                 FileSize? splitSize = splitting.Value;
 
-                MuxableType chapterInputType = null;
-                if (!String.IsNullOrEmpty(this.chapters.Filename))
-                {
-                    ChapterType type = VideoUtil.guessChapterType(this.chapters.Filename);
-                    if (type != null)
-                        chapterInputType = new MuxableType(type, null);
-                }
+                MuxableType chapterInputType = new MuxableType(ChapterType.OGG_TXT, null);
 
                 MuxableType deviceOutputType = null;
                 if (!String.IsNullOrEmpty(this.cbType.Text))
@@ -255,7 +249,7 @@ namespace MeGUI
                 }
 
                 return JobUtil.GenerateMuxJobs(myVideo, fps.Value, audioStreams, audioTypes, subtitleStreams,
-                    subtitleTypes, this.chapters.Filename, chapterInputType, (cbContainer.SelectedItem as ContainerType), 
+                    subtitleTypes, chapterInfo, chapterInputType, (cbContainer.SelectedItem as ContainerType), 
                     output.Filename, splitSize, new List<string>(), this.cbType.Text, deviceOutputType, false);
             }
         }
@@ -292,7 +286,7 @@ namespace MeGUI
             checkIO();
         }
 
-        public void getAdditionalStreams(out MuxStream[] audio, out MuxStream[] subtitles, out string chapters, out string output, out ContainerType cot)
+        public void getAdditionalStreams(out MuxStream[] audio, out MuxStream[] subtitles, out ChapterInfo chapters, out string output, out ContainerType cot)
         {
             cot = (cbContainer.SelectedItem as ContainerType);
             output = this.output.Filename;

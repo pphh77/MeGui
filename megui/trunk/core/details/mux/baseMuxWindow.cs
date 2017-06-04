@@ -60,6 +60,7 @@ namespace MeGUI
             subtitleTracks[0].input.FileSelected += new MeGUI.FileBarEventHandler(this.Subtitle_FileSelected);
             audioTracks[0].input.FileSelected += new MeGUI.FileBarEventHandler(this.Audio_FileSelected);
         }
+
         public baseMuxWindow(MainForm mainForm, IMuxing muxer) : this()
         {
             this.mainForm = mainForm;
@@ -77,13 +78,17 @@ namespace MeGUI
         /// sets the configuration of the GUI
         /// used when a job is loaded (jobs have everything already filled out)
         /// </summary>
-        /// <param name="videoInput">the video input (raw or mp4)</param>
+        /// <param name="videoInput">the video input file</param>
+        /// <param name="videoName">the name of the video track</param>
         /// <param name="framerate">framerate of the input</param>
-        /// <param name="audioStreams">the audiostreams</param>
+        /// <param name="audioStreams">the audio streams</param>
         /// <param name="subtitleStreams">the subtitle streams</param>
-        /// <param name="output">name of the output</param>
+        /// <param name="chapterInfo">the chapterinfo information</param>
+        /// <param name="output">name of the output file</param>
         /// <param name="splitSize">split size of the output</param>
-        public void setConfig(string videoInput, string videoName, decimal? framerate, MuxStream[] audioStreams, MuxStream[] subtitleStreams, string chapterFile, string output, FileSize? splitSize, Dar? dar, string deviceType)
+        /// <param name="dar">the DAR of the file</param>
+        /// <param name="deviceType">the device type (e.g. for AVI, M2TS, MP4)</param>
+        public void setConfig(string videoInput, string videoName, decimal? framerate, MuxStream[] audioStreams, MuxStream[] subtitleStreams, ChapterInfo chapterInfo, string output, FileSize? splitSize, Dar? dar, string deviceType)
         {
             this.dar = dar;
             vInput.Filename = videoInput;
@@ -108,7 +113,7 @@ namespace MeGUI
                 index++;
             }
 
-            chapters.Filename = chapterFile;
+            chapters.Filename = chapterInfo.SourceName;
             this.output.Filename = output;
             this.splitting.Value = splitSize;
             this.muxButton.Text = "Update";
@@ -123,12 +128,26 @@ namespace MeGUI
         /// </summary>
         /// <param name="aStreams">the configured audio streams(language assignments)</param>
         /// <param name="sStreams">the newly added subtitle streams</param>
-        /// <param name="chapterFile">the assigned chapter file</param>
-        public void getAdditionalStreams(out MuxStream[] aStreams, out MuxStream[] sStreams, out string chapterFile)
+        /// <param name="chapterInfo">the ChapterInfo</param>
+        public void getAdditionalStreams(out MuxStream[] aStreams, out MuxStream[] sStreams, out ChapterInfo chapterInfo)
         {
             aStreams = getStreams(audioTracks);
             sStreams = getStreams(subtitleTracks);
-            chapterFile = chapters.Filename;
+            chapterInfo = new ChapterInfo();
+            if (chapters.Filename.StartsWith("<"))
+            {
+                MediaInfoFile oInfo = new MediaInfoFile(vInput.Filename);
+                chapterInfo = oInfo.ChapterInfo;
+            }
+            else
+            {
+                chapterInfo.LoadFile(chapters.Filename);
+                if (chapterInfo.FramesPerSecond == 0)
+                {
+                    MediaInfoFile oInfo = new MediaInfoFile(vInput.Filename);
+                    chapterInfo.FramesPerSecond = oInfo.VideoInfo.FPS;
+                }
+            }
         }
 
         private MuxStream[] getStreams(List<MuxStreamControl> controls)
@@ -222,14 +241,14 @@ namespace MeGUI
         #region button event handlers
         private void vInput_FileSelected(FileBar sender, FileBarEventArgs args)
         {
-            try
-            {
-                fps.Value = (decimal)new MediaInfoFile(vInput.Filename).VideoInfo.FPS;
-            }
-            catch (Exception) { fps.Value = null; }
+            MediaInfoFile oInfo = new MediaInfoFile(vInput.Filename);
+            fps.Value = (decimal)oInfo.VideoInfo.FPS;
 
             if (string.IsNullOrEmpty(output.Filename))
                 chooseOutputFilename();
+
+            if (String.IsNullOrEmpty(chapters.Filename) && oInfo.HasChapters)
+                chapters.Filename = "<internal chapters>";
 
             fileUpdated();
             checkIO();
@@ -247,6 +266,15 @@ namespace MeGUI
 
         private void chapters_FileSelected(FileBar sender, FileBarEventArgs args)
         {
+            if (!File.Exists(chapters.Filename))
+            {
+                fileUpdated();
+                return;
+            }
+
+            ChapterInfo oChapter = new ChapterInfo();
+            if (!oChapter.LoadFile(chapters.Filename))
+                MessageBox.Show("The selected file is not a valid chapter file", "Invalid Chapter File", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             fileUpdated();
         }
         #endregion
@@ -365,6 +393,7 @@ namespace MeGUI
         private void cbContainer_SelectedIndexChanged(object sender, EventArgs e)
         {
             upDeviceTypes();
+            UpdateChapterBox();
         }
 
         private void output_Click(object sender, EventArgs e)
@@ -380,15 +409,23 @@ namespace MeGUI
             fps.Value = null;
         }
 
+        private void UpdateChapterBox()
+        {
+            if (muxer != null 
+                && (muxer.MuxerType == MuxerType.AVIMUXGUI 
+                || (muxer.MuxerType == MuxerType.TSMUXER && cbType.SelectedItem.ToString() == "Standard")))
+                chaptersGroupbox.Enabled = false;
+            else if (cbContainer.SelectedItem != null 
+                && (cbContainer.SelectedItem.ToString().Equals("AVI") 
+                || (cbContainer.SelectedItem.ToString().Equals("M2TS") && cbType.SelectedItem.ToString() == "Standard")))
+                chaptersGroupbox.Enabled = false;
+            else
+                chaptersGroupbox.Enabled = true;
+        }
+
         private void cbType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (muxer == null || muxer.MuxerType != MuxerType.TSMUXER)
-                return;
-
-            if (!string.IsNullOrEmpty(cbType.SelectedItem.ToString()) && cbType.SelectedItem.ToString() != "Standard")
-                chaptersGroupbox.Enabled = true;
-            else
-                chaptersGroupbox.Enabled = false;
+            UpdateChapterBox();
         }
     }
 }
