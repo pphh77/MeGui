@@ -72,14 +72,6 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.FeatureBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.StreamGroupBox = new System.Windows.Forms.GroupBox();
             this.StreamDataGridView = new MeGUI.packages.tools.hdbdextractor.CustomDataGridView();
-            this.StreamNumberTextBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.StreamExtractCheckBox = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.StreamTypeTextBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.StreamDescriptionTextBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.StreamExtractAsComboBox = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.StreamAddOptionsTextBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.languageDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.nameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.StreamsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.OutputGroupBox = new System.Windows.Forms.GroupBox();
             this.FolderOutputSourceButton = new System.Windows.Forms.Button();
@@ -93,6 +85,14 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
+            this.StreamNumberTextBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.StreamExtractCheckBox = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.StreamTypeTextBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.StreamDescriptionTextBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.StreamExtractAsComboBox = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.StreamAddOptionsTextBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.languageDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.nameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.StatusStrip.SuspendLayout();
             this.InputGroupBox.SuspendLayout();
             this.FeatureGroupBox.SuspendLayout();
@@ -377,81 +377,6 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.StreamDataGridView.TabIndex = 7;
             this.StreamDataGridView.DataSourceChanged += new System.EventHandler(this.StreamDataGridView_DataSourceChanged);
             // 
-            // StreamNumberTextBox
-            // 
-            this.StreamNumberTextBox.DataPropertyName = "Number";
-            this.StreamNumberTextBox.HeaderText = "#";
-            this.StreamNumberTextBox.MinimumWidth = 20;
-            this.StreamNumberTextBox.Name = "StreamNumberTextBox";
-            this.StreamNumberTextBox.ReadOnly = true;
-            this.StreamNumberTextBox.ToolTipText = "Stream number";
-            this.StreamNumberTextBox.Width = 20;
-            // 
-            // StreamExtractCheckBox
-            // 
-            this.StreamExtractCheckBox.FalseValue = "0";
-            this.StreamExtractCheckBox.HeaderText = "Extract?";
-            this.StreamExtractCheckBox.IndeterminateValue = "-1";
-            this.StreamExtractCheckBox.MinimumWidth = 49;
-            this.StreamExtractCheckBox.Name = "StreamExtractCheckBox";
-            this.StreamExtractCheckBox.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.StreamExtractCheckBox.ToolTipText = "Extract stream?";
-            this.StreamExtractCheckBox.TrueValue = "1";
-            this.StreamExtractCheckBox.Width = 49;
-            // 
-            // StreamTypeTextBox
-            // 
-            this.StreamTypeTextBox.DataPropertyName = "Type";
-            this.StreamTypeTextBox.HeaderText = "Type";
-            this.StreamTypeTextBox.MinimumWidth = 47;
-            this.StreamTypeTextBox.Name = "StreamTypeTextBox";
-            this.StreamTypeTextBox.ReadOnly = true;
-            this.StreamTypeTextBox.ToolTipText = "Stream type";
-            this.StreamTypeTextBox.Width = 47;
-            // 
-            // StreamDescriptionTextBox
-            // 
-            this.StreamDescriptionTextBox.DataPropertyName = "Description";
-            this.StreamDescriptionTextBox.HeaderText = "Description";
-            this.StreamDescriptionTextBox.MinimumWidth = 260;
-            this.StreamDescriptionTextBox.Name = "StreamDescriptionTextBox";
-            this.StreamDescriptionTextBox.ReadOnly = true;
-            this.StreamDescriptionTextBox.ToolTipText = "Stream description";
-            this.StreamDescriptionTextBox.Width = 260;
-            // 
-            // StreamExtractAsComboBox
-            // 
-            this.StreamExtractAsComboBox.HeaderText = "Extract As";
-            this.StreamExtractAsComboBox.MinimumWidth = 69;
-            this.StreamExtractAsComboBox.Name = "StreamExtractAsComboBox";
-            this.StreamExtractAsComboBox.ToolTipText = "Stream extract type";
-            this.StreamExtractAsComboBox.Width = 69;
-            // 
-            // StreamAddOptionsTextBox
-            // 
-            this.StreamAddOptionsTextBox.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.StreamAddOptionsTextBox.HeaderText = "+ Options";
-            this.StreamAddOptionsTextBox.MinimumWidth = 83;
-            this.StreamAddOptionsTextBox.Name = "StreamAddOptionsTextBox";
-            this.StreamAddOptionsTextBox.ToolTipText = "Stream extract additional options";
-            // 
-            // languageDataGridViewTextBoxColumn
-            // 
-            this.languageDataGridViewTextBoxColumn.DataPropertyName = "Language";
-            this.languageDataGridViewTextBoxColumn.HeaderText = "Language";
-            this.languageDataGridViewTextBoxColumn.MinimumWidth = 80;
-            this.languageDataGridViewTextBoxColumn.Name = "languageDataGridViewTextBoxColumn";
-            this.languageDataGridViewTextBoxColumn.ToolTipText = "Stream language";
-            this.languageDataGridViewTextBoxColumn.Width = 80;
-            // 
-            // nameDataGridViewTextBoxColumn
-            // 
-            this.nameDataGridViewTextBoxColumn.DataPropertyName = "Name";
-            this.nameDataGridViewTextBoxColumn.HeaderText = "Name";
-            this.nameDataGridViewTextBoxColumn.MinimumWidth = 100;
-            this.nameDataGridViewTextBoxColumn.Name = "nameDataGridViewTextBoxColumn";
-            this.nameDataGridViewTextBoxColumn.ToolTipText = "Stream name";
-            // 
             // StreamsBindingSource
             // 
             this.StreamsBindingSource.DataSource = typeof(eac3to.Stream);
@@ -565,6 +490,81 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.toolStripMenuItem5.Text = "Extract As: show all demux options";
             this.toolStripMenuItem5.Click += new System.EventHandler(this.toolStripMenuItem5_Click);
             // 
+            // StreamNumberTextBox
+            // 
+            this.StreamNumberTextBox.DataPropertyName = "Number";
+            this.StreamNumberTextBox.HeaderText = "#";
+            this.StreamNumberTextBox.MinimumWidth = 20;
+            this.StreamNumberTextBox.Name = "StreamNumberTextBox";
+            this.StreamNumberTextBox.ReadOnly = true;
+            this.StreamNumberTextBox.ToolTipText = "Stream number";
+            this.StreamNumberTextBox.Width = 20;
+            // 
+            // StreamExtractCheckBox
+            // 
+            this.StreamExtractCheckBox.FalseValue = "0";
+            this.StreamExtractCheckBox.HeaderText = "Extract?";
+            this.StreamExtractCheckBox.IndeterminateValue = "-1";
+            this.StreamExtractCheckBox.MinimumWidth = 49;
+            this.StreamExtractCheckBox.Name = "StreamExtractCheckBox";
+            this.StreamExtractCheckBox.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.StreamExtractCheckBox.ToolTipText = "Extract stream?";
+            this.StreamExtractCheckBox.TrueValue = "1";
+            this.StreamExtractCheckBox.Width = 49;
+            // 
+            // StreamTypeTextBox
+            // 
+            this.StreamTypeTextBox.DataPropertyName = "Type";
+            this.StreamTypeTextBox.HeaderText = "Type";
+            this.StreamTypeTextBox.MinimumWidth = 47;
+            this.StreamTypeTextBox.Name = "StreamTypeTextBox";
+            this.StreamTypeTextBox.ReadOnly = true;
+            this.StreamTypeTextBox.ToolTipText = "Stream type";
+            this.StreamTypeTextBox.Width = 47;
+            // 
+            // StreamDescriptionTextBox
+            // 
+            this.StreamDescriptionTextBox.DataPropertyName = "Description";
+            this.StreamDescriptionTextBox.HeaderText = "Description";
+            this.StreamDescriptionTextBox.MinimumWidth = 260;
+            this.StreamDescriptionTextBox.Name = "StreamDescriptionTextBox";
+            this.StreamDescriptionTextBox.ReadOnly = true;
+            this.StreamDescriptionTextBox.ToolTipText = "Stream description";
+            this.StreamDescriptionTextBox.Width = 260;
+            // 
+            // StreamExtractAsComboBox
+            // 
+            this.StreamExtractAsComboBox.HeaderText = "Extract As";
+            this.StreamExtractAsComboBox.MinimumWidth = 80;
+            this.StreamExtractAsComboBox.Name = "StreamExtractAsComboBox";
+            this.StreamExtractAsComboBox.ToolTipText = "Stream extract type";
+            this.StreamExtractAsComboBox.Width = 80;
+            // 
+            // StreamAddOptionsTextBox
+            // 
+            this.StreamAddOptionsTextBox.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.StreamAddOptionsTextBox.HeaderText = "+ Options";
+            this.StreamAddOptionsTextBox.MinimumWidth = 83;
+            this.StreamAddOptionsTextBox.Name = "StreamAddOptionsTextBox";
+            this.StreamAddOptionsTextBox.ToolTipText = "Stream extract additional options";
+            // 
+            // languageDataGridViewTextBoxColumn
+            // 
+            this.languageDataGridViewTextBoxColumn.DataPropertyName = "Language";
+            this.languageDataGridViewTextBoxColumn.HeaderText = "Language";
+            this.languageDataGridViewTextBoxColumn.MinimumWidth = 80;
+            this.languageDataGridViewTextBoxColumn.Name = "languageDataGridViewTextBoxColumn";
+            this.languageDataGridViewTextBoxColumn.ToolTipText = "Stream language";
+            this.languageDataGridViewTextBoxColumn.Width = 80;
+            // 
+            // nameDataGridViewTextBoxColumn
+            // 
+            this.nameDataGridViewTextBoxColumn.DataPropertyName = "Name";
+            this.nameDataGridViewTextBoxColumn.HeaderText = "Name";
+            this.nameDataGridViewTextBoxColumn.MinimumWidth = 100;
+            this.nameDataGridViewTextBoxColumn.Name = "nameDataGridViewTextBoxColumn";
+            this.nameDataGridViewTextBoxColumn.ToolTipText = "Stream name";
+            // 
             // HdBdStreamExtractor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -642,6 +642,12 @@ namespace MeGUI.packages.tools.hdbdextractor
         private System.Windows.Forms.DataGridViewTextBoxColumn FeatureDescriptionDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewComboBoxColumn FeatureFileDataGridViewComboBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn FeatureDurationDataGridViewTextBoxColumn;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem4;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
         private System.Windows.Forms.DataGridViewTextBoxColumn StreamNumberTextBox;
         private System.Windows.Forms.DataGridViewCheckBoxColumn StreamExtractCheckBox;
         private System.Windows.Forms.DataGridViewTextBoxColumn StreamTypeTextBox;
@@ -650,11 +656,5 @@ namespace MeGUI.packages.tools.hdbdextractor
         private System.Windows.Forms.DataGridViewTextBoxColumn StreamAddOptionsTextBox;
         private System.Windows.Forms.DataGridViewTextBoxColumn languageDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn nameDataGridViewTextBoxColumn;
-        private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem4;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
     }
 }

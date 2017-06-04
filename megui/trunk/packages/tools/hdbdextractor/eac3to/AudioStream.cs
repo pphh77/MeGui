@@ -33,6 +33,7 @@ namespace eac3to
         public AudioStreamType AudioType { get; set; }
         public override string Language { get; set; }
         public string TypeCore;
+        public bool ParsingFailed;
 
         public override object[] ExtractTypes
         {
@@ -59,9 +60,9 @@ namespace eac3to
                             arrType.AddRange(new string[] { "WAV", "WAVS", "RAW", "RF64" });
                         break;
                     case AudioStreamType.DTS:
-                        if (!String.IsNullOrEmpty(TypeCore))
+                        if (!String.IsNullOrEmpty(TypeCore) || ParsingFailed)
                         {
-                            if (bDefaultToHD)
+                            if (bDefaultToHD && !ParsingFailed)
                                 arrType.AddRange(new string[] { "DTS", "DTS_CORE" });
                             else
                                 arrType.AddRange(new string[] { "DTS_CORE", "DTS" });
@@ -78,9 +79,9 @@ namespace eac3to
                     case AudioStreamType.MP3:
                         arrType.Add("MP3"); break;
                     case AudioStreamType.TrueHD:
-                        if (!String.IsNullOrEmpty(TypeCore))
+                        if (!String.IsNullOrEmpty(TypeCore) || ParsingFailed)
                         {
-                            if (bDefaultToHD)
+                            if (bDefaultToHD && !ParsingFailed)
                                 arrType.AddRange(new string[] { "THD", "THD+AC3", "AC3" });
                             else
                                 arrType.AddRange(new string[] { "AC3", "THD", "THD+AC3" });
@@ -125,6 +126,7 @@ namespace eac3to
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
             TypeCore = string.Empty;
+            ParsingFailed = false;
         }
 
         new public static Stream Parse(string s, LogItem _log)
@@ -200,6 +202,10 @@ namespace eac3to
                     audioStream.AudioType = AudioStreamType.UNKNOWN;
                     break;
             }
+
+            if (s.ToLowerInvariant().EndsWith(", unknown parameters"))
+                audioStream.ParsingFailed = true;
+
             return audioStream;
         }
 
