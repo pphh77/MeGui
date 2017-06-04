@@ -1,10 +1,11 @@
+2750 [Worker]               fixed rare invisible progress window (regression of 2743)
 2749 [Update]               fixed a rare crash when a restart is required and MeGUI is already closed
 2748 [HD Streams Extractor] added detection of "core/embedded" tracks
                             removed the DTSHD "extract as" option
                             added the DTS_CORE "extract as" option
                             added settings menu:
                             - added option to select by default the (non-)HD tracks (defaults to non-HD)
-                            - moved the language track selection option from the settings into the new menu
+                            - moved the language track selection option from the global settings into the new menu
                             - added settings to inlcude the encoding and/or all demuxer "extract as" options
                               AAC encoding is only available if neroaacenc.exe is found in the eac3to directory
 2747 [Worker]               improved handling of multiple worker instances. part II

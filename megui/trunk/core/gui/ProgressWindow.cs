@@ -42,7 +42,7 @@ namespace MeGUI
     {
         private bool isUserClosing;
 
-        #region start / stop
+        #region start / stop & show / hide
         /// <summary>
 		/// default constructor, initializes the GUI components
 		/// </summary>
@@ -72,6 +72,12 @@ namespace MeGUI
                 base.OnClosing(e);
             }
         }
+
+        public void SetVisible(bool bShow)
+        {
+            this.Visible = bShow;
+        }
+
         #endregion
 
         #region statusupdate processing

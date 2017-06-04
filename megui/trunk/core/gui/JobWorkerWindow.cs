@@ -89,13 +89,13 @@ namespace MeGUI.core.gui
         public void HideProcessWindow()
         {
             if (pw != null)
-                Util.ThreadSafeRun(pw, delegate { pw.Hide(); });
+                MainForm.Instance.Jobs.ShowProgressWindow(pw, false);
         }
 
         public void ShowProcessWindow()
         {
             if (pw != null)
-                Util.ThreadSafeRun(pw, delegate { pw.Show(); });
+                MainForm.Instance.Jobs.ShowProgressWindow(pw, true);
         }
         /// <summary>
         /// callback for the progress window

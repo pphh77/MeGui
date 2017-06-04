@@ -53,6 +53,18 @@ namespace MeGUI.core.details
                 w.HideProcessWindow();
         }
 
+        /// <summary>
+        /// Changes the visibility of the ProgressWindow
+        /// Invoke needed to ensure that it is threadsafe
+        /// Therefore it will run in the JobControl thread
+        /// </summary>
+        /// <param name="oProgress">the ProgressWindow to change </param>
+        /// <param name="bShow">true if to be shown, false if not</param>
+        public void ShowProgressWindow(ProgressWindow oProgress, bool bShow)
+        {
+            this.Invoke((System.Action)delegate { oProgress.Visible = bShow; });
+        }
+
         public void AbortAll()
         {
             foreach (JobWorker worker in workers.Values)
@@ -755,13 +767,13 @@ namespace MeGUI.core.details
         internal void HideAllWorkers()
         {
             foreach (JobWorker w in workers.Values)
-                w.Hide();
+                Util.ThreadSafeRun(w, delegate { w.Hide(); });
         }
 
         internal void ShowAllWorkers()
         {
             foreach (JobWorker w in workers.Values)
-                w.Show();
+                Util.ThreadSafeRun(w, delegate { w.Show(); });
         }
 
         internal void RequestNewWorker()
@@ -822,9 +834,9 @@ namespace MeGUI.core.details
         internal void SetWorkerVisible(string p, bool p_2)
         {
             if (p_2)
-                workers[p].Show();
+                Util.ThreadSafeRun(workers[p], delegate { workers[p].Show(); });
             else
-                workers[p].Hide();
+                Util.ThreadSafeRun(workers[p], delegate { workers[p].Hide(); });
         }
 
         private void newWorkerButton_Click(object sender, EventArgs e)
