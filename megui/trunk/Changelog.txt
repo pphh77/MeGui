@@ -1,3 +1,5 @@
+2755 [AutoEncode]           fixed a crash if trying to add additional content (regression of 2753)
+                            improved logging
 2754 [MKV Info]             switched to the JSON format as the old switch is deprecated (requires mkvmerge 9.7+) 
 2753 [Chapter]              improved chapter handling
                             all MediaInfo supported files and TXT/XML files can be used as chapter files

@@ -39,7 +39,6 @@ namespace MeGUI
         private List<AudioJob> audioStreams;
         private bool prerender;
         private VideoInfo vInfo;
-        private LogItem log = new LogItem("AutoEncode job generation log", ImageType.Information);
 		private bool isBitrateMode = true;
         #endregion
 
@@ -51,13 +50,15 @@ namespace MeGUI
         public AutoEncodeWindow(VideoStream videoStream, List<AudioJob> audioStreams, bool prerender, VideoInfo vInfo) : this()
         {
             this.vInfo = vInfo;
-            MainForm.Instance.Log.Add(log);
             this.videoStream = videoStream;
             this.audioStreams = audioStreams;
             this.prerender = prerender;
             muxProvider = MainForm.Instance.MuxProvider;
             container.Items.AddRange(muxProvider.GetSupportedContainers().ToArray());
             splitting.MinimumFileSize = new FileSize(Unit.MB, 1);
+
+            if (MainForm.Instance.AutoEncodeLog == null)
+                MainForm.Instance.AutoEncodeLog = MainForm.Instance.Log.Info("AutoEncode");
         }
         /// <summary>
         /// does the final initialization of the dialog
@@ -309,13 +310,17 @@ namespace MeGUI
 
             FileSize? desiredSize = targetSize.Value;
             FileSize? splitSize = splitting.Value;
+            LogItem log = new LogItem(this.muxedOutput.Filename);
+            MainForm.Instance.AutoEncodeLog.Add(log);
 
             if (FileSizeRadio.Checked)
-                log.LogValue("Desired Size ", desiredSize);
+                log.LogValue("Desired Size", desiredSize);
             else if (averageBitrateRadio.Checked)
-                log.LogValue("Projected Bitrate ", string.Format("{0}kbps", projectedBitrateKBits.Text));
+                log.LogValue("Projected Bitrate", string.Format("{0}kbps", projectedBitrateKBits.Text));
+            else
+                log.LogEvent("No Target Size (use profile settings)");
 
-            log.LogValue("Split Size ", splitSize);
+            log.LogValue("Split Size", splitSize);
 
             MuxStream[] audio;
             AudioJob[] aStreams;

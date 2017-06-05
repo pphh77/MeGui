@@ -87,6 +87,9 @@ namespace MeGUI
 
         public bool LoadFile(string strFileName)
         {
+            if (!File.Exists(strFileName))
+                return false;
+
             if (LoadText(strFileName))
                 return true;
 

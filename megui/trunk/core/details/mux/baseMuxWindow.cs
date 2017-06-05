@@ -139,7 +139,7 @@ namespace MeGUI
                 MediaInfoFile oInfo = new MediaInfoFile(vInput.Filename);
                 chapterInfo = oInfo.ChapterInfo;
             }
-            else
+            else if (File.Exists(chapters.Filename))
             {
                 chapterInfo.LoadFile(chapters.Filename);
                 if (chapterInfo.FramesPerSecond == 0)

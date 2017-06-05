@@ -265,7 +265,7 @@ namespace MeGUI
         public void setMinimizedMode(string videoInput, string videoName, VideoEncoderType videoType, double framerate, MuxStream[] audioStreams, AudioEncoderType[] audioTypes, string output,
             FileSize? splitSize, ContainerType cft)
         {
-            base.setConfig(videoInput, videoName, (decimal)framerate, audioStreams, new MuxStream[0], null, output, splitSize, null, null);
+            base.setConfig(videoInput, videoName, (decimal)framerate, audioStreams, new MuxStream[0], new ChapterInfo(), output, splitSize, null, null);
 
             minimizedMode = true;
             knownVideoType = videoType;

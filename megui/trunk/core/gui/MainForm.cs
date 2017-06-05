@@ -72,12 +72,14 @@ namespace MeGUI
         public MuxProvider MuxProvider { get { return muxProvider; } }
 
         private LogItem _oneClickLog;
+        private LogItem _autoEncodeLog;
         private LogItem _aVSScriptCreatorLog;
         private LogItem _fileIndexerLog;
         private LogItem _eac3toLog;
         private LogItem _avisynthWrapperLog;
         private LogItem _mediaInfoWrapperLog;
         public LogItem OneClickLog { get { return _oneClickLog; } set { _oneClickLog = value; } }
+        public LogItem AutoEncodeLog { get { return _autoEncodeLog; } set { _autoEncodeLog = value; } }
         public LogItem AVSScriptCreatorLog { get { return _aVSScriptCreatorLog; } set { _aVSScriptCreatorLog = value; } }
         public LogItem FileIndexerLog { get { return _fileIndexerLog; } set { _fileIndexerLog = value; } }
         public LogItem Eac3toLog { get { return _eac3toLog; } set { _eac3toLog = value; } }
