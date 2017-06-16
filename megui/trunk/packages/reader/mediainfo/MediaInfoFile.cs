@@ -536,6 +536,17 @@ namespace MeGUI
                         _ChapterInfo.Chapters.Add(oChapter);
                     }
                 }
+                if (Path.GetExtension(file).ToLowerInvariant().Equals(".mpls"))
+                {
+                    // Blu-ray playlist chapters
+                    // MediaInfo sometimes does not extract all chapters (only 00:00:00 = 1 chapter)
+                    // therefore check if all chapters have been detected properly
+                    ChapterInfo pgc = new ChapterInfo();
+                    MplsExtractor ex = new MplsExtractor();
+                    pgc = ex.GetChapterInfo(file, _VideoInfo.FPS);
+                    if (pgc.HasChapters && _ChapterInfo.Chapters.Count != pgc.Chapters.Count)
+                        _ChapterInfo = pgc;
+                }
             }
             catch (Exception ex)
             {

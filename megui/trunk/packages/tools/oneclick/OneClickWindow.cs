@@ -1000,6 +1000,7 @@ namespace MeGUI
                     // internal chapter processing
                     if (File.Exists(dpp.IFOInput))
                     {
+                        // IFO/DVD chapters
                         ChapterInfo pgc;
                         IfoExtractor ex = new IfoExtractor();
                         pgc = ex.GetChapterInfo(dpp.IFOInput, dpp.TitleNumberToProcess);

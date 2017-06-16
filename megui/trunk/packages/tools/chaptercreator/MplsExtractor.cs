@@ -28,24 +28,33 @@ namespace MeGUI
 
         public override List<ChapterInfo> GetStreams(string location)
         {
+            ChapterInfo pgc = GetChapterInfo(location, 0);
+            if (!String.IsNullOrEmpty(pgc.SourceName))
+            {
+                OnStreamDetected(pgc);
+                OnChaptersLoaded(pgc);
+            }
+            OnExtractionComplete();
+            return new List<ChapterInfo>() { pgc };
+        }
+
+        public ChapterInfo GetChapterInfo(string strMplsFile, double iFPS)
+        {
             ChapterInfo pgc = new ChapterInfo();
-            List<Chapter> chapters = new List<Chapter>();
-            pgc.SourceName = location;
-            pgc.SourceType = "Blu-Ray";
-            pgc.Title = Path.GetFileNameWithoutExtension(location);
 
-            FileInfo fileInfo = new FileInfo(location);
-            byte[] data = File.ReadAllBytes(location);
-
+            byte[] data = File.ReadAllBytes(strMplsFile);
             string fileType = ASCIIEncoding.ASCII.GetString(data, 0, 8);
-
             if ((fileType != "MPLS0100" && fileType != "MPLS0200")
             /*|| data[45] != 1*/)
             {
                 // playlist has an unknown file type
-                OnExtractionComplete();
-                return new List<ChapterInfo>();
+                return pgc;
             }
+
+            List<Chapter> chapters = new List<Chapter>();
+            pgc.SourceName = strMplsFile;
+            pgc.SourceType = "Blu-Ray";
+            pgc.Title = Path.GetFileNameWithoutExtension(strMplsFile);
 
             List<Clip> chapterClips = GetClips(data);
             pgc.Duration = new TimeSpan((long)(chapterClips.Sum(c => c.Length) * (double)TimeSpan.TicksPerSecond));
@@ -95,13 +104,15 @@ namespace MeGUI
             }
             pgc.Chapters = chapters;
 
-            MediaInfoFile oInfo = new MediaInfoFile(pgc.SourceName);
-            pgc.FramesPerSecond = oInfo.VideoInfo.FPS;
+            if (iFPS == 0)
+            {
+                MediaInfoFile oInfo = new MediaInfoFile(pgc.SourceName);
+                pgc.FramesPerSecond = oInfo.VideoInfo.FPS;
+            }
+            else
+                pgc.FramesPerSecond = iFPS;
 
-            OnStreamDetected(pgc);
-            OnChaptersLoaded(pgc);
-            OnExtractionComplete();
-            return new List<ChapterInfo>() { pgc };
+            return pgc;
         }
 
         List<Clip> GetClips(byte[] data)
