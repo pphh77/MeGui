@@ -19,10 +19,8 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
 
 using MeGUI.core.util;
 
@@ -64,8 +62,7 @@ namespace MeGUI
                 if (!String.IsNullOrEmpty(job.Output))
                 {
                     FileUtil.ensureDirectoryExists(Path.GetDirectoryName(job.Output));
-                    if (File.Exists(job.Output))
-                        File.Delete(job.Output);
+                    FileUtil.DeleteFile(job.Input + ".lwi", base.log);
                 }
             }
             finally
@@ -77,57 +74,26 @@ namespace MeGUI
 
         public override void ProcessLine(string line, StreamType stream, ImageType oType)
         {
+            // make sure that this is only called once
             if (indexer)
                 return;
             indexer = true;
-            stdoutLog.LogEvent("Creating LSMASH index...");
 
-            string strErrorText;
+            // generate the avs script
             StringBuilder strAVSScript = new StringBuilder();
-            string outputIndex = job.Output;
+            MediaInfoFile oInfo = null;
+            strAVSScript.Append(VideoUtil.getLSMASHVideoInputLine(job.Input, job.Input + ".lwi", 0, ref oInfo));
+            oInfo.Dispose();
+            base.log.LogValue("AviSynth script", strAVSScript.ToString(), ImageType.Information);
 
-            bool b8bit = true;
-            if (File.Exists(job.Input))
-            {
-                using (MediaInfoFile oInfo = new MediaInfoFile(job.Input))
-                {
-                    if (oInfo.VideoInfo.HasVideo)
-                        if (oInfo.VideoInfo.BitDepth > 8)
-                            b8bit = false;
-                }
-            }
-
-            strAVSScript.Append(VideoUtil.getLSMASHVideoInputLine(job.Input, job.Output, 0, b8bit));
-            stdoutLog.LogValue("AviSynth script", strAVSScript.ToString(), ImageType.Information);
-            job.Output = job.Input + ".lwi";
-            if (File.Exists(job.Output))
-                File.Delete(job.Output);
+            // check if the script has a video track, also this call will create the index file if there is one
+            string strErrorText;
             if (!VideoUtil.AVSScriptHasVideo(strAVSScript.ToString(), out strErrorText))
             {
-                stderrLog.LogEvent(strErrorText, ImageType.Error);
+                // avs script has no video track or an error has been thrown
+                base.log.LogEvent(strErrorText, ImageType.Error);
                 su.HasError = true;
             }
-            else if (!VideoUtil.UseLSMASHVideoSource(job.Input))
-            {
-                string inputIndex = job.Output;
-                if (!String.IsNullOrEmpty(outputIndex) && !outputIndex.ToLowerInvariant().Equals(inputIndex.ToLowerInvariant()))
-                {
-                    try
-                    {
-                        su.Status = "Copying LSMASH index...";
-                        File.Delete(outputIndex);
-                        File.Copy(inputIndex, outputIndex);
-                        File.Delete(inputIndex);
-                        stdoutLog.LogEvent(inputIndex + " moved to " + outputIndex);
-                    }
-                    catch (Exception e)
-                    {
-                        stderrLog.LogEvent(inputIndex + " not moved to " + outputIndex + ". error: " + e.Message, ImageType.Error);
-                        su.HasError = true;
-                    }
-                }
-            }
-            job.Output = outputIndex;
 
             if (proc == null || proc.HasExited)
                 return;
@@ -155,13 +121,52 @@ namespace MeGUI
 
         protected override void doExitConfig()
         {
-            if (su.HasError || su.WasAborted || job.DemuxMode == 0 || job.AudioTracks.Count == 0)
+            // no further action if job failed or was aborted
+            if (su.HasError || su.WasAborted)
             {
+                job.FilesToDelete.Add(job.Input + ".lwi");
                 base.doExitConfig();
                 return;
             }
 
             bool bFound = File.Exists(job.Input + ".lwi");
+            if (bFound)
+            {
+                // LWLibavVideoSource() and therefore an index file is used
+                string inputIndex = job.Input + ".lwi";
+                string outputIndex = job.Output;
+
+                if (!String.IsNullOrEmpty(outputIndex) && !outputIndex.ToLowerInvariant().Equals(inputIndex.ToLowerInvariant()))
+                {
+                    // index in a location different from the standard one should be used
+                    su.Status = "Copying LSMASH index...";
+                    try
+                    {
+                        // try to delete the destination file
+                        if (FileUtil.DeleteFile(outputIndex, stderrLog))
+                        {
+                            // destination file is deleted / not available ==> copy source to destination
+                            File.Copy(inputIndex, outputIndex, true);
+                            base.log.LogEvent(inputIndex + " moved to " + outputIndex);
+                            job.FilesToDelete.Add(inputIndex);
+                        }
+                        else
+                            su.HasError = true;
+                    }
+                    catch (Exception e)
+                    {
+                        base.log.LogEvent(inputIndex + " not moved to " + outputIndex + ". error: " + e.Message + " " + e.StackTrace, ImageType.Error);
+                        su.HasError = true;
+                    }
+                }
+            }
+
+            if (job.DemuxMode == 0 || job.AudioTracks.Count == 0 || su.HasError)
+            {
+                // no audio processing
+                base.doExitConfig();
+                return;
+            }
 
             int iTracksFound = 0;
             int iCurrentAudioTrack = -1;
@@ -183,7 +188,7 @@ namespace MeGUI
 
                     // write avs file
                     string strAudioAVSFile;
-                    strAudioAVSFile = Path.GetFileNameWithoutExtension(job.Output) + "_track_" + (oAudioTrack.TrackIndex + 1) + "_" + oAudioTrack.Language.ToLower(System.Globalization.CultureInfo.InvariantCulture) + ".avs";
+                    strAudioAVSFile = Path.GetFileNameWithoutExtension(job.Output) + "_track_" + (oAudioTrack.TrackIndex + 1) + "_" + oAudioTrack.Language.ToLowerInvariant() + ".avs";
                     strAudioAVSFile = Path.Combine(Path.GetDirectoryName(job.Output), Path.GetFileName(strAudioAVSFile));
                     try
                     {
@@ -195,7 +200,7 @@ namespace MeGUI
                     }
                     catch (Exception ex)
                     {
-                        log.LogValue("Error creating audio AVS file", ex);
+                        base.log.LogEvent("Error creating audio AVS file: " + ex.Message, ImageType.Error);
                     }
                     break;
                 }
@@ -204,7 +209,7 @@ namespace MeGUI
             }
 
             if (!bFound && File.Exists(job.Input + ".lwi"))
-                File.Delete(job.Input + ".lwi");
+                job.FilesToDelete.Add(job.Input + ".lwi");
 
             base.doExitConfig();
         }

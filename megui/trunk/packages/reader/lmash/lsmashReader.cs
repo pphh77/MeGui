@@ -99,22 +99,8 @@ namespace MeGUI
             else
                 this.fileName = fileName;
 
-            double fps = 0;
-            bool b8bit = true;
             MediaInfoFile oInfo = null;
-            if (File.Exists(this.fileName))
-            {
-                oInfo = new MediaInfoFile(this.fileName);
-                if (oInfo.VideoInfo.HasVideo)
-                {
-                    if (oInfo.VideoInfo.FPS > 0)
-                        fps = oInfo.VideoInfo.FPS;
-                    if (oInfo.VideoInfo.BitDepth > 8)
-                        b8bit = false;
-                }
-            }
-
-            reader = AvsFile.ParseScript(VideoUtil.getLSMASHVideoInputLine(this.fileName, indexFile, fps, b8bit));
+            reader = AvsFile.ParseScript(VideoUtil.getLSMASHVideoInputLine(this.fileName, indexFile, 0, ref oInfo));
             info = reader.VideoInfo.Clone();
             if (oInfo != null)
                 info.DAR = oInfo.VideoInfo.DAR;

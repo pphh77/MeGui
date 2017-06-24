@@ -745,7 +745,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 return true;
             }
             sbOpen = new StringBuilder();
-            FileUtil.DeleteFile(audioJob.Input + ".ffindex");
+            FileUtil.DeleteFile(audioJob.Input + ".ffindex", _log);
             if (String.IsNullOrEmpty(strErrorText))
                 _log.LogEvent("Failed opening the file with FFAudioSource()", ImageType.Information);
             else
@@ -766,7 +766,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 return true;
             }
             sbOpen = new StringBuilder();
-            FileUtil.DeleteFile(audioJob.Input + ".lwi");
+            FileUtil.DeleteFile(audioJob.Input + ".lwi", _log);
             if (String.IsNullOrEmpty(strErrorText))
                 _log.LogEvent("Failed opening the file with LWLibavAudioSource()", ImageType.Information);
             else

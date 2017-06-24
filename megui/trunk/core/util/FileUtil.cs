@@ -49,17 +49,34 @@ namespace MeGUI.core.util
             }
         }
 
-        public static bool DeleteFile(string strFile)
+        public static bool DeleteFile(string strFile, LogItem oLog)
         {
-            try
-            {
-                File.Delete(strFile);
+            if (!File.Exists(strFile))
                 return true;
-            }
-            catch
+
+            int iCounter = 0;
+            string strError = String.Empty;
+            while (iCounter++ < 10)
             {
-                return false;
+                try
+                {
+                    File.Delete(strFile);
+                    break;
+                }
+                catch (IOException ex)
+                {
+                    strError = ex.Message;
+                    System.Threading.Thread.Sleep(1000);
+                }
+                catch (Exception ex)
+                {
+                    strError = ex.Message;
+                    break;
+                }
             }
+            if (oLog != null && !String.IsNullOrEmpty(strError))
+                oLog.Error("Error deleting file " + strFile + ": " + strError);
+            return (!File.Exists(strFile));
         }
 
         public static void CreateZipFile(string path, string filename)
