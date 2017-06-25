@@ -19,8 +19,6 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Xml.Serialization;
 
 namespace MeGUI
@@ -50,32 +48,46 @@ namespace MeGUI
         public static readonly VideoCodec MPEG2 = new VideoCodec("MPEG2");
         public static readonly VideoCodec VC1   = new VideoCodec("VC1");
     }
+
     public class AudioCodec : ICodec, IIDable
     {
+        // needed for serilaization only
+        public AudioCodec() : this("", "") { }
+
+        public AudioCodec(string id, string mediaInfoRegex)
+        {
+            this.id = id;
+            this.mediaInfoRegex = mediaInfoRegex;
+        }
+
         private string id;
         public string ID
         {
             get { return id; }
+            set { id = value; }
         }
-        public AudioCodec(string id)
+
+        private string mediaInfoRegex;
+        public string MediaInfoRegex
         {
-            this.id = id;
+            get { return mediaInfoRegex; }
+            set { mediaInfoRegex = value; }
         }
-        public static readonly AudioCodec MP3    = new AudioCodec("MP3");
-        public static readonly AudioCodec AAC    = new AudioCodec("AAC");
-        public static readonly AudioCodec VORBIS = new AudioCodec("VORBIS");
-        public static readonly AudioCodec DTS    = new AudioCodec("DTS");
-        public static readonly AudioCodec AC3    = new AudioCodec("AC-3");
-        public static readonly AudioCodec MP2    = new AudioCodec("MP2");
-        public static readonly AudioCodec WAV    = new AudioCodec("WAV");
-        public static readonly AudioCodec PCM    = new AudioCodec("PCM");
-        public static readonly AudioCodec EAC3   = new AudioCodec("EAC3");
-        public static readonly AudioCodec THD    = new AudioCodec("THD");
-        public static readonly AudioCodec DTSHD  = new AudioCodec("DTSHD");
-        public static readonly AudioCodec DTSMA  = new AudioCodec("DTSMA");
-        public static readonly AudioCodec FLAC   = new AudioCodec("FLAC");
-        public static readonly AudioCodec OPUS   = new AudioCodec("OPUS");
+ 
+        public static readonly AudioCodec AAC    = new AudioCodec("AAC", "^AAC$");
+        public static readonly AudioCodec AC3    = new AudioCodec("AC-3", "^AC-3$");
+        public static readonly AudioCodec DTS    = new AudioCodec("DTS", "^DTS$");
+        public static readonly AudioCodec EAC3   = new AudioCodec("EAC3", "^E-AC-3$");
+        public static readonly AudioCodec FLAC   = new AudioCodec("FLAC", "^FLAC$");
+        public static readonly AudioCodec MP2    = new AudioCodec("MP2", "^MP2$");
+        public static readonly AudioCodec MP3    = new AudioCodec("MP3", "^MP3$");
+        public static readonly AudioCodec OPUS   = new AudioCodec("OPUS", "^Opus$");
+        public static readonly AudioCodec PCM    = new AudioCodec("PCM", "^PCM$");
+        public static readonly AudioCodec THD    = new AudioCodec("THD", "^(?=.*TrueHD)(?!.*AC-3).*");
+        public static readonly AudioCodec THDAC3 = new AudioCodec("THDAC3", "^(?=.*TrueHD)(?=.*AC-3).*");
+        public static readonly AudioCodec VORBIS = new AudioCodec("VORBIS", "^Vorbis$");
     }
+
     public class SubtitleCodec : ICodec, IIDable
     {
         private string id;
@@ -187,19 +199,19 @@ namespace MeGUI
                 VideoCodecs.Register(VideoCodec.VC1)))
                 throw new Exception("Failed to register a standard video codec");
             if (!(
-                AudioCodecs.Register(AudioCodec.AAC) &&
-                AudioCodecs.Register(AudioCodec.AC3) &&
-                AudioCodecs.Register(AudioCodec.DTS) &&
-                AudioCodecs.Register(AudioCodec.MP2) &&
-                AudioCodecs.Register(AudioCodec.MP3) &&
-                AudioCodecs.Register(AudioCodec.VORBIS) &&
-                AudioCodecs.Register(AudioCodec.DTSHD)  &&
-                AudioCodecs.Register(AudioCodec.DTSMA)  &&
+                AudioCodecs.Register(AudioCodec.AAC)    &&
+                AudioCodecs.Register(AudioCodec.AC3)    &&
+                AudioCodecs.Register(AudioCodec.DTS)    &&
                 AudioCodecs.Register(AudioCodec.EAC3)   &&
+                AudioCodecs.Register(AudioCodec.FLAC)   &&
+                AudioCodecs.Register(AudioCodec.MP2)    &&
+                AudioCodecs.Register(AudioCodec.MP3)    &&
+                AudioCodecs.Register(AudioCodec.OPUS)   &&
                 AudioCodecs.Register(AudioCodec.PCM)    &&
                 AudioCodecs.Register(AudioCodec.THD)    &&
-                AudioCodecs.Register(AudioCodec.FLAC)   &&
-                AudioCodecs.Register(AudioCodec.WAV))) 
+                AudioCodecs.Register(AudioCodec.THDAC3) &&
+                AudioCodecs.Register(AudioCodec.VORBIS) 
+                ))
                 throw new Exception("Failed to register a standard audio codec");
             if (!(
                 VideoEncoderTypes.Register(VideoEncoderType.HFYU) &&
@@ -250,14 +262,18 @@ namespace MeGUI
         public static readonly VideoType RAWHEVC = new VideoType("RAWHEVC", "RAW MPEG-H HEVC Files", "hevc", null, VideoCodec.HEVC);
         public static readonly VideoType VC1     = new VideoType("VC1", "VC-1 Files", "vc1", null, VideoCodec.VC1);
     }
+
     public class AudioType : OutputType
     {
         private AudioCodec[] supportedCodecs;
-
         public AudioCodec[] SupportedCodecs
         {
             get { return supportedCodecs; }
+            set { supportedCodecs = value; }
         }
+
+        // needed only for serialization
+        public AudioType() : base("", "", "", null) { }
 
         public AudioType(string name, string filterName, string extension, ContainerType containerType, AudioCodec supportedCodec)
             : this(name, filterName, extension, containerType, new AudioCodec[] { supportedCodec }) { }
@@ -274,19 +290,17 @@ namespace MeGUI
         public static readonly AudioType AC3    = new AudioType("AC3", "AC3 Files", "ac3", null, AudioCodec.AC3);
         public static readonly AudioType MP2    = new AudioType("MP2", "MP2 Files", "mp2", null, AudioCodec.MP2);
         public static readonly AudioType DTS    = new AudioType("DTS", "DTS Files", "dts", null, AudioCodec.DTS);
-        public static readonly AudioType WAV    = new AudioType("WAV", "WAV Files", "wav", null, AudioCodec.WAV);
+        public static readonly AudioType WAV    = new AudioType("WAV", "WAV Files", "wav", null, AudioCodec.PCM);
         public static readonly AudioType W64    = new AudioType("W64", "W64 Files", "w64", null, AudioCodec.PCM);
         public static readonly AudioType PCM    = new AudioType("PCM", "PCM Files", "pcm", null, AudioCodec.PCM);
-        public static readonly AudioType CBRMP3 = new AudioType("CBR MP3", "CBR MP3 Files", "mp3", null, AudioCodec.MP3);
-        public static readonly AudioType VBRMP3 = new AudioType("VBR MP3", "VBR MP3 Files", "mp3", null, AudioCodec.MP3);
-        public static readonly AudioType EAC3   = new AudioType("EAC3", "EAC3 Files", "ddp", null, AudioCodec.EAC3);
+        public static readonly AudioType EAC3   = new AudioType("EAC3", "EAC3 Files", "eac3", null, AudioCodec.EAC3);
         public static readonly AudioType THD    = new AudioType("THD", "TrueHD Files", "thd", null, AudioCodec.THD);
-        public static readonly AudioType DTSHD  = new AudioType("DTSHD", "DTS-HD High Resolution Files", "dtshd", null, AudioCodec.DTSHD);
-        public static readonly AudioType DTSMA  = new AudioType("DTSMA", "DTS Master Audio Files", "dtsma", null, AudioCodec.DTSMA);
+        public static readonly AudioType THDAC3 = new AudioType("THDAC3", "TrueHD+AC3 Files", "thd+ac3", null, AudioCodec.THDAC3);
         public static readonly AudioType FLAC   = new AudioType("FLAC", "FLAC Audio Lossless Files", "flac", null, AudioCodec.FLAC);
         public static readonly AudioType AVS    = new AudioType("AVS", "AviSynth Script Files", "avs", null, AudioCodec.PCM);
         public static readonly AudioType OPUS   = new AudioType("OPUS", "Opus Audio Files", "opus", null, AudioCodec.OPUS);
     }
+
     public class SubtitleType : OutputType
     {
         public SubtitleType(string name, string filterName, string extension, ContainerType containerType)
@@ -298,6 +312,7 @@ namespace MeGUI
         public static readonly SubtitleType VOBSUB = new SubtitleType("Vobsub", "Vobsub Subtitle Files", "idx", null);
         public static readonly SubtitleType TTXT   = new SubtitleType("TTXT", "Time Text Subtitles Files", "ttxt", null);
     }
+
     public class ChapterType : OutputType
     {
         public ChapterType(string name, string filterName, string extension, ContainerType containerType)
@@ -305,6 +320,7 @@ namespace MeGUI
         public static readonly ChapterType OGG_TXT = new ChapterType("Ogg Chapter", "Ogg Chapter Files", "txt", null);
         public static readonly ChapterType MKV_XML = new ChapterType("Matroska Chapter", "Matroska Chapter Files", "xml", null);
     }
+
     public class DeviceType : OutputType
     {
         public DeviceType(string name, string filterName, string extension, ContainerType containerType)
@@ -319,10 +335,15 @@ namespace MeGUI
         public static readonly DeviceType AVCHD = new DeviceType("AVCHD", "AVCHD", "AVCHD", ContainerType.M2TS);
         public static readonly DeviceType PC = new DeviceType("PC", "PC", "PC", ContainerType.AVI);
     }
+
     public class ContainerType : OutputFileType
     {
+        // needed for the serialization only
+        public ContainerType() : base("", "", "") { }
+
         public ContainerType(string name, string filterName, string extension)
             : base(name, filterName, extension) { }
+
         public static readonly ContainerType MP4  = new ContainerType("MP4", "MP4 Files", "mp4");
         public static readonly ContainerType MKV  = new ContainerType("MKV", "Matroska Files", "mkv");
         public static readonly ContainerType AVI  = new ContainerType("AVI", "AVI Files", "avi");
@@ -338,6 +359,7 @@ namespace MeGUI
         }
     }
     #endregion
+
     public class ContainerManager
     {
         public static GenericRegisterer<VideoType> VideoTypes = new GenericRegisterer<VideoType>();
@@ -372,13 +394,12 @@ namespace MeGUI
                 AudioTypes.Register(AudioType.M4A)    &&
                 AudioTypes.Register(AudioType.RAWAAC) &&
                 AudioTypes.Register(AudioType.VORBIS) &&
-                AudioTypes.Register(AudioType.DTSHD)  &&
-                AudioTypes.Register(AudioType.DTSMA)  &&
                 AudioTypes.Register(AudioType.EAC3)   &&
                 AudioTypes.Register(AudioType.FLAC)   &&
                 AudioTypes.Register(AudioType.AVS)    &&
                 AudioTypes.Register(AudioType.OPUS)   &&
-                AudioTypes.Register(AudioType.THD)))
+                AudioTypes.Register(AudioType.THD)    &&
+                AudioTypes.Register(AudioType.THDAC3)))
                 throw new Exception("Failed to register an audio type");
             if (!(
                 SubtitleTypes.Register(SubtitleType.ASS)    &&
@@ -414,6 +435,9 @@ namespace MeGUI
 
     public class OutputFileType : IIDable
     {
+        // needed for serialization only
+        public OutputFileType () : this ("", "", "") { }
+
         public OutputFileType(string name, string filterName, string extension)
         {
             this.name = name;
@@ -421,12 +445,20 @@ namespace MeGUI
             this.extension = extension;
         }
 
+        private string name;
         public string ID
         {
             get { return name; }
+            set { name = value; }
         }
 
-        private string name, filterName, extension;
+        private string filterName;
+        public string FilterName
+        {
+            get { return filterName; }
+            set { filterName = value; }
+        }
+
         /// <summary>
         /// used to display the output type in dropdowns
         /// </summary>
@@ -435,29 +467,39 @@ namespace MeGUI
         {
             return this.name;
         }
+
+        [XmlIgnore]
         public string OutputFilter
         {
             get { return "*." + extension; }
         }
+
         /// <summary>
         /// gets a valid filter string for file dialogs based on the known extension
         /// </summary>
         /// <returns></returns>
+        [XmlIgnore]
         public string OutputFilterString
         {
             get {return filterName + " (*." + extension + ")|*." + extension;}
         }
+
+        private string extension;
         /// <summary>
         /// gets the extension for this file type
         /// </summary>
         public string Extension
         {
             get {return this.extension;}
+            set { this.extension = value; }
         }
     }
 
     public class OutputType : OutputFileType
     {
+        // needed for serialization only
+        public OutputType() : base("", "", "") { }
+
         public OutputType(string name, string filterName, string extension, ContainerType containerType)
             : base(name, filterName, extension)
         {
@@ -468,6 +510,7 @@ namespace MeGUI
         public ContainerType ContainerType
         {
             get { return this.containerType; }
+            set { this.containerType = value; }
         }
     }
 }

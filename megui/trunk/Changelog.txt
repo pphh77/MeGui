@@ -1,3 +1,5 @@
+2758 [Muxer]                removed dtshd and dtsma file extension and added eac3 and thd+ac3 file extension where suitable
+     [MediaInfo]            improved audio codec/type detection
 2757 [L-SMASH Indexer]      improved error handling
 2756 [Chapter]              added a workaround for MediaInfo sometimes not detecting all chapters in MPLS files (regression of 2753)
 2755 [AutoEncode]           fixed a crash if trying to add additional content (regression of 2753)

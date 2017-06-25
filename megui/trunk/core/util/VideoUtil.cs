@@ -72,7 +72,7 @@ namespace MeGUI
         /// <returns>true if the file has chapters</returns>
         public static bool HasChapters(MediaInfoFile iFile)
         {
-            if (iFile.HasChapters || iFile.getEac3toChaptersTrack() > -1)
+            if (iFile.HasChapters)
                 return true;
 
             if (Path.GetExtension(iFile.FileName.ToLowerInvariant()) != ".vob" &&
@@ -661,8 +661,8 @@ namespace MeGUI
             if (useMediaInfo)
             {
                 MediaInfoFile info = new MediaInfoFile(p);
-                if (info.AudioInfo.Type != null)
-                    return new MuxableType(info.AudioInfo.Type, info.AudioInfo.Codecs[0]);
+                if (info.AudioInfo.Tracks.Count == 1 && info.AudioInfo.Tracks[0].AudioType != null)
+                    return new MuxableType(info.AudioInfo.Tracks[0].AudioType, info.AudioInfo.Tracks[0].AudioCodec);
             }
 
             AudioType aType = guessAudioType(p);

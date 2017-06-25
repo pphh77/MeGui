@@ -23,8 +23,12 @@ namespace MeGUI
 {
     public class AudioTrackInfo : TrackInfo
     {
-        private string nbChannels, samplingRate, channelPositions;
+        private string nbChannels, samplingRate, channelPositions, codecProfile;
         private int aacFlag;
+        private bool bHasCore;
+        private AudioCodec _codec;
+        private AudioType _type;
+        private BitrateManagementMode _bitrateMode;
 
         public AudioTrackInfo() : this(null, null, 0)
         {
@@ -40,6 +44,10 @@ namespace MeGUI
             this.nbChannels = "unknown";
             this.samplingRate = "unknown";
             this.channelPositions = "unknown";
+            this.bHasCore = false;
+            this.codecProfile = string.Empty;
+            this._bitrateMode = BitrateManagementMode.CBR;
+            this._type = null;
         }
 
         public string TrackIDx
@@ -75,6 +83,51 @@ namespace MeGUI
         {
             get { return aacFlag; }
             set { aacFlag = value; }
+        }
+
+        /// <summary>
+        /// Returns true if the audio track has a core track
+        /// </summary>
+        public bool HasCore
+        {
+            get { return bHasCore; }
+            set { bHasCore = value; }
+        }
+
+        /// <summary>
+        /// The Codec String
+        /// </summary>
+        public string CodecProfile
+        {
+            get { return codecProfile; }
+            set { codecProfile = value; }
+        }
+
+        /// <summary>
+        /// AudioCodec of the track
+        /// </summary>
+        public AudioCodec AudioCodec
+        {
+            get { return _codec; }
+            set { _codec = value; }
+        }
+
+        /// <summary>
+        /// AudioType of the track
+        /// </summary>
+        public AudioType AudioType
+        {
+            get { return _type; }
+            set { _type = value; }
+        }
+
+        /// <summary>
+        /// BitrateMode of the track
+        /// </summary>
+        public BitrateManagementMode BitrateMode
+        {
+            get { return _bitrateMode; }
+            set { _bitrateMode = value; }
         }
 
         public override string ToString()

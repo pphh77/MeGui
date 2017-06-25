@@ -19,9 +19,7 @@
 // ****************************************************************************
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace MeGUI
 {
@@ -501,8 +499,6 @@ namespace MeGUI
             supportedAudioTypes.Add(AudioType.M4A);
             supportedAudioTypes.Add(AudioType.MP2);
             supportedAudioTypes.Add(AudioType.MP3);
-            supportedAudioTypes.Add(AudioType.VBRMP3);
-            supportedAudioTypes.Add(AudioType.CBRMP3);
 
             supportedVideoCodecs.Add(VideoCodec.ASP);
             supportedVideoCodecs.Add(VideoCodec.AVC);
@@ -560,13 +556,12 @@ namespace MeGUI
             supportedVideoTypes.Add(VideoType.MPEG2);
             supportedVideoTypes.Add(VideoType.VC1);
             supportedVideoTypes.Add(VideoType.RAWHEVC);
+            supportedVideoTypes.Add(VideoType.M2TS);
 
             supportedAudioTypes.Add(AudioType.RAWAAC);
             supportedAudioTypes.Add(AudioType.MP4AAC);
             supportedAudioTypes.Add(AudioType.M4A);
             supportedAudioTypes.Add(AudioType.MP3);
-            supportedAudioTypes.Add(AudioType.VBRMP3);
-            supportedAudioTypes.Add(AudioType.CBRMP3);
             supportedAudioTypes.Add(AudioType.VORBIS);
             supportedAudioTypes.Add(AudioType.OPUS);
             supportedAudioTypes.Add(AudioType.MP2);
@@ -577,8 +572,7 @@ namespace MeGUI
             supportedAudioTypes.Add(AudioType.EAC3);
             supportedAudioTypes.Add(AudioType.FLAC);
             supportedAudioTypes.Add(AudioType.THD);
-            supportedAudioTypes.Add(AudioType.DTSHD);
-            supportedAudioTypes.Add(AudioType.DTSMA);
+            supportedAudioTypes.Add(AudioType.THDAC3);
 
             supportedVideoCodecs.Add(VideoCodec.ASP);
             supportedVideoCodecs.Add(VideoCodec.AVC);
@@ -592,8 +586,6 @@ namespace MeGUI
             supportedAudioCodecs.Add(AudioCodec.AAC);
             supportedAudioCodecs.Add(AudioCodec.AC3);
             supportedAudioCodecs.Add(AudioCodec.DTS);
-            supportedAudioCodecs.Add(AudioCodec.DTSHD);
-            supportedAudioCodecs.Add(AudioCodec.DTSMA);
             supportedAudioCodecs.Add(AudioCodec.EAC3);
             supportedAudioCodecs.Add(AudioCodec.FLAC);
             supportedAudioCodecs.Add(AudioCodec.MP2);
@@ -601,8 +593,8 @@ namespace MeGUI
             supportedAudioCodecs.Add(AudioCodec.OPUS);
             supportedAudioCodecs.Add(AudioCodec.PCM);
             supportedAudioCodecs.Add(AudioCodec.THD);
+            supportedAudioCodecs.Add(AudioCodec.THDAC3);
             supportedAudioCodecs.Add(AudioCodec.VORBIS);
-            supportedAudioCodecs.Add(AudioCodec.WAV);
             supportsAnyInputtableAudioCodec = false;
 
             supportedSubtitleTypes.Add(SubtitleType.SUBRIP);
@@ -619,6 +611,7 @@ namespace MeGUI
             supportedContainerInputTypes.Add(ContainerType.MP4);
             supportedContainerInputTypes.Add(ContainerType.AVI);
             supportedContainerInputTypes.Add(ContainerType.MKV);
+            supportedContainerInputTypes.Add(ContainerType.M2TS);
 
             maxFilesOfType = new int[] { -1, -1, -1, 1, 0};
             base.type = MuxerType.MKVMERGE;
@@ -646,8 +639,6 @@ namespace MeGUI
             supportedAudioTypes.Add(AudioType.AC3);
             supportedAudioTypes.Add(AudioType.DTS);
             supportedAudioTypes.Add(AudioType.MP3);
-            supportedAudioTypes.Add(AudioType.VBRMP3);
-            supportedAudioTypes.Add(AudioType.CBRMP3);
             supportedAudioTypes.Add(AudioType.MP2);
             supportedAudioTypes.Add(AudioType.RAWAAC);
 
@@ -689,17 +680,18 @@ namespace MeGUI
             supportedVideoTypes.Add(VideoType.MPEG2);
             supportedVideoTypes.Add(VideoType.MP4);
             supportedVideoTypes.Add(VideoType.MKV);
+            supportedVideoTypes.Add(VideoType.M2TS);
 
             supportedAudioTypes.Add(AudioType.AC3);
             supportedAudioTypes.Add(AudioType.DTS);
             supportedAudioTypes.Add(AudioType.EAC3);
             supportedAudioTypes.Add(AudioType.RAWAAC);
-            supportedAudioTypes.Add(AudioType.DTSHD);
-            supportedAudioTypes.Add(AudioType.DTSMA);
             supportedAudioTypes.Add(AudioType.MP4AAC);
             supportedAudioTypes.Add(AudioType.WAV);
             supportedAudioTypes.Add(AudioType.W64);
             supportedAudioTypes.Add(AudioType.PCM);
+            supportedAudioTypes.Add(AudioType.THD);
+            supportedAudioTypes.Add(AudioType.THDAC3);
 
             supportedVideoCodecs.Add(VideoCodec.AVC);
             supportedVideoCodecs.Add(VideoCodec.HEVC);
@@ -710,10 +702,9 @@ namespace MeGUI
             supportedAudioCodecs.Add(AudioCodec.AAC);
             supportedAudioCodecs.Add(AudioCodec.AC3);
             supportedAudioCodecs.Add(AudioCodec.DTS);
-            supportedAudioCodecs.Add(AudioCodec.DTSHD);
-            supportedAudioCodecs.Add(AudioCodec.DTSMA);
+            supportedAudioCodecs.Add(AudioCodec.EAC3);
+            supportedAudioCodecs.Add(AudioCodec.THDAC3);
             supportedAudioCodecs.Add(AudioCodec.PCM);
-            supportedAudioCodecs.Add(AudioCodec.WAV);
             supportsAnyInputtableAudioCodec = false;
 
             supportedSubtitleTypes.Add(SubtitleType.SUBRIP);

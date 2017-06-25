@@ -957,7 +957,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             _log.LogEvent("Trying to open the file with NicAudio", ImageType.Information);
 
             string strErrorText = String.Empty;
-            if (oInfo.AudioInfo.Tracks.Count > 0 && oInfo.AudioInfo.Tracks[0].Codec.Equals("DTS-HD Master Audio") && !bForce)
+            if (oInfo.AudioInfo.Tracks.Count > 0 && oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.DTS && oInfo.AudioInfo.Tracks[0].CodecProfile.Contains("MA") && !bForce)
             {
                 _log.LogEvent("DTS-MA is blocked in the first place when using NicAudio", ImageType.Information);
             }
@@ -1063,8 +1063,8 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                     bFound = OpenSourceWithFFAudioSource(out script);
             }
 
-            if (!bFound && oInfo.AudioInfo.Tracks.Count > 0 && oInfo.AudioInfo.Tracks[0].Codec.Equals("DTS-HD Master Audio"))
-                bFound = OpenSourceWithNicAudio(out script, oInfo, true);
+            if (!bFound && oInfo.AudioInfo.Tracks.Count > 0 && oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.DTS && oInfo.AudioInfo.Tracks[0].CodecProfile.Contains("MA"))
+                    bFound = OpenSourceWithNicAudio(out script, oInfo, true);
 
             if (!bFound)
             {

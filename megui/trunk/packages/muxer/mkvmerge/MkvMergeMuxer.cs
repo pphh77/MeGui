@@ -176,7 +176,7 @@ namespace MeGUI
                     else
                         trackID = 0;
 
-                    if (oAudioInfo.ContainerFileType == ContainerType.MP4 || oAudioInfo.AudioInfo.Codecs[0] == AudioCodec.AAC)
+                    if (oAudioInfo.ContainerFileType == ContainerType.MP4 || oAudioInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.AAC)
                     {
                         int heaac_flag = -1;
                         if (oAudioInfo.AudioInfo.Tracks.Count > 0)

@@ -75,9 +75,7 @@ namespace MeGUI
         #region variables
         private static readonly CultureInfo culture = new CultureInfo("en-us");
         private static Dictionary<string, VideoCodec> knownVideoDescriptions;
-        private static Dictionary<string, AudioCodec> knownAudioDescriptions;
         private static Dictionary<string, ContainerType> knownContainerTypes;
-        private static Dictionary<string, ContainerType> knownContainerDescriptions;
         private IMediaFile videoSourceFile = null;
         private IVideoReader videoReader = null; 
         private ContainerType cType;
@@ -307,10 +305,6 @@ namespace MeGUI
                 }
 
                 // audio detection
-                _AudioInfo.Codecs = new AudioCodec[info.Audio.Count];
-                _AudioInfo.BitrateModes = new BitrateManagementMode[info.Audio.Count];
-                _AudioInfo.Type = null;
-
                 for (int counter = 0; counter < info.Audio.Count; counter++)
                 {
                     MediaInfoWrapper.AudioTrack atrack = info.Audio[counter];
@@ -318,15 +312,6 @@ namespace MeGUI
                     if (String.IsNullOrEmpty(atrack.Delay) && String.IsNullOrEmpty(atrack.SamplingRate) 
                         && String.IsNullOrEmpty(atrack.FormatProfile) && String.IsNullOrEmpty(atrack.Channels))
                         continue;
-
-                    _AudioInfo.Codecs[counter] = getAudioCodec(atrack.Format);
-                    if (_AudioInfo.Codecs.Length == 1)
-                        _AudioInfo.Type = getAudioType(_AudioInfo.Codecs[counter], cType, file);
-
-                    if (atrack.BitRateMode == "VBR")
-                        _AudioInfo.BitrateModes[counter] = BitrateManagementMode.VBR;
-                    else
-                        _AudioInfo.BitrateModes[counter] = BitrateManagementMode.CBR;
 
                     AudioTrackInfo ati = new AudioTrackInfo();
                     ati.SourceFileName = _file;
@@ -364,29 +349,33 @@ namespace MeGUI
                     {
                         switch (atrack.FormatProfile)
                         {
-                            case "Dolby Digital": ati.Codec = "AC-3"; break;
-                            case "HRA / Core":
-                            case "HRA": ati.Codec = "DTS-HD High Resolution"; break;
                             case "Layer 1": ati.Codec = "MPA"; break;
                             case "Layer 2": ati.Codec = "MP2"; break;
                             case "Layer 3": ati.Codec = "MP3"; break;
-                            case "LC": ati.Codec = "AAC"; break;
-                            case "MA":
-                            case "MA / Core": ati.Codec = "DTS-HD Master Audio"; break;
-                            case "TrueHD": ati.Codec = "TrueHD"; break;
-                            case "ES": ati.Codec = "DTS-ES"; break;
                             default: ati.Codec = atrack.Format; break;
                         }
                     }
                     else
                         ati.Codec = atrack.Format;
 
-                    if (MainForm.Instance.Settings.ShowDebugInformation && String.IsNullOrEmpty(ati.Codec))
+                    if (atrack.MuxingMode.Equals("Stream extension") 
+                        && (atrack.Format.Equals("DTS") || atrack.Format.Contains("TrueHD")|| atrack.Format.Equals("E-AC-3")))
+                        ati.HasCore = true;
+
+                    ati.AudioCodec = getAudioCodec(ati.Codec);
+                    if (ati.AudioCodec != null)
+                        ati.AudioType = getAudioType(ati.AudioCodec, cType, file);
+
+                    if (MainForm.Instance.Settings.ShowDebugInformation && ati.AudioCodec == null)
                     {
                         if (_Log == null)
                             _Log = MainForm.Instance.Log.Info("MediaInfo");
-                        _Log.LogEvent("Unknown audio codec found: " + atrack.FormatProfile + " / " + atrack.Format, ImageType.Warning);
+                        _Log.LogEvent("Unknown audio codec found: \"" + atrack.Format + "\"" 
+                            + (!String.IsNullOrEmpty(atrack.FormatProfile) ? (", \"" + atrack.FormatProfile + "\"") : String.Empty), ImageType.Warning);
                     }
+
+                    if (atrack.BitRateMode == "VBR")
+                        ati.BitrateMode = BitrateManagementMode.VBR;
 
                     ati.NbChannels = atrack.ChannelsString;
                     ati.ChannelPositions = atrack.ChannelPositionsString2;
@@ -682,6 +671,7 @@ namespace MeGUI
                     oTrack.Info("FormatProfile: " + t.FormatProfile);
                     oTrack.Info("FormatSettingsSBR: " + t.FormatSettingsSBR);
                     oTrack.Info("FormatSettingsPS: " + t.FormatSettingsPS);
+                    oTrack.Info("Muxing Mode: " + t.MuxingMode);
                     oTrack.Info("SamplingRate: " + t.SamplingRate);
                     oTrack.Info("SamplingRateString: " + t.SamplingRateString);
                     oTrack.Info("Channels: " + t.Channels);
@@ -931,26 +921,6 @@ namespace MeGUI
                 _MkvInfo = new MkvInfo(_file, ref _Log);
 
             return _MkvInfo.IsMuxable;
-        }
-
-        /// <summary>checks if the file is an eac3to demuxable file and has chapters</summary>
-        /// <returns>track number or -1 if no chapters available</returns>
-        public int getEac3toChaptersTrack()
-        {
-            if (!isEac3toDemuxable())
-                return -1;
-
-            if (_Eac3toInfo == null)
-                _Eac3toInfo = new Eac3toInfo(new List<string>() { _file }, this, _Log);
-
-            int iTrack = -1;
-            foreach (eac3to.Stream oTrack in _Eac3toInfo.Features[0].Streams)
-            {
-                if (oTrack.Type == eac3to.StreamType.Chapter)
-                    iTrack = oTrack.Number;
-            }
-
-            return iTrack;
         }
 
         /// <summary>checks if the file is indexable by DGIndexNV</summary>
@@ -1302,19 +1272,19 @@ namespace MeGUI
         {
             if (knownContainerTypes.ContainsKey(codec))
                 return knownContainerTypes[codec];
-            description = description.ToLowerInvariant();
-            foreach (string knownDescription in knownContainerDescriptions.Keys)
-                if (description.Contains(knownDescription))
-                    return knownContainerDescriptions[knownDescription];
             return null;
         }
 
         private static AudioCodec getAudioCodec(string description)
         {
-            description = description.ToLowerInvariant();
-            foreach (string knownDescription in knownAudioDescriptions.Keys)
-                if (description.Contains(knownDescription))
-                    return knownAudioDescriptions[knownDescription];
+            foreach (AudioCodec _codec in CodecManager.AudioCodecs.Values)
+            {
+                if (string.IsNullOrEmpty(_codec.MediaInfoRegex))
+                    continue;
+
+                if (System.Text.RegularExpressions.Regex.IsMatch(description, _codec.MediaInfoRegex, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                    return _codec;
+            }
             return null;
         }
 
@@ -1373,34 +1343,20 @@ namespace MeGUI
             knownVideoDescriptions.Add("V_MPEG2", VideoCodec.MPEG2);
             knownVideoDescriptions.Add("hevc", VideoCodec.HEVC);
 
-            knownAudioDescriptions = new Dictionary<string, AudioCodec>();
-            knownAudioDescriptions.Add("aac", AudioCodec.AAC);
-            knownAudioDescriptions.Add("ac3", AudioCodec.AC3);
-            knownAudioDescriptions.Add("ac-3", AudioCodec.AC3);
-            knownAudioDescriptions.Add("dts", AudioCodec.DTS);
-            knownAudioDescriptions.Add("vorbis", AudioCodec.VORBIS);
-            knownAudioDescriptions.Add("ogg", AudioCodec.VORBIS);
-            knownAudioDescriptions.Add(" l3", AudioCodec.MP3);
-            knownAudioDescriptions.Add("mpeg-2 audio", AudioCodec.MP2);
-            knownAudioDescriptions.Add("mpeg-4 audio", AudioCodec.AAC);
-            knownAudioDescriptions.Add("flac", AudioCodec.FLAC);
-            knownAudioDescriptions.Add("pcm", AudioCodec.PCM);
-
             knownContainerTypes = new Dictionary<string, ContainerType>();
             knownContainerTypes.Add("AVI", ContainerType.AVI);
             knownContainerTypes.Add("Matroska", ContainerType.MKV);
             knownContainerTypes.Add("MPEG-4", ContainerType.MP4);
             knownContainerTypes.Add("3GPP", ContainerType.MP4);
             knownContainerTypes.Add("BDAV", ContainerType.M2TS);
-
-            knownContainerDescriptions = new Dictionary<string,ContainerType>();
+            knownContainerTypes.Add("MPEG-TS", ContainerType.M2TS);
         }
 
         #region IMediaFile Members
 
         public bool HasAudio
         {
-            get { return (_AudioInfo.HasAudio()); }
+            get { return (_AudioInfo.Tracks.Count > 0); }
         }
 
         public bool HasChapters
@@ -1545,32 +1501,11 @@ namespace MeGUI
 
     public class AudioInformation
     {
-        private BitrateManagementMode[] _aBitrateModes;
         private List<AudioTrackInfo> _arrAudioTracks = new List<AudioTrackInfo>();
-        private AudioCodec[] _aCodecs;
-        private AudioType _aType;
 
         public AudioInformation()
         {
-            _aCodecs = new AudioCodec[]{};
-        }
-
-        public AudioType Type
-        {
-            get { return _aType; }
-            set { _aType = value; }
-        }
-
-        public AudioCodec[] Codecs
-        {
-            get { return _aCodecs; }
-            set { _aCodecs = value; }
-        }
-
-        public BitrateManagementMode[] BitrateModes
-        {
-            get { return _aBitrateModes; }
-            set { _aBitrateModes = value; }
+            _arrAudioTracks = new List<AudioTrackInfo>();
         }
 
         public List<AudioTrackInfo> Tracks
@@ -1583,20 +1518,11 @@ namespace MeGUI
         /// <returns>trackID or 0</returns>
         public int GetFirstTrackID()
         {
-            // check if the file contains a video audio track
-            if (_aCodecs.Length == 0)
+            // check if the file contains an audio track
+            if (_arrAudioTracks.Count == 0)
                 return 0;
 
             return _arrAudioTracks[0].MMGTrackID;
-        }
-
-        /// <summary>gets the information if the file has as least one audio track</summary>
-        /// <returns>true if the file has at least one audio track</returns>
-        public bool HasAudio()
-        {
-            if (_aCodecs != null && _aCodecs.Length > 0)
-                return true;
-            return false;
         }
 
         public VideoInformation Clone()

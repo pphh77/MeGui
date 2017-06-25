@@ -309,7 +309,7 @@ namespace MeGUI
                     }
                     sb.Append("#trackID=" + trackID);
 
-                    if (oInfo.ContainerFileType == ContainerType.MP4 || oInfo.AudioInfo.Codecs[0] == AudioCodec.AAC)
+                    if (oInfo.ContainerFileType == ContainerType.MP4 || oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.AAC)
                     {
                         switch (heaac_flag)
                         {

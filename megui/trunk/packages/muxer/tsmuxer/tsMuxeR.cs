@@ -186,7 +186,7 @@ namespace MeGUI
 
                         if (oVideoInfo.ContainerFileType == ContainerType.MP4)
                             trackID = "track=1";
-                        else if (oVideoInfo.ContainerFileType == ContainerType.MKV)
+                        else if (oVideoInfo.ContainerFileType == ContainerType.MKV || oVideoInfo.ContainerFileType == ContainerType.M2TS)
                             trackID = "track=" + oVideoInfo.VideoInfo.Track.TrackID;
 
                         sw.Write("\n" + vcodecID + ", ");
@@ -201,10 +201,10 @@ namespace MeGUI
                         sw.Write(", fps=" + fpsString);
 
                         if (!String.IsNullOrEmpty(extra))
-                            sw.Write(" ," + extra);
+                            sw.Write(", " + extra);
 
                         if (!String.IsNullOrEmpty(trackID))
-                            sw.Write(" ," + trackID);
+                            sw.Write(", " + trackID);
                     }
                     else
                         log.Error("No video track found: " + videoFile);
@@ -223,14 +223,20 @@ namespace MeGUI
                         continue;
                     }
 
-                    if (oInfo.AudioInfo.Codecs[0] == AudioCodec.AC3)
+                    if (oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.AC3 || oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.EAC3
+                        || oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.THDAC3)
                         acodecID = "A_AC3";
-                    else if (oInfo.AudioInfo.Codecs[0] == AudioCodec.AAC)
+                    else if (oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.AAC)
                         acodecID = "A_AAC";
-                    else if (oInfo.AudioInfo.Codecs[0] == AudioCodec.DTS || oInfo.AudioInfo.Codecs[0] == AudioCodec.DTSHD || oInfo.AudioInfo.Codecs[0] == AudioCodec.DTSMA)
+                    else if (oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.DTS)
                         acodecID = "A_DTS";
-                    else if (oInfo.AudioInfo.Codecs[0] == AudioCodec.PCM || oInfo.AudioInfo.Codecs[0] == AudioCodec.WAV)
+                    else if (oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.PCM)
                         acodecID = "A_LPCM";
+                    else
+                    {
+                        log.Error("Audio Codec not supported: " + oInfo.AudioInfo.Tracks[0].Codec);
+                        continue;
+                    }
 
                     sw.Write("\n" + acodecID + ", ");
                     sw.Write("\"" + stream.path + "\"");

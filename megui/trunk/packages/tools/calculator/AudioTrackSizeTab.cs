@@ -19,17 +19,10 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 using MeGUI.core.details;
 using MeGUI.core.util;
-
-using MediaInfoWrapper;
 
 namespace MeGUI.packages.tools.calculator
 {
@@ -76,7 +69,7 @@ namespace MeGUI.packages.tools.calculator
 
             int bitrate = (int)audio1Bitrate.Value;
             if (bitrate > 0 && audio1Type.SelectedIndex == -1)
-                audio1Type.SelectedItem = AudioType.VBRMP3;
+                audio1Type.SelectedItem = AudioType.MP3;
             double bytesPerSecond = (double)bitrate * 1000.0 / 8.0;
             FileSize f = new FileSize((ulong)(length * bytesPerSecond));
             //size.CertainValue = f;
@@ -102,23 +95,6 @@ namespace MeGUI.packages.tools.calculator
             AudioType aud2Type = VideoUtil.guessAudioType(file);
             if (audio1Type.Items.Contains(aud2Type))
                 audio1Type.SelectedItem = aud2Type;
-
-            //MediaInfo info;
-            //try
-            //{
-            //    info = new MediaInfo(file);
-            //    MediaInfoWrapper.AudioTrack atrack = info.Audio[0];
-            //    //this.length = atrack.Duration
-            //    if (atrack.Format == "DTS" && (atrack.BitRate == "768000" || atrack.BitRate == "1536000"))
-            //    {
-            //        audio1Bitrate.Value = (Convert.ToInt32(atrack.BitRate) / 1000);
-            //    }
-            //}
-            //catch (Exception i)
-            //{
-            //    MessageBox.Show("The following error ocurred when trying to get Media info for file " + file + "\r\n" + i.Message, "Error parsing mediainfo data", MessageBoxButtons.OK);                
-            //}
-
         }
 
         private readonly string filter = VideoUtil.GenerateCombinedFilter(ContainerManager.AudioTypes.ValuesArray);
@@ -160,7 +136,7 @@ namespace MeGUI.packages.tools.calculator
 
             FileSize s = FileSize.Parse(size.Text); //size.CertainValue;
             if (s > FileSize.Empty && audio1Type.SelectedIndex == -1)
-                audio1Type.SelectedItem = AudioType.VBRMP3;
+                audio1Type.SelectedItem = AudioType.MP3;
 
             double bytesPerSecond = (double)s.Bytes / (double)length;
             int bitrate = (int)(bytesPerSecond * 8.0 / 1000.0);

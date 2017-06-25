@@ -103,6 +103,7 @@ namespace MeGUI.packages.tools.calculator
             this.audio1Type.Location = new System.Drawing.Point(197, 27);
             this.audio1Type.Name = "audio1Type";
             this.audio1Type.Size = new System.Drawing.Size(75, 21);
+            this.audio1Type.Sorted = true;
             this.audio1Type.TabIndex = 1;
             this.audio1Type.SelectedIndexChanged += new System.EventHandler(this.audio1Type_SelectedIndexChanged);
             // 

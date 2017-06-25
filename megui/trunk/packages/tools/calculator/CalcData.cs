@@ -20,13 +20,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Drawing;
 using MeGUI.core.util;
 using MeGUI.core.details;
-using System.Diagnostics;
-using eac3to;
-using MeGUI.Properties;
 
 namespace MeGUI.packages.tools.calculator
 {
@@ -35,7 +31,7 @@ namespace MeGUI.packages.tools.calculator
         private static readonly decimal mp4OverheadWithBframes = 10.4M;
         private static readonly decimal mp4OverheadWithoutBframes = 4.3M;
         private static readonly decimal aviVideoOverhead = 24M;
-        private static readonly decimal cbrMP3Overhead = 23.75M;
+        //private static readonly decimal cbrMP3Overhead = 23.75M;
         private static readonly decimal vbrMP3Overhead = 40M;
         private static readonly decimal ac3Overhead = 23.75M;
         private static readonly int AACBlockSize = 1024;
@@ -274,7 +270,7 @@ namespace MeGUI.packages.tools.calculator
             int samplesPerBlock = 0;
             if (audioType == AudioType.MP4AAC || audioType == AudioType.M4A || audioType == AudioType.RAWAAC)
                 samplesPerBlock = AACBlockSize;
-            else if (audioType == AudioType.VBRMP3 || audioType == AudioType.CBRMP3 || audioType == AudioType.MP3 || audioType == AudioType.DTS)
+            else if (audioType == AudioType.MP3 || audioType == AudioType.DTS)
                 samplesPerBlock = MP3BlockSize;
             else if (audioType == AudioType.AC3)
                 samplesPerBlock = AC3BlockSize;
@@ -303,7 +299,7 @@ namespace MeGUI.packages.tools.calculator
         /// <returns>overhead this audio track will incurr</returns>
         private static int GetM2tsAudioOverhead(AudioType audioType, long lFrames, ulong length, ulong lFileSize, bool bVideohandling)
         {
-            if (audioType == AudioType.DTS || audioType == AudioType.DTSHD || audioType == AudioType.DTSMA)
+            if (audioType == AudioType.DTS)
             {
                 // formula based on http://forum.doom9.org/showpost.php?p=1484281&postcount=141
                 int packageSize = 192;
@@ -390,10 +386,6 @@ namespace MeGUI.packages.tools.calculator
                 return ac3Overhead;
             else if (audioType == AudioType.MP3)
                 return vbrMP3Overhead;
-            else if (audioType == AudioType.VBRMP3)
-                return vbrMP3Overhead;
-            else if (audioType == AudioType.CBRMP3)
-                return cbrMP3Overhead;
             else if (audioType == AudioType.RAWAAC)
                 return vbrMP3Overhead;
             else if (audioType == AudioType.DTS)
