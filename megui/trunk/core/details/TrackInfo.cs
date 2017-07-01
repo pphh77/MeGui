@@ -35,14 +35,11 @@ namespace MeGUI
     public class TrackInfo : ICloneable
     {
         private string _codec, _containerType, _language, _name, _sourceFileName;
-        private int _trackID, _mmgTrackID, _delay, _trackIndex;
+        private int _trackID, _mmgTrackID, _delay, _trackIndex, _oneClickTrackNumber;
         private bool _bDefault, _bForced, _bMKVTrack;
         private TrackType _trackType;
 
-        public TrackInfo() : this(null, null)
-        {
-
-        }
+        public TrackInfo() : this(null, null) { }
 
         public TrackInfo(string language, string name)
         {
@@ -55,6 +52,7 @@ namespace MeGUI
             this._trackIndex = 0;
             this._codec = _containerType = String.Empty;
             this._bMKVTrack = false;
+            this._oneClickTrackNumber = 0;
         }
 
         /// <summary>
@@ -145,6 +143,15 @@ namespace MeGUI
         }
 
         /// <summary>
+        /// The OneClick track number
+        /// </summary>
+        public int OneClickTrackNumber
+        {
+            get { return _oneClickTrackNumber; }
+            set { _oneClickTrackNumber = value; }
+        }
+
+        /// <summary>
         /// The Codec String
         /// </summary>
         public string Codec
@@ -218,11 +225,13 @@ namespace MeGUI
                     strCodec = arrCodec[0].ToUpperInvariant();
                 }
 
-                if (strCodec.StartsWith("DTS", StringComparison.InvariantCultureIgnoreCase))
-                    strCodec = "DTS";
-
-                if (strCodec.ToUpperInvariant().Contains("TRUEHD"))
-                    strCodec = "TRUEHD";
+                if (strCode.Contains("TRUEHD"))
+                {
+                    if (strCodec.Contains("AC-3"))
+                        strCodec = "TRUEHD+AC3";
+                    else
+                        strCodec = "TRUEHD";
+                }
 
                 switch (strCodec)
                 {
@@ -230,6 +239,7 @@ namespace MeGUI
                     case "AC-3": strExtension = "ac3"; break;
                     case "E-AC-3": strExtension = "eac3"; break;
                     case "TRUEHD": strExtension = "thd"; break;
+                    case "TRUEHD+AC3": strExtension = "thd+ac3"; break;
                     case "DTS": strExtension = "dts"; break;
                     case "MP3": strExtension = "mp3"; break;
                     case "MP2": strExtension = "mp2"; break;
@@ -263,7 +273,10 @@ namespace MeGUI
 
                 if (!strExtension.Equals("avs", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    strFileName = System.IO.Path.GetFileNameWithoutExtension(_sourceFileName) + " - [" + _trackIndex + "]";
+                    strFileName = System.IO.Path.GetFileNameWithoutExtension(_sourceFileName) + " - ";
+                    if (_oneClickTrackNumber > 0)
+                        strFileName += "[" + _oneClickTrackNumber + "]";
+                    strFileName += "[" + _trackIndex + "]";
                     if (!String.IsNullOrEmpty(_language))
                         strFileName += " " + _language;
                     if (_delay != 0)

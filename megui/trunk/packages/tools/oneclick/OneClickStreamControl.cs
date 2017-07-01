@@ -60,14 +60,8 @@ namespace MeGUI
         [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public AudioEncodingMode EncodingMode
         {
-            get
-            {
-                return (AudioEncodingMode)cbEncodingMode.SelectedIndex;
-            }
-            set
-            {
-                cbEncodingMode.SelectedIndex = (int)value;
-            }
+            get { return (AudioEncodingMode)cbEncodingMode.SelectedIndex; }
+            set { cbEncodingMode.SelectedIndex = (int)value; }
         }
 
         [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -101,7 +95,7 @@ namespace MeGUI
                     return;
                 }
 
-                MeGUI.core.gui.NiceComboBoxItem oItem = new core.gui.NiceComboBoxItem(value.DemuxFilePath, value);
+                NiceComboBoxItem oItem = new NiceComboBoxItem(value.DemuxFilePath, value);
                 input.SelectedItem = oItem;
                 if (!string.IsNullOrEmpty(value.Language))
                 {
@@ -168,6 +162,13 @@ namespace MeGUI
             }
         }
 
+        private int trackNumber = 0;
+        public int TrackNumber
+        {
+            get { return trackNumber; }
+            set { trackNumber = value; }
+        }
+
         public string Filter
         {
             get { return input.Filter; }
@@ -221,6 +222,7 @@ namespace MeGUI
                     oStream.ForcedStream = ((OneClickStream)input.SelectedObject).ForcedStream;
                     oStream.EncoderSettings = (AudioCodecSettings)encoderProfile.SelectedProfile.BaseSettings;
                     oStream.EncodingMode = (AudioEncodingMode)cbEncodingMode.SelectedIndex;
+                    oStream.TrackInfo.OneClickTrackNumber = trackNumber;
                     return oStream;
                 }
                 else

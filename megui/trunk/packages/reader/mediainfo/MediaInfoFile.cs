@@ -358,13 +358,14 @@ namespace MeGUI
                     else
                         ati.Codec = atrack.Format;
 
-                    if (atrack.MuxingMode.Equals("Stream extension") 
-                        && (atrack.Format.Equals("DTS") || atrack.Format.Contains("TrueHD")|| atrack.Format.Equals("E-AC-3")))
-                        ati.HasCore = true;
-
                     ati.AudioCodec = getAudioCodec(ati.Codec);
                     if (ati.AudioCodec != null)
                         ati.AudioType = getAudioType(ati.AudioCodec, cType, file);
+
+                    if ((atrack.Format.Equals("E-AC-3") && atrack.MuxingMode.Equals("Stream extension"))
+                        || (atrack.Format.Equals("DTS") && atrack.FormatProfile.Contains("/"))
+                        || (ati.AudioCodec == AudioCodec.THDAC3))
+                        ati.HasCore = true;
 
                     if (MainForm.Instance.Settings.ShowDebugInformation && ati.AudioCodec == null)
                     {

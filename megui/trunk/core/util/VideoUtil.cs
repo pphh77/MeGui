@@ -104,19 +104,6 @@ namespace MeGUI
             return false;
         }
 
-        public static List<string> setDeviceTypes(string outputFormat)
-        {
-            List<string> deviceList = new List<string>();
-            switch (outputFormat)
-            {
-                case ".avi": deviceList.AddRange(new string[] { "PC" }); break;
-                case ".mp4": deviceList.AddRange(new string[] { "Apple TV", "iPad", "iPhone", "iPod", "ISMA", "PSP" }); break;
-                case ".m2ts": deviceList.AddRange(new string[] { "AVCHD", "Blu-ray" }); break;
-            }
-
-            return deviceList;
-        }
-
  		#endregion
 
 		#region dgindex postprocessing

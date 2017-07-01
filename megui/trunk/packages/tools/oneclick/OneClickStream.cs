@@ -76,8 +76,10 @@ namespace MeGUI
         public OneClickStream Clone()
         {
             OneClickStream newStream = (OneClickStream)this.MemberwiseClone();
-            newStream.EncoderSettings = _encoderSettings.Clone();
-            newStream.TrackInfo = _trackInfo.Clone();
+            if (_encoderSettings != null)
+                newStream.EncoderSettings = _encoderSettings.Clone();
+            if (_trackInfo != null)
+                newStream.TrackInfo = _trackInfo.Clone();
             return newStream;
         }
 

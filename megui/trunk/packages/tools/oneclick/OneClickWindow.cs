@@ -81,12 +81,14 @@ namespace MeGUI
         {
             audioTracks = new List<OneClickStreamControl>();
             audioTracks.Add(oneClickAudioStreamControl1);
+            oneClickAudioStreamControl1.TrackNumber = 1;
             oneClickAudioStreamControl1.StandardStreams = new object[] { "None" };
             oneClickAudioStreamControl1.SelectedStreamIndex = 0;
             oneClickAudioStreamControl1.Filter = VideoUtil.GenerateCombinedFilter(ContainerManager.AudioTypes.ValuesArray);
-            
+
             subtitleTracks = new List<OneClickStreamControl>();
             subtitleTracks.Add(oneClickSubtitleStreamControl1);
+            oneClickSubtitleStreamControl1.TrackNumber = 1;
             oneClickSubtitleStreamControl1.StandardStreams = new object[] { "None" };
             oneClickSubtitleStreamControl1.SelectedStreamIndex = 0;
             oneClickSubtitleStreamControl1.Filter = VideoUtil.GenerateCombinedFilter(ContainerManager.SubtitleTypes.ValuesArray);
@@ -265,7 +267,8 @@ namespace MeGUI
 
         private void updateChapterSelection(object sender, EventArgs e)
         {
-            if (this.containerFormat.Text == "AVI" || (this.containerFormat.Text == "M2TS" && devicetype.SelectedItem.ToString().Equals("Standard")))
+            if (this.containerFormat.Text == "AVI" 
+                || (this.containerFormat.Text == "M2TS" && (devicetype.SelectedItem == null || devicetype.SelectedItem.ToString().Equals("Standard"))))
                 chapterFile.Enabled = false;
             else
                 chapterFile.Enabled = true;
@@ -830,6 +833,7 @@ namespace MeGUI
                 }
             }
 
+            bool bRemuxInputToMKV = false;
             dpp.IntermediateMKVFile = String.Empty;
             if (_videoInputInfo.isEac3toDemuxable())
             {
@@ -853,23 +857,50 @@ namespace MeGUI
                         continue;
 
                     bool bCoreOnly = false;
-                    if (!isDontEncodeAudioPossible(_videoInputInfo, oStreamControl.SelectedItem.IsStandard, inputContainer) || oStreamControl.SelectedStream.EncodingMode != AudioEncodingMode.Never)
+                    AudioCodec audioCodec = ((AudioTrackInfo)oStreamControl.SelectedStream.TrackInfo).AudioCodec;
+                    if (oStreamControl.SelectedStream.EncodingMode != AudioEncodingMode.Never 
+                        && ((AudioTrackInfo)oStreamControl.SelectedStream.TrackInfo).HasCore)
                     {
-                        //check if core must be extracted
-                        if (oStreamControl.SelectedStream.TrackInfo.Codec.ToLowerInvariant().Contains("truehd"))
+                        // audio file can be demuxed && should be touched (core needed)
+                        if (audioCodec == AudioCodec.THDAC3)
                         {
-                            oStreamControl.SelectedStream.TrackInfo.Codec = "AC-3";
-                            bCoreOnly = true;
+                            // if FLAC is used as encoder it cannot deal with THDAC3 so either THD or AC3 has to be used
+                            if (oStreamControl.SelectedStream.EncoderSettings is FlacSettings
+                                && oStreamControl.SelectedStream.EncoderSettings.DownmixMode == ChannelMode.KeepOriginal
+                                && oStreamControl.SelectedStream.EncodingMode != AudioEncodingMode.NeverOnlyCore)
+                            {
+                                oStreamControl.SelectedStream.TrackInfo.Codec = "TrueHD";
+                                ((AudioTrackInfo)oStreamControl.SelectedStream.TrackInfo).AudioType = AudioType.THD;
+                                ((AudioTrackInfo)oStreamControl.SelectedStream.TrackInfo).AudioCodec = AudioCodec.THD;
+                            }
+                            else
+                            {
+                                oStreamControl.SelectedStream.TrackInfo.Codec = "AC-3";
+                                ((AudioTrackInfo)oStreamControl.SelectedStream.TrackInfo).AudioType = AudioType.AC3;
+                                ((AudioTrackInfo)oStreamControl.SelectedStream.TrackInfo).AudioCodec = AudioCodec.AC3;
+                                bCoreOnly = true;
+                            }
+                            ((AudioTrackInfo)oStreamControl.SelectedStream.TrackInfo).HasCore = false;
                         }
-                        else if (oStreamControl.SelectedStream.TrackInfo.Codec.StartsWith("DTS-HD", StringComparison.InvariantCultureIgnoreCase))
+                        else if (audioCodec == AudioCodec.DTS)
                         {
-                            oStreamControl.SelectedStream.TrackInfo.Codec = "DTS";
-                            bCoreOnly = true;
+                            // do not etraxt only the core if FLAC is used as encoder
+                            if (!(oStreamControl.SelectedStream.EncoderSettings is FlacSettings)
+                                || oStreamControl.SelectedStream.EncodingMode == AudioEncodingMode.NeverOnlyCore
+                                || oStreamControl.SelectedStream.EncoderSettings.DownmixMode != ChannelMode.KeepOriginal)
+                            {
+                                oStreamControl.SelectedStream.TrackInfo.Codec = "DTS";
+                                ((AudioTrackInfo)oStreamControl.SelectedStream.TrackInfo).AudioType = AudioType.DTS;
+                                ((AudioTrackInfo)oStreamControl.SelectedStream.TrackInfo).AudioCodec = AudioCodec.DTS;
+                                ((AudioTrackInfo)oStreamControl.SelectedStream.TrackInfo).HasCore = false;
+                                bCoreOnly = true;
+                            }
                         }
                     }
 
-                    //check if core must be extracted
-                    if (oStreamControl.SelectedStream.TrackInfo.Codec.ToLowerInvariant().Contains("e-ac-3"))
+                    // core must be extracted (workaround for an eac3to issue)
+                    // http://bugs.madshi.net/view.php?id=450
+                    if (audioCodec == AudioCodec.EAC3)
                         bCoreOnly = true;
 
                     OneClickStream oStream = oStreamControl.SelectedStream.Clone();
@@ -902,11 +933,10 @@ namespace MeGUI
             else if (inputContainer != ContainerType.MKV)
             {
                 // mux input file into MKV if possible and necessary
-                bool bRemuxInput = false;
                 if (muxVideo)
-                    bRemuxInput = true;
+                    bRemuxInputToMKV = true;
 
-                if (!bRemuxInput && 
+                if (!bRemuxInputToMKV && 
                     (dpp.IndexType == FileIndexerWindow.IndexType.FFMS ||
                     dpp.IndexType == FileIndexerWindow.IndexType.AVISOURCE ||
                     dpp.IndexType == FileIndexerWindow.IndexType.LSMASH))
@@ -919,12 +949,12 @@ namespace MeGUI
                         if (oStreamControl.SelectedStreamIndex <= 0) // not NONE
                             continue;
 
-                        bRemuxInput = true;
+                        bRemuxInputToMKV = true;
                         break;
                     }
                 }
 
-                if (!bRemuxInput && Path.GetExtension(_videoInputInfo.FileName.ToUpperInvariant()) != ".VOB")
+                if (!bRemuxInputToMKV && Path.GetExtension(_videoInputInfo.FileName.ToUpperInvariant()) != ".VOB")
                 {
                     foreach (OneClickStreamControl oStreamControl in subtitleTracks)
                     {
@@ -934,12 +964,12 @@ namespace MeGUI
                         if (oStreamControl.SelectedStreamIndex <= 0) // not NONE
                             continue;
 
-                        bRemuxInput = true;
+                        bRemuxInputToMKV = true;
                         break;
                     }
                 }
 
-                if (bRemuxInput)
+                if (bRemuxInputToMKV)
                 {
                     if (!_oSettings.DisableIntermediateMKV && _videoInputInfo.MuxableToMKV())
                     {
@@ -1047,9 +1077,10 @@ namespace MeGUI
             // MKV tracks which need to be extracted
             List<TrackInfo> oExtractMKVTrack = new List<TrackInfo>();
 
-            // get audio information
+            // audio handling
             JobChain audioJobs = null;
             List<AudioTrackInfo> arrAudioTrackInfo = new List<AudioTrackInfo>();
+            int iTrueHDOffset = 0;
             foreach (OneClickStreamControl oStreamControl in audioTracks)
             {
                 if (oStreamControl.SelectedStreamIndex <= 0) // "None"
@@ -1058,7 +1089,6 @@ namespace MeGUI
                 string aInput = null;
                 string strLanguage = null;
                 string strName = null;
-                string strAudioCodec = null;
                 bool bExtractMKVTrack = false;
                 AudioTrackInfo oAudioTrackInfo = null;
                 OneClickStream oStream = oStreamControl.SelectedStream.Clone();
@@ -1073,6 +1103,15 @@ namespace MeGUI
                         continue;
                     }
 
+                    if (bRemuxInputToMKV)
+                    {
+                        // if a remux to MKV will happen, the THDAC3 track will be splitted:
+                        // https://github.com/mbunkus/mkvtoolnix/wiki/TrueHD-and-AC-3
+                        if (oAudioTrackInfo.AudioCodec == AudioCodec.THDAC3)
+                            iTrueHDOffset++;
+                        oStream.TrackInfo.MMGTrackID += iTrueHDOffset;
+                    }
+
                     arrAudioTrackInfo.Add(oAudioTrackInfo);
                     if (dpp.IndexType != FileIndexerWindow.IndexType.NONE && !dpp.Eac3toDemux)
                         aInput = "::" + oAudioTrackInfo.TrackID + "::";
@@ -1080,24 +1119,50 @@ namespace MeGUI
                         aInput = Path.Combine(dpp.WorkingDirectory, oAudioTrackInfo.DemuxFileName);
                     strName = oAudioTrackInfo.Name;
                     strLanguage = oAudioTrackInfo.Language;
-                    strAudioCodec = oAudioTrackInfo.Codec;
                     if (inputContainer == ContainerType.MKV && !dpp.Eac3toDemux) // only if container MKV and no demux with eac3to
                     {
-                        if (!strAudioCodec.Equals("PCM", StringComparison.InvariantCultureIgnoreCase)) // some PCM tracks cannot be extracted by mkvextract
+                        if (oAudioTrackInfo.AudioCodec != AudioCodec.PCM) // some PCM tracks cannot be extracted by mkvextract
                         {
-                            oExtractMKVTrack.Add(oStream.TrackInfo);
+                            // if TrueHD has to be extracted from a TrueHD + AC3 track within a MKV, iTrueHDOffset - 1 has to be used for the track ID
+                            if (oAudioTrackInfo.AudioCodec == AudioCodec.THDAC3)
+                            {
+                                if (oStream.EncodingMode == AudioEncodingMode.Never
+                                || (oStream.EncoderSettings is FlacSettings
+                                    && oStream.EncoderSettings.DownmixMode == ChannelMode.KeepOriginal
+                                    && oStream.EncodingMode != AudioEncodingMode.NeverOnlyCore))
+                                {
+                                    oAudioTrackInfo.MMGTrackID = oStream.TrackInfo.MMGTrackID - 1;
+                                    oAudioTrackInfo.Codec = "TrueHD";
+                                    oAudioTrackInfo.AudioCodec = AudioCodec.THD;
+                                    oAudioTrackInfo.AudioType = AudioType.THD;
+                                }
+                                else
+                                {
+                                    oAudioTrackInfo.Codec = "AC-3";
+                                    oAudioTrackInfo.AudioCodec = AudioCodec.AC3;
+                                    oAudioTrackInfo.AudioType = AudioType.AC3; 
+                                }
+                                oAudioTrackInfo.HasCore = false;
+                            }
+
+                            oExtractMKVTrack.Add(oStream.TrackInfo.Clone());
                             bExtractMKVTrack = true;
                         }
                     }
                 }
                 else
                 {
+                    strName = oStream.Name;
+                    strLanguage = oStream.Language;
                     aInput = oStreamControl.SelectedFile;
                     MediaInfoFile oInfo = new MediaInfoFile(aInput, ref _oLog);
                     if (oInfo.AudioInfo.Tracks.Count > 0)
-                        strAudioCodec = oInfo.AudioInfo.Tracks[0].Codec;
-                    strName = oStream.Name;
-                    strLanguage = oStream.Language;
+                    {
+                        oAudioTrackInfo = oInfo.AudioInfo.Tracks[0];
+                        oStream.TrackInfo = oAudioTrackInfo;
+                        oStream.Language = strLanguage;
+                        oStream.Name = strName;
+                    }
                 }
 
                 bool bIsDontEncodeAudioPossible = isDontEncodeAudioPossible(_videoInputInfo, oStreamControl.SelectedItem.IsStandard, inputContainer);
@@ -1105,10 +1170,10 @@ namespace MeGUI
                     (oStream.EncodingMode == AudioEncodingMode.Never ||
                     (oStream.EncodingMode == AudioEncodingMode.NeverOnlyCore && dpp.Eac3toDemux) ||
                     (oStream.EncodingMode == AudioEncodingMode.IfCodecDoesNotMatch &&
-                    oStream.EncoderSettings.EncoderType.ACodec.ID.Equals(strAudioCodec, StringComparison.InvariantCultureIgnoreCase))))
+                    oStream.EncoderSettings.EncoderType.ACodec.ID.Equals(oAudioTrackInfo.AudioCodec.ID))))
                 {
                     if (oStreamControl.SelectedItem.IsStandard && inputContainer == ContainerType.MKV 
-                        && strAudioCodec.Equals("PCM", StringComparison.InvariantCultureIgnoreCase))
+                        && oAudioTrackInfo.AudioCodec == AudioCodec.PCM)
                     {
                         int trackID = oStream.TrackInfo.TrackID;
                         if (_videoInputInfo.ContainerFileType != ContainerType.MKV)
@@ -1127,73 +1192,131 @@ namespace MeGUI
                     (oStream.EncodingMode == AudioEncodingMode.Never ||
                     (oStream.EncodingMode == AudioEncodingMode.NeverOnlyCore && dpp.Eac3toDemux) ||
                     (oStream.EncodingMode == AudioEncodingMode.IfCodecDoesNotMatch &&
-                     oStream.EncoderSettings.EncoderType.ACodec.ID.Equals(strAudioCodec, StringComparison.InvariantCultureIgnoreCase))))
-                        _oLog.LogEvent("Audio " + oStream + " cannot be processed with encoding mode \"" + oStream.EncodingMode + "\" as it must be encoded");
+                     oStream.EncoderSettings.EncoderType.ACodec.ID.Equals(oAudioTrackInfo.AudioCodec.ID))))
+                        _oLog.LogEvent("Audio " + oStream + " cannot be processed with encoding mode \"" + oStream.EncodingMode + "\" as it must be encoded", ImageType.Error);
 
                     // audio track will be encoded
                     string strFileName = string.Empty;
                     if (!oStreamControl.SelectedItem.IsStandard || !dpp.Eac3toDemux)
                     {
-                        if (strAudioCodec.ToLowerInvariant().Contains("truehd"))
+                        if (oAudioTrackInfo.HasCore && oStream.EncodingMode != AudioEncodingMode.Never)
                         {
-                            strAudioCodec = "AC-3";
+                            if (oAudioTrackInfo.AudioCodec == AudioCodec.THDAC3)
+                            {
+                                // if FLAC is used as encoder it cannot deal with THDAC3 so either THD or AC3 has to be used
+                                if (oStream.EncoderSettings is FlacSettings
+                                    && oStream.EncoderSettings.DownmixMode == ChannelMode.KeepOriginal
+                                    && oStream.EncodingMode != AudioEncodingMode.NeverOnlyCore)
+                                {
+                                    oAudioTrackInfo.Codec = "TrueHD";
+                                    oAudioTrackInfo.AudioCodec = AudioCodec.THD;
+                                    oAudioTrackInfo.AudioType = AudioType.THD;
+                                }
+                                else
+                                {
+                                    oAudioTrackInfo.Codec = "AC-3";
+                                    oAudioTrackInfo.AudioCodec = AudioCodec.AC3;
+                                    oAudioTrackInfo.AudioType = AudioType.AC3;
+                                }
+                                oAudioTrackInfo.HasCore = false;
+
+                                if (oStreamControl.SelectedItem.IsStandard)
+                                {
+                                    strFileName = Path.Combine(strWorkingDirectory, oStream.TrackInfo.DemuxFileName);
+                                    aInput = FileUtil.AddToFileName(strFileName, "_core");
+                                }
+                                else
+                                {
+                                    strFileName = oStreamControl.SelectedFile;
+                                    aInput = FileUtil.AddToFileName(Path.ChangeExtension(strFileName, oAudioTrackInfo.AudioType.Extension), "_core");
+                                    aInput = Path.Combine(strWorkingDirectory, Path.GetFileName(aInput));
+                                }
+
+                                HDStreamsExJob oJob = new HDStreamsExJob(new List<string>() { strFileName }, aInput, null, "\"" + aInput + "\"", 2);
+                                audioJobs = new SequentialChain(audioJobs, new SequentialChain(oJob));
+                                dpp.FilesToDelete.Add(FileUtil.AddToFileName(Path.ChangeExtension(aInput, "txt"), " - Log"));
+                                dpp.FilesToDelete.Add(aInput);
+                            }
+                            else if (oAudioTrackInfo.AudioCodec == AudioCodec.DTS)
+                            {
+                                // do not etraxt only the core if FLAC is used as encoder
+                                if (!(oStreamControl.SelectedStream.EncoderSettings is FlacSettings)
+                                    || oStreamControl.SelectedStream.EncodingMode == AudioEncodingMode.NeverOnlyCore
+                                    || oStreamControl.SelectedStream.EncoderSettings.DownmixMode != ChannelMode.KeepOriginal)
+                                {
+                                    if (oStreamControl.SelectedItem.IsStandard)
+                                    {
+                                        strFileName = Path.Combine(strWorkingDirectory, oStream.TrackInfo.DemuxFileName);
+                                        aInput = FileUtil.AddToFileName(Path.ChangeExtension(strFileName, "dts"), "_core");
+                                    }
+                                    else
+                                    {
+                                        strFileName = oStreamControl.SelectedFile;
+                                        aInput = FileUtil.AddToFileName(Path.ChangeExtension(strFileName, "dts"), "_core");
+                                        aInput = Path.Combine(strWorkingDirectory, Path.GetFileName(aInput));
+                                    }
+                                    oAudioTrackInfo.HasCore = false;
+
+                                    HDStreamsExJob oJob = new HDStreamsExJob(new List<string>() { strFileName }, aInput, null, "\"" + aInput + "\" -core", 2);
+                                    audioJobs = new SequentialChain(audioJobs, new SequentialChain(oJob));
+                                    dpp.FilesToDelete.Add(FileUtil.AddToFileName(Path.ChangeExtension(aInput, "txt"), " - Log"));
+                                    dpp.FilesToDelete.Add(aInput);
+                                }
+                            }
+                        }
+
+                        if (oAudioTrackInfo.AudioCodec == AudioCodec.EAC3)
+                        {
                             if (oStreamControl.SelectedItem.IsStandard)
                             {
                                 strFileName = Path.Combine(strWorkingDirectory, oStream.TrackInfo.DemuxFileName);
-                                strFileName = Path.ChangeExtension(strFileName, "ac3");
-                                oAudioTrackInfo.Codec = strAudioCodec;
                                 aInput = FileUtil.AddToFileName(strFileName, "_core");
                             }
                             else
                             {
                                 strFileName = oStreamControl.SelectedFile;
-                                aInput = FileUtil.AddToFileName(Path.ChangeExtension(strFileName, "ac3"), "_core");
+                                aInput = FileUtil.AddToFileName(strFileName, "_core");
                                 aInput = Path.Combine(strWorkingDirectory, Path.GetFileName(aInput));
                             }
 
-                            HDStreamsExJob oJob = new HDStreamsExJob(new List<string>() { strFileName }, aInput, null, "\"" + aInput + "\"", 2);
-                            audioJobs = new SequentialChain(audioJobs, new SequentialChain(oJob));
-                            dpp.FilesToDelete.Add(FileUtil.AddToFileName(Path.ChangeExtension(aInput, "txt"), " - Log"));
-                            dpp.FilesToDelete.Add(aInput);
-                        }
-                        else if (strAudioCodec.StartsWith("DTS-HD", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            strAudioCodec = "DTS";
-                            if (oStreamControl.SelectedItem.IsStandard)
+                            if (oAudioTrackInfo.HasCore)
                             {
-                                strFileName = Path.Combine(strWorkingDirectory, oStream.TrackInfo.DemuxFileName);
-                                oAudioTrackInfo.Codec = strAudioCodec;
-                                aInput = FileUtil.AddToFileName(Path.ChangeExtension(strFileName, "dts"), "_core");
+                                oAudioTrackInfo.Codec = "E-AC-3";
+                                oAudioTrackInfo.AudioCodec = AudioCodec.AC3;
+                                oAudioTrackInfo.AudioType = AudioType.AC3;
                             }
-                            else
-                            {
-                                strFileName = oStreamControl.SelectedFile;
-                                aInput = FileUtil.AddToFileName(Path.ChangeExtension(strFileName, "dts"), "_core");
-                                aInput = Path.Combine(strWorkingDirectory, Path.GetFileName(aInput));
-                            }
+                            oAudioTrackInfo.HasCore = false;
 
                             HDStreamsExJob oJob = new HDStreamsExJob(new List<string>() { strFileName }, aInput, null, "\"" + aInput + "\" -core", 2);
                             audioJobs = new SequentialChain(audioJobs, new SequentialChain(oJob));
                             dpp.FilesToDelete.Add(FileUtil.AddToFileName(Path.ChangeExtension(aInput, "txt"), " - Log"));
                             dpp.FilesToDelete.Add(aInput);
                         }
-                        else if (oStreamControl.SelectedItem.IsStandard && strAudioCodec.Equals("PCM", StringComparison.InvariantCultureIgnoreCase))
+                        else if (oAudioTrackInfo.AudioCodec == AudioCodec.PCM && inputContainer == ContainerType.MKV && oStreamControl.SelectedItem.IsStandard)
                         {
-                            if (inputContainer == ContainerType.MKV)
-                            {
-                                int trackID = oStream.TrackInfo.TrackID;
-                                if (_videoInputInfo.ContainerFileType != ContainerType.MKV)
-                                    trackID++;
-                                aInput = Path.Combine(strWorkingDirectory, oStream.TrackInfo.DemuxFileName);
-                                HDStreamsExJob oJob = new HDStreamsExJob(new List<string>() { dpp.VideoInput }, aInput, null, trackID + ":\"" + aInput + "\"", 2);
-                                audioJobs = new SequentialChain(audioJobs, new SequentialChain(oJob));
-                                dpp.FilesToDelete.Add(FileUtil.AddToFileName(Path.ChangeExtension(aInput, "txt"), " - Log"));
-                                dpp.FilesToDelete.Add(aInput);
-                            }
+                            int trackID = oStream.TrackInfo.TrackID;
+                            if (_videoInputInfo.ContainerFileType != ContainerType.MKV)
+                                trackID++;
+                            aInput = Path.Combine(strWorkingDirectory, oStream.TrackInfo.DemuxFileName);
+                            HDStreamsExJob oJob = new HDStreamsExJob(new List<string>() { dpp.VideoInput }, aInput, null, trackID + ":\"" + aInput + "\"", 2);
+                            audioJobs = new SequentialChain(audioJobs, new SequentialChain(oJob));
+                            dpp.FilesToDelete.Add(FileUtil.AddToFileName(Path.ChangeExtension(aInput, "txt"), " - Log"));
+                            dpp.FilesToDelete.Add(aInput);
                         }
                     }
 
-                    if (oStream.EncodingMode == AudioEncodingMode.NeverOnlyCore)
+                    if (dpp.Eac3toDemux && oAudioTrackInfo.AudioCodec == AudioCodec.EAC3 && oAudioTrackInfo.HasCore)
+                    {
+                        // E-AC-3 has been extracted by eac3to so the AC-3 core has been extracted
+                        // change the codec but not the codec string so that the file extension is still correct
+                        oAudioTrackInfo.Codec = "E-AC-3";
+                        oAudioTrackInfo.AudioCodec = AudioCodec.AC3;
+                        oAudioTrackInfo.AudioType = AudioType.AC3;
+                        oAudioTrackInfo.HasCore = false;
+                    }
+
+                    if (oStream.EncodingMode == AudioEncodingMode.Never || oStream.EncodingMode == AudioEncodingMode.NeverOnlyCore
+                        || (oStream.EncodingMode == AudioEncodingMode.IfCodecDoesNotMatch && oStream.EncoderSettings.EncoderType.ACodec.ID.Equals(oAudioTrackInfo.AudioCodec.ID)))
                         dpp.AudioTracks.Add(new OneClickAudioTrack(null, new MuxStream(aInput, strLanguage, strName, delay, false, false, null), oAudioTrackInfo, bExtractMKVTrack));
                     else
                         dpp.AudioTracks.Add(new OneClickAudioTrack(new AudioJob(aInput, null, null, oStream.EncoderSettings, delay, strLanguage, strName), null, oAudioTrackInfo, bExtractMKVTrack));
@@ -1213,6 +1336,9 @@ namespace MeGUI
 
                 if (oStreamControl.SelectedItem.IsStandard)
                 {
+                    if (bRemuxInputToMKV)
+                        oStream.TrackInfo.MMGTrackID += iTrueHDOffset;
+
                     string strExtension = Path.GetExtension(oStream.TrackInfo.SourceFileName.ToLowerInvariant());
                     if (strExtension.Equals(".ifo") || strExtension.Equals(".vob"))
                     {
@@ -1234,7 +1360,7 @@ namespace MeGUI
                     else if (inputContainer == ContainerType.MKV && !dpp.Eac3toDemux) // only if container MKV and no demux with eac3to
                     {
                         oStream.TrackInfo.ExtractMKVTrack = true;
-                        oExtractMKVTrack.Add(oStream.TrackInfo);
+                        oExtractMKVTrack.Add(oStream.TrackInfo.Clone());
                         dpp.SubtitleTracks.Add(oStream);
                     }
                 }
@@ -1601,6 +1727,7 @@ namespace MeGUI
             p.Padding = subtitlesTab.TabPages[0].Padding;
 
             OneClickStreamControl a = new OneClickStreamControl();
+            a.TrackNumber = subtitleTracks.Count + 1;
             a.Dock = subtitleTracks[0].Dock;
             a.Padding = subtitleTracks[0].Padding;
             a.ShowDelay = subtitleTracks[0].ShowDelay;
@@ -1610,10 +1737,23 @@ namespace MeGUI
             a.SomethingChanged += new EventHandler(audio1_SomethingChanged);
             a.Filter = subtitleTracks[0].Filter;
             a.FileUpdated += oneClickSubtitleStreamControl_FileUpdated;
-            a.StandardStreams = subtitleTracks[0].StandardStreams;
+
+            // clone the streams
+            object[] oStreams = new object[subtitleTracks[0].StandardStreams.Length];
+            int i = 0;
+            foreach (object oStream in subtitleTracks[0].StandardStreams)
+            {
+                if (oStream is OneClickStream)
+                    oStreams[i] = ((OneClickStream)oStream).Clone();
+                else
+                    oStreams[i] = oStream;
+                i++;
+            }
+            a.StandardStreams = oStreams;
+
             a.CustomStreams = subtitleTracks[0].CustomStreams;
             a.SelectedStreamIndex = 0;
-            a.initProfileHandler();
+            a.initProfileHandler();  
             if (this.Visible)
                 a.enableDragDrop();
 
@@ -1786,6 +1926,7 @@ namespace MeGUI
             p.Padding = audioTab.TabPages[0].Padding;
 
             OneClickStreamControl a = new OneClickStreamControl();
+            a.TrackNumber = audioTracks.Count + 1;
             a.Dock = audioTracks[0].Dock;
             a.Padding = audioTracks[0].Padding;
             a.ShowDelay = audioTracks[0].ShowDelay;
@@ -1793,7 +1934,20 @@ namespace MeGUI
             a.ShowForceStream = audioTracks[0].ShowForceStream;
             a.Filter = audioTracks[0].Filter;
             a.FileUpdated += oneClickAudioStreamControl_FileUpdated;
-            a.StandardStreams = audioTracks[0].StandardStreams;
+
+            // clone the streams
+            object[] oStreams = new object[audioTracks[0].StandardStreams.Length];
+            int i = 0;
+            foreach (object oStream in audioTracks[0].StandardStreams)
+            {
+                if (oStream is OneClickStream)
+                    oStreams[i] = ((OneClickStream)oStream).Clone();
+                else
+                    oStreams[i] = oStream;
+                i++;
+            }
+            a.StandardStreams = oStreams;
+
             a.CustomStreams = audioTracks[0].CustomStreams;
             a.SelectedStreamIndex = 0;
             a.SomethingChanged += new EventHandler(audio1_SomethingChanged);
@@ -2061,14 +2215,24 @@ namespace MeGUI
                 SubtitleRemoveTrack(subtitlesTab.SelectedIndex);
         }
 
+        /// <summary>
+        /// Checks if the audio can be not encoded = remuxed only
+        /// </summary>
+        /// <param name="iFile">MediaInfoFile of the selected video input</param>
+        /// <param name="bIsStandardTrack">true if standard = inlcuded track, false if external/dedicated file</param>
+        /// <param name="inputContainer">the input container type</param>
+        /// <returns>true if do not encode is possible</returns>
         private bool isDontEncodeAudioPossible(MediaInfoFile iFile, bool bIsStandardTrack, ContainerType inputContainer)
         {
+            // external files can be remuxed
             if (!bIsStandardTrack)
                 return true;
 
+            // if no media information is available ==> recode
             if (iFile == null)
                 return false;
 
+            // only mkv content can be extracted and only the DGIndexXX tools extract audio tracks
             if (inputContainer == ContainerType.MKV ||
                 iFile.IndexerToUse == FileIndexerWindow.IndexType.D2V ||
                 iFile.IndexerToUse == FileIndexerWindow.IndexType.DGM ||

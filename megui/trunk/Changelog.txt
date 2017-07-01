@@ -1,3 +1,7 @@
+2759 [OneClick]             improved handling of audio tracks:
+                            - FLAC encodings use the HD track instead of the core if possible. Feature request #610
+                            - fixed demux of multiple audio tracks using the same input track (eac3to only)
+                            - fixed handling of TrueHD+AC3 tracks if using an intermediate MKV file
 2758 [Muxer]                removed dtshd and dtsma file extension and added eac3 and thd+ac3 file extension where suitable
      [MediaInfo]            improved audio codec/type detection
 2757 [L-SMASH Indexer]      improved error handling
