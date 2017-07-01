@@ -81,14 +81,12 @@ namespace MeGUI
         {
             audioTracks = new List<OneClickStreamControl>();
             audioTracks.Add(oneClickAudioStreamControl1);
-            oneClickAudioStreamControl1.TrackNumber = 1;
             oneClickAudioStreamControl1.StandardStreams = new object[] { "None" };
             oneClickAudioStreamControl1.SelectedStreamIndex = 0;
             oneClickAudioStreamControl1.Filter = VideoUtil.GenerateCombinedFilter(ContainerManager.AudioTypes.ValuesArray);
 
             subtitleTracks = new List<OneClickStreamControl>();
             subtitleTracks.Add(oneClickSubtitleStreamControl1);
-            oneClickSubtitleStreamControl1.TrackNumber = 1;
             oneClickSubtitleStreamControl1.StandardStreams = new object[] { "None" };
             oneClickSubtitleStreamControl1.SelectedStreamIndex = 0;
             oneClickSubtitleStreamControl1.Filter = VideoUtil.GenerateCombinedFilter(ContainerManager.SubtitleTypes.ValuesArray);

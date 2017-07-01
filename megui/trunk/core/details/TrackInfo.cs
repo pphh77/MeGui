@@ -225,7 +225,7 @@ namespace MeGUI
                     strCodec = arrCodec[0].ToUpperInvariant();
                 }
 
-                if (strCode.Contains("TRUEHD"))
+                if (strCodec.Contains("TRUEHD"))
                 {
                     if (strCodec.Contains("AC-3"))
                         strCodec = "TRUEHD+AC3";

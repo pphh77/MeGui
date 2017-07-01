@@ -1,3 +1,4 @@
+2760 [OneClick]             cosmetics
 2759 [OneClick]             improved handling of audio tracks:
                             - FLAC encodings use the HD track instead of the core if possible. Feature request #610
                             - fixed demux of multiple audio tracks using the same input track (eac3to only)

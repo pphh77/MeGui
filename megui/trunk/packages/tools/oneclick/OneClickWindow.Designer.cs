@@ -311,6 +311,7 @@ namespace MeGUI
             this.oneClickAudioStreamControl1.Size = new System.Drawing.Size(434, 149);
             this.oneClickAudioStreamControl1.StandardStreams = new object[0];
             this.oneClickAudioStreamControl1.TabIndex = 0;
+            this.oneClickAudioStreamControl1.TrackNumber = 1;
             this.oneClickAudioStreamControl1.FileUpdated += new System.EventHandler(this.oneClickAudioStreamControl_FileUpdated);
             // 
             // tabPage2
@@ -363,6 +364,7 @@ namespace MeGUI
             this.oneClickSubtitleStreamControl1.Size = new System.Drawing.Size(434, 90);
             this.oneClickSubtitleStreamControl1.StandardStreams = new object[0];
             this.oneClickSubtitleStreamControl1.TabIndex = 0;
+            this.oneClickSubtitleStreamControl1.TrackNumber = 1;
             this.oneClickSubtitleStreamControl1.FileUpdated += new System.EventHandler(this.oneClickSubtitleStreamControl_FileUpdated);
             // 
             // tabPage5
@@ -896,6 +898,7 @@ namespace MeGUI
             this.Controls.Add(this.goButton);
             this.Controls.Add(this.cbGUIMode);
             this.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "OneClickWindow";
