@@ -121,7 +121,8 @@ namespace MeGUI
             string strTrackName;
             string[] files;
 
-            if ((audioTracks == null || audioTracks.Count == 0) && (audioTracksDemux == null || audioTracksDemux.Count == 0))
+            if (String.IsNullOrEmpty(projectName) 
+                || ((audioTracks == null || audioTracks.Count == 0) && (audioTracksDemux == null || audioTracksDemux.Count == 0)))
                 return audioFiles;
 
             if (audioTracks != null && audioTracks.Count > 0)

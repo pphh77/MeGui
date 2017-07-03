@@ -1182,7 +1182,7 @@ namespace MeGUI
                         dpp.FilesToDelete.Add(FileUtil.AddToFileName(Path.ChangeExtension(aInput, "txt"), " - Log"));
                         dpp.FilesToDelete.Add(aInput);
                     }
-                    dpp.AudioTracks.Add(new OneClickAudioTrack(null, new MuxStream(aInput, strLanguage, strName, delay, false, false, null), oAudioTrackInfo, bExtractMKVTrack));
+                    dpp.AudioTracks.Add(new OneClickAudioTrack(null, new MuxStream(aInput, strLanguage, strName, delay, false, false, null), oStreamControl.SelectedItem.IsStandard ? oAudioTrackInfo : null, bExtractMKVTrack));
                 }
                 else
                 {
@@ -1315,9 +1315,9 @@ namespace MeGUI
 
                     if (oStream.EncodingMode == AudioEncodingMode.Never || oStream.EncodingMode == AudioEncodingMode.NeverOnlyCore
                         || (oStream.EncodingMode == AudioEncodingMode.IfCodecDoesNotMatch && oStream.EncoderSettings.EncoderType.ACodec.ID.Equals(oAudioTrackInfo.AudioCodec.ID)))
-                        dpp.AudioTracks.Add(new OneClickAudioTrack(null, new MuxStream(aInput, strLanguage, strName, delay, false, false, null), oAudioTrackInfo, bExtractMKVTrack));
+                        dpp.AudioTracks.Add(new OneClickAudioTrack(null, new MuxStream(aInput, strLanguage, strName, delay, false, false, null), oStreamControl.SelectedItem.IsStandard ? oAudioTrackInfo : null, bExtractMKVTrack));
                     else
-                        dpp.AudioTracks.Add(new OneClickAudioTrack(new AudioJob(aInput, null, null, oStream.EncoderSettings, delay, strLanguage, strName), null, oAudioTrackInfo, bExtractMKVTrack));
+                        dpp.AudioTracks.Add(new OneClickAudioTrack(new AudioJob(aInput, null, null, oStream.EncoderSettings, delay, strLanguage, strName), null, oStreamControl.SelectedItem.IsStandard ? oAudioTrackInfo : null, bExtractMKVTrack));
                 }
             }
 

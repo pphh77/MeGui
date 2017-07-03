@@ -1,6 +1,7 @@
-2763 [Audio Encoder]        ignore the sample rate change if source and target are identical
+2764 [OneClick]             fixed external audio file handling (regression of 2759). bug #889
+2763 [Audio Encoder]        ignore a requested sample rate change if source and target are identical
 2762 [Audio Encoder]        fixed "NicAudio" not being saved as preferred decoder (regression of 2693)
-2761 [OneClick] + [AVS SC]  enable AviSource() or DirectShowSource() only if suitable
+2761 [OneClick] + [AVS SC]  select AviSource() or DirectShowSource() only if suitable
 2760 [OneClick]             cosmetics
 2759 [OneClick]             improved handling of audio tracks:
                             - FLAC encodings use the HD track instead of the core if possible. Feature request #610

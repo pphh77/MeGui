@@ -206,7 +206,9 @@ namespace MeGUI
                     if (oAudioTrack.DirectMuxAudio != null)
                         arrMuxStreams.Add(oAudioTrack.DirectMuxAudio);
                 }
-                if (audioFiles.Count == 0 && job.PostprocessingProperties.IndexType != FileIndexerWindow.IndexType.NONE && !job.PostprocessingProperties.Eac3toDemux)
+                if (audioFiles.Count == 0 && !job.PostprocessingProperties.Eac3toDemux
+                    && job.PostprocessingProperties.IndexType != FileIndexerWindow.IndexType.NONE
+                    && job.PostprocessingProperties.IndexType != FileIndexerWindow.IndexType.AVISOURCE)
                     audioFiles = VideoUtil.getAllDemuxedAudio(arrAudioTracks, new List<AudioTrackInfo>(), out arrAudioFilesDelete, job.IndexFile, _log);
 
                 fillInAudioInformation(ref arrAudioJobs, arrMuxStreams);
