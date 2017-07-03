@@ -1086,8 +1086,8 @@ namespace MeGUI
             return false;
         }
 
-        /// <summary>checks if the file is indexable by FFMSindex</summary>
-        /// <returns>true if indexable, false if not</returns>
+        /// <summary>checks if the file is readable by AVISource</summary>
+        /// <returns>true if readable, false if not</returns>
         public bool isAVISourceIndexable(bool bStrictFilesOnly)
         {
             // check if the file is a video file
@@ -1097,6 +1097,17 @@ namespace MeGUI
             // only the following container format is supported
             if (!_strContainer.ToUpperInvariant().Equals("AVI"))
                 return false;
+
+            try
+            {
+                string tempAvs = "AVISource(\"" + _file + "\", audio=false)";
+                IMediaFile iMediaFile = AvsFile.ParseScript(tempAvs);
+                iMediaFile.Dispose();
+            }
+            catch (Exception)
+            {
+                return false;
+            }
 
             // if all AVI files should be processed or only the ones where FFMS cannot handle them
             if (!bStrictFilesOnly)
@@ -1108,6 +1119,28 @@ namespace MeGUI
                 return true;
 
             return false;
+        }
+
+        /// <summary>checks if the file is readable by DirectShowSource/DSS2</summary>
+        /// <returns>true if readable, false if not</returns>
+        public bool isDirectShowSourceIndexable()
+        {
+            // check if the file is a video file
+            if (!_VideoInfo.HasVideo)
+                return false;
+
+            try
+            {
+                string tempAvs = "DirectShowSource(\"" + _file + "\", audio=false)";
+                IMediaFile iMediaFile = AvsFile.ParseScript(tempAvs);
+                iMediaFile.Dispose();
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>gets the recommended indexer</summary>

@@ -605,7 +605,7 @@ namespace MeGUI
             {
                 OneClickWindow ocmt = new OneClickWindow();
                 ocmt.setInput(fileName);
-                ocmt.ShowDialog();
+                ocmt.Show();
             }
             else
             {

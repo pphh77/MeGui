@@ -170,9 +170,9 @@ namespace MeGUI
             if (mainForm.Settings.DialogSettings.AskAboutVOBs)
             {
                 bool askAgain;
-                bool bResult = askAbout("Do you want to open this file with the One Click\r\n" +
-                    "Encoder (automated, easy to use) or the File\r\n" +
-                    "Indexer (manual, advanced)?", "Please choose your preferred tool", 
+                bool bResult = askAbout("Do you want to open this file with\r\n" +
+                    "- One Click Encoder (fully automated, easy to use) or\r\n" +
+                    "- File Indexer (manual, advanced)?", "Please choose your preferred tool", 
                     "One Click Encoder", "File Indexer", MessageBoxIcon.Question, out askAgain);
 
                 mainForm.Settings.DialogSettings.AskAboutVOBs = askAgain;
@@ -196,7 +196,7 @@ namespace MeGUI
                 oIndexer != FileIndexerWindow.IndexType.LSMASH)
                 return iResult;
 
-            if (iFile.ContainerFileTypeString.ToUpperInvariant().Equals("AVI"))
+            if (iFile.isAVISourceIndexable(false))
             {
                 iResult = askAbout3("Do you want to open this file with\r\n" +
                     "- One Click Encoder (fully automated, easy to use) or\r\n" +
@@ -204,13 +204,20 @@ namespace MeGUI
                     "- AviSource (manual, expert, may cause problems)?", "Please choose your prefered way to open this file",
                     "One Click Encoder", "File Indexer", "AviSource", MessageBoxIcon.Question);
             }
-            else
+            else if (iFile.isDirectShowSourceIndexable())
             {
                 iResult = askAbout3("Do you want to open this file with\r\n" +
                     "- One Click Encoder (fully automated, easy to use) or\r\n" +
                     "- File Indexer (manual, advanced) or \r\n" +
                     "- DirectShowSource (manual, expert, may cause problems)?", "Please choose your prefered way to open this file",
                     "One Click Encoder", "File Indexer", "DirectShowSource", MessageBoxIcon.Question);
+            }
+            else
+            {
+                if (useOneClick())
+                    iResult = 0;
+                else
+                    iResult = 1;
             }
             return iResult;
         }

@@ -1,3 +1,4 @@
+2761 [OneClick] + [AVS SC]  enable AviSource() or DirectShowSource() only if suitable
 2760 [OneClick]             cosmetics
 2759 [OneClick]             improved handling of audio tracks:
                             - FLAC encodings use the HD track instead of the core if possible. Feature request #610
