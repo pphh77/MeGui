@@ -1106,10 +1106,14 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             string strChannelPositions = string.Empty;
             int iChannelCount = 0;
             int iAVSChannelCount = 0;
+            int iAVSAudioSampleRate = 0;
 
             // get real detected channel count from AVS 
             using (AvsFile avi = AvsFile.ParseScript(script.ToString()))
+            {
                 iAVSChannelCount = avi.Clip.ChannelsCount;
+                iAVSAudioSampleRate = avi.Clip.AudioSampleRate;
+            }
 
             // get the channel information from source file
             if (oInfo.ContainerFileTypeString.Equals("AVS"))
@@ -1148,7 +1152,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             script.AppendFormat(@"# detected channel positions: {0}{1}", strChannelPositions, Environment.NewLine);
 
             if (iAVSChannelCount != iChannelCount)
-                _log.LogEvent("channel count mismatch! The input file is reporting " + iChannelCount + " channels and the AviSynth script is reporting " + iAVSChannelCount + " channels", ImageType.Warning);
+                _log.LogEvent("Channel count mismatch! The input file is reporting " + iChannelCount + " channels and the AviSynth script is reporting " + iAVSChannelCount + " channels", ImageType.Warning);
 
             switch (audioJob.Settings.DownmixMode)
             {
@@ -1163,21 +1167,21 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 case ChannelMode.StereoDownmix:
                     if (iChannelCount == 0)
                     {
-                        _log.LogEvent("no audio detected: " + audioJob.Input, ImageType.Error);
+                        _log.LogEvent("No audio detected: " + audioJob.Input, ImageType.Error);
                         break;
                     }
                     if (iAVSChannelCount != iChannelCount)
                     {
-                        _log.LogEvent("ignoring downmix because of the channel count mismatch", ImageType.Warning);
+                        _log.LogEvent("Ignoring downmix because of the channel count mismatch", ImageType.Warning);
                         break;
                     }
                     if (iChannelCount <= 2 || (iChannelCount <= 6 && audioJob.Settings.DownmixMode == ChannelMode.Downmix51))
                     {
-                        _log.LogEvent("ignoring downmix as there is only " + iChannelCount + " channel(s)", ImageType.Information);
+                        _log.LogEvent("Ignoring downmix as there is only " + iChannelCount + " channel(s)", ImageType.Information);
                         break;
                     }
                     if (String.IsNullOrEmpty(strChannelPositions))
-                        _log.LogEvent("no channel positions found. Downmix result may be wrong.", ImageType.Information);
+                        _log.LogEvent("No channel positions found. Downmix result may be wrong.", ImageType.Information);
 
                     if (iChannelCount > 5)
                     {
@@ -1294,17 +1298,17 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 case ChannelMode.UpmixWithCenterChannelDialog:
                     if (iChannelCount == 0)
                     {
-                        _log.LogEvent("no audio detected: " + audioJob.Input, ImageType.Error);
+                        _log.LogEvent("No audio detected: " + audioJob.Input, ImageType.Error);
                         break;
                     }
                     if (iAVSChannelCount != iChannelCount)
                     {
-                        _log.LogEvent("ignoring upmix because of the channel count mismatch", ImageType.Warning);
+                        _log.LogEvent("Ignoring upmix because of the channel count mismatch", ImageType.Warning);
                         break;
                     }
                     if (iChannelCount != 2)
                     {
-                        _log.LogEvent("ignoring upmix as it can only be used for 2 channels", ImageType.Information);
+                        _log.LogEvent("Ignoring upmix as it can only be used for 2 channels", ImageType.Information);
                         break;
                     }
                     if (audioJob.Settings.DownmixMode == ChannelMode.Upmix)
@@ -1325,7 +1329,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                         }
                         else
                         {
-                            _log.LogEvent("as SoxFilter() is not availabble, use default upmix mode", ImageType.Information);
+                            _log.LogEvent("As SoxFilter() is not availabble, use default upmix mode", ImageType.Information);
                             createTemporallyEqFiles(tmp);
                             script.Append("2==Audiochannels(last)?x_upmix" + id + @"(last):last" + Environment.NewLine);
                         } 
@@ -1334,34 +1338,36 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             }
 
             // SampleRate
-            if (MainForm.Instance.Settings.AviSynthPlus && 
-                (audioJob.Settings.SampleRate != SampleRateMode.KeepOriginal || audioJob.Settings.TimeModification != TimeModificationMode.KeepOriginal))
-                script.Append("ConvertAudioToFloat(last)" + Environment.NewLine);
+            int iTargetAudioSampleRate = 0;
             switch (audioJob.Settings.SampleRate)
             {
-                case SampleRateMode.KeepOriginal:
-                    break;
                 case SampleRateMode.ConvertTo08000:
-                    script.Append("SSRC(8000)" + Environment.NewLine);
-                    break;
+                    iTargetAudioSampleRate = 8000;  break;
                 case SampleRateMode.ConvertTo11025:
-                    script.Append("SSRC(11025)" + Environment.NewLine);
-                    break;
+                    iTargetAudioSampleRate = 11025; break;
                 case SampleRateMode.ConvertTo22050:
-                    script.Append("SSRC(22050)" + Environment.NewLine);
-                    break;
+                    iTargetAudioSampleRate = 22050; break;
                 case SampleRateMode.ConvertTo32000:
-                    script.Append("SSRC(32000)" + Environment.NewLine);
-                    break;
+                    iTargetAudioSampleRate = 32000; break;
                 case SampleRateMode.ConvertTo44100:
-                    script.Append("SSRC(44100)" + Environment.NewLine);
-                    break;
+                    iTargetAudioSampleRate = 44100; break;
                 case SampleRateMode.ConvertTo48000:
-                    script.Append("SSRC(48000)" + Environment.NewLine);
-                    break;
+                    iTargetAudioSampleRate = 48000; break;
                 case SampleRateMode.ConvertTo96000:
-                    script.Append("SSRC(96000)" + Environment.NewLine);
-                    break;
+                    iTargetAudioSampleRate = 96000; break;
+            }
+
+            if (MainForm.Instance.Settings.AviSynthPlus &&
+                ((audioJob.Settings.SampleRate != SampleRateMode.KeepOriginal && iTargetAudioSampleRate != iAVSAudioSampleRate)
+                    || audioJob.Settings.TimeModification != TimeModificationMode.KeepOriginal))
+                script.Append("ConvertAudioToFloat(last)" + Environment.NewLine);
+
+            if (audioJob.Settings.SampleRate != SampleRateMode.KeepOriginal)
+            {
+                if (iTargetAudioSampleRate == iAVSAudioSampleRate)
+                    _log.LogEvent("Ignoring sample rate change as it is the same as in the AVS", ImageType.Information);
+                else
+                    script.Append("SSRC(" + iTargetAudioSampleRate + ")" + Environment.NewLine);
             }
 
             // TimeModification
