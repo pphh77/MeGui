@@ -192,6 +192,8 @@ namespace MeGUI
                     preferredDecoder = AudioDecodingEngine.DirectShow;
                 else if (value.Equals("BassAudio"))
                     preferredDecoder = AudioDecodingEngine.BassAudio;
+                else if (value.Equals("NicAudio"))
+                    preferredDecoder = AudioDecodingEngine.NicAudio;
                 else if (value.Equals("LWLibavAudioSource"))
                     preferredDecoder = AudioDecodingEngine.LWLibavAudioSource;
             }
