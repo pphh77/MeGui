@@ -1,3 +1,4 @@
+2765 [Video Preview]        aligned the total time and frame count in the title bar with the Info() output
 2764 [OneClick]             fixed external audio file handling (regression of 2759). bug #889
 2763 [Audio Encoder]        ignore a requested sample rate change if source and target are identical
 2762 [Audio Encoder]        fixed "NicAudio" not being saved as preferred decoder (regression of 2693)

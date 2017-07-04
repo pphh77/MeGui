@@ -557,17 +557,17 @@ namespace MeGUI
 		/// </summary>
 		private void setTitleText()
 		{
-            totalTime = Util.converFrameNumberToTimecode(this.positionSlider.Maximum, file.VideoInfo.FPS);
+            totalTime = Util.converFrameNumberToTimecode(this.positionSlider.Maximum + 1, file.VideoInfo.FPS);
             currentTime = Util.converFrameNumberToTimecode(this.positionSlider.Value, file.VideoInfo.FPS);
             if (this.zoneStart > -1 || this.zoneEnd > -1)
             {
-                this.Text = "Pos: " + CurrentFrame + "/" + (FrameCount - 1);
+                this.Text = "Pos: " + CurrentFrame + "/" + FrameCount;
                 
                 this.Text += " Zone start: " + (zoneStart > -1 ? zoneStart.ToString() : "?");
                 this.Text += " end: " + (zoneEnd > -1 ? zoneEnd.ToString() : "?");
             }
             else
-                this.Text = "Current position: " + CurrentFrame + "/" + (FrameCount - 1);
+                this.Text = "Current position: " + CurrentFrame + "/" + FrameCount;
             if (this.introEndFrame > -1)
 				this.Text += " Intro end: " + this.introEndFrame;
 			if (this.creditsStartFrame > -1)
