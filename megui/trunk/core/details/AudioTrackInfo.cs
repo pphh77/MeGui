@@ -48,6 +48,7 @@ namespace MeGUI
             this.codecProfile = string.Empty;
             this._bitrateMode = BitrateManagementMode.CBR;
             this._type = null;
+            this._codec = AudioCodec.UNKNOWN;
         }
 
         public string TrackIDx

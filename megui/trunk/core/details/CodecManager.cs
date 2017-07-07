@@ -74,18 +74,20 @@ namespace MeGUI
             set { mediaInfoRegex = value; }
         }
  
-        public static readonly AudioCodec AAC    = new AudioCodec("AAC", "^AAC$");
-        public static readonly AudioCodec AC3    = new AudioCodec("AC-3", "^AC-3$");
-        public static readonly AudioCodec DTS    = new AudioCodec("DTS", "^DTS$");
-        public static readonly AudioCodec EAC3   = new AudioCodec("EAC3", "^E-AC-3$");
-        public static readonly AudioCodec FLAC   = new AudioCodec("FLAC", "^FLAC$");
-        public static readonly AudioCodec MP2    = new AudioCodec("MP2", "^MP2$");
-        public static readonly AudioCodec MP3    = new AudioCodec("MP3", "^MP3$");
-        public static readonly AudioCodec OPUS   = new AudioCodec("OPUS", "^Opus$");
-        public static readonly AudioCodec PCM    = new AudioCodec("PCM", "^PCM$");
-        public static readonly AudioCodec THD    = new AudioCodec("THD", "^(?=.*TrueHD)(?!.*AC-3).*");
-        public static readonly AudioCodec THDAC3 = new AudioCodec("THDAC3", "^(?=.*TrueHD)(?=.*AC-3).*");
-        public static readonly AudioCodec VORBIS = new AudioCodec("VORBIS", "^Vorbis$");
+        public static readonly AudioCodec AAC     = new AudioCodec("AAC", "^AAC$");
+        public static readonly AudioCodec AC3     = new AudioCodec("AC-3", "^AC-3$");
+        public static readonly AudioCodec AVS     = new AudioCodec("AVS", "AVS$");
+        public static readonly AudioCodec DTS     = new AudioCodec("DTS", "^DTS$");
+        public static readonly AudioCodec EAC3    = new AudioCodec("EAC3", "^E-AC-3$");
+        public static readonly AudioCodec FLAC    = new AudioCodec("FLAC", "^FLAC$");
+        public static readonly AudioCodec MP2     = new AudioCodec("MP2", "^MP2$");
+        public static readonly AudioCodec MP3     = new AudioCodec("MP3", "^MP3$");
+        public static readonly AudioCodec OPUS    = new AudioCodec("OPUS", "^Opus$");
+        public static readonly AudioCodec PCM     = new AudioCodec("PCM", "^PCM$");
+        public static readonly AudioCodec THD     = new AudioCodec("THD", "^(?=.*TrueHD)(?!.*AC-3).*");
+        public static readonly AudioCodec THDAC3  = new AudioCodec("THDAC3", "^(?=.*TrueHD)(?=.*AC-3).*");
+        public static readonly AudioCodec VORBIS  = new AudioCodec("VORBIS", "^Vorbis$");
+        public static readonly AudioCodec UNKNOWN = new AudioCodec("UNKNOWN", ".*");
     }
 
     public class SubtitleCodec : ICodec, IIDable
@@ -201,6 +203,7 @@ namespace MeGUI
             if (!(
                 AudioCodecs.Register(AudioCodec.AAC)    &&
                 AudioCodecs.Register(AudioCodec.AC3)    &&
+                AudioCodecs.Register(AudioCodec.AVS)    &&
                 AudioCodecs.Register(AudioCodec.DTS)    &&
                 AudioCodecs.Register(AudioCodec.EAC3)   &&
                 AudioCodecs.Register(AudioCodec.FLAC)   &&
@@ -210,7 +213,8 @@ namespace MeGUI
                 AudioCodecs.Register(AudioCodec.PCM)    &&
                 AudioCodecs.Register(AudioCodec.THD)    &&
                 AudioCodecs.Register(AudioCodec.THDAC3) &&
-                AudioCodecs.Register(AudioCodec.VORBIS) 
+                AudioCodecs.Register(AudioCodec.VORBIS) &&
+                AudioCodecs.Register(AudioCodec.UNKNOWN)
                 ))
                 throw new Exception("Failed to register a standard audio codec");
             if (!(

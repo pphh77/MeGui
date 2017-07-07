@@ -367,7 +367,7 @@ namespace MeGUI
                         || (ati.AudioCodec == AudioCodec.THDAC3))
                         ati.HasCore = true;
 
-                    if (MainForm.Instance.Settings.ShowDebugInformation && ati.AudioCodec == null)
+                    if (MainForm.Instance.Settings.ShowDebugInformation && ati.AudioCodec == AudioCodec.UNKNOWN)
                     {
                         if (_Log == null)
                             _Log = MainForm.Instance.Log.Info("MediaInfo");
