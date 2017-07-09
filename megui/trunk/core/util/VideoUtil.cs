@@ -791,7 +791,7 @@ namespace MeGUI
                 (indexFile.ToLowerInvariant().Equals(inputFile.ToLowerInvariant() + ".lwi") || !File.Exists(indexFile)))
                 indexFile = null;
 
-            bool bUseLsmash = UseLSMASHVideoSource(inputFile, video);
+            bool bUseLsmash = UseLSMASHVideoSource(inputFile);
             if (video)
             {
                 script.AppendFormat("{0}(\"{1}\"{2}{3})",
@@ -811,26 +811,11 @@ namespace MeGUI
             return script.ToString();
         }
 
-        public static bool UseLSMASHVideoSource(string inputFile, bool bVideo)
+        public static bool UseLSMASHVideoSource(string inputFile)
         {
-            StringBuilder script = new StringBuilder();
-            script.AppendFormat("LoadPlugin(\"{0}\"){1}", MainForm.Instance.Settings.LSMASH.Path, Environment.NewLine);
-            script.AppendFormat("{0}(\"{1}\")", (bVideo ? "LSMASHVideoSource" : "LSMASHAudioSource"), inputFile);
-
-            try
-            {
-                using (AviSynthScriptEnvironment env = new AviSynthScriptEnvironment())
-                {
-                    using (AviSynthClip a = env.ParseScript(script.ToString()))
-                    {
-                        return true;
-                    }
-                }
-            }
-            catch
-            {
-                return false;
-            }
+            string extension = Path.GetExtension(inputFile).ToLowerInvariant();
+            return (extension.Equals(".mp4") || extension.Equals(".m4v") || extension.Equals(".mov") || extension.Equals(".m4a")
+                || extension.Equals(".3gp") || extension.Equals(".3g2") || extension.Equals(".qt") || extension.Equals(".aac"));
         }
 
         public static string getAssumeFPS(double fps, string strInput)

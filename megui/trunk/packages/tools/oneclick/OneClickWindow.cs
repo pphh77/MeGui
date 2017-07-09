@@ -1191,7 +1191,7 @@ namespace MeGUI
                         (oStream.EncodingMode == AudioEncodingMode.NeverOnlyCore && dpp.Eac3toDemux) ||
                         (oStream.EncodingMode == AudioEncodingMode.IfCodecDoesNotMatch &&
                          oStream.EncoderSettings.EncoderType.ACodec.ID.Equals(oAudioTrackInfo.AudioCodec.ID))))
-                        _oLog.LogEvent("Audio " + oStream + " cannot be processed with encoding mode \"" + oStream.EncodingMode + "\" as it must be encoded", ImageType.Error);
+                        _oLog.LogEvent("Audio " + oStream + " cannot be processed with encoding mode \"" + oStream.EncodingMode + "\" as it must be encoded", ImageType.Warning);
 
                     // audio track will be encoded
                     string strFileName = string.Empty;
