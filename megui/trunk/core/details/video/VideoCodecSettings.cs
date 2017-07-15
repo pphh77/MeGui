@@ -202,32 +202,7 @@ namespace MeGUI
 		/// </summary>
 		public string CustomEncoderOptions
 		{
-			get 
-            {
-                if (EncoderType.ID.ToLowerInvariant().Equals("x264"))
-                {
-                    // update custom command line if necessary
-                    String strNewCommandLine = "", strNewCommand = "";
-                    foreach (String strCommand in System.Text.RegularExpressions.Regex.Split(customEncoderOptions, "--"))
-                    {
-                        if (strCommand.Trim().ToLowerInvariant().Equals("nal-hrd"))
-                            strNewCommand = "nal-hrd vbr";
-                        else if (strCommand.Trim().ToLowerInvariant().Equals("open-gop none"))
-                            strNewCommand = String.Empty;
-                        else if (strCommand.Trim().ToLowerInvariant().Equals("open-gop normal"))
-                            strNewCommand = "open-gop";
-                        else if (strCommand.Trim().ToLowerInvariant().Equals("open-gop bluray"))
-                            strNewCommand = "open-gop --bluray-compat";
-                        else
-                            strNewCommand = strCommand.Trim();
-                        if (!String.IsNullOrEmpty(strNewCommand))
-                            strNewCommandLine += " --" + strNewCommand;
-                    }
-                    return strNewCommandLine.Trim();
-                }
-                else
-                    return customEncoderOptions;
-            }
+			get { return customEncoderOptions; }
 			set { customEncoderOptions = value; }
 		}
 		/// <summary>

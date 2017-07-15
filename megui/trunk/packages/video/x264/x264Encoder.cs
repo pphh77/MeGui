@@ -948,7 +948,7 @@ namespace MeGUI
 
             xs.CustomEncoderOptions = oSettingsHandler.getCustomCommandLine();
             if (!String.IsNullOrEmpty(xs.CustomEncoderOptions)) // add custom encoder options
-                sb.Append(xs.CustomEncoderOptions + " ");
+                sb.Append(xs.CustomEncoderOptions.Trim() + " ");
 
             string strTemp;
             xs.SampleAR = oSettingsHandler.getSar(d, hres, vres, out strTemp, CustomSarValue);

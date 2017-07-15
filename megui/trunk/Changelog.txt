@@ -1,3 +1,4 @@
+2768 [x264]                 improved custom command line parameter detection
 2767 [L-SMASH Indexer]      fixed some issues (regression of 2757)
 2766 [OneClick]             fixed an issue if the input audio codec cannot be used for direct muxing (regression of 2759). bug #890
 2765 [Video Preview]        aligned the total time and frame count in the title bar with the Info() output

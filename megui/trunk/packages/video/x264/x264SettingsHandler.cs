@@ -961,7 +961,8 @@ namespace MeGUI.packages.video.x264
                     strLeading = " -";
                 strCommand = strCommand.Substring(strLeading.Length);
 
-                if (strCommand.Trim().ToLowerInvariant().StartsWith(strCommandToExtract.ToLowerInvariant()))
+                if (strCommand.Trim().ToLowerInvariant().Equals(strCommandToExtract.ToLowerInvariant()) 
+                    || strCommand.Trim().ToLowerInvariant().StartsWith(strCommandToExtract.ToLowerInvariant() + " "))
                 {
                     strCommandValue = strCommand.Substring(strCommandToExtract.Length).Trim();
                     bFound = true;
