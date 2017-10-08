@@ -90,10 +90,7 @@ namespace MeGUI
             if (!File.Exists(strFileName))
                 return false;
 
-            if (LoadText(strFileName))
-                return true;
-
-            if (LoadXML(strFileName))
+            if (LoadText(strFileName) || LoadText2(strFileName) || LoadXML(strFileName))
                 return true;
 
             // now try mediainfo
@@ -186,6 +183,45 @@ namespace MeGUI
                         Chapters.Add(new Chapter() { Name = name, Time = ts });
                     }
                     onTime = !onTime;
+                }
+
+                SourceName = strFileName;
+                Title = Path.GetFileNameWithoutExtension(strFileName);
+                if (Chapters.Count > 0)
+                    Duration = Chapters[Chapters.Count - 1].Time;
+            }
+            catch (Exception)
+            {
+                Chapters.Clear();
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool LoadText2(string strFileName)
+        {
+            // 00:00:00.000 Prologue
+            // 00:00:14.000 Opening
+
+            try
+            {
+                FileInfo oFileInfo = new FileInfo(strFileName);
+                if (oFileInfo.Length > 1048576)
+                    return false;
+
+                foreach (string line in File.ReadAllLines(strFileName))
+                {
+                    int iPos = line.IndexOf(' ');
+                    if (iPos <= 0)
+                        continue;
+
+                    string chapterTime = line.Split(' ')[0];
+                    TimeSpan chapterSpan;
+                    if (!TimeSpan.TryParse(chapterTime, out chapterSpan))
+                        continue;
+
+                    Chapters.Add(new Chapter() { Name = line.Substring(iPos + 1), Time = chapterSpan });
                 }
 
                 SourceName = strFileName;

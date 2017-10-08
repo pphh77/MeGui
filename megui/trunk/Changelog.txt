@@ -1,3 +1,4 @@
+2770 [Chapter]              added support for alternative TXT chapter files (regression of 2753). bug #893
 2769 [Chapter]              improved Apple XML handling. patch #70 by Eli Bildirici
 2768 [x264]                 improved custom command line parameter detection
 2767 [L-SMASH Indexer]      fixed some issues (regression of 2757)
