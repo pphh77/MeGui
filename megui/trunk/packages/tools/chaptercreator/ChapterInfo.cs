@@ -218,47 +218,46 @@ namespace MeGUI
             }
         }
 
-        public void SaveTsmuxerMeta(string filename)
+        public bool SaveXml(string filename)
         {
-            string text = "--custom-" + Environment.NewLine + "chapters=";
-            foreach (Chapter c in Chapters)
-                text += c.Time.ToString() + ";";
-            text = text.Substring(0, text.Length - 1);
-            File.WriteAllText(filename, text);
-        }
-
-        public void SaveXml(string filename)
-        {
-            Random rndb = new Random();
-            XmlTextWriter xmlchap = new XmlTextWriter(filename, Encoding.UTF8);
-            xmlchap.Formatting = Formatting.Indented;
-            xmlchap.WriteStartDocument();
-            xmlchap.WriteComment("<!DOCTYPE Tags SYSTEM " + "\"" + "matroskatags.dtd" + "\"" + ">");
-            xmlchap.WriteStartElement("Chapters");
-            xmlchap.WriteStartElement("EditionEntry");
-            xmlchap.WriteElementString("EditionFlagHidden", "0");
-            xmlchap.WriteElementString("EditionFlagDefault", "0");
-            xmlchap.WriteElementString("EditionUID", Convert.ToString(rndb.Next(1, Int32.MaxValue)));
-            foreach (Chapter c in Chapters)
+            try
             {
-                xmlchap.WriteStartElement("ChapterAtom");
-                xmlchap.WriteStartElement("ChapterDisplay");
-                xmlchap.WriteElementString("ChapterString", c.Name);
-                xmlchap.WriteElementString("ChapterLanguage", "und");
+                Random rndb = new Random();
+                XmlTextWriter xmlchap = new XmlTextWriter(filename, Encoding.UTF8);
+                xmlchap.Formatting = Formatting.Indented;
+                xmlchap.WriteStartDocument();
+                xmlchap.WriteComment("<!DOCTYPE Tags SYSTEM " + "\"" + "matroskatags.dtd" + "\"" + ">");
+                xmlchap.WriteStartElement("Chapters");
+                xmlchap.WriteStartElement("EditionEntry");
+                xmlchap.WriteElementString("EditionFlagHidden", "0");
+                xmlchap.WriteElementString("EditionFlagDefault", "0");
+                xmlchap.WriteElementString("EditionUID", Convert.ToString(rndb.Next(1, Int32.MaxValue)));
+                foreach (Chapter c in Chapters)
+                {
+                    xmlchap.WriteStartElement("ChapterAtom");
+                    xmlchap.WriteStartElement("ChapterDisplay");
+                    xmlchap.WriteElementString("ChapterString", c.Name);
+                    xmlchap.WriteElementString("ChapterLanguage", "und");
+                    xmlchap.WriteEndElement();
+                    xmlchap.WriteElementString("ChapterUID", Convert.ToString(rndb.Next(1, Int32.MaxValue)));
+                    if (c.Time.ToString().Length == 8)
+                        xmlchap.WriteElementString("ChapterTimeStart", c.Time.ToString() + ".0000000");
+                    else
+                        xmlchap.WriteElementString("ChapterTimeStart", c.Time.ToString());
+                    xmlchap.WriteElementString("ChapterFlagHidden", "0");
+                    xmlchap.WriteElementString("ChapterFlagEnabled", "1");
+                    xmlchap.WriteEndElement();
+                }
                 xmlchap.WriteEndElement();
-                xmlchap.WriteElementString("ChapterUID", Convert.ToString(rndb.Next(1, Int32.MaxValue)));
-                if (c.Time.ToString().Length == 8)
-                    xmlchap.WriteElementString("ChapterTimeStart", c.Time.ToString() + ".0000000");
-                else
-                    xmlchap.WriteElementString("ChapterTimeStart", c.Time.ToString());
-                xmlchap.WriteElementString("ChapterFlagHidden", "0");
-                xmlchap.WriteElementString("ChapterFlagEnabled", "1");
                 xmlchap.WriteEndElement();
+                xmlchap.Flush();
+                xmlchap.Close();
             }
-            xmlchap.WriteEndElement();
-            xmlchap.WriteEndElement();
-            xmlchap.Flush();
-            xmlchap.Close();
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
         }
 
         private bool LoadXML(string strFileName)
@@ -326,55 +325,51 @@ namespace MeGUI
         }
 
         /// <summary>
-        /// Create Chapters XML File from OGG Chapters File
+        /// Creates Apple Style Chapters XML File
         /// </summary>
-        /// <param name="inFile">input</inFile>
-        public void SaveAppleXML(string inFile)
+        /// <param name="strFileName">output file name</inFile>
+        public bool SaveAppleXML(string strFileName)
         {
             try
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendLine("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
-                sb.AppendLine("<!-- GPAC 3GPP Text Stream -->");
-                sb.AppendLine("<TextStream version=\"1.1\">");
-                sb.AppendLine("<TextStreamHeader>");
-                sb.AppendLine("<TextSampleDescription>");
-                sb.AppendLine("</TextSampleDescription>");
-                sb.AppendLine("</TextStreamHeader>");
-                string lastTime = null;
+                XmlTextWriter xmlchap = new XmlTextWriter(strFileName, Encoding.UTF8);
+                xmlchap.Formatting = Formatting.Indented;
 
-                using (StreamReader sr = new StreamReader(inFile))
-                {
-                    string line = null;
-                    string chapTitle = null;
-                    int i = 0;
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        i++;
-                        if (i % 2 == 1)
-                        {
-                            lastTime = line.Substring(line.IndexOf("=") + 1);
-                            sb.Append("<TextSample sampleTime=\"" + lastTime + "\"");
-                        }
-                        else
-                        {
-                            chapTitle = System.Text.RegularExpressions.Regex.Replace(line.Substring(line.IndexOf("=") + 1), "\"", "&quot;");
-                            sb.Append(" text=\"" + chapTitle + "\" />" + Environment.NewLine);
-                        }
-                    }
-                }
-                sb.AppendLine("<TextSample sampleTime=\"" + (TimeSpan.Parse(lastTime) + new TimeSpan(0, 0, 0, 0, 500)).ToString(@"hh\:mm\:ss\.fff") + "\" xml:space=\"preserve\" />");
-                sb.AppendLine("</TextStream>");
+                xmlchap.WriteStartDocument();
+                xmlchap.WriteComment("GPAC 3GPP Text Stream");
+                xmlchap.WriteStartElement("TextStream");
+                xmlchap.WriteAttributeString("version", "1.1");
+                xmlchap.WriteStartElement("TextStreamHeader");
+                xmlchap.WriteStartElement("TextSampleDescription");
+                xmlchap.WriteEndElement();
+                xmlchap.WriteEndElement();
 
-                using (StreamWriter sw = new StreamWriter(Path.Combine(Path.GetDirectoryName(inFile), Path.GetFileNameWithoutExtension(inFile) + ".xml")))
+                foreach (Chapter c in Chapters)
                 {
-                    sw.Write(sb.ToString());
-                    sw.Close();
+                    xmlchap.WriteStartElement("TextSample");
+                    if (c.Time.ToString().Length == 8)
+                        xmlchap.WriteAttributeString("sampleTime", c.Time.ToString() + ".000");
+                    else
+                        xmlchap.WriteAttributeString("sampleTime", c.Time.ToString().Substring(0, 12));
+                    xmlchap.WriteAttributeString("text", c.Name.ToString());
+                    xmlchap.WriteEndElement();
                 }
+
+                // add a final dummy chapter element to prevent incorrect length reporting
+                Chapter last = Chapters[Chapters.Count - 1];
+                xmlchap.WriteStartElement("TextSample");
+                xmlchap.WriteAttributeString("sampleTime", (TimeSpan.Parse(last.Time.ToString()) + new TimeSpan(0, 0, 0, 0, 500)).ToString(@"hh\:mm\:ss\.fff"));
+                xmlchap.WriteAttributeString("xml:space", "preserve");
+                xmlchap.WriteEndElement();
+
+                xmlchap.WriteEndElement(); // close TextStream
+                xmlchap.Flush();
+                xmlchap.Close();
+                return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                e.Message.ToString();
+                return false;
             }
         }
 

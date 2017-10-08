@@ -517,6 +517,11 @@ namespace MeGUI
                     }
                     foreach (KeyValuePair<string, string> ChapterKeyPair in t.Chapters)
                     {
+                        string chapterTime = ChapterKeyPair.Key;
+                        TimeSpan chapterSpan;
+                        if (!TimeSpan.TryParse(chapterTime, out chapterSpan))
+                            continue;
+
                         string chapterName = ChapterKeyPair.Value;
                         if (chapterName.Contains(":"))
                             chapterName = chapterName.Substring(chapterName.IndexOf(":") + 1);

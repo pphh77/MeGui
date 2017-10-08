@@ -401,15 +401,14 @@ namespace MeGUI
                     {
                         // Add Apple Devices Chapter format
                         strChapterFile = Path.ChangeExtension(strChapterFile, ".xml");
-                        settings.ChapterInfo.SaveAppleXML(strChapterFile);
-                        sb.Append(" -add \"" + Path.Combine(Path.GetDirectoryName(strChapterFile), Path.GetFileNameWithoutExtension(strChapterFile) + ".xml:name=:chap") + "\"");
+                        if (settings.ChapterInfo.SaveAppleXML(strChapterFile))
+                            sb.Append(" -add \"" + strChapterFile + ":name=:chap\"");
                     }
                     else
-                    {                   
-                        settings.ChapterInfo.SaveText(strChapterFile);
-
-                        // Add Nero Style Chapters - this doesn't break Apple Devices playback  - just for better interoperability with other tools
-                        sb.Append(" -chap \"" + strChapterFile + "\"");
+                    {
+                        // Add Nero Style Chapters
+                        if (settings.ChapterInfo.SaveText(strChapterFile))                            
+                            sb.Append(" -chap \"" + strChapterFile + "\"");
                     }
                     job.FilesToDelete.Add(strChapterFile);
                 }
