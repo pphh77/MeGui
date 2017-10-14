@@ -39,6 +39,8 @@ namespace eac3to
                         return new object[] { "MKV", "H264" };
                     case VideoStreamType.MVC:
                         return new object[] { "H264" };
+                    case VideoStreamType.HEVC:
+                        return new object[] { "H265" };
                     case VideoStreamType.VC1:
                         return new object[] { "MKV", "VC1" };
                     case VideoStreamType.MPEG:
@@ -75,6 +77,9 @@ namespace eac3to
                     break;
                 case "H264/MVC":
                     videoStream.VideoType = VideoStreamType.MVC;
+                    break;
+                case "H265/HEVC":
+                    videoStream.VideoType = VideoStreamType.HEVC;
                     break;
                 case "VC-1":
                     videoStream.VideoType = VideoStreamType.VC1;

@@ -31,6 +31,8 @@ namespace eac3to
         AVC,
         [StringValue("MVC")]
         MVC,
+        [StringValue("HEVC")]
+        HEVC,
         [StringValue("VC-1")]
         VC1,
         [StringValue("MPEG")]
