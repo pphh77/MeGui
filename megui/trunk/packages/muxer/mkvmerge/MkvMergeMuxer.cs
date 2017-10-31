@@ -201,7 +201,7 @@ namespace MeGUI
                     if (!string.IsNullOrEmpty(stream.name))
                         sb.Append(" --track-name \"" + trackID + ":" + stream.name.Replace("\"", "\\\"") + "\"");
                     if (stream.delay != 0)
-                        sb.AppendFormat(" --sync {0}:{1}ms", trackID, stream.delay);
+                        sb.AppendFormat(" --sync {0}:{1}", trackID, stream.delay);
                     sb.Append(" \"--compression\" \"" + trackID + ":none\"");
                     sb.Append(" -a " + trackID + " --no-chapters -D -S \"" + stream.path + "\"");
                 }
@@ -233,7 +233,7 @@ namespace MeGUI
                         if (!string.IsNullOrEmpty(stream.MuxOnlyInfo.Name))
                             sb.Append(" --track-name \"" + trackID + ":" + stream.MuxOnlyInfo.Name.Replace("\"", "\\\"") + "\"");
                         if (stream.delay != 0)
-                            sb.AppendFormat(" --sync {0}:{1}ms", trackID, stream.delay);
+                            sb.AppendFormat(" --sync {0}:{1}", trackID, stream.delay);
                         if (stream.MuxOnlyInfo.DefaultTrack)
                             sb.Append(" --default-track \"" + trackID + ":yes\"");
                         else
@@ -273,7 +273,7 @@ namespace MeGUI
                             if (!string.IsNullOrEmpty(stream.name))
                                 sb.Append(" --track-name \"" + trackID + ":" + stream.name.Replace("\"", "\\\"") + "\"");
                             if (stream.delay != 0)
-                                sb.AppendFormat(" --sync {0}:{1}ms", trackID, stream.delay);
+                                sb.AppendFormat(" --sync {0}:{1}", trackID, stream.delay);
                             if (stream.bDefaultTrack && trackID == 0)
                                 sb.Append(" --default-track 0:yes");
                             else
@@ -312,7 +312,7 @@ namespace MeGUI
                         if (!string.IsNullOrEmpty(stream.name))
                             sb.Append(" --track-name \"" + trackID + ":" + stream.name.Replace("\"", "\\\"") + "\"");
                         if (stream.delay != 0)
-                            sb.AppendFormat(" --sync {0}:{1}ms", trackID, stream.delay);
+                            sb.AppendFormat(" --sync {0}:{1}", trackID, stream.delay);
                         if (stream.bDefaultTrack)
                             sb.Append(" --default-track \"" + trackID + ":yes\"");
                         else
