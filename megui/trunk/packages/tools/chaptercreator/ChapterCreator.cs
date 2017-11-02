@@ -495,6 +495,9 @@ namespace MeGUI
 
         public void SetTimeBasedOnString(string strTimeCode)
         {
+            if (strTimeCode.Length > 16)
+                strTimeCode = strTimeCode.Substring(0, 16);
+
             if (TimeSpan.TryParse(strTimeCode, new System.Globalization.CultureInfo("en-US"), out TimeSpan result))
                 Time = result;
         }

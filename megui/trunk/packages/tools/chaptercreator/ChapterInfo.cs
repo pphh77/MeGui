@@ -330,7 +330,6 @@ namespace MeGUI
                                             oChapter.Name = oChapterString.InnerText;
                                         }
                                     }
-                                    break; // avoid multiple chapter entries
                                 }
                             }
                             Chapters.Add(oChapter);
