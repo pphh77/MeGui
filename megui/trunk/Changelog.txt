@@ -1,3 +1,4 @@
+2773 [Chapter]              fixed XML chapter handling (regression of 2753). bug #894
 2772 [MKV Muxer]            adjusted delay syntax (requires mkvmerge 17.0+)
 2771 [HD Streams Extractor] added support for HEVC video tracks (requires eac3to 3.32+)
      [Muxer]                added support for the h265 file extension

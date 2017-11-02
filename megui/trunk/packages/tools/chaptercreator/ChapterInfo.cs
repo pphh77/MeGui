@@ -90,8 +90,12 @@ namespace MeGUI
             if (!File.Exists(strFileName))
                 return false;
 
-            if (LoadText(strFileName) || LoadText2(strFileName) || LoadXML(strFileName))
-                return true;
+            FileInfo oFileInfo = new FileInfo(strFileName);
+            if (oFileInfo.Length < 2097152)
+            {
+                if (LoadText(strFileName) || LoadText2(strFileName) || LoadXML(strFileName))
+                    return true;
+            }
 
             // now try mediainfo
             MediaInfoFile oInfo = new MediaInfoFile(strFileName);
@@ -156,10 +160,6 @@ namespace MeGUI
         {
             try
             {
-                FileInfo oFileInfo = new FileInfo(strFileName);
-                if (oFileInfo.Length > 1048576)
-                    return false;
-
                 int num = 0;
                 TimeSpan ts = new TimeSpan(0);
                 string time = String.Empty;
@@ -196,7 +196,7 @@ namespace MeGUI
                 return false;
             }
 
-            return true;
+            return Chapters.Count != 0;
         }
 
         private bool LoadText2(string strFileName)
@@ -206,10 +206,6 @@ namespace MeGUI
 
             try
             {
-                FileInfo oFileInfo = new FileInfo(strFileName);
-                if (oFileInfo.Length > 1048576)
-                    return false;
-
                 foreach (string line in File.ReadAllLines(strFileName))
                 {
                     int iPos = line.IndexOf(' ');
@@ -235,7 +231,7 @@ namespace MeGUI
                 return false;
             }
 
-            return true;
+            return Chapters.Count != 0;
         }
 
         public bool SaveQpfile(string strFileName)
@@ -300,10 +296,6 @@ namespace MeGUI
         {
             try
             {
-                FileInfo oFileInfo = new FileInfo(strFileName);
-                if (oFileInfo.Length > 1048576)
-                    return false;
-
                 XmlDocument oChap = new XmlDocument();
                 oChap.Load(strFileName);
 
@@ -357,7 +349,8 @@ namespace MeGUI
                 Chapters.Clear();
                 return false;
             }
-            return true;
+
+            return Chapters.Count != 0;
         }
 
         /// <summary>
