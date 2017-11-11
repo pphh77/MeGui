@@ -1,157 +1,27 @@
-2774 [Chapter]              fixed XML chapter handling. part II (regression of 2753). bug #894
-2773 [Chapter]              fixed XML chapter handling (regression of 2753). bug #894
-2772 [MKV Muxer]            adjusted delay syntax (requires mkvmerge 17.0+)
-2771 [HD Streams Extractor] added support for HEVC video tracks (requires eac3to 3.32+)
-     [Muxer]                added support for the h265 file extension
-2770 [Chapter]              added support for alternative TXT chapter files (regression of 2753). bug #893
-2769 [Chapter]              improved Apple XML handling. patch #70 by Eli Bildirici
-2768 [x264]                 improved custom command line parameter detection
-2767 [L-SMASH Indexer]      fixed some issues (regression of 2757)
-2766 [OneClick]             fixed an issue if the input audio codec cannot be used for direct muxing (regression of 2759). bug #890
-2765 [Video Preview]        aligned the total time and frame count in the title bar with the Info() output
-2764 [OneClick]             fixed external audio file handling (regression of 2759). bug #889
-2763 [Audio Encoder]        ignore a requested sample rate change if source and target are identical
-2762 [Audio Encoder]        fixed "NicAudio" not being saved as preferred decoder (regression of 2693)
-2761 [OneClick] + [AVS SC]  select AviSource() or DirectShowSource() only if suitable
-2760 [OneClick]             cosmetics
-2759 [OneClick]             improved handling of audio tracks:
-                            - FLAC encodings use the HD track instead of the core if possible. Feature request #610
-                            - fixed demux of multiple audio tracks using the same input track (eac3to only)
-                            - fixed handling of TrueHD+AC3 tracks if using an intermediate MKV file
-2758 [Muxer]                removed dtshd and dtsma file extension and added eac3 and thd+ac3 file extension where suitable
-     [MediaInfo]            improved audio codec/type detection
-2757 [L-SMASH Indexer]      improved error handling
-2756 [Chapter]              added a workaround for MediaInfo sometimes not detecting all chapters in MPLS files (regression of 2753)
-2755 [AutoEncode]           fixed a crash if trying to add additional content (regression of 2753)
-                            improved logging
-2754 [MKV Info]             switched to the JSON format as the old switch is deprecated (requires mkvmerge 9.7+) 
-2753 [Chapter]              improved chapter handling
-                            all MediaInfo supported files and TXT/XML files can be used as chapter files
-                            !!! existing jobs have to be recreated as otherwise the chapter information will not be added !!!
-     [Muxer]                use chapter information from the input video file if available
-     [Muxer] + [OneClick]   disable/enable the chapter selection box based upon the selected container and device type
-2752 [MKV Muxer]            ignore invalid subtitle files
-2751 [HD Streams Extractor] improved handling of audio tracks with unknown parameters
-2750 [Worker]               fixed rare invisible progress window (regression of 2743)
-2749 [Update]               fixed a rare crash when a restart is required and MeGUI is already closed
-2748 [HD Streams Extractor] added detection of "core/embedded" tracks
-                            removed the DTSHD "extract as" option
-                            added the DTS_CORE "extract as" option
-                            added settings menu:
-                            - added option to select by default the (non-)HD tracks (defaults to non-HD)
-                            - moved the language track selection option from the global settings into the new menu
-                            - added settings to inlcude the encoding and/or all demuxer "extract as" options
-                              AAC encoding is only available if neroaacenc.exe is found in the eac3to directory
-2747 [Worker]               improved handling of multiple worker instances. part II
-2746 [Worker]               improved handling of multiple worker instances
-2745 [Main]                 added option to extend logging
-2744 [Worker]               improved child process priority handling. part II
-2743 [Worker]               improved child process priority handling
-2742 [Main]                 improved OS detection
-2741 [MediaInfo]            fixed chapter detection
-                            prevent MediaInfo from locking the GUI
-2740 [OneClick]             disable controls while input detection is ongoing
-2739 [MediaInfo]            removed the external dependency to MediaInfoWrapper.dll
-2738 [OneClick]             fixed detection of audio track names
-2737 [Muxer] + [OneClick]   removed unnecessary "X" buttons
-2736 [Update]               x64: fixed detection of the DGIndexIM package 
-2735 [MP4 Muxer]            write always aspect ratio information to preserve anamorphic information. Bug #837
-2734 [Profile]              removed redundant second warning when changing a profile which should be saved to the scratchpad. Feature request #606
-2733 [OneClick]             added button to clear the working directory path and the chapters file
-     [AVS Script Creator]   added button to clear the subtitle file
-     [Muxer]                added button to clear the chapter file
-2732 [OneClick]             fixed OneClick startup error (regression of 2631)
-2731 [OneClick]             added aspect ratio selection to the OneClick profile
-                            input aspect ratio can always be selected
-                            if an input aspect ratio will be selected this will be forced
-                            the aspect ratio will not be forced by the muxer if the video track has been encoded
-                            cosmetics
-2730 [AutoEncode]           do not force the aspect ratio to be written by the muxer as it is available in the video stream
-2729 [Muxer]                added/improved aspect ratio writing (all muxers except the AVI muxer)
-                            for the M2TS muxer only some input video types are supported
-                            improved logging
-2728 [VideoEncoder]         forced aspect ratio to be written to the encoding
-                            if not available in the job the avs aspect ratio information will be used
-2727 [Worker]               priority changes will also be applied to child processes. Feature request #615
-2726 [OneClick]             removed the "Anamorph Output" option in the OneClick profile. Please use the anamorphic encoding options in the AviSynth profile instead.
-2725 [Main]                 fixed wrong AR of a "video encoding" queued job in rare cases (regression of 2610)
-2724 [OneClick]             cosmetic fix as sometimes even with "don't encode video" some video processing options were not disabled
-2723 [OneClick]             improved error handling of invalid AviSynth scripts
-2722 [Main]                 if not at least AviSynth 2.6 is installed the portable build will be used
-                            improved AviSynth logging
-2720 [AviSynth Wrapper]     added functions to detect AviSynth details
-2719 [AviSynth Wrapper]     updated wrapper to interface 3
-2718 [FFMS Indexer]         enabled AVI file handling
-2717 [AviSynth Wrapper]     improved error handling
-2716 [VideoEncoder]         extended avs log information
-
-
-Changelog 2624 --> 2715
+Changelog 2715 --> 2774
 
 Features/Changes:
-[AudioEncoder]         default to LWLibavAudioSource()/LSMASHAudioSource()
-[AviSynth]             replaced Yadif by Yadifmod2
-[FileIndexer]          added title selector for DVD sources incl. multi-angle support
-[Update]               improved updater to download appropriate architecture packages (can be deselected in the options)
-[VobSubber]            The VobSubber has been enhanced
-                       - to support demux of forced subtitles
-					   - to select if the subtitles should be extracted to multiple files
-					   - with improved speed as the source will only be indexed once for multiple tracks
-					   - to detect DVD sources incl. multi-angle suppor
-[x265 Encoder]         x265 is now always enabled
+[Chapter]              all MediaInfo supported files and TXT/XML files can be used as chapter files. The muxers will use chapter information from the input video file if available.
+                       !!! existing jobs created by older MeGUI builds have to be recreated as otherwise the chapter information is not available !!!
+[HD Streams Extractor] added settings menu:
+                       - added settings to include the encoding and/or all demuxer "extract as" options. AAC encoding is only available if neroaacenc.exe is found in the eac3to directory.
+                       - moved the language track selection option from the global settings into the new menu
+                       - added option to select by default the (non-)HD tracks (defaults to non-HD)
+					   removed the DTSHD "extract as" option and added the DTS_CORE option
+[OneClick]             removed the "Anamorph Output" option from the OneClick profile. Please use the anamorphic encoding options in the AviSynth profile instead.
+                       added aspect ratio selection to the OneClick profile
+[Main]                 if not at least AviSynth 2.6 is installed the portable build will be used
+[Muxer]                added/improved aspect ratio writing (all muxers except the AVI muxer). Therefore the aspect ratio of the video track will be used if not forced by other tools (e.g. OneClick).
 
 Enhancements/Fixes:
-[AudioEncoder]         added downmix option to 5.1
-[FileIndexer]          added IFO as supported input file type
-[Haali Media Splitter] if the Haali Media Splitter is needed by the HD Streams Extractor it will be installed (administrative permissions are required)
-[HD Streams Extractor] Unknown or not supported tracks cannot be selected
-[OneClick]             added MPLS as supported input files
-[Title Selector]       improved DVD/Blu-ray support & added option to change the minimum title length also in the global settings
-[Various]              where appropriate for DVD/Blu-ray sources a prefix and suffix is attached to the output file name
-
-
-Changelog 2525 --> 2624
-
-Features/Changes:
-[Aften Encoder]        The Aften AC-3 encoder has been removed. Please switch to FFmpeg AC-3.
-[DGAVCIndex Indexer]   DGAVCIndexer has been removed. Please use another indexer.
-[DGIndexIM Indexer]    DGIndexIM has been added. It is disabled by default and has to be enabled in the settings. 
-                       The new default indexer order is: DGIndexNV, DGIndexIM, DGIndex, L-SMASH, FFMS
-[Main]                 .NET 4.0 is now required for MeGUI
-[Main]                 The support for Windows XP has been dropped
-[x265 Encoder]         Added n-pass support
-[Xvid Encoder]         Added support for Xvid 1.3. An additional automated step is required as the output file must be prepared with FFmpeg.
-
-
-Enhancements/Fixes:
-[FFMS Indexer]         disabled AVI file handling as FFMS may cause jittery motion
-[HD Streams Extractor] + [MediaInfo] if a language cannot be detected or matched the default MeGUI language will be used
-[HD Streams Extractor] improved feature selection & handling of unsupported tracks
-[Main]                 added ~300 additional languages to select based upon ISO 639-2
-[Muxer] + [OneClick]   improved language detection based on the file name
-[Profile]              profiles will be saved to disk also when a profile is changed. 
-                       additionally "Load Defaults" resets now the selected profile (before it was the scratchpad one). 
-[Update]               clean package directory during update
-
-
-Changelog 2507 --> 2525
-
-Features/Changes:
-[Audio Encoder]        added custom command line support
-[Chapter Creator]      added option to sort the title list by chapter count
-[FDK-AAC Encoder]      added FDK-AAC encoder support
-                       due to the FDK-AAC license the encoder will not be available in the online updater
-
-Enhancements/Fixes:
-[Chapter Creator]      cosmetics
-[Chapter Creator]      improved error handling
-[HD Streams Extractor] cosmetics
-[OneClick]             better support for Blu-ray playlist where eac3to and mediainfo report different track information
-[OneClick]             fixed removing the wrong subtitle track when using the DEL key
-[Update]               get update server configuration data from the update server itself
-[Update]               if an outdated package is enabled the update will be downloaded automatically (if auto update is not disabled)
-[VobSubber]            improved error handling
-[x265]                 adjusted command line for recent avs4x265
+[FFMS Indexer]         enabled AVI file handling
+[HD Streams Extractor] added detection of "core/embedded" tracks and support for HEVC video tracks
+[Muxer]                removed dtshd and dtsma file extension and added eac3, h265 and thd+ac3 file extension where suitable
+[OneClick]             improved handling of audio tracks:
+                       - fixed demux of multiple audio tracks using the same input track (eac3to only)
+                       - fixed handling of TrueHD+AC3 tracks if using an intermediate MKV file
+                       - FLAC encodings use the HD track instead of the core if possible
+[Worker]               priority changes will also be applied to child processes
 
 
 Known Problems:
