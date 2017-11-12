@@ -1395,10 +1395,23 @@ namespace MeGUI
                 oExtractMKVTrack.Add(_videoInputInfo.VideoInfo.Track);
             }
 
+            // check if mkv attachments have to be extracted
+            if (_videoInputInfo.Attachments.Count > 0 && _videoInputInfo.ContainerFileType == ContainerType.MKV && dpp.Container == ContainerType.MKV)
+            {
+                foreach (string strFileName in _videoInputInfo.Attachments)
+                {
+                    string strFile = Path.Combine(dpp.WorkingDirectory, strFileName);
+                    dpp.Attachments.Add(strFile);
+                    dpp.FilesToDelete.Add(strFile);
+                }
+            }
+
             // create MKV extract job if required
-            if (oExtractMKVTrack.Count > 0)
+            // either because a track has to be extracted or that attachments MKV --> MKV are to be extracted & included
+            if (oExtractMKVTrack.Count > 0 || dpp.Attachments.Count > 0)
             {
                 MkvExtractJob extractJob = new MkvExtractJob(dpp.VideoInput, dpp.WorkingDirectory, oExtractMKVTrack);
+                extractJob.Attachments = dpp.Attachments;
                 prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(extractJob));
                 if (dpp.ApplyDelayCorrection)
                     _oLog.LogEvent("Audio delay will be detected later as an intermediate MKV file is beeing used");

@@ -189,6 +189,7 @@ namespace MediaInfoWrapper
         private string _ImageCodecList;
         private string _ImageLanguageList;
         private string _Other;
+        private string _Attachments;
 
         ///<summary> Count of objects available in this stream </summary>
         public string Count
@@ -2647,6 +2648,21 @@ namespace MediaInfoWrapper
             set
             {
                 this._Other = value;
+            }
+        }
+
+        ///<summary> Attachments separated by " / " </summary>
+        public string Attachments
+        {
+            get
+            {
+                if (String.IsNullOrEmpty(this._Attachments))
+                    this._Attachments = "";
+                return _Attachments;
+            }
+            set
+            {
+                this._Attachments = value;
             }
         }
     }

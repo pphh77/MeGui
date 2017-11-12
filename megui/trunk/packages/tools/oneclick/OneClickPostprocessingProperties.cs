@@ -50,6 +50,7 @@ namespace MeGUI
         private OneClickSettings _oneClickSettings;
         private List<OneClickFilesToProcess> _filesToProcess;
         private ChapterInfo chapterInfo;
+        private List<string> _oAttachments;
 
 		public OneClickPostprocessingProperties()
 		{
@@ -78,6 +79,7 @@ namespace MeGUI
             ifoFile = string.Empty;
             applyDelayCorrection = false;
             chapterInfo = new ChapterInfo();
+            _oAttachments = new List<string>();
 		}
 
         public bool AutoDeinterlace
@@ -346,6 +348,15 @@ namespace MeGUI
         {
             get { return _filesToProcess; }
             set { _filesToProcess = value; }
+        }
+
+        /// <summary>
+        /// gets / sets attachments which need to be processed
+        /// </summary>
+        public List<string> Attachments
+        {
+            get { return _oAttachments; }
+            set { _oAttachments = value; }
         }
 
         /// <summary>

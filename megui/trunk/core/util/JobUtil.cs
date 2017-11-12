@@ -101,7 +101,7 @@ namespace MeGUI
         }
 
         public static JobChain GenerateMuxJobs(VideoStream video, decimal? framerate, MuxStream[] audioStreamsArray, 
-            MuxableType[] audioTypes, MuxStream[] subtitleStreamsArray, MuxableType[] subTypes,
+            MuxableType[] audioTypes, MuxStream[] subtitleStreamsArray, MuxableType[] subTypes, List<string> attachments,
             ChapterInfo chapterInfo, MuxableType chapterInputType, ContainerType container, string output, 
             FileSize? splitSize, List<string> inputsToDelete, string deviceType, MuxableType deviceOutputType, bool alwaysMuxOutput)
         {
@@ -262,6 +262,7 @@ namespace MeGUI
                 }
                 previousOutput = mjob.Settings.MuxedOutput;
                 index++;
+                mjob.Settings.Attachments = attachments;
                 jobs.Add(mjob);
                 if (string.IsNullOrEmpty(mjob.Settings.VideoInput))
                     mjob.Input = mjob.Settings.MuxedInput;

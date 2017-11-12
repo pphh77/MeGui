@@ -39,12 +39,14 @@ namespace MeGUI
         private Dar? dar;
         private ChapterInfo chapterInfo;
         private FileSize? splitSize;
+        private List<string> attachments;
 
 		public MuxSettings()
 		{
 			audioStreams = new List<MuxStream>();
 			subtitleStreams = new List<MuxStream>();
             chapterInfo = new ChapterInfo();
+            attachments = new List<string>();
             framerate = null;
             muxedInput = "";
             videoName = "";
@@ -109,10 +111,19 @@ namespace MeGUI
 			set {chapterInfo = value;}
 		}
 
-		/// <summary>
-		/// file size at which the output file is to be split
-		/// </summary>
-		public FileSize? SplitSize
+        /// <summary>
+        /// Array of all the attachments to be muxed
+        /// </summary>
+        public List<string> Attachments
+        {
+            get { return attachments; }
+            set { attachments = value; }
+        }
+
+        /// <summary>
+        /// file size at which the output file is to be split
+        /// </summary>
+        public FileSize? SplitSize
 		{
 			get {return splitSize;}
 			set {splitSize = value;}

@@ -637,6 +637,7 @@ namespace MediaInfoWrapper
                         _tracktemp_.ImageCodecList= GetSpecificMediaInfo(StreamKind.General,num2,"Image_Codec_List");
                         _tracktemp_.ImageLanguageList= GetSpecificMediaInfo(StreamKind.General,num2,"Image_Language_List");
                         _tracktemp_.Other= GetSpecificMediaInfo(StreamKind.General,num2,"Other");
+                        _tracktemp_.Attachments = GetSpecificMediaInfo(StreamKind.General, num2, "Attachments");
                         this._General.Add(_tracktemp_);
                     }
                 }  

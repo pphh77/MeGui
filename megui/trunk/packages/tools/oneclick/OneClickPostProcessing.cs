@@ -348,7 +348,7 @@ namespace MeGUI
                     }
 
                     JobChain c = VideoUtil.GenerateJobSeries(myVideo, job.PostprocessingProperties.FinalOutput, arrAudioJobs.ToArray(), 
-                        subtitles.ToArray(), job.PostprocessingProperties.ChapterInfo, job.PostprocessingProperties.OutputSize,
+                        subtitles.ToArray(), job.PostprocessingProperties.Attachments, job.PostprocessingProperties.ChapterInfo, job.PostprocessingProperties.OutputSize,
                         job.PostprocessingProperties.Splitting, job.PostprocessingProperties.Container,
                         job.PostprocessingProperties.PrerenderJob, arrMuxStreams.ToArray(),
                         _log, job.PostprocessingProperties.DeviceOutputType, null, job.PostprocessingProperties.VideoFileToMux, 

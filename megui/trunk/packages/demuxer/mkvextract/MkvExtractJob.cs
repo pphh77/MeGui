@@ -31,6 +31,7 @@ namespace MeGUI
     {
         private List<TrackInfo> _oTracks;
         private string _strOutputPath;
+        private List<string> _oAttachments;
 
         public MkvExtractJob() 
         {
@@ -41,6 +42,7 @@ namespace MeGUI
         {
             this._oTracks = oTracks;
             this._strOutputPath = strOutputPath;
+            this._oAttachments = new List<string>();
         }
 
         public MkvExtractJob(string strInput, string strOutputPath, List<AudioTrackInfo> oTracks)
@@ -50,6 +52,7 @@ namespace MeGUI
             foreach (AudioTrackInfo oInfo in oTracks)
                 this._oTracks.Add((TrackInfo)oInfo);
             this._strOutputPath = strOutputPath;
+            this._oAttachments = new List<string>();
         }
 
         public override string CodecString
@@ -72,6 +75,12 @@ namespace MeGUI
         {
             get { return _strOutputPath; }
             set { _strOutputPath = value; }
+        }
+
+        public List<string> Attachments
+        {
+            get { return _oAttachments; }
+            set { _oAttachments = value; }
         }
     }
 }

@@ -88,6 +88,7 @@ namespace MeGUI
         private MkvInfo _MkvInfo;
         private Eac3toInfo _Eac3toInfo;
         private LogItem _Log;
+        private List<string> _attachments;
         #endregion
         #region properties
         public AudioInformation AudioInfo
@@ -118,6 +119,11 @@ namespace MeGUI
         public string ContainerFileTypeString
         {
             get { return _strContainer; }
+        }
+
+        public List<string> Attachments
+        {
+            get { return _attachments; }
         }
         #endregion
 
@@ -155,6 +161,7 @@ namespace MeGUI
             this._SubtitleInfo = new SubtitleInformation();
             this._VideoInfo = new VideoInformation(false, 0, 0, Dar.A1x1, 0, 0, 0, 1);
             this._ChapterInfo = new ChapterInfo();
+            this._attachments = new List<string>();
 
             MediaInfo info = null;
 
@@ -302,6 +309,7 @@ namespace MeGUI
                 {
                     cType = getContainerType(info.General[0].Format, info.General[0].FormatString);
                     _strContainer = info.General[0].Format;
+                    _attachments.AddRange(info.General[0].Attachments.Split(new string[] { " / " }, StringSplitOptions.RemoveEmptyEntries));
                 }
 
                 // audio detection
@@ -629,6 +637,8 @@ namespace MeGUI
                         oTrack.Info("AngleCount: " + _VideoInfo.AngleCount);
                         oTrack.Info("AngleNumber: " + _VideoInfo.AngleNumber);
                     }
+                    if (!String.IsNullOrEmpty(t.Attachments))
+                        oTrack.Info("Attachments: " + t.Attachments);
 
                     infoLog.Add(oTrack);
                 }

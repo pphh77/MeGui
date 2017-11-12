@@ -19,10 +19,9 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
 
 using MeGUI.core.util;
 
@@ -67,7 +66,7 @@ namespace MeGUI
             }
             catch (Exception e)
             {
-                log.LogValue("Exception in getPercentage(" + line + ")", e, MeGUI.core.util.ImageType.Warning);
+                log.LogValue("Exception in getPercentage(" + line + ")", e, ImageType.Warning);
                 return null;
             }
         }
@@ -129,23 +128,37 @@ namespace MeGUI
                 }
 
                 // Input File
-                sb.Append("tracks \"" + job.Input + "\" --ui-language en");
+                sb.Append("\"" + job.Input + "\"");
 
                 // Tracks to extract
-                System.Collections.ArrayList trackID = new System.Collections.ArrayList();
-                foreach (TrackInfo oTrack in job.MkvTracks)
+                if (job.MkvTracks.Count > 0)
                 {
-                    // Extract only audio/subtitle/video tracks
-                    if (oTrack.TrackType == TrackType.Unknown)
-                        continue;
+                    sb.Append(" tracks");
+                    ArrayList trackID = new ArrayList();
+                    foreach (TrackInfo oTrack in job.MkvTracks)
+                    {
+                        // Extract only audio/subtitle/video tracks
+                        if (oTrack.TrackType == TrackType.Unknown)
+                            continue;
 
-                    // extract every track only once
-                    if (trackID.Contains(oTrack.MMGTrackID))
-                        continue;
+                        // extract every track only once
+                        if (trackID.Contains(oTrack.MMGTrackID))
+                            continue;
 
-                    sb.Append(" " + oTrack.MMGTrackID + ":\"" + job.OutputPath + "\\" + oTrack.DemuxFileName + "\"");
-                    trackID.Add(oTrack.MMGTrackID);
+                        sb.Append(" " + oTrack.MMGTrackID + ":\"" + job.OutputPath + "\\" + oTrack.DemuxFileName + "\"");
+                        trackID.Add(oTrack.MMGTrackID);
+                    }
                 }
+
+                if (job.Attachments.Count > 0)
+                {
+                    sb.Append(" attachments");
+                    int i = 1;
+                    foreach (string strFileName in job.Attachments)
+                        sb.Append(" " + i++ + ":\"" + strFileName + "\"");
+                }
+
+                sb.Append(" --ui-language en");
 
                 return sb.ToString();
             }

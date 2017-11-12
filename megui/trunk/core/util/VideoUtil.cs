@@ -388,7 +388,7 @@ namespace MeGUI
 
         #region new stuff
         public static JobChain GenerateJobSeries(VideoStream video, string muxedOutput, AudioJob[] audioStreams,
-            MuxStream[] subtitles, ChapterInfo chapterInfo, FileSize? desiredSize, FileSize? splitSize, 
+            MuxStream[] subtitles, List<string> attachments, ChapterInfo chapterInfo, FileSize? desiredSize, FileSize? splitSize, 
             ContainerType container, bool prerender, MuxStream[] muxOnlyAudio, LogItem log, string deviceType, 
             Zone[] zones, string videoFileToMux, OneClickAudioTrack[] audioTracks, bool alwaysMuxOutput)
         {
@@ -487,7 +487,7 @@ namespace MeGUI
             inputsToDelete.AddRange(Array.ConvertAll<AudioJob, string>(audioStreams, delegate(AudioJob a) { return a.Output; }));
 
             JobChain muxJobs = JobUtil.GenerateMuxJobs(video, null, allAudioToMux.ToArray(), allInputAudioTypes.ToArray(),
-                subtitles, allInputSubtitleTypes.ToArray(), chapterInfo, chapterInputType, container, muxedOutput, splitSize, inputsToDelete, 
+                subtitles, allInputSubtitleTypes.ToArray(), attachments, chapterInfo, chapterInputType, container, muxedOutput, splitSize, inputsToDelete, 
                 deviceType, deviceOutputType, alwaysMuxOutput);
 
             if (desiredSize.HasValue && String.IsNullOrEmpty(videoFileToMux))

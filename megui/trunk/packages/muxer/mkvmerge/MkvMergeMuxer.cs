@@ -109,7 +109,8 @@ namespace MeGUI
                 MuxSettings settings = job.Settings;
                 int trackID;
                 
-                sb.Append("-o \"" + settings.MuxedOutput + "\"");
+                sb.Append("--output \"" + settings.MuxedOutput + "\"");
+
                 if (settings.MuxAll)
                 {
                     string strInput = string.Empty;
@@ -123,10 +124,7 @@ namespace MeGUI
                     else
                         trackID = 0;
 
-                    sb.Append(" \"" + strInput + "\"");
-                    sb.Append(" \"--compression\" \"" + trackID + ":none\"");
-                    sb.Append(" --ui-language en");
-
+                    sb.Append(" \"" + strInput + "\" --ui-language en");
                     return sb.ToString();
                 }
 
@@ -156,10 +154,13 @@ namespace MeGUI
                         if (!String.IsNullOrEmpty(fpsString))
                             sb.Append(" --default-duration " + trackID + ":" + PrettyFormatting.ReplaceFPSValue(fpsString) + "fps");
                     }
-                    sb.Append(" \"--compression\" \"" + trackID + ":none\"");
-                    sb.Append(" -d \"" + trackID + "\" --no-chapters -A -S \"" + inputFile + "\"");
+                    sb.Append(" --video-tracks " + trackID + " --no-audio --no-subtitles --no-chapters");
+                    if (settings.Attachments.Count > 0)
+                        sb.Append(" --no-attachments");
+                    sb.Append(" \"" + inputFile + "\"");
                 }
 
+                // audio tracks
                 foreach (object o in settings.AudioStreams)
                 {
                     MuxStream stream = (MuxStream)o;
@@ -202,16 +203,16 @@ namespace MeGUI
                         sb.Append(" --track-name \"" + trackID + ":" + stream.name.Replace("\"", "\\\"") + "\"");
                     if (stream.delay != 0)
                         sb.AppendFormat(" --sync {0}:{1}", trackID, stream.delay);
-                    sb.Append(" \"--compression\" \"" + trackID + ":none\"");
-                    sb.Append(" -a " + trackID + " --no-chapters -D -S \"" + stream.path + "\"");
+                    sb.Append(" --audio-tracks " + trackID + " --no-chapters --no-video --no-subtitles \"" + stream.path + "\"");
                 }
 
+                // subtitle tracks
                 foreach (object o in settings.SubtitleStreams)
                 {
                     MuxStream stream = (MuxStream)o;
 
                     trackID = 0;
-                    if (System.IO.File.Exists(stream.path))
+                    if (File.Exists(stream.path))
                     {
                         MediaInfoFile oSubtitleInfo = new MediaInfoFile(stream.path, ref log);
                         if (oSubtitleInfo.ContainerFileType == ContainerType.MP4 || oSubtitleInfo.ContainerFileType == ContainerType.MKV)
@@ -235,14 +236,14 @@ namespace MeGUI
                         if (stream.delay != 0)
                             sb.AppendFormat(" --sync {0}:{1}", trackID, stream.delay);
                         if (stream.MuxOnlyInfo.DefaultTrack)
-                            sb.Append(" --default-track \"" + trackID + ":yes\"");
+                            sb.Append(" --default-track " + trackID + ":yes");
                         else
-                            sb.Append(" --default-track \"" + trackID + ":no\"");
+                            sb.Append(" --default-track " + trackID + ":no");
                         if (stream.MuxOnlyInfo.ForcedTrack)
-                            sb.Append(" --forced-track \"" + trackID + ":yes\"");
+                            sb.Append(" --forced-track " + trackID + ":yes");
                         else
-                            sb.Append(" --forced-track \"" + trackID + ":no\"");
-                        sb.Append(" -s " + trackID + " -D -A -T --no-global-tags --no-chapters \"" + stream.MuxOnlyInfo.SourceFileName + "\"");
+                            sb.Append(" --forced-track " + trackID + ":no");
+                        sb.Append(" --subtitle-tracks " + trackID + " --no-video --no-audio --no-track-tags --no-global-tags --no-chapters \"" + stream.MuxOnlyInfo.SourceFileName + "\"");
                     }
                     else if (stream.path.ToLowerInvariant().EndsWith(".idx"))
                     {
@@ -285,7 +286,7 @@ namespace MeGUI
                             ++trackID;
                         }
                         trackID = 0;
-                        sb.Append(" -s ");
+                        sb.Append(" --subtitle-tracks ");
                         foreach (SubtitleInfo strack in subTracks)
                         {
                             if (trackID > 0)
@@ -294,7 +295,7 @@ namespace MeGUI
                                 sb.Append("0");
                             ++trackID;
                         }
-                        sb.Append(" -D -A \"" + stream.path + "\"");
+                        sb.Append(" --no-video --no-audio \"" + stream.path + "\"");
                     }
                     else
                     {
@@ -314,22 +315,31 @@ namespace MeGUI
                         if (stream.delay != 0)
                             sb.AppendFormat(" --sync {0}:{1}", trackID, stream.delay);
                         if (stream.bDefaultTrack)
-                            sb.Append(" --default-track \"" + trackID + ":yes\"");
+                            sb.Append(" --default-track " + trackID + ":yes");
                         else
-                            sb.Append(" --default-track \"" + trackID + ":no\"");
+                            sb.Append(" --default-track " + trackID + ":no");
                         if (stream.bForceTrack)
-                            sb.Append(" --forced-track \"" + trackID + ":yes\"");
+                            sb.Append(" --forced-track " + trackID + ":yes");
                         else
-                            sb.Append(" --forced-track \"" + trackID + ":no\"");
-                        sb.Append(" -s " + trackID + " -D -A \"" + stream.path + "\"");
+                            sb.Append(" --forced-track " + trackID + ":no");
+                        sb.Append(" --subtitle-tracks " + trackID + " --no-video --no-audio \"" + stream.path + "\"");
                     }
                 }
+
+                // chapters
                 if (settings.ChapterInfo.HasChapters) // chapters are defined
                 {
                     string strChapterFile = Path.Combine(Path.GetDirectoryName(settings.MuxedOutput), Path.GetFileNameWithoutExtension(settings.MuxedOutput) + "_chptmp.txt");
                     settings.ChapterInfo.SaveText(strChapterFile);
                     job.FilesToDelete.Add(strChapterFile);
                     sb.Append(" --chapters \"" + strChapterFile + "\"");
+                }
+
+                // attachments
+                if (settings.Attachments.Count > 0)
+                {
+                    foreach (string strFileName in settings.Attachments)
+                        sb.Append(" --attach-file \"" + strFileName + "\"");
                 }
 
                 if (settings.SplitSize.HasValue)
