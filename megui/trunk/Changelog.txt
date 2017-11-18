@@ -1,3 +1,4 @@
+2777 [Settings]             changed the default value of "delete completed jobs" to be enabled
 2776 [OneClick]             added support for MKV attachments. If the MKV source does have such attachments, it will be copied to the target MKV. feature request #617
 
 Changelog 2715 --> 2774

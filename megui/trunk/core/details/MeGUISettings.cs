@@ -122,7 +122,7 @@ namespace MeGUI
 			autoOpenScript = true;
 			overwriteStats = true;
 			keep2of3passOutput = false;
-			deleteCompletedJobs = false;
+			deleteCompletedJobs = true;
 			nbPasses = 2;
 			deleteIntermediateFiles = true;
 			deleteAbortedOutput = true;
