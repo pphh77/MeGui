@@ -147,7 +147,7 @@ namespace MeGUI
                         lines.Add("CHAPTER" + i.ToString("00") + "=" + c.Time.ToString());
                     lines.Add("CHAPTER" + i.ToString("00") + "NAME=" + c.Name);
                 }
-                File.WriteAllLines(strFileName, lines.ToArray());
+                File.WriteAllLines(strFileName, lines.ToArray(), Encoding.UTF8);
                 return true;
             }
             catch (Exception)
