@@ -1,4 +1,5 @@
-2778 [Chapter]              fixed non-ASCII handling. bug #898
+2779 [Xvid]                 added a workaround to be able to use Xvid in portable AviSynth mode
+2778 [Chapter]              fixed non-ASCII handling (regression of 2753). bug #898
 2777 [Settings]             changed the default value of "delete completed jobs" to be enabled
 2776 [OneClick]             added support for MKV attachments. If the MKV source does have such attachments, it will be copied to the target MKV. feature request #617
 

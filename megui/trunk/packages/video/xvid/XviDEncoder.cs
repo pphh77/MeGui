@@ -19,13 +19,9 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Text;
-using System.Windows.Forms; // used for the MethodInvoker
 
-using MeGUI.core.plugins.implemented;
 using MeGUI.core.util;
 
 namespace MeGUI
@@ -34,6 +30,7 @@ namespace MeGUI
     {
         public static readonly JobProcessorFactory Factory =
 new JobProcessorFactory(new ProcessorFactory(init), "XviDEncoder");
+        private bool bAVSKeyToBeRemoved = true;
 
         private static IJobProcessor init(MainForm mf, Job j)
         {
@@ -52,6 +49,9 @@ new JobProcessorFactory(new ProcessorFactory(init), "XviDEncoder");
 
         public override void ProcessLine(string line, StreamType stream, ImageType oType)
         {
+            if (bAVSKeyToBeRemoved)
+                RemoveAVSKeys();
+
             if (line.IndexOf(": key") != -1) // we found a position line, parse it
             {
                 int frameNumberEnd = line.IndexOf(":");
@@ -72,8 +72,146 @@ new JobProcessorFactory(new ProcessorFactory(init), "XviDEncoder");
         {
             get
             {
+                SetAVSKeys();
                 return genCommandline(job.Input, job.Output, job.DAR, job.Settings as xvidSettings, hres, vres, fps_n, fps_d, job.Zones, base.log);
             }
+        }
+
+        /// <summary>
+        /// Checks if temporary AVS keys have to be set. 
+        /// This is required so that Xvid can find/use the avisynth.dll - especially in the portable avisynth mode
+        /// </summary>
+        private void SetAVSKeys()
+        {
+            bool bKeyWritten = false;
+
+            try
+            {
+                // try to find the class GUID for AVS
+                string guid = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_CLASSES_ROOT\AVIFile\Extensions\AVS", null, string.Empty);  
+                if (String.IsNullOrEmpty(guid))
+                {
+                    // GUID not found - set it to the default value
+                    guid = "{E6D6B700-124D-11D4-86F3-DB80AFD98778}";
+                    bKeyWritten = true;
+
+                    // write the keys if they do not exist
+                    Microsoft.Win32.RegistryKey oKey;
+                    oKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Classes\AVIFile");
+                    if (oKey == null)
+                        Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Software\Classes\AVIFile", "MeGUI", "true");
+
+                    oKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Classes\AVIFile\Extensions");
+                    if (oKey == null)
+                        Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Software\Classes\AVIFile\Extensions", "MeGUI", "true");
+
+                    oKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Classes\AVIFile\Extensions\AVS");
+                    if (oKey == null)
+                        Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Software\Classes\AVIFile\Extensions\AVS", "MeGUI", "true");
+
+                    // finally the GUID value has to be set
+                    Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Software\Classes\AVIFile\Extensions\AVS", null, guid);
+                }
+
+                // check which registry part has to be changed
+                string strWOWkey = string.Empty;
+                if (!MainForm.Instance.Settings.IsMeGUIx64 && MainForm.Instance.Settings.IsOSx64)
+                    strWOWkey = @"Wow6432Node\";
+
+                // try to find the avisynth.dll entry
+                string strAViSynthDLL = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_CLASSES_ROOT\" + strWOWkey + @"CLSID\" + guid + @"\InProcServer32", null, string.Empty);
+                if (String.IsNullOrEmpty(strAViSynthDLL) || !strAViSynthDLL.ToLowerInvariant().Equals("avisynth.dll"))
+                {
+                    // avisynth.dll value could not be found
+                    bKeyWritten = true;
+
+                    // write the keys if they do not exist
+                    Microsoft.Win32.RegistryKey oKey;
+                    oKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Classes\" + strWOWkey + @"CLSID\" + guid);
+                    if (oKey == null)
+                        Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Software\Classes\" + strWOWkey + @"CLSID\" + guid, "MeGUI", "true");
+
+                    oKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Classes\" + strWOWkey + @"CLSID\" + guid + @"\InProcServer32");
+                    if (oKey == null)
+                        Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Software\Classes\" + strWOWkey + @"CLSID\" + guid + @"\InProcServer32", "MeGUI", "true");
+
+                    // finally the avisynth value has to be set
+                    Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Software\Classes\" + strWOWkey + @"CLSID\" + guid + @"\InProcServer32", null, "AviSynth.dll");
+                }
+            }
+            catch (Exception ex)
+            {
+                log.LogEvent("Temporary Xvid registry entries could not be added: " + ex.Message, ImageType.Error);
+            }
+
+            if (bKeyWritten)
+                log.LogEvent("Temporary Xvid registry entries have been added", ImageType.Information);
+        }
+
+        /// <summary>
+        /// If set by MeGUI the temporary AVS keys have to be removed again
+        /// </summary>
+        private void RemoveAVSKeys()
+        {
+            bool bKeyRemoved = false;
+
+            try
+            {
+                string guid = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_CLASSES_ROOT\AVIFile\Extensions\AVS", null, string.Empty);
+                if (String.IsNullOrEmpty(guid))
+                {
+                    // GUID not found - set it
+                    guid = "{E6D6B700-124D-11D4-86F3-DB80AFD98778}";
+                }
+
+                string strMeGUIWritten = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Classes\AVIFile\Extensions\AVS", "MeGUI", string.Empty);
+                if (!String.IsNullOrEmpty(strMeGUIWritten))
+                {
+                    Microsoft.Win32.Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\AVIFile\Extensions\AVS");
+                    bKeyRemoved = true;
+                }
+
+                strMeGUIWritten = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Classes\AVIFile\Extensions", "MeGUI", string.Empty);
+                if (!String.IsNullOrEmpty(strMeGUIWritten))
+                {
+                    Microsoft.Win32.Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\AVIFile\Extensions");
+                    bKeyRemoved = true;
+                }
+
+                strMeGUIWritten = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Classes\AVIFile", "MeGUI", string.Empty);
+                if (!String.IsNullOrEmpty(strMeGUIWritten))
+                {
+                    Microsoft.Win32.Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\AVIFile");
+                    bKeyRemoved = true;
+                }
+
+                // check which registry part has been changed
+                string strWOWkey = string.Empty;
+                if (!MainForm.Instance.Settings.IsMeGUIx64 && MainForm.Instance.Settings.IsOSx64)
+                    strWOWkey = @"Wow6432Node\";
+
+                strMeGUIWritten = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Classes\" + strWOWkey + @"CLSID\" + guid + @"\InProcServer32", "MeGUI", string.Empty);
+                if (!String.IsNullOrEmpty(strMeGUIWritten))
+                {
+                    Microsoft.Win32.Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\" + strWOWkey + @"CLSID\" + guid + @"\InProcServer32");
+                    bKeyRemoved = true;
+                }
+
+                strMeGUIWritten = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Classes\" + strWOWkey + @"CLSID\" + guid, "MeGUI", string.Empty);
+                if (!String.IsNullOrEmpty(strMeGUIWritten))
+                {
+                    Microsoft.Win32.Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\" + strWOWkey + @"CLSID\" + guid);
+                    bKeyRemoved = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                log.LogEvent("Temporary Xvid registry changes could not be removed: " + ex.Message, ImageType.Error);
+            }
+
+            bAVSKeyToBeRemoved = false;
+            if (bKeyRemoved)
+                log.LogEvent("Temporary Xvid registry entries have been removed", ImageType.Information);
         }
 
         public static string genCommandline(string input, string output, Dar? d, xvidSettings xs, int hres, int vres, int fps_n, int fps_d, Zone[] zones, LogItem log)
@@ -307,6 +445,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "XviDEncoder");
 
             if (!String.IsNullOrEmpty(xs.CustomEncoderOptions.Trim())) // add custom encoder options
                 sb.Append(xs.CustomEncoderOptions.Trim());
+
             return sb.ToString();
         }
     }
