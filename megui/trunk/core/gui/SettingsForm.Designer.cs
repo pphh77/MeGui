@@ -153,6 +153,7 @@ namespace MeGUI
             this.autoEncodeDefaultsButton = new System.Windows.Forms.Button();
             this.toolTipHelp = new System.Windows.Forms.ToolTip(this.components);
             this.helpButton1 = new MeGUI.core.gui.HelpButton();
+            this.chkDirectShowSource = new System.Windows.Forms.CheckBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
             groupBox1.SuspendLayout();
             this.otherGroupBox.SuspendLayout();
@@ -267,6 +268,7 @@ namespace MeGUI
             // 
             // otherGroupBox
             // 
+            this.otherGroupBox.Controls.Add(this.chkDirectShowSource);
             this.otherGroupBox.Controls.Add(this.chkDebugInformation);
             this.otherGroupBox.Controls.Add(this.lblMinimumLength);
             this.otherGroupBox.Controls.Add(this.minimumTitleLength);
@@ -1340,6 +1342,15 @@ namespace MeGUI
             this.helpButton1.Size = new System.Drawing.Size(38, 23);
             this.helpButton1.TabIndex = 1;
             // 
+            // chkDirectShowSource
+            // 
+            this.chkDirectShowSource.AutoSize = true;
+            this.chkDirectShowSource.Location = new System.Drawing.Point(12, 142);
+            this.chkDirectShowSource.Name = "chkDirectShowSource";
+            this.chkDirectShowSource.Size = new System.Drawing.Size(278, 17);
+            this.chkDirectShowSource.TabIndex = 26;
+            this.chkDirectShowSource.Text = "Enable DirectShowSource() in the AVS Script Creator";
+            // 
             // SettingsForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 14);
@@ -1498,5 +1509,6 @@ namespace MeGUI
         private System.Windows.Forms.NumericUpDown minimumTitleLength;
         private System.Windows.Forms.CheckBox chk64Bit;
         private System.Windows.Forms.CheckBox chkDebugInformation;
+        private System.Windows.Forms.CheckBox chkDirectShowSource;
     }
 }

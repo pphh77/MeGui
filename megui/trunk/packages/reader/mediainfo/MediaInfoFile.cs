@@ -1101,7 +1101,10 @@ namespace MeGUI
             return false;
         }
 
-        /// <summary>checks if the file is readable by AVISource</summary>
+        /// <summary>
+        /// checks if the file is readable by AVISource
+        /// </summary>
+        /// <param name="bStrictFilesOnly">if true, it returns only true for files which ffms cannot parse</param>
         /// <returns>true if readable, false if not</returns>
         public bool isAVISourceIndexable(bool bStrictFilesOnly)
         {
@@ -1147,6 +1150,8 @@ namespace MeGUI
             try
             {
                 string tempAvs = "DirectShowSource(\"" + _file + "\", audio=false)";
+                if (MainForm.Instance.Settings.PortableAviSynth)
+                    tempAvs = "LoadPlugin(\"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynth.Path), @"plugins\directshowsource.dll") + "\")\r\n" + tempAvs;
                 IMediaFile iMediaFile = AvsFile.ParseScript(tempAvs);
                 iMediaFile.Dispose();
             }

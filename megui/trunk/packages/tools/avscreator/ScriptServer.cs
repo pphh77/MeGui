@@ -188,35 +188,29 @@ namespace MeGUI
                     oInfo.Dispose();
                     break;
                 case PossibleSources.vdr:
+                case PossibleSources.avisource:
                     inputLine = "AVISource(\"" + input + "\", audio=false)" + VideoUtil.getAssumeFPS(fps, input);
                     break;
                 case PossibleSources.directShow:
-                    if (input.ToLowerInvariant().EndsWith(".avi"))
+                    if (dss2)
                     {
-                        inputLine = "AVISource(\"" + input + "\", audio=false)" + VideoUtil.getAssumeFPS(fps, input);
+                        string path = MeGUI.core.util.FileUtil.GetHaaliInstalledPath();
+                        if (!File.Exists(Path.Combine(path, "avss.dll")))
+                        {
+                            UpdateCacher.CheckPackage("haali");
+                            path = Path.GetDirectoryName(MainForm.Instance.Settings.Haali.Path);
+                        }
+                        inputLine = "LoadPlugin(\"" + path + "\\avss.dll" + "\")\r\ndss2(\"" + input + "\"" + ((fps > 0) ? ", fps=" + fps.ToString("F3", new CultureInfo("en-us")) : string.Empty) + ")" + VideoUtil.getAssumeFPS(fps, input);
                     }
                     else
                     {
-                        if (dss2)
-                        {
-                            string path = MeGUI.core.util.FileUtil.GetHaaliInstalledPath();
-                            if (!File.Exists(Path.Combine(path, "avss.dll")))
-                            {
-                                UpdateCacher.CheckPackage("haali");
-                                path = Path.GetDirectoryName(MainForm.Instance.Settings.Haali.Path);
-                            }
-                            inputLine = "LoadPlugin(\"" + path + "\\avss.dll" + "\")\r\ndss2(\"" + input + "\"" + ((fps > 0) ? ", fps=" + fps.ToString("F3", new CultureInfo("en-us")) : string.Empty) + ")" + VideoUtil.getAssumeFPS(fps, input);
-                        }
-                        else
-                        {
-                            inputLine = String.Empty;
-                            if (MainForm.Instance.Settings.PortableAviSynth)
-                                inputLine = "LoadPlugin(\"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynth.Path), @"plugins\directshowsource.dll") + "\")\r\n";
-                            inputLine += "DirectShowSource(\"" + input + "\"" + ((fps > 0) ? ", fps=" + fps.ToString("F3", new CultureInfo("en-us")) : string.Empty) + ", audio=false, convertfps=true)" + VideoUtil.getAssumeFPS(fps, input);
-                        }
-                        if (flipVertical)
-                            inputLine = inputLine + "\r\nFlipVertical()";
+                        inputLine = String.Empty;
+                        if (MainForm.Instance.Settings.PortableAviSynth)
+                            inputLine = "LoadPlugin(\"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynth.Path), @"plugins\directshowsource.dll") + "\")\r\n";
+                        inputLine += "DirectShowSource(\"" + input + "\"" + ((fps > 0) ? ", fps=" + fps.ToString("F3", new CultureInfo("en-us")) : string.Empty) + ", audio=false, convertfps=true)" + VideoUtil.getAssumeFPS(fps, input);
                     }
+                    if (flipVertical)
+                        inputLine = inputLine + "\r\nFlipVertical()";
                     break;
             }
             return inputLine;

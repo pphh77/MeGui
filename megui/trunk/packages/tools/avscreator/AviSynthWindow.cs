@@ -439,10 +439,17 @@ namespace MeGUI
                                 fileIndexer.Show();
                                 this.Close();
                                 break;
-                            default:
+                            case 2:
+                                sourceType = PossibleSources.avisource;
+                                openDirectShow(videoInput);
+                                break;
+                            case 3:
                                 sourceType = PossibleSources.directShow;
                                 openDirectShow(videoInput);
                                 break;
+                            default:
+                                MessageBox.Show("Unable to render the file.\r\nYou probably don't have the correct filters installed.", "DirectShow Error", MessageBoxButtons.OK);
+                                return;
                         }
                     }
                     break;
@@ -493,6 +500,7 @@ namespace MeGUI
                     break;
                 case PossibleSources.vdr:
                 case PossibleSources.avs:
+                case PossibleSources.avisource:
                     this.mpeg2Deblocking.Checked = false;
                     this.mpeg2Deblocking.Enabled = false;
                     this.colourCorrect.Enabled = false;
@@ -669,47 +677,38 @@ namespace MeGUI
                 MessageBox.Show(fileName + " could not be found", "File Not Found", MessageBoxButtons.OK);
                 return;
             }
+
+            string tempAvs;
+            if (sourceType == PossibleSources.avisource)
+            {
+                tempAvs = "AVISource(\"" + fileName + "\", audio=false)" + VideoUtil.getAssumeFPS(0, fileName);
+            }
             else
             {
-                DirectShow ds = new DirectShow();
-                if (!ds.checkRender(fileName)) // make sure graphedit can render the file
+                string frameRateString = null;
+                try
                 {
-                    MessageBox.Show("Unable to render the file.\r\nYou probably don't have the correct filters installed", "Direct Show Error", MessageBoxButtons.OK);
-                    return;
+                    MediaInfoFile info = new MediaInfoFile(fileName);
+                    if (info.VideoInfo.HasVideo && info.VideoInfo.FPS > 0)
+                        frameRateString = info.VideoInfo.FPS.ToString(System.Globalization.CultureInfo.InvariantCulture);
                 }
+                catch (Exception)
+                { }
 
-                string tempAvs;
-                if (fileName.ToLowerInvariant().EndsWith(".avi"))
-                {
-                    tempAvs = "AVISource(\"" + fileName + "\", audio=false)" + VideoUtil.getAssumeFPS(0, fileName);
-                }
-                else
-                {
-                    string frameRateString = null;
-                    try
-                    {
-                        MediaInfoFile info = new MediaInfoFile(fileName);
-                        if (info.VideoInfo.HasVideo && info.VideoInfo.FPS > 0)
-                            frameRateString = info.VideoInfo.FPS.ToString(System.Globalization.CultureInfo.InvariantCulture);
-                    }
-                    catch (Exception)
-                    { }
+                tempAvs = string.Format(
+                    "DirectShowSource(\"{0}\", audio=false{1}, convertfps=true){2}{3}",
+                    fileName,
+                    frameRateString == null ? string.Empty : (", fps=" + frameRateString),
+                    VideoUtil.getAssumeFPS(0, fileName),
+                    this.flipVertical.Checked ? ".FlipVertical()" : string.Empty
+                    );
+                if (MainForm.Instance.Settings.PortableAviSynth)
+                    tempAvs = "LoadPlugin(\"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynth.Path), @"plugins\directshowsource.dll") + "\")\r\n" + tempAvs;
+            } 
+            if (file != null)
+                file.Dispose();
+            openVideo(tempAvs, fileName, true);
 
-                    tempAvs = string.Format(
-                        "DirectShowSource(\"{0}\", audio=false{1}, convertfps=true){2}{3}",
-                        fileName,
-                        frameRateString == null ? string.Empty : (", fps=" + frameRateString),
-                        VideoUtil.getAssumeFPS(0, fileName),
-                        this.flipVertical.Checked ? ".FlipVertical()" : string.Empty
-                        );
-                    if (MainForm.Instance.Settings.PortableAviSynth)
-                        tempAvs = "LoadPlugin(\"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynth.Path), @"plugins\directshowsource.dll") + "\")\r\n" + tempAvs;
-                } 
-                if (file != null)
-                    file.Dispose();
-                openVideo(tempAvs, fileName, true);
-
-            }
         }
         
         /// <summary>
@@ -1499,7 +1498,7 @@ namespace MeGUI
         }
     }
     public delegate void OpenScriptCallback(string avisynthScript, MediaInfoFile oInfo);
-    public enum PossibleSources { d2v, dgm, dgi, vdr, directShow, avs, ffindex, lsmash };
+    public enum PossibleSources { d2v, dgm, dgi, vdr, directShow, avs, ffindex, lsmash, avisource };
     public enum mod16Method : int { none = -1, resize = 0, overcrop, nonMod16, mod4Horizontal, undercrop };
     public enum modValue : int { mod16 = 0, mod8, mod4, mod2 };
 

@@ -57,7 +57,7 @@ namespace MeGUI
                      deleteAbortedOutput, openProgressWindow, bEac3toAutoSelectStreams, bUseFDKAac, bVobSubberKeepAll,
                      alwaysOnTop, addTimePosition, alwaysbackupfiles, bUseITU, bEac3toLastUsedFileMode, bMeGUIx64,
                      bAutoLoadDG, bAutoStartQueueStartup, bAlwayUsePortableAviSynth, bVobSubberSingleFileExport,
-                     bEnsureCorrectPlaybackSpeed, bExternalMuxerX264, bUseNeroAacEnc, bOSx64,
+                     bEnsureCorrectPlaybackSpeed, bExternalMuxerX264, bUseNeroAacEnc, bOSx64, bEnableDirectShowSource,
                      bVobSubberExtractForced, bVobSubberShowAll, bUsex64Tools, bShowDebugInformation, bEac3toDefaultToHD,
                      bEac3toEnableEncoder, bEac3toEnableDecoder;
         private decimal forceFilmThreshold, acceptableFPSError;
@@ -186,6 +186,7 @@ namespace MeGUI
             bVobSubberShowAll = false;
             chapterCreatorSortString = "duration";
             bShowDebugInformation = false;
+            bEnableDirectShowSource = false;
         }
 
         #region properties
@@ -432,6 +433,12 @@ namespace MeGUI
         {
             get { return bEac3toAutoSelectStreams; }
             set { bEac3toAutoSelectStreams = value; }
+        }
+
+        public bool EnableDirectShowSource
+        {
+            get { return bEnableDirectShowSource; }
+            set { bEnableDirectShowSource = value; }
         }
 
         /// <summary>

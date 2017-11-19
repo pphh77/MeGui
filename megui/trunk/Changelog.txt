@@ -1,3 +1,5 @@
+2784 [AVS Script Creator]   fixed DirectShowSource/AVISource not available if the portable AviSynth is used. bug #896
+                            DirectShowSource/AVISource are disabled by default and have to be enabled in the MeGUI settings
 2783 [AVS Script Creator]   improved the file extension filters of the "video input" file open dialogue
 2782 [L-SMASH Indexer]      delete always the index file after it has been copied (and not only when "delete intermediate files" is selected)
 2781 [Settings]             removed "improved AVS opening" setting. It is now always enabled.

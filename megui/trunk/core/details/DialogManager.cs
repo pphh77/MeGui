@@ -182,43 +182,65 @@ namespace MeGUI
             return mainForm.Settings.DialogSettings.UseOneClick;
         }
 
+        /// <summary>
+        /// Gets the information how the file can be opened
+        /// </summary>
+        /// <param name="videoInput"></param>
+        /// <returns>
+        /// -1 file cannot be opened
+        ///  0 OneClick Encoder
+        ///  1 File Indexer
+        ///  2 AviSource
+        ///  3 DirectShowSource
+        /// </returns>
         public int AVSCreatorOpen(string videoInput)
         {
             int iResult = -1;
             MediaInfoFile iFile = new MediaInfoFile(videoInput);
-            FileIndexerWindow.IndexType oIndexer;
+            FileIndexerWindow.IndexType oIndexer = FileIndexerWindow.IndexType.NONE;
 
+            // check if OCE or FileIndexer can be used
             if (!iFile.recommendIndexer(out oIndexer, true))
-                return iResult;
-
-            if (oIndexer != FileIndexerWindow.IndexType.D2V && oIndexer != FileIndexerWindow.IndexType.DGM &&
-                oIndexer != FileIndexerWindow.IndexType.DGI && oIndexer != FileIndexerWindow.IndexType.FFMS &&
-                oIndexer != FileIndexerWindow.IndexType.LSMASH)
-                return iResult;
-
-            if (iFile.isAVISourceIndexable(false))
             {
-                iResult = askAbout3("Do you want to open this file with\r\n" +
-                    "- One Click Encoder (fully automated, easy to use) or\r\n" +
-                    "- File Indexer (manual, advanced) or \r\n" +
-                    "- AviSource (manual, expert, may cause problems)?", "Please choose your prefered way to open this file",
-                    "One Click Encoder", "File Indexer", "AviSource", MessageBoxIcon.Question);
+                // they cannot be used
+                if (iFile.isAVISourceIndexable(false))
+                    iResult = 2;
+                else if (iFile.isDirectShowSourceIndexable())
+                    iResult = 3;
+                return iResult;
             }
-            else if (iFile.isDirectShowSourceIndexable())
+
+            // OCE or File Indexer can be used - should DirectShowSource/AVISource be tried as well?
+
+            if (MainForm.Instance.Settings.EnableDirectShowSource)
             {
-                iResult = askAbout3("Do you want to open this file with\r\n" +
-                    "- One Click Encoder (fully automated, easy to use) or\r\n" +
-                    "- File Indexer (manual, advanced) or \r\n" +
-                    "- DirectShowSource (manual, expert, may cause problems)?", "Please choose your prefered way to open this file",
-                    "One Click Encoder", "File Indexer", "DirectShowSource", MessageBoxIcon.Question);
+
+                if (iFile.isAVISourceIndexable(false))
+                {
+                    iResult = askAbout3("Do you want to open this file with\r\n" +
+                        "- One Click Encoder (fully automated, easy to use) or\r\n" +
+                        "- File Indexer (manual, advanced) or \r\n" +
+                        "- AviSource (manual, expert, may cause problems)?", "Please choose your prefered way to open this file",
+                        "One Click Encoder", "File Indexer", "AviSource", MessageBoxIcon.Question);
+                    return iResult;
+                }
+                else if (iFile.isDirectShowSourceIndexable())
+                {
+                    iResult = askAbout3("Do you want to open this file with\r\n" +
+                        "- One Click Encoder (fully automated, easy to use) or\r\n" +
+                        "- File Indexer (manual, advanced) or \r\n" +
+                        "- DirectShowSource (manual, expert, may cause problems)?", "Please choose your prefered way to open this file",
+                        "One Click Encoder", "File Indexer", "DirectShowSource", MessageBoxIcon.Question);
+                    if (iResult == 2)
+                        iResult = 3;
+                    return iResult;
+                }
             }
+
+            if (useOneClick())
+                iResult = 0;
             else
-            {
-                if (useOneClick())
-                    iResult = 0;
-                else
-                    iResult = 1;
-            }
+                iResult = 1;
             return iResult;
         }
 

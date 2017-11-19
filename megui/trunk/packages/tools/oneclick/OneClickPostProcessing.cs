@@ -517,7 +517,7 @@ namespace MeGUI
             {
                 string tempAvs = "AVISource(\"" + inputFile + "\", audio=false)" + VideoUtil.getAssumeFPS(0, inputFile);
                 iMediaFile = AvsFile.ParseScript(tempAvs);
-                oPossibleSource = PossibleSources.directShow;
+                oPossibleSource = PossibleSources.avisource;
             }
             else
             {

@@ -260,6 +260,7 @@ namespace MeGUI
                 settings.ChapterCreatorMinimumLength = (int)minimumTitleLength.Value;
                 settings.Usex64Tools = chk64Bit.Checked;
                 settings.ShowDebugInformation = chkDebugInformation.Checked;
+                settings.EnableDirectShowSource = chkDirectShowSource.Checked;
 
 				return settings;
 			}
@@ -328,6 +329,7 @@ namespace MeGUI
                 minimumTitleLength.Value = settings.ChapterCreatorMinimumLength;
                 chk64Bit.Checked = settings.Usex64Tools;
                 chkDebugInformation.Checked = settings.ShowDebugInformation;
+                chkDirectShowSource.Checked = settings.EnableDirectShowSource;
             }
 		}
 		#endregion
