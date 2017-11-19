@@ -148,7 +148,7 @@ namespace MeGUI
                             // destination file is deleted / not available ==> copy source to destination
                             File.Copy(inputIndex, outputIndex, true);
                             base.log.LogEvent(inputIndex + " moved to " + outputIndex);
-                            job.FilesToDelete.Add(inputIndex);
+                            FileUtil.DeleteFile(inputIndex, base.log);
                         }
                         else
                             su.HasError = true;

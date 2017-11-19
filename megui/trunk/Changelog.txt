@@ -1,3 +1,4 @@
+2782 [L-SMASH Indexer]      delete always the index file after it has been copied (and not only when "delete intermediate files" is selected)
 2781 [Settings]             removed "improved AVS opening" setting. It is now always enabled.
 2780 [Update]               removed the abort button
 2779 [Xvid]                 added a workaround to be able to use Xvid in portable AviSynth mode
