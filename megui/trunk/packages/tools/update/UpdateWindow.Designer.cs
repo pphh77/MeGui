@@ -74,7 +74,6 @@ namespace MeGUI
             this.helpButton1 = new MeGUI.core.gui.HelpButton();
             this.progressBar = new MeGUI.core.gui.CustomProgressBar();
             this.btnUpdate = new System.Windows.Forms.Button();
-            this.btnAbort = new System.Windows.Forms.Button();
             this.statusToolStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -250,7 +249,6 @@ namespace MeGUI
             this.panel1.Controls.Add(this.helpButton1);
             this.panel1.Controls.Add(this.progressBar);
             this.panel1.Controls.Add(this.btnUpdate);
-            this.panel1.Controls.Add(this.btnAbort);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel1.Location = new System.Drawing.Point(0, 4);
             this.panel1.Name = "panel1";
@@ -261,7 +259,7 @@ namespace MeGUI
             // 
             this.chkShowAllFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.chkShowAllFiles.AutoSize = true;
-            this.chkShowAllFiles.Location = new System.Drawing.Point(406, 34);
+            this.chkShowAllFiles.Location = new System.Drawing.Point(515, 34);
             this.chkShowAllFiles.Name = "chkShowAllFiles";
             this.chkShowAllFiles.Size = new System.Drawing.Size(113, 17);
             this.chkShowAllFiles.TabIndex = 9;
@@ -293,25 +291,13 @@ namespace MeGUI
             // 
             this.btnUpdate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnUpdate.Enabled = false;
-            this.btnUpdate.Location = new System.Drawing.Point(556, 30);
+            this.btnUpdate.Location = new System.Drawing.Point(634, 30);
             this.btnUpdate.Name = "btnUpdate";
             this.btnUpdate.Size = new System.Drawing.Size(75, 23);
             this.btnUpdate.TabIndex = 3;
             this.btnUpdate.Text = "Update";
             this.btnUpdate.UseVisualStyleBackColor = true;
             this.btnUpdate.Click += new System.EventHandler(this.btnUpdate_Click);
-            // 
-            // btnAbort
-            // 
-            this.btnAbort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAbort.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnAbort.Location = new System.Drawing.Point(637, 30);
-            this.btnAbort.Name = "btnAbort";
-            this.btnAbort.Size = new System.Drawing.Size(72, 23);
-            this.btnAbort.TabIndex = 4;
-            this.btnAbort.Text = "Abort";
-            this.btnAbort.UseVisualStyleBackColor = true;
-            this.btnAbort.Click += new System.EventHandler(this.btnAbort_Click);
             // 
             // UpdateWindow
             // 
@@ -370,7 +356,6 @@ namespace MeGUI
         private core.gui.HelpButton helpButton1;
         private MeGUI.core.gui.CustomProgressBar progressBar;
         private System.Windows.Forms.Button btnUpdate;
-        private System.Windows.Forms.Button btnAbort;
         private System.Windows.Forms.ToolStripMenuItem enableToolStripMenuItem;
         private System.Windows.Forms.ColumnHeader colArchitecture;
     }

@@ -1089,9 +1089,7 @@ namespace MeGUI
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
-            btnAbort.Enabled = true;
             btnUpdate.Enabled = false;
-            MainForm.Instance.UpdateHandler.AbortUpdate = false;
 
             Thread updateThread = new Thread(new ThreadStart(MainForm.Instance.UpdateHandler.ProcessUpdate));
             updateThread.IsBackground = true;
@@ -1099,24 +1097,16 @@ namespace MeGUI
             while (updateThread.IsAlive)
             {
                 Application.DoEvents();
-                System.Threading.Thread.Sleep(100);
+                Thread.Sleep(100);
             }
 
             RefreshGUI();
 
-            btnAbort.Enabled = false;
             btnUpdate.Enabled = bUpdateAllowed;
         }
 
         #endregion
         #region updating
-
-        private void btnAbort_Click(object sender, EventArgs e)
-        {
-            MainForm.Instance.UpdateHandler.AbortUpdate = true;
-            btnUpdate.Enabled = bUpdateAllowed;
-            btnAbort.Enabled = false;
-        }
 
         private void chkShowAllFiles_CheckedChanged(object sender, EventArgs e)
         {
@@ -1210,8 +1200,8 @@ namespace MeGUI
         {
             int compareResult;
             ListViewItem listviewX, listviewY;
-            DateTime dateX, dateY;
-
+            DateTime dateX, dateY;            
+            
             // Cast the objects to be compared to ListViewItem objects
             listviewX = (ListViewItem)x;
             listviewY = (ListViewItem)y;

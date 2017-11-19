@@ -60,7 +60,7 @@ namespace MeGUI
         private List<UpgradeData> packagesToUpdateAtRestart = new List<UpgradeData>();
         private UpdateWindow.iUpgradeableCollection _updateData = null;
         private System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-        private bool _abortUpdate, _updateRunning;
+        private bool _updateRunning;
         private UpdateMode _updateMode;
         private string _forcePackage;
         private WebClient wc;
@@ -86,17 +86,6 @@ namespace MeGUI
         public StringBuilder UpdateLOG
         {
             get { return _updateLogText; }
-        }
-
-        public bool AbortUpdate
-        {
-            get { return _abortUpdate; }
-            set 
-            {
-                _abortUpdate = value;
-                if (value == true && wc != null && wc.IsBusy)
-                    wc.CancelAsync();
-            }
         }
 
         public List<UpgradeData> PackagesToUpdateAtRestart
@@ -248,7 +237,7 @@ namespace MeGUI
                 {
                     if (e.Error != null)
                     {
-                        if (e.Error is WebException && !_abortUpdate)
+                        if (e.Error is WebException)
                         {
                             WebException webex = (WebException)e.Error;
                             if (webex.Response != null && ((HttpWebResponse)webex.Response).StatusCode == HttpStatusCode.NotFound)
@@ -564,8 +553,6 @@ namespace MeGUI
                 if ((String.IsNullOrEmpty(_forcePackage) && file.DownloadChecked) || file.Name.Equals(_forcePackage))
                     updateableFileCount++;
 
-            _abortUpdate = false;
-
             // Now update the files we can
             foreach (UpdateWindow.iUpgradeable file in UpdateData)
             {
@@ -599,12 +586,12 @@ namespace MeGUI
                 else
                 {
                     result = DownloadFile(file.AvailableVersion.Url, null, file.DisplayName);
-                    if (result != UpdateWindow.ErrorState.Successful || _abortUpdate)
+                    if (result != UpdateWindow.ErrorState.Successful)
                     {
                         failedFiles.Add(file);
                         AddTextToLog(string.Format("Failed to download package {0}: {1}.", file.DisplayName, EnumProxy.Create(result).ToString()), ImageType.Error, true);
                     }
-                    else if ((_updateMode != UpdateMode.Automatic || !String.IsNullOrEmpty(_forcePackage)) && !_abortUpdate)
+                    else if ((_updateMode != UpdateMode.Automatic || !String.IsNullOrEmpty(_forcePackage)))
                     {
                         // install only if not in full automatic mode and if download successful
                         UpdateWindow.ErrorState state = Install(file);
@@ -636,14 +623,11 @@ namespace MeGUI
                     }
                 }
 
-                if (currentFile >= updateableFileCount || _abortUpdate)
+                if (currentFile >= updateableFileCount)
                     break;
 
                 currentFile++;
             }
-
-            if (_abortUpdate)
-                AddTextToLog("Update aborted", ImageType.Information, true);
 
             if (_updateMode == UpdateMode.Automatic)
             {
