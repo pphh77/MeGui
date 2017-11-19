@@ -550,8 +550,8 @@ namespace MeGUI
             this.input.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.input.Filename = "";
-            this.input.Filter = resources.GetString("input.Filter");
-            this.input.FilterIndex = 6;
+            this.input.Filter = "All files|*.*";
+            this.input.FilterIndex = 1;
             this.input.FolderMode = false;
             this.input.Location = new System.Drawing.Point(96, 15);
             this.input.Name = "input";

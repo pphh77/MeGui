@@ -560,7 +560,7 @@ namespace MeGUI
                     continue;
 
                 if (!String.IsNullOrEmpty(_forcePackage))
-                    AddTextToLog(string.Format("updating active package {0} as it is missing or outdated", file.DisplayName), ImageType.Information, true);
+                    AddTextToLog(string.Format("updating package {0} as it is missing or outdated", file.DisplayName), ImageType.Information, true);
                 else
                     AddTextToLog(string.Format("{1}/{2} - updating package {0}", file.DisplayName, currentFile, updateableFileCount), ImageType.Information, true);
 

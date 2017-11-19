@@ -102,16 +102,16 @@ namespace MeGUI
 
         private void CheckDGIIndexer()
         {
-            string filter = "All DGIndex supported files|*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.tp;*.ts;*.trp;*.m2t;*.m2ts;*.pva;*.vro;*.ifo";
-            filter += "|All FFMS Indexer supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.vob;*.mpg;*.m2ts;*.ts;*.ifo";
-            filter += "|All LSMASH Indexer supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.vob;*.mpg;*.m2ts;*.ts;*.ifo";
+            string filter = "All DGIndex supported files|*.ifo;*.m1v;*.m2t;*.m2ts;*.m2v;*.mpeg;*.mpg;*.mpv;*.pva;*.tp;*.trp;*.ts;*.vob;*.vro";
+            filter += "|All FFMS Indexer supported files|*.avi;*.flv;*.ifo;*.m2ts;*.mkv;*.mp4;*.mpg;*.ogm;*.ts;*.vob;*.wmv";
+            filter += "|All LSMASH Indexer supported files|*.avi;*.flv;*.ifo;*.m2ts;*.mkv;*.mp4;*.mpg;*.ogm;*.ts;*.vob;*.wmv";
             if (MainForm.Instance.Settings.IsDGIIndexerAvailable() || MainForm.Instance.Settings.IsDGMIndexerAvailable())
             {
                 if (MainForm.Instance.Settings.IsDGIIndexerAvailable())
-                    filter += "|All DGIndexNV supported files|*.264;*.h264;*.avc;*.m2v;*.mpv;*.vc1;*.mkv;*.vob;*.mp4;*.mpg;*.mpeg;*.m2t;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.ifo";
+                    filter += "|All DGIndexNV supported files|*.264;*.avc;*.h264;*.ifo;*.m2t;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpv;*.mts;*.tp;*.trp;*.ts;*.vc1;*.vob";
                 if (MainForm.Instance.Settings.IsDGMIndexerAvailable())
-                    filter += "|All DGIndexIM supported files|*.264;*.h264;*.avc;*.m2v;*.mpv;*.vc1;*.mkv;*.vob;*.mp4;*.mpg;*.mpeg;*.m2t;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.ifo";
-                filter += "|All supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.264;*.h264;*.avc;*.m2t*;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.pva;*.vro;*.vc1;*.ifo";
+                    filter += "|All DGIndexIM supported files|*.264;*.avc;*.h264;*.ifo;*.m2t;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpv;*.mts;*.tp;*.trp;*.ts;*.vc1;*.vob";
+                filter += "|All supported files|*.264;*.avc;*.avi;*.flv;*.h264;*.ifo;*.m1v;*.m2t*;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpv;*.mts;*.ogm;*.pva;*.tp;*.trp;*.ts;*.vc1;*.vob;*.vro;*.wmv";
                 filter += "|All files|*.*";
                 input.Filter = filter;
                 if (MainForm.Instance.Settings.IsDGIIndexerAvailable() && MainForm.Instance.Settings.IsDGMIndexerAvailable())
@@ -121,7 +121,7 @@ namespace MeGUI
             }
             else
             {
-                filter += "|All supported files|*.mkv;*.avi;*.mp4;*.flv;*.wmv;*.ogm;*.264;*.h264;*.avc;*.m2t*;*.m2ts;*.mts;*.tp;*.ts;*.trp;*.vob;*.mpg;*.mpeg;*.m1v;*.m2v;*.mpv;*.pva;*.vro;*.ifo";
+                filter += "|All supported files|*.264;*.avc;*.avi;*.flv;*.h264;*.ifo;*.m1v;*.m2t*;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpv;*.mts;*.ogm;*.pva;*.tp;*.trp;*.ts;*.vob;*.vro;*.wmv";
                 filter += "|All files|*.*";
                 input.Filter = filter;
                 input.FilterIndex = 4;
