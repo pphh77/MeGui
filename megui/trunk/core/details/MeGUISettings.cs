@@ -57,7 +57,7 @@ namespace MeGUI
                      deleteAbortedOutput, openProgressWindow, bEac3toAutoSelectStreams, bUseFDKAac, bVobSubberKeepAll,
                      alwaysOnTop, addTimePosition, alwaysbackupfiles, bUseITU, bEac3toLastUsedFileMode, bMeGUIx64,
                      bAutoLoadDG, bAutoStartQueueStartup, bAlwayUsePortableAviSynth, bVobSubberSingleFileExport,
-                     bEnsureCorrectPlaybackSpeed, bOpenAVSInThread, bExternalMuxerX264, bUseNeroAacEnc, bOSx64,
+                     bEnsureCorrectPlaybackSpeed, bExternalMuxerX264, bUseNeroAacEnc, bOSx64,
                      bVobSubberExtractForced, bVobSubberShowAll, bUsex64Tools, bShowDebugInformation, bEac3toDefaultToHD,
                      bEac3toEnableEncoder, bEac3toEnableDecoder;
         private decimal forceFilmThreshold, acceptableFPSError;
@@ -176,7 +176,6 @@ namespace MeGUI
             appendToForcedStreams = "";
             ocGUIMode = OCGUIMode.Default;
             bUseITU = true;
-            bOpenAVSInThread = true;
             lastUsedOneClickFolder = "";
             bUseNeroAacEnc = bUseFDKAac = bUseQAAC = bUseDGIndexNV = bUseDGIndexIM = false;
             chapterCreatorMinimumLength = 900;
@@ -740,35 +739,6 @@ namespace MeGUI
                 return processingPriority; 
             }
             set { processingPriority = value; }
-        }
-
-        /// <summary>
-        /// open AVS files in a thread
-        /// </summary>
-        public bool OpenAVSInThread
-        {
-            get { return bOpenAVSInThread; }
-            set { bOpenAVSInThread = value; }
-        }
-
-        private bool bOpenAVSInThreadDuringSession;
-        private bool bOpenAVSInThreadDuringSessionSet;
-        /// <summary>
-        /// default priority for all new processes during this session
-        /// </summary>
-        [XmlIgnore()]
-        public bool OpenAVSInThreadDuringSession
-        {
-            get
-            {
-                if (!bOpenAVSInThreadDuringSessionSet)
-                {
-                    bOpenAVSInThreadDuringSession = bOpenAVSInThread;
-                    bOpenAVSInThreadDuringSessionSet = true;
-                }
-                return bOpenAVSInThreadDuringSession;
-            }
-            set { bOpenAVSInThreadDuringSession = value; }
         }
 
 		/// <summary>

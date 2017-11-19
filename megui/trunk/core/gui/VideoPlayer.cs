@@ -183,7 +183,7 @@ namespace MeGUI
                 int iStart = 0;
                 if (startFrame >= 0)
                     iStart = startFrame;
-                else if (MainForm.Instance.Settings.OpenAVSInThreadDuringSession)
+                else
                     iStart = reader.FrameCount / 2;
                 videoPreview.LoadVideo(reader, file.VideoInfo.FPS, iStart);
                 setTitleText();
@@ -250,7 +250,7 @@ namespace MeGUI
                 int iStart = 0;
                 if (positionSlider.Value >= 0 && positionSlider.Value <= reader.FrameCount)
                     iStart = positionSlider.Value;
-                else if (MainForm.Instance.Settings.OpenAVSInThreadDuringSession)
+                else
                     iStart = reader.FrameCount / 2;
                 videoPreview.LoadVideo(reader, file.VideoInfo.FPS, iStart);
                 setTitleText();

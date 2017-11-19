@@ -1,3 +1,4 @@
+2781 [Settings]             removed "improved AVS opening" setting. It is now always enabled.
 2780 [Update]               removed the abort button
 2779 [Xvid]                 added a workaround to be able to use Xvid in portable AviSynth mode
 2778 [Chapter]              fixed non-ASCII handling (regression of 2753). bug #898

@@ -192,11 +192,6 @@ namespace MeGUI
                 settings.EnsureCorrectPlaybackSpeed = chkEnsureCorrectPlaybackSpeed.Checked;
 				settings.ForceFilmThreshold = forceFilmPercentage.Value;
 				settings.DefaultPriority = (ProcessPriority)priority.SelectedIndex;
-                settings.OpenAVSInThread = cbOpenAVSinThread.Checked;
-                if (cbOpenAVSinThread.CheckState == CheckState.Checked)
-                    settings.OpenAVSInThreadDuringSession = true;
-                else
-                    settings.OpenAVSInThreadDuringSession = false;
 				settings.AutoStartQueue = this.autostartQueue.Checked;
                 settings.AutoStartQueueStartup = this.cbAutoStartQueueStartup.Checked;
                 if (donothing.Checked)
@@ -290,9 +285,6 @@ namespace MeGUI
                 cbAutoLoadDG.Checked = settings.AutoLoadDG;
 				forceFilmPercentage.Value = settings.ForceFilmThreshold;
 				priority.SelectedIndex = (int)settings.DefaultPriority;
-                cbOpenAVSinThread.Checked = settings.OpenAVSInThread;
-                if (settings.OpenAVSInThread && !settings.OpenAVSInThreadDuringSession)
-                    cbOpenAVSinThread.CheckState = CheckState.Indeterminate;
 				autostartQueue.Checked = settings.AutoStartQueue;
                 cbAutoStartQueueStartup.Checked = settings.AutoStartQueueStartup;
                 donothing.Checked = settings.AfterEncoding == AfterEncoding.DoNothing;

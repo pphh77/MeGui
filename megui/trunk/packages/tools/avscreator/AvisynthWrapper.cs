@@ -540,27 +540,20 @@ namespace MeGUI
                 if (MainForm.Instance.Settings.ShowDebugInformation)
                     HandleAviSynthWrapperDLL(false, arg);
 
-                if (MainForm.Instance.Settings.OpenAVSInThreadDuringSession)
-                {
-                    Thread t = new Thread(new ThreadStart(delegate
-                    {
-                        System.Windows.Forms.Application.UseWaitCursor = true;
-                        if (0 == dimzon_avs_init_2(ref _avs, func, arg, ref _vi, ref _colorSpace, ref _sampleType, forceColorspace.ToString()))
-                            bOpenSuccess = true;
-                        System.Windows.Forms.Application.UseWaitCursor = false;
-                    }));
-                    t.Start();
 
-                    while (t.ThreadState == ThreadState.Running)
-                    {
-                        System.Windows.Forms.Application.DoEvents();
-                        Thread.Sleep(100);
-                    }
-                }
-                else
+                Thread t = new Thread(new ThreadStart(delegate
                 {
+                    System.Windows.Forms.Application.UseWaitCursor = true;
                     if (0 == dimzon_avs_init_2(ref _avs, func, arg, ref _vi, ref _colorSpace, ref _sampleType, forceColorspace.ToString()))
                         bOpenSuccess = true;
+                    System.Windows.Forms.Application.UseWaitCursor = false;
+                }));
+                t.Start();
+
+                while (t.ThreadState == ThreadState.Running)
+                {
+                    System.Windows.Forms.Application.DoEvents();
+                    Thread.Sleep(100);
                 }
             }
 

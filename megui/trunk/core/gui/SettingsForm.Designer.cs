@@ -63,7 +63,6 @@ namespace MeGUI
             this.lblMinimumLength = new System.Windows.Forms.Label();
             this.minimumTitleLength = new System.Windows.Forms.NumericUpDown();
             this.cbUseIncludedAviSynth = new System.Windows.Forms.CheckBox();
-            this.cbOpenAVSinThread = new System.Windows.Forms.CheckBox();
             this.cbUseITUValues = new System.Windows.Forms.CheckBox();
             this.cbAutoStartQueueStartup = new System.Windows.Forms.CheckBox();
             this.acceptableFPSError = new System.Windows.Forms.NumericUpDown();
@@ -272,7 +271,6 @@ namespace MeGUI
             this.otherGroupBox.Controls.Add(this.lblMinimumLength);
             this.otherGroupBox.Controls.Add(this.minimumTitleLength);
             this.otherGroupBox.Controls.Add(this.cbUseIncludedAviSynth);
-            this.otherGroupBox.Controls.Add(this.cbOpenAVSinThread);
             this.otherGroupBox.Controls.Add(this.cbUseITUValues);
             this.otherGroupBox.Controls.Add(this.cbAutoStartQueueStartup);
             this.otherGroupBox.Controls.Add(this.acceptableFPSError);
@@ -300,7 +298,7 @@ namespace MeGUI
             this.chkDebugInformation.AutoSize = true;
             this.chkDebugInformation.Checked = true;
             this.chkDebugInformation.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkDebugInformation.Location = new System.Drawing.Point(309, 141);
+            this.chkDebugInformation.Location = new System.Drawing.Point(309, 119);
             this.chkDebugInformation.Name = "chkDebugInformation";
             this.chkDebugInformation.Size = new System.Drawing.Size(133, 17);
             this.chkDebugInformation.TabIndex = 25;
@@ -341,16 +339,6 @@ namespace MeGUI
             this.cbUseIncludedAviSynth.TabIndex = 22;
             this.cbUseIncludedAviSynth.Text = "Always use the included AviSynth";
             this.cbUseIncludedAviSynth.CheckedChanged += new System.EventHandler(this.cbUseIncludedAviSynth_CheckedChanged);
-            // 
-            // cbOpenAVSinThread
-            // 
-            this.cbOpenAVSinThread.Checked = true;
-            this.cbOpenAVSinThread.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbOpenAVSinThread.Location = new System.Drawing.Point(309, 50);
-            this.cbOpenAVSinThread.Name = "cbOpenAVSinThread";
-            this.cbOpenAVSinThread.Size = new System.Drawing.Size(144, 17);
-            this.cbOpenAVSinThread.TabIndex = 21;
-            this.cbOpenAVSinThread.Text = "Improved AVS opening";
             // 
             // cbUseITUValues
             // 
@@ -432,7 +420,7 @@ namespace MeGUI
             // 
             this.openProgressWindow.Checked = true;
             this.openProgressWindow.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.openProgressWindow.Location = new System.Drawing.Point(309, 119);
+            this.openProgressWindow.Location = new System.Drawing.Point(309, 96);
             this.openProgressWindow.Name = "openProgressWindow";
             this.openProgressWindow.Size = new System.Drawing.Size(144, 17);
             this.openProgressWindow.TabIndex = 15;
@@ -442,7 +430,7 @@ namespace MeGUI
             // 
             this.deleteIntermediateFiles.Checked = true;
             this.deleteIntermediateFiles.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.deleteIntermediateFiles.Location = new System.Drawing.Point(309, 96);
+            this.deleteIntermediateFiles.Location = new System.Drawing.Point(309, 73);
             this.deleteIntermediateFiles.Name = "deleteIntermediateFiles";
             this.deleteIntermediateFiles.Size = new System.Drawing.Size(152, 17);
             this.deleteIntermediateFiles.TabIndex = 13;
@@ -460,7 +448,7 @@ namespace MeGUI
             // 
             // deleteCompletedJobs
             // 
-            this.deleteCompletedJobs.Location = new System.Drawing.Point(309, 73);
+            this.deleteCompletedJobs.Location = new System.Drawing.Point(309, 50);
             this.deleteCompletedJobs.Name = "deleteCompletedJobs";
             this.deleteCompletedJobs.Size = new System.Drawing.Size(144, 17);
             this.deleteCompletedJobs.TabIndex = 11;
@@ -1491,7 +1479,6 @@ namespace MeGUI
         private System.Windows.Forms.Label lblForcedName;
         private System.Windows.Forms.TextBox txtForcedName;
         private System.Windows.Forms.CheckBox cbUseITUValues;
-        private System.Windows.Forms.CheckBox cbOpenAVSinThread;
         private core.gui.TargetSizeSCBox targetSizeSCBox1;
         private FileBar neroaacencLocation;
         private System.Windows.Forms.CheckBox useNeroAacEnc;

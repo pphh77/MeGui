@@ -294,12 +294,16 @@ namespace MeGUI.core.gui
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, "Video Player Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    if (MainForm.Instance.Settings.OpenAVSInThreadDuringSession)
- 	  	            {
- 	  	                MainForm.Instance.Settings.OpenAVSInThreadDuringSession = false;
-                        MessageBox.Show("As a result during this session the option \"Improved AVS opening\" in the settings is now disabled. Please disable it there completly if necessary.", "Video Player Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
- 	  	            }
+                    MessageBox.Show("Could not read AVS frame.", "Video Player Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    MeGUI.core.util.LogItem _oLog = MainForm.Instance.AVSScriptCreatorLog;
+                    if (_oLog == null)
+                    {
+                        _oLog = MainForm.Instance.Log.Info("AVS Script Creator");
+                        MainForm.Instance.AVSScriptCreatorLog = _oLog;
+                    }
+                    _oLog.LogValue("Could not read frame", ex.Message, MeGUI.core.util.ImageType.Warning, true);
+
                     break;
                 }
                 

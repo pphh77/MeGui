@@ -214,19 +214,32 @@ namespace MeGUI
                     bmp.RotateFlip(RotateFlipType.Rotate180FlipX);
                     return bmp;
                 }
-                catch (System.Runtime.InteropServices.SEHException)
+                catch (System.Runtime.InteropServices.SEHException ex)
                 {
                     bmp.Dispose();
-                    if (MainForm.Instance.Settings.OpenAVSInThreadDuringSession)
+
+                    MeGUI.core.util.LogItem _oLog = MainForm.Instance.AVSScriptCreatorLog;
+                    if (_oLog == null)
                     {
-                        MainForm.Instance.Settings.OpenAVSInThreadDuringSession = false;
-                        MessageBox.Show("External AviSynth Error. As a result during this session the option \"Improved AVS opening\" in the settings is now disabled. Please disable it there completly if necessary.", "AviSynth Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        _oLog = MainForm.Instance.Log.Info("AVS Script Creator");
+                        MainForm.Instance.AVSScriptCreatorLog = _oLog;
                     }
+                    _oLog.LogValue("Could not read frame", ex.Message, MeGUI.core.util.ImageType.Warning, true);
+
                     throw;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     bmp.Dispose();
+
+                    MeGUI.core.util.LogItem _oLog = MainForm.Instance.AVSScriptCreatorLog;
+                    if (_oLog == null)
+                    {
+                        _oLog = MainForm.Instance.Log.Info("AVS Script Creator");
+                        MainForm.Instance.AVSScriptCreatorLog = _oLog;
+                    }
+                    _oLog.LogValue("Could not read frame", ex.Message, MeGUI.core.util.ImageType.Warning, true);
+
                     throw;
                 }
             }
