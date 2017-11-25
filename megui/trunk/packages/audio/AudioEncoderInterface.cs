@@ -1503,7 +1503,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 _sendWavHeaderToEncoderStdIn = HeaderType.WAV;
                 
                 sb.Append(" -ignorelength");
-                if (!oSettings.CustomEncoderOptions.Contains("-he") && !oSettings.CustomEncoderOptions.Contains("-hev2") && !oSettings.CustomEncoderOptions.Contains("-lc"))
+                if (oSettings.BitrateMode != BitrateManagementMode.VBR && !oSettings.CustomEncoderOptions.Contains("-he") && !oSettings.CustomEncoderOptions.Contains("-hev2") && !oSettings.CustomEncoderOptions.Contains("-lc"))
                 {
                     switch (oSettings.Profile)
                     {

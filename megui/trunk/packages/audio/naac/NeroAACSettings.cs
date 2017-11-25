@@ -50,7 +50,6 @@ namespace MeGUI
 		{
             Quality = 0.5M;
             Profile = AacProfile.Auto;
-            CreateHintTrack = false;
 		}
 
         private AacProfile profile;
@@ -66,14 +65,5 @@ namespace MeGUI
             get { return quality; }
             set { quality = value; }
         }
-
-        private bool createHintTrack;
-        public bool CreateHintTrack
-        {
-            get { return createHintTrack; }
-            set { createHintTrack = value; }
-        }
-
-
 	}
 }

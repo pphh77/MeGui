@@ -214,19 +214,22 @@ namespace MeGUI.packages.audio.naac
         {
             if (rbtnVBR.Checked)
             {
+                label1.Visible = comboBox1.Visible = false;
                 rbtnABR.Text = "Adaptive Bitrate";
                 rbtnCBR.Text = "Constant Bitrate";
                 Decimal q = ((Decimal)vQuality.Value) / vQuality.Maximum;
-                rbtnVBR.Text = String.Format("Variable Bitrate (Q={0}) ", q);
+                rbtnVBR.Text = String.Format("Variable Bitrate, Q > 0.31 for AAC LC (Q={0}) ", q);
             }
             else if (rbtnABR.Checked)
             {
+                label1.Visible = comboBox1.Visible = true;
                 rbtnABR.Text = String.Format("Adaptive Bitrate @ {0} kbit/s", vBitrate.Value);
                 rbtnCBR.Text = "Constant Bitrate";
                 rbtnVBR.Text = "Variable Bitrate";
             }
             else
             {
+                label1.Visible = comboBox1.Visible = true;
                 rbtnABR.Text = "Adaptive Bitrate";
                 rbtnCBR.Text = String.Format("Constant Bitrate @ {0} kbit/s", vBitrate.Value);
                 rbtnVBR.Text = "Variable Bitrate";
