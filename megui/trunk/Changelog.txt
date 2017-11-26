@@ -1,3 +1,5 @@
+2786 [DGIndex* Indexer]     all: support absolute paths in the index files when written with Full_Path_In_Files=0
+                            IM/NV: ensure that ResponseOnAudioMismatch=0 is not set (if set, it will be set to 1)
 2785 [Nero AAC Encoder]     if VBR is used the profile will automatically be selected
 2784 [AVS Script Creator]   fixed DirectShowSource/AVISource not available if the portable AviSynth is used (regression of 2761). bug #896
                             DirectShowSource/AVISource are disabled by default and have to be enabled in the MeGUI settings

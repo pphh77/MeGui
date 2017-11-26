@@ -204,28 +204,44 @@ namespace MeGUI
                                 if (line.ToLower().Contains("dgindexim"))
                                     bDGIndexIM = true;
                             }
-                            if (iLineCount == 3 && !Path.GetExtension(file).ToLowerInvariant().Equals(".dgi"))
+                            if (iLineCount == 3 && Path.GetExtension(file).ToLowerInvariant().Equals(".d2v"))
                             {
                                 string strSourceFile = line;
-                                if (Path.GetExtension(file).ToLowerInvariant().Equals(".dgi"))
-                                    strSourceFile = line.Substring(0, line.LastIndexOf(" "));
+                                if (!File.Exists(strSourceFile))
+                                {
+                                    // try it also with absolute path name
+                                    strSourceFile = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file), strSourceFile));
+                                }
                                 if (File.Exists(strSourceFile))
+                                {
                                     _file = file = strSourceFile;
+                                    if (infoLog != null)
+                                        infoLog.Info("Indexed file: " + _file);
+                                }
+                                else if (infoLog != null)
+                                    infoLog.Error("Indexed file not found: " + line);
                                 break;
                             }
                             else if (iLineCount == 4)
                             {
                                 string strSourceFile = line.Substring(0, line.LastIndexOf(" "));
-                                if (bDGIndexIM)
-                                    strSourceFile = Path.Combine(Path.GetDirectoryName(file), strSourceFile);
+                                if (!File.Exists(strSourceFile))
+                                {
+                                    // try it also with absolute path name
+                                    strSourceFile = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file), strSourceFile));
+                                }
                                 if (File.Exists(strSourceFile))
+                                {
                                     _file = file = strSourceFile;
+                                    if (infoLog != null)
+                                        infoLog.Info("Indexed file: " + _file);
+                                }
+                                else if (infoLog != null)
+                                    infoLog.Error("Indexed file not found: " + line);
                                 break;
                             }
                         }
                     }
-                    if (infoLog != null)
-                        infoLog.Info("Indexed File: " + _file);
                 }
                 else if (Path.GetExtension(file).ToLowerInvariant().Equals(".lwi"))
                 {

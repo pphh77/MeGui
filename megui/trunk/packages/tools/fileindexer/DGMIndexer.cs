@@ -60,12 +60,90 @@ namespace MeGUI
             base.ProcessLine(line, stream, oType);
         }
 
+        /// <summary>
+        /// If necessary the dgindexim.ini will be created or changed
+        /// </summary>
+        private void CheckINI()
+        {
+            try
+            {
+                string strFileName = "DGIndexIM.ini";
+                bool bChanged = false;
+                string strINIFile = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexIM.Path), strFileName);
+                StringBuilder sb = new StringBuilder();
+                if (File.Exists(strINIFile))
+                {
+                    // Read the file
+                    string line;
+                    using (StreamReader file = new StreamReader(strINIFile))
+                    {
+                        while ((line = file.ReadLine()) != null)
+                        {
+                            if (line.Equals("ResponseOnAudioMismatch=0", StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                sb.AppendLine("ResponseOnAudioMismatch=1");
+                                log.LogEvent("ResponseOnAudioMismatch=1 written to " + strFileName, ImageType.Information);
+                                bChanged = true;
+                                continue;
+                            }
+
+                            if (String.IsNullOrEmpty(line))
+                                continue;
+
+                            sb.AppendLine(line);
+                        }
+                    }
+                }
+                else
+                {
+                    sb.AppendLine("Version=");
+                    sb.AppendLine("Window_Position=0,0");
+                    sb.AppendLine("Info_Window_Position=0,0");
+                    sb.AppendLine("Process_Priority=2");
+                    sb.AppendLine("Playback_Speed=3");
+                    sb.AppendLine("AVS_Template_Folder=");
+                    sb.AppendLine("AVS_Template_File=template.avs");
+                    sb.AppendLine("AVS_Enable_Template=1");
+                    sb.AppendLine("AVS_Overwrite=0");
+                    sb.AppendLine("Full_Path_In_Files=1");
+                    sb.AppendLine("MRUList[0]=");
+                    sb.AppendLine("MRUList[1]=");
+                    sb.AppendLine("MRUList[2]=");
+                    sb.AppendLine("MRUList[3]=");
+                    sb.AppendLine("Enable_Info_Log=0");
+                    sb.AppendLine("Loop_Playback=0");
+                    sb.AppendLine("AVC_Extension=264");
+                    sb.AppendLine("MPG_Extension=m2v");
+                    sb.AppendLine("VC1_Extension=vc1");
+                    sb.AppendLine("Deinterlace=0");
+                    sb.AppendLine("UsePF=0");
+                    sb.AppendLine("AlwaysCrop=1");
+                    sb.AppendLine("UseD3D=0");
+                    sb.AppendLine("Snapped=0");
+                    sb.AppendLine("ResponseOnAudioMismatch=1");
+                    sb.AppendLine("Enable_Audio_Demux=1");
+                    sb.AppendLine("CUDA_Device=255");
+                    sb.AppendLine("Decode_Modes=0,1,0");
+                    sb.AppendLine("Full_Info=1");
+                    sb.AppendLine("Bare_Demux=0");
+
+                    log.LogEvent("Created " + strFileName, ImageType.Information);
+                    bChanged = true;
+                }
+
+                if (bChanged)
+                    File.WriteAllText(strINIFile, sb.ToString(), Encoding.UTF8);
+            }
+            catch (Exception) { }
+        }
+
         protected override void checkJobIO()
         {
             try
             {
                 if (!String.IsNullOrEmpty(job.Output))
                     FileUtil.ensureDirectoryExists(Path.GetDirectoryName(job.Output));
+                CheckINI();
             }
             finally
             {
@@ -98,11 +176,13 @@ namespace MeGUI
                     }
                 }
                 if (job.DemuxVideo)
-                    sb.Append(" -od \"" + job.Output + "\" -e -h");
+                    sb.Append(" -od \"" + job.Output + "\" -h");
                 else
-                    sb.Append(" -o \"" + job.Output + "\" -e -h");
+                    sb.Append(" -o \"" + job.Output + "\" -h");
                 if (job.DemuxMode == 2)
                     sb.Append(" -a"); // demux everything
+                if (Path.GetExtension(job.Input).ToLowerInvariant().Equals(".mpls"))
+                    sb.Append(" -ang 0");
                 return sb.ToString();
             }
         }
