@@ -1,3 +1,6 @@
+2787 [AVS Script Creator]   added mpls as supported input type
+     [File Indexer]         added mpls as supported input type
+     [File Indexer]         do not reset the output path when selecting a different indexer if the path has already been set
 2786 [DGIndex* Indexer]     all: support absolute paths in the index files when written with Full_Path_In_Files=0
                             IM/NV: ensure that ResponseOnAudioMismatch=0 is not set (if set, it will be set to 1)
 2785 [Nero AAC Encoder]     if VBR is used the profile will automatically be selected

@@ -103,15 +103,15 @@ namespace MeGUI
         private void CheckDGIIndexer()
         {
             string filter = "All DGIndex supported files|*.ifo;*.m1v;*.m2t;*.m2ts;*.m2v;*.mpeg;*.mpg;*.mpv;*.pva;*.tp;*.trp;*.ts;*.vob;*.vro";
-            filter += "|All FFMS Indexer supported files|*.avi;*.flv;*.ifo;*.m2ts;*.mkv;*.mp4;*.mpg;*.ogm;*.ts;*.vob;*.wmv";
-            filter += "|All LSMASH Indexer supported files|*.avi;*.flv;*.ifo;*.m2ts;*.mkv;*.mp4;*.mpg;*.ogm;*.ts;*.vob;*.wmv";
+            filter += "|All FFMS Indexer supported files|*.avi;*.flv;*.ifo;*.m2ts;*.mkv;*.mp4;*.mpg;*.mpls;*.ogm;*.ts;*.vob;*.wmv";
+            filter += "|All LSMASH Indexer supported files|*.avi;*.flv;*.ifo;*.m2ts;*.mkv;*.mp4;*.mpg;*.mpls;*.ogm;*.ts;*.vob;*.wmv";
             if (MainForm.Instance.Settings.IsDGIIndexerAvailable() || MainForm.Instance.Settings.IsDGMIndexerAvailable())
             {
                 if (MainForm.Instance.Settings.IsDGIIndexerAvailable())
-                    filter += "|All DGIndexNV supported files|*.264;*.avc;*.h264;*.ifo;*.m2t;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpv;*.mts;*.tp;*.trp;*.ts;*.vc1;*.vob";
+                    filter += "|All DGIndexNV supported files|*.264;*.avc;*.h264;*.ifo;*.m2t;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpls;*.mpv;*.mts;*.tp;*.trp;*.ts;*.vc1;*.vob";
                 if (MainForm.Instance.Settings.IsDGMIndexerAvailable())
-                    filter += "|All DGIndexIM supported files|*.264;*.avc;*.h264;*.ifo;*.m2t;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpv;*.mts;*.tp;*.trp;*.ts;*.vc1;*.vob";
-                filter += "|All supported files|*.264;*.avc;*.avi;*.flv;*.h264;*.ifo;*.m1v;*.m2t*;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpv;*.mts;*.ogm;*.pva;*.tp;*.trp;*.ts;*.vc1;*.vob;*.vro;*.wmv";
+                    filter += "|All DGIndexIM supported files|*.264;*.avc;*.h264;*.ifo;*.m2t;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpls;*.mpv;*.mts;*.tp;*.trp;*.ts;*.vc1;*.vob";
+                filter += "|All supported files|*.264;*.avc;*.avi;*.flv;*.h264;*.ifo;*.m1v;*.m2t*;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpls;*.mpv;*.mts;*.ogm;*.pva;*.tp;*.trp;*.ts;*.vc1;*.vob;*.vro;*.wmv";
                 filter += "|All files|*.*";
                 input.Filter = filter;
                 if (MainForm.Instance.Settings.IsDGIIndexerAvailable() && MainForm.Instance.Settings.IsDGMIndexerAvailable())
@@ -121,7 +121,7 @@ namespace MeGUI
             }
             else
             {
-                filter += "|All supported files|*.264;*.avc;*.avi;*.flv;*.h264;*.ifo;*.m1v;*.m2t*;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpv;*.mts;*.ogm;*.pva;*.tp;*.trp;*.ts;*.vob;*.vro;*.wmv";
+                filter += "|All supported files|*.264;*.avc;*.avi;*.flv;*.h264;*.ifo;*.m1v;*.m2t*;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpls;*.mpv;*.mts;*.ogm;*.pva;*.tp;*.trp;*.ts;*.vob;*.vro;*.wmv";
                 filter += "|All files|*.*";
                 input.Filter = filter;
                 input.FilterIndex = 4;
@@ -275,7 +275,9 @@ namespace MeGUI
                 if (iFile != null)
                 {
                     fileName = iFile.FileName;
-                    gbFileInformation.Text += " - PGC " + iFile.VideoInfo.PGCNumber.ToString("D2") + (iFile.VideoInfo.AngleNumber > 0 ? " - Angle " + iFile.VideoInfo.AngleNumber + " " : " ");
+                    string strText = (iFile.VideoInfo.PGCNumber > 1 ? " - PGC " + iFile.VideoInfo.PGCNumber.ToString("D2") : string.Empty) + (iFile.VideoInfo.AngleNumber > 0 ? " - Angle " + iFile.VideoInfo.AngleNumber + " " : string.Empty);
+                    if (strText.Trim().Length > 0)
+                        gbFileInformation.Text += strText.Trim() + " ";
                 }
             }
             else
@@ -358,7 +360,7 @@ namespace MeGUI
                     return false;
 
                 // only continue if a DVD or Blu-ray structure is found
-                if (!frm.IsDVDSource)
+                if (!frm.IsDVDOrBluraySource)
                     return false;
 
                 // open the selection window if not exactly one title set with the desired minimum length is found
@@ -371,6 +373,8 @@ namespace MeGUI
 
                 ChapterInfo oChapterInfo = frm.SelectedSingleChapterInfo;
                 string strSourceFile = Path.Combine(oChapterInfo.SourcePath, oChapterInfo.Title + "_0.IFO");
+                if (!frm.IsDVDSource)
+                    strSourceFile = Path.Combine(oChapterInfo.SourcePath, oChapterInfo.Title + ".mpls");
                 if (!File.Exists(strSourceFile))
                 {
                     _oLog.LogEvent(strSourceFile + " cannot be found. skipping...");
@@ -422,7 +426,8 @@ namespace MeGUI
                 if (!strContainerFormat.ToUpperInvariant().Equals("MATROSKA") &&
                     !strContainerFormat.ToUpperInvariant().Equals("AVI") &&
                     !strContainerFormat.ToUpperInvariant().Equals("MPEG-4") &&
-                    !strContainerFormat.ToUpperInvariant().Equals("FLASH VIDEO"))
+                    !strContainerFormat.ToUpperInvariant().Equals("FLASH VIDEO") &&
+                    !strContainerFormat.ToUpperInvariant().Equals("BLU-RAY PLAYLIST"))
                 {
                     MessageBox.Show("It is recommended to use a MKV, AVI, MP4 or FLV container to index files with the FFMS2 indexer", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
@@ -437,7 +442,12 @@ namespace MeGUI
             if (String.IsNullOrEmpty(this.input.Filename))
                 return;
 
-            string projectPath = FileUtil.GetOutputFolder(this.input.Filename);
+            string projectPath = string.Empty;
+            if (!String.IsNullOrEmpty(output.Text))
+                projectPath = Path.GetDirectoryName(output.Text);
+            else
+                projectPath = FileUtil.GetOutputFolder(this.input.Filename);
+
             string fileNamePrefix = FileUtil.GetOutputFilePrefix(this.input.Filename);
             string fileNameNoPath = Path.GetFileName(this.input.Filename);
 
@@ -452,15 +462,25 @@ namespace MeGUI
                     fileName += "_" + iFile.VideoInfo.AngleNumber;
 
             }
-            fileName = fileNamePrefix + fileName + Path.GetExtension(this.input.Filename);
+            fileName = fileNamePrefix + fileName + Path.GetExtension(this.input.Filename).ToLowerInvariant();
 
             switch (IndexerUsed)
             {
                 case IndexType.D2V: output.Text = Path.Combine(projectPath, Path.ChangeExtension(fileName, ".d2v")); break;
                 case IndexType.DGM:
                 case IndexType.DGI: output.Text = Path.Combine(projectPath, Path.ChangeExtension(fileName, ".dgi")); break;
-                case IndexType.FFMS: output.Text = Path.Combine(projectPath, fileName + ".ffindex"); break;
-                case IndexType.LSMASH: output.Text = Path.Combine(projectPath, fileName + ".lwi"); break;
+                case IndexType.FFMS:
+                    if (Path.GetExtension(fileName).Equals(".mpls", StringComparison.InvariantCultureIgnoreCase))
+                        output.Text = Path.Combine(projectPath, Path.ChangeExtension(fileName, ".ffindex"));
+                    else
+                        output.Text = Path.Combine(projectPath, fileName + ".ffindex");
+                    break;
+                case IndexType.LSMASH:
+                    if (Path.GetExtension(fileName).Equals(".mpls", StringComparison.InvariantCultureIgnoreCase))
+                        output.Text = Path.Combine(projectPath, Path.ChangeExtension(fileName, ".lwi"));
+                    else
+                        output.Text = Path.Combine(projectPath, fileName + ".lwi");
+                    break;
             }
         }
 
@@ -530,6 +550,68 @@ namespace MeGUI
                     }
                 }
             }
+            else if (Path.GetExtension(input.Filename).ToUpperInvariant().Equals(".MPLS") && IndexerUsed != IndexType.DGI && IndexerUsed != IndexType.DGM)
+            {
+                // blu-ray playlist without DGI/DGM used - therefore eac3to must be used first
+
+                string strTempMKVFile = Path.Combine(Path.GetDirectoryName(output.Text), Path.GetFileNameWithoutExtension(output.Text) + ".mkv");
+                if (File.Exists(strTempMKVFile))
+                {
+                    DialogResult dr = MessageBox.Show("The demux file already exist: \n" + strTempMKVFile + "\n" +
+                                                        "Do you want to overwrite this file?", "Configuration Incomplete",
+                                                        MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    if (dr == DialogResult.No)
+                        return;
+                }
+
+                StringBuilder sb = new StringBuilder();
+                sb.Append(string.Format("{0}:\"{1}\" ", iFile.VideoInfo.Track.TrackID, strTempMKVFile));
+
+                foreach (AudioTrackInfo oStreamControl in AudioTracks.CheckedItems)
+                {
+                    bool bCoreOnly = false;
+                    AudioCodec audioCodec = oStreamControl.AudioCodec;
+                    if (oStreamControl.HasCore && !MainForm.Instance.Settings.Eac3toDefaultToHD)
+                    {
+                        // audio file can be demuxed && should be touched (core needed)
+                        if (audioCodec == AudioCodec.THDAC3)
+                        {
+                            oStreamControl.Codec = "AC-3";
+                            oStreamControl.AudioType = AudioType.AC3;
+                            oStreamControl.AudioCodec = AudioCodec.AC3;
+                            bCoreOnly = true;
+                            oStreamControl.HasCore = false;
+                        }
+                        else if (audioCodec == AudioCodec.DTS)
+                        {
+                            oStreamControl.Codec = "DTS";
+                            oStreamControl.AudioType = AudioType.DTS;
+                            oStreamControl.AudioCodec = AudioCodec.DTS;
+                            oStreamControl.HasCore = false;
+                            bCoreOnly = true;
+                        }
+                    }
+
+                    // core must be extracted (workaround for an eac3to issue)
+                    // http://bugs.madshi.net/view.php?id=450
+                    if (audioCodec == AudioCodec.EAC3)
+                        bCoreOnly = true;
+
+                    string strSourceFileName = Path.Combine(Path.GetDirectoryName(input.Filename), Path.GetFileNameWithoutExtension(strTempMKVFile));
+
+                    oStreamControl.SourceFileName = strSourceFileName;
+
+                    sb.Append(string.Format("{0}:\"{1}\" ", oStreamControl.TrackID, Path.Combine(Path.GetDirectoryName(output.Text), oStreamControl.DemuxFileName)));
+                    if (bCoreOnly)
+                        sb.Append("-core ");
+                }
+
+                HDStreamsExJob oJob = new HDStreamsExJob(new List<string>() { input.Filename }, Path.GetDirectoryName(output.Text), null, sb.ToString(), 2);
+                oJob.FilesToDelete.Add(strTempMKVFile + ".gaps");
+                oJob.FilesToDelete.Add(Path.Combine(Path.GetDirectoryName(output.Text), Path.GetFileNameWithoutExtension(strTempMKVFile) + " - Log.txt"));
+                prepareJobs = new SequentialChain(oJob);
+                videoInput = strTempMKVFile;
+            }
 
             switch (IndexerUsed)
             {
@@ -560,14 +642,18 @@ namespace MeGUI
                 case IndexType.FFMS:
                     {
                         FFMSIndexJob job = generateFFMSIndexJob(videoInput);
-                        if (txtContainerInformation.Text.Trim().ToUpperInvariant().Equals("MATROSKA") 
-                            && job.DemuxMode > 0 && job.AudioTracks.Count > 0)
+                        if (job.DemuxMode > 0 && job.AudioTracks.Count > 0 &&
+                            (txtContainerInformation.Text.Trim().ToUpperInvariant().Equals("MATROSKA")
+                            || txtContainerInformation.Text.Trim().ToUpperInvariant().Equals("BLU-RAY PLAYLIST")))
                         {
                             job.DemuxMode = 0;
                             job.AudioTracksDemux = job.AudioTracks;
                             job.AudioTracks = new List<AudioTrackInfo>();
-                            MkvExtractJob extractJob = new MkvExtractJob(videoInput, Path.GetDirectoryName(this.output.Text), job.AudioTracksDemux);
-                            prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(extractJob));
+                            if (txtContainerInformation.Text.Trim().ToUpperInvariant().Equals("MATROSKA"))
+                            {
+                                MkvExtractJob extractJob = new MkvExtractJob(videoInput, Path.GetDirectoryName(this.output.Text), job.AudioTracksDemux);
+                                prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(extractJob));
+                            }
                         }
                         prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(job));
                         MainForm.Instance.Jobs.addJobsWithDependencies(prepareJobs, true);
@@ -578,14 +664,18 @@ namespace MeGUI
                 case IndexType.LSMASH:
                     {
                         LSMASHIndexJob job = generateLSMASHIndexJob(videoInput);
-                        if (txtContainerInformation.Text.Trim().ToUpperInvariant().Equals("MATROSKA")
-                            && job.DemuxMode > 0 && job.AudioTracks.Count > 0)
+                        if (job.DemuxMode > 0 && job.AudioTracks.Count > 0 &&
+                            (txtContainerInformation.Text.Trim().ToUpperInvariant().Equals("MATROSKA")
+                            || txtContainerInformation.Text.Trim().ToUpperInvariant().Equals("BLU-RAY PLAYLIST")))
                         {
                             job.DemuxMode = 0;
                             job.AudioTracksDemux = job.AudioTracks;
                             job.AudioTracks = new List<AudioTrackInfo>();
-                            MkvExtractJob extractJob = new MkvExtractJob(videoInput, Path.GetDirectoryName(this.output.Text), job.AudioTracksDemux);
-                            prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(extractJob));
+                            if (txtContainerInformation.Text.Trim().ToUpperInvariant().Equals("MATROSKA"))
+                            {
+                                MkvExtractJob extractJob = new MkvExtractJob(videoInput, Path.GetDirectoryName(this.output.Text), job.AudioTracksDemux);
+                                prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(extractJob));
+                            }
                         }
                         prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(job));
                         MainForm.Instance.Jobs.addJobsWithDependencies(prepareJobs, true);
@@ -787,7 +877,7 @@ namespace MeGUI
             Dictionary<int, string> audioFiles = VideoUtil.getAllDemuxedAudio(job.AudioTracks, new List<AudioTrackInfo>(), out arrFilesToDelete, job.Output, null);
             if (job.LoadSources)
             {
-                if (job.DemuxMode != 0 && audioFiles.Count > 0)
+                if (audioFiles.Count > 0)
                 {
                     string[] files = new string[audioFiles.Values.Count];
                     audioFiles.Values.CopyTo(files, 0);
@@ -825,7 +915,7 @@ namespace MeGUI
             Dictionary<int, string> audioFiles = VideoUtil.getAllDemuxedAudio(job.AudioTracks, new List<AudioTrackInfo>(), out arrFilesToDelete, job.Output, null);
             if (job.LoadSources)
             {
-                if (job.DemuxMode != 0 && audioFiles.Count > 0)
+                if (audioFiles.Count > 0)
                 {
                     string[] files = new string[audioFiles.Values.Count];
                     audioFiles.Values.CopyTo(files, 0);
@@ -864,7 +954,7 @@ namespace MeGUI
             Dictionary<int, string> audioFiles = VideoUtil.getAllDemuxedAudio(job.AudioTracks, new List<AudioTrackInfo>(), out arrFilesToDelete, job.Output, null);
             if (job.LoadSources)
             {
-                if (job.DemuxMode != 0 && audioFiles.Count > 0)
+                if (audioFiles.Count > 0)
                 {
                     string[] files = new string[audioFiles.Values.Count];
                     audioFiles.Values.CopyTo(files, 0);
@@ -902,7 +992,7 @@ namespace MeGUI
             Dictionary<int, string> audioFiles = VideoUtil.getAllDemuxedAudio(job.AudioTracks, job.AudioTracksDemux, out arrFilesToDelete, job.Output, null);
             if (job.LoadSources)
             {
-                if (job.DemuxMode != 0)
+                if (audioFiles.Count > 0)
                 {
                     string[] files = new string[audioFiles.Values.Count];
                     audioFiles.Values.CopyTo(files, 0);
@@ -941,7 +1031,7 @@ namespace MeGUI
             Dictionary<int, string> audioFiles = VideoUtil.getAllDemuxedAudio(job.AudioTracks, job.AudioTracksDemux, out arrFilesToDelete, job.Output, null);
             if (job.LoadSources)
             {
-                if (job.DemuxMode != 0)
+                if (audioFiles.Count > 0)
                 {
                     string[] files = new string[audioFiles.Values.Count];
                     audioFiles.Values.CopyTo(files, 0);
