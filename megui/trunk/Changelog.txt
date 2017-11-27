@@ -1,3 +1,4 @@
+2789 [Chapter]              fixed non-ASCII handling (regression of 2753). bug #898
 2788 [x264]                 adjusted --b-adapt default value for "--preset slow"
 2787 [AVS Script Creator]   added mpls as supported input type
      [File Indexer]         added mpls as supported input type

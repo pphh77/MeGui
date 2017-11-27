@@ -165,7 +165,7 @@ namespace MeGUI
                 string time = String.Empty;
                 string name = String.Empty;
                 bool onTime = true;
-                string[] lines = File.ReadAllLines(strFileName);
+                string[] lines = File.ReadAllLines(strFileName, Encoding.Default);
                 foreach (string line in lines)
                 {
                     if (onTime)
@@ -206,7 +206,7 @@ namespace MeGUI
 
             try
             {
-                foreach (string line in File.ReadAllLines(strFileName))
+                foreach (string line in File.ReadAllLines(strFileName, Encoding.Default))
                 {
                     int iPos = line.IndexOf(' ');
                     if (iPos <= 0)
