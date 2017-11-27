@@ -780,8 +780,8 @@ namespace MeGUI.packages.video.x264
                             x264METype.SelectedIndex = 1;
                         if (x264SubpelRefinement.SelectedIndex != 8)
                             x264SubpelRefinement.SelectedIndex = 8;
-                        if (x264NewAdaptiveBframes.SelectedIndex != 2)
-                            x264NewAdaptiveBframes.SelectedIndex = 2;
+                        if (x264NewAdaptiveBframes.SelectedIndex != 1)
+                            x264NewAdaptiveBframes.SelectedIndex = 1;
                         if (x264BframePredictionMode.SelectedIndex != 3)
                             x264BframePredictionMode.SelectedIndex = 3;
                         if (trellis.SelectedIndex != 2)

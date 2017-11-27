@@ -325,7 +325,7 @@ namespace MeGUI
                 if (!xs.CustomEncoderOptions.Contains("-b-adapt"))
                 {
                     display = false;
-                    if (xs.x264PresetLevel > x264Settings.x264PresetLevelModes.medium)
+                    if (xs.x264PresetLevel > x264Settings.x264PresetLevelModes.slow)
                     {
                         if (xs.NewAdaptiveBFrames != 2)
                             display = true;

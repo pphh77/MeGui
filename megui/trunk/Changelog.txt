@@ -1,3 +1,4 @@
+2788 [x264]                 adjusted --b-adapt default value for "--preset slow"
 2787 [AVS Script Creator]   added mpls as supported input type
      [File Indexer]         added mpls as supported input type
      [File Indexer]         do not reset the output path when selecting a different indexer if the path has already been set
