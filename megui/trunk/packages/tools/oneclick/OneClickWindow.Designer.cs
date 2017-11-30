@@ -60,6 +60,8 @@ namespace MeGUI
             this.outputLabel = new System.Windows.Forms.Label();
             this.videoTab = new System.Windows.Forms.TabControl();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.lblInputName = new System.Windows.Forms.Label();
+            this.inputName = new System.Windows.Forms.TextBox();
             this.input = new MeGUI.core.gui.FileSCBox();
             this.inputLabel = new System.Windows.Forms.Label();
             this.audioTab = new System.Windows.Forms.TabControl();
@@ -155,7 +157,7 @@ namespace MeGUI
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(464, 487);
+            this.tabPage1.Size = new System.Drawing.Size(464, 514);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "General";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -163,10 +165,10 @@ namespace MeGUI
             // outputTab
             // 
             this.outputTab.Controls.Add(this.tabPage4);
-            this.outputTab.Location = new System.Drawing.Point(6, 379);
+            this.outputTab.Location = new System.Drawing.Point(6, 412);
             this.outputTab.Name = "outputTab";
             this.outputTab.SelectedIndex = 0;
-            this.outputTab.Size = new System.Drawing.Size(452, 95);
+            this.outputTab.Size = new System.Drawing.Size(452, 98);
             this.outputTab.TabIndex = 22;
             // 
             // tabPage4
@@ -178,7 +180,7 @@ namespace MeGUI
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(444, 69);
+            this.tabPage4.Size = new System.Drawing.Size(444, 72);
             this.tabPage4.TabIndex = 0;
             this.tabPage4.Text = "Output";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -232,20 +234,38 @@ namespace MeGUI
             this.videoTab.Location = new System.Drawing.Point(6, 6);
             this.videoTab.Name = "videoTab";
             this.videoTab.SelectedIndex = 0;
-            this.videoTab.Size = new System.Drawing.Size(452, 65);
+            this.videoTab.Size = new System.Drawing.Size(452, 98);
             this.videoTab.TabIndex = 21;
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.lblInputName);
+            this.tabPage3.Controls.Add(this.inputName);
             this.tabPage3.Controls.Add(this.input);
             this.tabPage3.Controls.Add(this.inputLabel);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(444, 39);
+            this.tabPage3.Size = new System.Drawing.Size(444, 72);
             this.tabPage3.TabIndex = 0;
             this.tabPage3.Text = "Video";
             this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // lblInputName
+            // 
+            this.lblInputName.AutoSize = true;
+            this.lblInputName.Location = new System.Drawing.Point(8, 44);
+            this.lblInputName.Name = "lblInputName";
+            this.lblInputName.Size = new System.Drawing.Size(34, 13);
+            this.lblInputName.TabIndex = 52;
+            this.lblInputName.Text = "Name";
+            // 
+            // inputName
+            // 
+            this.inputName.Location = new System.Drawing.Point(63, 41);
+            this.inputName.Name = "inputName";
+            this.inputName.Size = new System.Drawing.Size(336, 21);
+            this.inputName.TabIndex = 51;
             // 
             // input
             // 
@@ -265,9 +285,10 @@ namespace MeGUI
             // 
             // inputLabel
             // 
+            this.inputLabel.AutoSize = true;
             this.inputLabel.Location = new System.Drawing.Point(8, 14);
             this.inputLabel.Name = "inputLabel";
-            this.inputLabel.Size = new System.Drawing.Size(100, 13);
+            this.inputLabel.Size = new System.Drawing.Size(33, 13);
             this.inputLabel.TabIndex = 49;
             this.inputLabel.Text = "Input";
             // 
@@ -277,13 +298,12 @@ namespace MeGUI
             | System.Windows.Forms.AnchorStyles.Right)));
             this.audioTab.Controls.Add(this.audioPage0);
             this.audioTab.Controls.Add(this.tabPage2);
-            this.audioTab.Location = new System.Drawing.Point(6, 77);
+            this.audioTab.Location = new System.Drawing.Point(6, 110);
             this.audioTab.Name = "audioTab";
             this.audioTab.SelectedIndex = 0;
             this.audioTab.Size = new System.Drawing.Size(452, 175);
             this.audioTab.TabIndex = 20;
             this.audioTab.SelectedIndexChanged += new System.EventHandler(this.audioTab_SelectedIndexChanged);
-            this.audioTab.KeyUp += new System.Windows.Forms.KeyEventHandler(this.audioTab_KeyUp);
             this.audioTab.MouseClick += new System.Windows.Forms.MouseEventHandler(this.audioTab_MouseClick);
             this.audioTab.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.audioTab_MouseDoubleClick);
             // 
@@ -330,13 +350,12 @@ namespace MeGUI
             | System.Windows.Forms.AnchorStyles.Right)));
             this.subtitlesTab.Controls.Add(this.subPage0);
             this.subtitlesTab.Controls.Add(this.tabPage5);
-            this.subtitlesTab.Location = new System.Drawing.Point(6, 258);
+            this.subtitlesTab.Location = new System.Drawing.Point(6, 291);
             this.subtitlesTab.Name = "subtitlesTab";
             this.subtitlesTab.SelectedIndex = 0;
             this.subtitlesTab.Size = new System.Drawing.Size(452, 115);
             this.subtitlesTab.TabIndex = 19;
             this.subtitlesTab.SelectedIndexChanged += new System.EventHandler(this.subtitlesTab_SelectedIndexChanged);
-            this.subtitlesTab.KeyUp += new System.Windows.Forms.KeyEventHandler(this.subtitlesTab_KeyUp);
             this.subtitlesTab.MouseClick += new System.Windows.Forms.MouseEventHandler(this.subtitlesTab_MouseClick);
             this.subtitlesTab.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.subtitlesTab_MouseDoubleClick);
             // 
@@ -433,7 +452,7 @@ namespace MeGUI
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(472, 513);
+            this.tabControl1.Size = new System.Drawing.Size(472, 540);
             this.tabControl1.TabIndex = 0;
             // 
             // encoderConfigTab
@@ -445,7 +464,7 @@ namespace MeGUI
             this.encoderConfigTab.Location = new System.Drawing.Point(4, 22);
             this.encoderConfigTab.Name = "encoderConfigTab";
             this.encoderConfigTab.Padding = new System.Windows.Forms.Padding(3);
-            this.encoderConfigTab.Size = new System.Drawing.Size(464, 487);
+            this.encoderConfigTab.Size = new System.Drawing.Size(464, 520);
             this.encoderConfigTab.TabIndex = 2;
             this.encoderConfigTab.Text = "Advanced Config";
             this.encoderConfigTab.UseVisualStyleBackColor = true;
@@ -845,7 +864,7 @@ namespace MeGUI
             // goButton
             // 
             this.goButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.goButton.Location = new System.Drawing.Point(385, 519);
+            this.goButton.Location = new System.Drawing.Point(385, 546);
             this.goButton.Name = "goButton";
             this.goButton.Size = new System.Drawing.Size(75, 23);
             this.goButton.TabIndex = 29;
@@ -859,7 +878,7 @@ namespace MeGUI
             this.openOnQueue.AutoSize = true;
             this.openOnQueue.Checked = true;
             this.openOnQueue.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.openOnQueue.Location = new System.Drawing.Point(302, 523);
+            this.openOnQueue.Location = new System.Drawing.Point(302, 550);
             this.openOnQueue.Name = "openOnQueue";
             this.openOnQueue.Size = new System.Drawing.Size(77, 17);
             this.openOnQueue.TabIndex = 33;
@@ -870,7 +889,7 @@ namespace MeGUI
             this.cbGUIMode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cbGUIMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbGUIMode.FormattingEnabled = true;
-            this.cbGUIMode.Location = new System.Drawing.Point(104, 521);
+            this.cbGUIMode.Location = new System.Drawing.Point(104, 548);
             this.cbGUIMode.Name = "cbGUIMode";
             this.cbGUIMode.Size = new System.Drawing.Size(145, 21);
             this.cbGUIMode.TabIndex = 34;
@@ -882,7 +901,7 @@ namespace MeGUI
             this.helpButton1.ArticleName = "Tools/One_Click_Encoder";
             this.helpButton1.AutoSize = true;
             this.helpButton1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.helpButton1.Location = new System.Drawing.Point(12, 519);
+            this.helpButton1.Location = new System.Drawing.Point(12, 546);
             this.helpButton1.Name = "helpButton1";
             this.helpButton1.Size = new System.Drawing.Size(38, 23);
             this.helpButton1.TabIndex = 32;
@@ -891,7 +910,7 @@ namespace MeGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(472, 550);
+            this.ClientSize = new System.Drawing.Size(472, 577);
             this.Controls.Add(this.helpButton1);
             this.Controls.Add(this.openOnQueue);
             this.Controls.Add(this.tabControl1);
@@ -910,6 +929,7 @@ namespace MeGUI
             this.tabPage4.PerformLayout();
             this.videoTab.ResumeLayout(false);
             this.tabPage3.ResumeLayout(false);
+            this.tabPage3.PerformLayout();
             this.audioTab.ResumeLayout(false);
             this.audioPage0.ResumeLayout(false);
             this.subtitlesTab.ResumeLayout(false);
@@ -999,5 +1019,7 @@ namespace MeGUI
         private core.gui.ARChooser ar;
         private System.Windows.Forms.Button deleteChapter;
         private System.Windows.Forms.Button deleteWorking;
+        private System.Windows.Forms.Label lblInputName;
+        private System.Windows.Forms.TextBox inputName;
     }
 }

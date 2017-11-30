@@ -205,17 +205,21 @@ namespace MeGUI
             
             if (MainForm.Instance.Settings.OneClickGUIMode == MeGUISettings.OCGUIMode.Advanced)
             {
+                videoTab.Height = 98;
                 audioTab.Height = 175;
-                subtitlesTab.Location = new Point(subtitlesTab.Location.X, 258);
+                audioTab.Location = new Point(audioTab.Location.X, 110);
+                subtitlesTab.Location = new Point(subtitlesTab.Location.X, 291);
                 subtitlesTab.Visible = true;
-                outputTab.Location = new Point(outputTab.Location.X, 379);
-                this.Height = 583;
+                outputTab.Location = new Point(outputTab.Location.X, 412);
+                this.Height = 616;
                 if (!tabControl1.TabPages.Contains(encoderConfigTab))
                     tabControl1.TabPages.Add(encoderConfigTab);
             }
             else if (MainForm.Instance.Settings.OneClickGUIMode == MeGUISettings.OCGUIMode.Basic)
             {
+                videoTab.Height = 65;
                 audioTab.Height = 90;
+                audioTab.Location = new Point(audioTab.Location.X, 77);
                 subtitlesTab.Visible = false;
                 outputTab.Location = new Point(outputTab.Location.X, 173);
                 this.Height = 377;
@@ -224,7 +228,9 @@ namespace MeGUI
             }
             else
             {
+                videoTab.Height = 65;
                 audioTab.Height = 115;
+                audioTab.Location = new Point(audioTab.Location.X, 77);
                 subtitlesTab.Location = new Point(subtitlesTab.Location.X, 198);
                 subtitlesTab.Visible = true;
                 outputTab.Location = new Point(outputTab.Location.X, 319);
@@ -485,6 +491,7 @@ namespace MeGUI
             bLock = false;
 
             _videoInputInfo = iFile;
+            inputName.Text = iFile.VideoInfo.Track.Name;
 
             List<OneClickStream> arrAudioTrackInfo = new List<OneClickStream>();
             foreach (AudioTrackInfo oInfo in iFile.AudioInfo.Tracks)
@@ -772,6 +779,7 @@ namespace MeGUI
             dpp.FinalOutput = output.Filename;
             dpp.DeviceOutputType = devicetype.Text;
             dpp.VideoSettings = VideoSettings.Clone();
+            dpp.VideoSettings.VideoName = inputName.Text;
             dpp.Splitting = splitting.Value;
             dpp.VideoInput = _videoInputInfo.FileName;
             dpp.IndexType = _videoInputInfo.IndexerToUse;
@@ -2208,22 +2216,10 @@ namespace MeGUI
                 AudioAddTrack(true);
         }
 
-        private void audioTab_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
-                AudioRemoveTrack(audioTab.SelectedIndex);
-        }
-
         private void subtitlesTab_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (subtitlesTab.SelectedTab.Text.Equals("   +"))
                 SubtitleAddTrack(true);
-        }
-
-        private void subtitlesTab_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
-                SubtitleRemoveTrack(subtitlesTab.SelectedIndex);
         }
 
         /// <summary>

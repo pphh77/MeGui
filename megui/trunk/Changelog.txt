@@ -1,3 +1,5 @@
+2791 [OneClick]             added video track name. feature request #537
+                            removed the possibility to delete tracks with DEL/BACKSPACE
 2790 [File Indexer]         fixed MPLS handling (regression of 2787)
 2789 [Chapter]              fixed non-ASCII handling (regression of 2753). bug #898
 2788 [x264]                 adjusted --b-adapt default value for "--preset slow"
