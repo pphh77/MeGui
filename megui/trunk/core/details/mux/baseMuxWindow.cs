@@ -113,7 +113,7 @@ namespace MeGUI
                 index++;
             }
 
-            chapters.Filename = chapterInfo.SourceName;
+            chapters.Filename = chapterInfo.SourceFilePath;
             this.output.Filename = output;
             this.splitting.Value = splitSize;
             this.muxButton.Text = "Update";

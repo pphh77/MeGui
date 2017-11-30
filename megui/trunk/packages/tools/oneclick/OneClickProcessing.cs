@@ -131,9 +131,9 @@ namespace MeGUI.packages.tools.oneclick
                 {
                     string strSourceFile = string.Empty;
                     if (frm.IsDVDSource)
-                        strSourceFile = Path.Combine(oChapterInfo.SourcePath, oChapterInfo.Title + "_1.VOB");
+                        strSourceFile = Path.Combine(Path.GetDirectoryName(oChapterInfo.SourceFilePath), oChapterInfo.Title + "_1.VOB");
                     else
-                        strSourceFile = Path.Combine(oChapterInfo.SourcePath, oChapterInfo.SourceName);
+                        strSourceFile = oChapterInfo.SourceFilePath;
 
                     if (!File.Exists(strSourceFile))
                     {

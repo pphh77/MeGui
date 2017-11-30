@@ -58,7 +58,7 @@ namespace MeGUI
             {
                 for (int i = 0; i < arrChapterInfo.Count; i++)
                 {
-                    if (arrChapterInfo[i].SourceName == arg.ProgramChain.SourceName)
+                    if (arrChapterInfo[i].SourceFilePath == arg.ProgramChain.SourceFilePath)
                     {
                         arrChapterInfo[i] = arg.ProgramChain;
                         break;

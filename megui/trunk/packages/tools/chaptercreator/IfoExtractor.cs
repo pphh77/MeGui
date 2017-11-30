@@ -58,8 +58,7 @@ namespace MeGUI
 
             ChapterInfo pgc = new ChapterInfo();
             pgc.SourceType = "DVD";
-            pgc.SourceName = "PGC " + iPGC.ToString("D2");
-            pgc.SourcePath = Path.GetDirectoryName(strIFOFile);
+            pgc.SourceFilePath = strIFOFile;
             pgc.TitleNumber = iTitle;
             pgc.PGCNumber = iPGC;
             pgc.Title = Path.GetFileNameWithoutExtension(strIFOFile);

@@ -79,7 +79,7 @@ namespace MeGUI
         public override List<ChapterInfo> GetStreams(string location)
         {
             ChapterInfo pgc = new ChapterInfo();
-            pgc.SourceName = location;
+            pgc.SourceFilePath = location;
             pgc.Title = Path.GetFileNameWithoutExtension(location);
             pgc.SourceType = "Blu-Ray";
 

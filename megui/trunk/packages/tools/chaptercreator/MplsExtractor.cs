@@ -29,7 +29,7 @@ namespace MeGUI
         public override List<ChapterInfo> GetStreams(string location)
         {
             ChapterInfo pgc = GetChapterInfo(location, 0);
-            if (!String.IsNullOrEmpty(pgc.SourceName))
+            if (!String.IsNullOrEmpty(pgc.SourceFilePath))
             {
                 OnStreamDetected(pgc);
                 OnChaptersLoaded(pgc);
@@ -52,7 +52,7 @@ namespace MeGUI
             }
 
             List<Chapter> chapters = new List<Chapter>();
-            pgc.SourceName = strMplsFile;
+            pgc.SourceFilePath = strMplsFile;
             pgc.SourceType = "Blu-Ray";
             pgc.Title = Path.GetFileNameWithoutExtension(strMplsFile);
 
@@ -106,7 +106,7 @@ namespace MeGUI
 
             if (iFPS == 0)
             {
-                MediaInfoFile oInfo = new MediaInfoFile(pgc.SourceName);
+                MediaInfoFile oInfo = new MediaInfoFile(pgc.SourceFilePath);
                 pgc.FramesPerSecond = oInfo.VideoInfo.FPS;
             }
             else

@@ -180,7 +180,7 @@ namespace MeGUI
                     return false;
 
                 ChapterInfo oChapterInfo = frm.SelectedSingleChapterInfo;
-                string strSourceFile = Path.Combine(oChapterInfo.SourcePath, oChapterInfo.Title + "_0.IFO");
+                string strSourceFile = Path.Combine(Path.GetDirectoryName(oChapterInfo.SourceFilePath), oChapterInfo.Title + "_0.IFO");
                 if (!File.Exists(strSourceFile))
                 {
                     // cannot be found. skipping...;

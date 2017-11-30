@@ -39,8 +39,8 @@ namespace MeGUI
                 if (pl == null)
                     continue;
 
-                pl.SourceName = Path.GetFileName(file);
-                pl.SourcePath = Path.GetDirectoryName(file);
+                pl.SourceFilePath = path;
+                pl.SourceType = "Blu-Ray";
                 mpls.Add(pl);
             }
 

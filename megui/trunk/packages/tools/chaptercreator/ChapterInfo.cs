@@ -40,8 +40,7 @@ namespace MeGUI
     public class ChapterInfo
     {
         public string Title { get; set; }
-        public string SourceName { get; set; }
-        public string SourcePath { get; set; }
+        public string SourceFilePath { get; set; }
         public string SourceType { get; set; }
         public double FramesPerSecond { get; set; }
         public int TitleNumber { get; set; }
@@ -62,18 +61,26 @@ namespace MeGUI
 
         public ChapterInfo()
         {
-            Chapters = new List<Chapter>();
+            Title = string.Empty;
+            SourceFilePath = string.Empty;
+            SourceType = string.Empty;
             FramesPerSecond = 0;
+            TitleNumber = 0;
+            PGCNumber = 0;
+            AngleNumber = 0;
+            Chapters = new List<Chapter>();
         }
 
         public override string ToString()
         {
             string strResult = string.Empty;
-
+            string strTitle = (String.IsNullOrEmpty(Title) ? Path.GetFileName(SourceFilePath) : Title);
+            if (SourceType.Equals("DVD"))
+                strTitle += "  -  PGC " + PGCNumber.ToString("D2");
             if (Chapters.Count != 1)
-                strResult = string.Format("{0}  -  {1}  -  {2}  -  [{3} Chapters]", Title, SourceName, string.Format("{0:00}:{1:00}:{2:00}.{3:000}", System.Math.Floor(Duration.TotalHours), Duration.Minutes, Duration.Seconds, Duration.Milliseconds), Chapters.Count);
+                strResult = string.Format("{0}  -  {1}  -  [{2} Chapters]", strTitle, string.Format("{0:00}:{1:00}:{2:00}.{3:000}", System.Math.Floor(Duration.TotalHours), Duration.Minutes, Duration.Seconds, Duration.Milliseconds), Chapters.Count);
             else
-                strResult = string.Format("{0}  -  {1}  -  {2}  -  [{3} Chapter]", Title, SourceName, string.Format("{0:00}:{1:00}:{2:00}.{3:000}", System.Math.Floor(Duration.TotalHours), Duration.Minutes, Duration.Seconds, Duration.Milliseconds), Chapters.Count);
+                strResult = string.Format("{0}  -  {1}  -  [{2} Chapter]", strTitle, string.Format("{0:00}:{1:00}:{2:00}.{3:000}", System.Math.Floor(Duration.TotalHours), Duration.Minutes, Duration.Seconds, Duration.Milliseconds), Chapters.Count);
             if (AngleNumber > 0)
                 strResult += "  -  Angle " + AngleNumber;
             return strResult;
@@ -101,9 +108,10 @@ namespace MeGUI
             MediaInfoFile oInfo = new MediaInfoFile(strFileName);
             if (!oInfo.HasChapters)
                 return false;
-
+        
             Chapters = oInfo.ChapterInfo.Chapters;
-            SourceName = oInfo.ChapterInfo.SourceName;
+            SourceFilePath = oInfo.ChapterInfo.SourceFilePath;
+            SourceType = oInfo.ChapterInfo.SourceType;
             FramesPerSecond = oInfo.ChapterInfo.FramesPerSecond;
             Title = oInfo.ChapterInfo.Title;
             Duration = oInfo.ChapterInfo.Duration;
@@ -185,7 +193,7 @@ namespace MeGUI
                     onTime = !onTime;
                 }
 
-                SourceName = strFileName;
+                SourceFilePath = strFileName;
                 Title = Path.GetFileNameWithoutExtension(strFileName);
                 if (Chapters.Count > 0)
                     Duration = Chapters[Chapters.Count - 1].Time;
@@ -220,7 +228,7 @@ namespace MeGUI
                     Chapters.Add(new Chapter() { Name = line.Substring(iPos + 1), Time = chapterSpan });
                 }
 
-                SourceName = strFileName;
+                SourceFilePath = strFileName;
                 Title = Path.GetFileNameWithoutExtension(strFileName);
                 if (Chapters.Count > 0)
                     Duration = Chapters[Chapters.Count - 1].Time;
@@ -338,7 +346,7 @@ namespace MeGUI
                     }
                 }
 
-                SourceName = strFileName;
+                SourceFilePath = strFileName;
                 Title = Path.GetFileNameWithoutExtension(strFileName);
                 if (Chapters.Count > 0)
                     Duration = Chapters[Chapters.Count - 1].Time;

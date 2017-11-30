@@ -270,7 +270,7 @@ namespace MeGUI
 
             gbFileInformation.Text = " File Information ";
             iFile = null;
-            if (GetDVDSource(fileName, ref iFile))
+            if (GetDVDorBluraySource(fileName, ref iFile))
             {
                 if (iFile != null)
                 {
@@ -345,12 +345,12 @@ namespace MeGUI
         }
 
         /// <summary>
-        /// Checks if the source file if from a DVD stucture & asks for title list if needed
+        /// Checks if the source file if from a DVD/Blu-ray stucture & asks for title list if needed
         /// </summary>
         /// <param name="fileName">input file name</param>
         /// <param name="iFileTemp">reference to the mediainfofile object</param>
-        /// <returns>true if DVD source is found, false if no DVD source is available</returns>
-        private bool GetDVDSource(string fileName, ref MediaInfoFile iFileTemp)
+        /// <returns>true if DVD/Blu-ray source is found, false if no DVD/Blu-ray source is available</returns>
+        private bool GetDVDorBluraySource(string fileName, ref MediaInfoFile iFileTemp)
         {
             iFileTemp = null;
             using (frmStreamSelect frm = new frmStreamSelect(fileName, SelectionMode.One))
@@ -369,12 +369,14 @@ namespace MeGUI
                     dr = frm.ShowDialog();
 
                 if (dr != DialogResult.OK)
-                    return true;
+                    return false;
 
                 ChapterInfo oChapterInfo = frm.SelectedSingleChapterInfo;
-                string strSourceFile = Path.Combine(oChapterInfo.SourcePath, oChapterInfo.Title + "_0.IFO");
-                if (!frm.IsDVDSource)
-                    strSourceFile = Path.Combine(oChapterInfo.SourcePath, oChapterInfo.Title + ".mpls");
+                string strSourceFile = string.Empty;
+                if (frm.IsDVDSource)
+                    strSourceFile = Path.Combine(Path.GetDirectoryName(oChapterInfo.SourceFilePath), oChapterInfo.Title + "_0.IFO");
+                else
+                    strSourceFile = oChapterInfo.SourceFilePath;
                 if (!File.Exists(strSourceFile))
                 {
                     _oLog.LogEvent(strSourceFile + " cannot be found. skipping...");

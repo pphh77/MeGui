@@ -195,15 +195,9 @@ namespace MeGUI
                     {
                         string line = null;
                         int iLineCount = 0;
-                        bool bDGIndexIM = false;
                         while ((line = sr.ReadLine()) != null)
                         {
                             iLineCount++;
-                            if (iLineCount == 1 && Path.GetExtension(file).ToLowerInvariant().Equals(".dgi"))
-                            {
-                                if (line.ToLower().Contains("dgindexim"))
-                                    bDGIndexIM = true;
-                            }
                             if (iLineCount == 3 && Path.GetExtension(file).ToLowerInvariant().Equals(".d2v"))
                             {
                                 string strSourceFile = line;
@@ -531,7 +525,7 @@ namespace MeGUI
                     if (_ChapterInfo.HasChapters)
                         break;
 
-                    _ChapterInfo.SourceName = _file;
+                    _ChapterInfo.SourceFilePath = _file;
                     _ChapterInfo.FramesPerSecond = _VideoInfo.FPS;
                     _ChapterInfo.Title = Path.GetFileNameWithoutExtension(_file);
                     if (info.General.Count > 0)
