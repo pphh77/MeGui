@@ -291,7 +291,7 @@ namespace MeGUI
             {
                 bool askAgain;
                 bool bResult = askAbout("The colorspace of your clip is not in YV12...\r\n" +
-                                        "Do you want me to add ConvertToYV12() to the end of your script ?",
+                                        "Do you want me to add ConvertToYV12() to the end of your script?",
                                         "Incorrect Colorspace", MessageBoxIcon.Warning, out askAgain);
 
                 mainForm.Settings.DialogSettings.AskAboutYV12 = askAgain;

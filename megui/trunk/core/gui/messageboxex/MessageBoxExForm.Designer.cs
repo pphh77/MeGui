@@ -48,7 +48,6 @@ namespace MeGUI.core.gui.MessageBoxExLib
 		private void InitializeComponent()
 		{
             this.components = new System.ComponentModel.Container();
-            System.Resources.ResourceManager resources = new System.Resources.ResourceManager(typeof(MessageBoxExForm));
             this.panelIcon = new System.Windows.Forms.Panel();
             this.chbSaveResponse = new System.Windows.Forms.CheckBox();
             this.imageListIcons = new System.Windows.Forms.ImageList(this.components);
@@ -77,7 +76,6 @@ namespace MeGUI.core.gui.MessageBoxExLib
             // 
             this.imageListIcons.ColorDepth = System.Windows.Forms.ColorDepth.Depth16Bit;
             this.imageListIcons.ImageSize = new System.Drawing.Size(32, 32);
-            this.imageListIcons.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageListIcons.ImageStream")));
             this.imageListIcons.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // rtbMessage
@@ -87,6 +85,7 @@ namespace MeGUI.core.gui.MessageBoxExLib
             this.rtbMessage.Location = new System.Drawing.Point(200, 8);
             this.rtbMessage.Name = "rtbMessage";
             this.rtbMessage.ReadOnly = true;
+            this.rtbMessage.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
             this.rtbMessage.Size = new System.Drawing.Size(100, 48);
             this.rtbMessage.TabIndex = 4;
             this.rtbMessage.Text = "";
@@ -94,13 +93,12 @@ namespace MeGUI.core.gui.MessageBoxExLib
             // 
             // MessageBoxExForm
             // 
-            this.AutoScale = false;
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 14);
             this.ClientSize = new System.Drawing.Size(322, 224);
             this.Controls.Add(this.rtbMessage);
             this.Controls.Add(this.chbSaveResponse);
             this.Controls.Add(this.panelIcon);
-            this.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((System.Byte)(0)));
+            this.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;

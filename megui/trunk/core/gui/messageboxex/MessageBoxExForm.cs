@@ -338,17 +338,10 @@ namespace MeGUI.core.gui.MessageBoxExLib
 			{
 				int maxWidth = _maxLayoutWidth;
 				if(panelIcon.Size.Width != 0)
-				{
 					maxWidth = maxWidth - (panelIcon.Size.Width + ICON_MESSAGE_PADDING);
-				}
 
-                //We need to account for scroll bar width and height, otherwise for certains
-                //kinds of text the scroll bar shows up unnecessarily
-                maxWidth = maxWidth - SystemInformation.VerticalScrollBarWidth;
 				Size messageRectSize = MeasureString(rtbMessage.Text, maxWidth);
-
-                messageRectSize.Width += SystemInformation.VerticalScrollBarWidth;
-				messageRectSize.Height = Math.Max(panelIcon.Height, messageRectSize.Height) + SystemInformation.HorizontalScrollBarHeight;
+				messageRectSize.Height = Math.Max(panelIcon.Height, messageRectSize.Height);
 
                 rtbMessage.Size = messageRectSize;
 				rtbMessage.Visible = true;
@@ -502,15 +495,17 @@ namespace MeGUI.core.gui.MessageBoxExLib
 			if(requiredWidth < captionWidth)
 				requiredWidth = captionWidth;
 
-			int requiredHeight = TOP_PADDING + Math.Max(rtbMessage.Height,panelIcon.Height) + ITEM_PADDING + chbSaveResponse.Height + ITEM_PADDING + GetButtonSize().Height + BOTTOM_PADDING + ncHeight;
+            int requiredHeight = 0;
+            if (chbSaveResponse.Height == 0)
+                requiredHeight = TOP_PADDING + Math.Max(rtbMessage.Height, panelIcon.Height) + ITEM_PADDING + GetButtonSize().Height + BOTTOM_PADDING + ncHeight;
+            else
+                requiredHeight = TOP_PADDING + Math.Max(rtbMessage.Height, panelIcon.Height) + ITEM_PADDING + chbSaveResponse.Height + ITEM_PADDING + GetButtonSize().Height + BOTTOM_PADDING + ncHeight;
 
             //Fix the bug where if the message text is huge then the buttons are overwritten.
             //Incase the required height is more than the max height then adjust that in the
             //message height
-            if(requiredHeight > _maxHeight)
-            {
+            if (requiredHeight > _maxHeight)
                 rtbMessage.Height -= requiredHeight - _maxHeight;
-            }
             
             int height = Math.Min(requiredHeight, _maxHeight);
 			int width = Math.Min(requiredWidth, _maxWidth);
@@ -556,8 +551,8 @@ namespace MeGUI.core.gui.MessageBoxExLib
             panelIcon.Location = new Point(LEFT_PADDING, TOP_PADDING);
             rtbMessage.Location = new Point(LEFT_PADDING + panelIcon.Width + ICON_MESSAGE_PADDING * (panelIcon.Width == 0 ? 0 : 1) , TOP_PADDING);
 			
-            chbSaveResponse.Location = new Point(LEFT_PADDING + (int)(panelIcon.Width / 2), 
-                TOP_PADDING + Math.Max(panelIcon.Height, rtbMessage.Height) + ITEM_PADDING);
+            chbSaveResponse.Location = new Point(rtbMessage.Location.X, TOP_PADDING + Math.Max(panelIcon.Height, rtbMessage.Height) + ITEM_PADDING);
+            chbSaveResponse.BringToFront();
 				
             Size buttonSize = GetButtonSize();
             int allButtonsWidth = GetWidthOfAllButtons();
