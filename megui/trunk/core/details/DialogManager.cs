@@ -22,7 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-using Utils.MessageBoxExLib;
+using MeGUI.core.gui.MessageBoxExLib;
 
 namespace MeGUI
 {

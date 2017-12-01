@@ -1,3 +1,4 @@
+2794 [MessageBoxEx]         remove external dependency to MessageBoxExLib.dll
 2793 [AVS Script Creator]   added information about DirectShowSource/AVISource when opening a file
 2792 [File Indexer]         removed the container warning when using the FFMS indexer
 2791 [OneClick]             added video track name. feature request #537
