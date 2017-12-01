@@ -53,7 +53,8 @@ namespace MeGUI
             msgBox.AllowSaveResponse = true;
             msgBox.SaveResponseText = "Don't ask me this again";
             return msgBox;
-        }        
+        }
+        
         /// <summary>
         /// Shows a message dialog (without a question) with a 'don't ask again' checkbox
         /// </summary>
@@ -68,6 +69,7 @@ namespace MeGUI
             msgBox.Show();
             return !msgBox.SaveResponseChecked;
         }
+
         /// <summary>
         /// Shows a custom dialog built on the MessageBoxEx system
         /// </summary>
@@ -111,7 +113,26 @@ namespace MeGUI
         /// <param name="caption">The window title to display</param>
         /// <param name="button1Text">The text on the first button</param>
         /// <param name="button2Text">The text on the second button</param>
-        /// <param name="button2Text">The text on the third button</param>
+        /// <param name="icon">The icon to display</param>
+        /// <returns>0, 1 or 2 depending on the button pressed</returns>
+        private int askAbout2(string text, string caption, string button1Text, string button2Text, MessageBoxIcon icon)
+        {
+            MessageBoxEx msgBox = createMessageBox(text, caption, icon);
+            msgBox.AddButton(button1Text, "0");
+            msgBox.AddButton(button2Text, "1");
+            msgBox.AllowSaveResponse = false;
+            string sResult = msgBox.Show();
+            return Int32.Parse(sResult);
+        }
+
+        /// <summary>
+        /// Shows a custom dialog built on the MessageBoxEx system
+        /// </summary>
+        /// <param name="text">The text to display</param>
+        /// <param name="caption">The window title to display</param>
+        /// <param name="button1Text">The text on the first button</param>
+        /// <param name="button2Text">The text on the second button</param>
+        /// <param name="button3Text">The text on the third button</param>
         /// <param name="icon">The icon to display</param>
         /// <returns>0, 1 or 2 depending on the button pressed</returns>
         private int askAbout3(string text, string caption, string button1Text, string button2Text,
@@ -214,7 +235,6 @@ namespace MeGUI
 
             if (MainForm.Instance.Settings.EnableDirectShowSource)
             {
-
                 if (iFile.isAVISourceIndexable(false))
                 {
                     iResult = askAbout3("Do you want to open this file with\r\n" +
@@ -237,10 +257,16 @@ namespace MeGUI
                 }
             }
 
-            if (useOneClick())
-                iResult = 0;
+            string strText = string.Empty;
+            if (MainForm.Instance.Settings.EnableDirectShowSource)
+                strText = "\r\n\r\nDirectShowSource or AVISource is not supported.";
             else
-                iResult = 1;
+                strText = "\r\n\r\nDirectShowSource or AVISource is not recommended\r\nand has to be enabled in the settings if required.";
+
+            iResult = askAbout2("Do you want to open this file with\r\n" +
+                "- One Click Encoder (fully automated, easy to use) or\r\n" +
+                "- File Indexer (manual, advanced)?" + strText, "Please choose your preferred tool",
+                "One Click Encoder", "File Indexer", MessageBoxIcon.Question);
             return iResult;
         }
 
