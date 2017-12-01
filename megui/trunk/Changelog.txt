@@ -1,3 +1,4 @@
+2792 [File Indexer]         removed the container warning when using the FFMS indexer
 2791 [OneClick]             added video track name. feature request #537
                             removed the possibility to delete tracks with DEL/BACKSPACE
 2790 [File Indexer]         fixed MPLS handling (regression of 2787)

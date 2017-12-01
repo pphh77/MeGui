@@ -422,18 +422,6 @@ namespace MeGUI
                 demuxTracks.Enabled = false;
             }
             AudioTracks.Enabled = demuxTracks.Checked;
-
-            if (IndexerUsed == IndexType.FFMS)
-            {
-                if (!strContainerFormat.ToUpperInvariant().Equals("MATROSKA") &&
-                    !strContainerFormat.ToUpperInvariant().Equals("AVI") &&
-                    !strContainerFormat.ToUpperInvariant().Equals("MPEG-4") &&
-                    !strContainerFormat.ToUpperInvariant().Equals("FLASH VIDEO") &&
-                    !strContainerFormat.ToUpperInvariant().Equals("BLU-RAY PLAYLIST"))
-                {
-                    MessageBox.Show("It is recommended to use a MKV, AVI, MP4 or FLV container to index files with the FFMS2 indexer", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-            }
         }
 
         /// <summary>
