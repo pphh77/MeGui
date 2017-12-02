@@ -803,7 +803,7 @@ namespace MeGUI
                         oInfo.Text.Add(oTextTrack);
                     }
                 }
-                else if (oInfo.General.Count > 0 && oInfo.General[0].FormatString.ToLowerInvariant().Equals("blu-ray playlist"))
+                else if (oInfo.General.Count > 0 && oInfo.Video.Count > 0 && oInfo.General[0].FormatString.ToLowerInvariant().Equals("blu-ray playlist"))
                 {
                     // Blu-ray Input File
                     if (infoLog != null)

@@ -28,7 +28,8 @@ namespace MeGUI
 
         public override List<ChapterInfo> GetStreams(string location)
         {
-            ChapterInfo pgc = GetChapterInfo(location, 0);
+            MediaInfoFile oInfo = new MediaInfoFile(location);
+            ChapterInfo pgc = oInfo.ChapterInfo;
             if (!String.IsNullOrEmpty(pgc.SourceFilePath))
             {
                 OnStreamDetected(pgc);
@@ -44,8 +45,7 @@ namespace MeGUI
 
             byte[] data = File.ReadAllBytes(strMplsFile);
             string fileType = ASCIIEncoding.ASCII.GetString(data, 0, 8);
-            if ((fileType != "MPLS0100" && fileType != "MPLS0200")
-            /*|| data[45] != 1*/)
+            if (fileType != "MPLS0100" && fileType != "MPLS0200" && fileType != "MPLS0300")
             {
                 // playlist has an unknown file type
                 return pgc;
@@ -103,14 +103,7 @@ namespace MeGUI
                 chapterOffset += 14;
             }
             pgc.Chapters = chapters;
-
-            if (iFPS == 0)
-            {
-                MediaInfoFile oInfo = new MediaInfoFile(pgc.SourceFilePath);
-                pgc.FramesPerSecond = oInfo.VideoInfo.FPS;
-            }
-            else
-                pgc.FramesPerSecond = iFPS;
+            pgc.FramesPerSecond = iFPS;
 
             return pgc;
         }
