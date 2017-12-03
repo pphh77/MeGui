@@ -39,7 +39,7 @@ namespace MeGUI
                 if (pl == null)
                     continue;
 
-                pl.SourceFilePath = path;
+                pl.SourceFilePath = file;
                 pl.SourceType = "Blu-Ray";
                 mpls.Add(pl);
             }

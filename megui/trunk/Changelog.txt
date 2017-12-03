@@ -1,4 +1,5 @@
-2797 [Language]             added "qaa" = "reserved for local use" language support
+2790 [OneClick]             fixed MPLS handling (regression of 2790)
+2797 [Language]             added "reserved for local use"/qaa language support
 2796 [Chapter]              added UHD Blu-ray support
 2795 [MessageBoxEx]         cosmetics
 2794 [MessageBoxEx]         removed external dependency to MessageBoxExLib.dll
