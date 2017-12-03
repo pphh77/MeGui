@@ -81,12 +81,19 @@ namespace eac3to
                     language = string.Empty;
             }
 
+            // check if the language is a proper full string language
             if (MeGUI.LanguageSelectionContainer.IsLanguageAvailable(language))
             {
                 this.Language = language;
                 return;
             }
 
+            // check if the language is a 2/3 ISO code
+            this.Language = MeGUI.LanguageSelectionContainer.LookupISOCode(language);
+            if (!String.IsNullOrEmpty(this.Language))
+                return;
+
+            // langauge not detected
             if (this.Type == StreamType.Video)
             {
                 if (!string.IsNullOrEmpty(language))

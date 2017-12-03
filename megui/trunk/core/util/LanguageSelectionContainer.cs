@@ -366,6 +366,7 @@ namespace MeGUI
             addLanguage("Rajasthani", "raj", "", "");
             addLanguage("Rapanui", "rap", "", "");
             addLanguage("Rarotongan", "rar", "", "");
+            addLanguage("Reserved for local use", "qaa", "", "");
             addLanguage("Romanian", "rum", "ron", "ro");
             addLanguage("Romansh", "roh", "", "rm");
             addLanguage("Romany", "rom", "", "");
