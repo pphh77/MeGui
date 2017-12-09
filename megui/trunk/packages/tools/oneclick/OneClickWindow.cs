@@ -843,7 +843,7 @@ namespace MeGUI
             dpp.IntermediateMKVFile = String.Empty;
             if (_videoInputInfo.isEac3toDemuxable())
             {
-                // create eac3to demux job if needed
+                // create eac3to demux job if needed - for blu-ray playlists
                 dpp.Eac3toDemux = true;
                 StringBuilder sb = new StringBuilder();
 
@@ -1179,7 +1179,7 @@ namespace MeGUI
                     oStream.EncoderSettings.EncoderType.ACodec.ID.Equals(oAudioTrackInfo.AudioCodec.ID))))
                 {
                     if (oStreamControl.SelectedItem.IsStandard && inputContainer == ContainerType.MKV 
-                        && oAudioTrackInfo.AudioCodec == AudioCodec.PCM)
+                        && oAudioTrackInfo.AudioCodec == AudioCodec.PCM && !dpp.Eac3toDemux)
                     {
                         int trackID = oStream.TrackInfo.TrackID;
                         if (_videoInputInfo.ContainerFileType != ContainerType.MKV)

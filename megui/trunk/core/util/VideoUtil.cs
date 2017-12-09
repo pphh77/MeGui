@@ -137,6 +137,16 @@ namespace MeGUI
 
                 for (int counter = 0; counter < audioTracks.Count; counter++)
                 {
+                    // if the expected demux file already exists, it will be directly used = no need to find it
+                    // e.g. when eac3to demuxes a PCM track from a MKV file
+                    if (File.Exists(Path.Combine(Path.GetDirectoryName(projectName), audioTracks[counter].DemuxFileName)))
+                    {
+                        string file = Path.Combine(Path.GetDirectoryName(projectName), audioTracks[counter].DemuxFileName);
+                        if (!audioFiles.ContainsValue(file))
+                            audioFiles.Add(audioTracks[counter].TrackID, file);
+                        continue;
+                    }
+
                     bool bFound = false;
                     string trackFile = strTrackName + audioTracks[counter].TrackIDx + "*";
                     if (Path.GetExtension(projectName).ToLowerInvariant().Equals(".ffindex") || Path.GetExtension(projectName).ToLowerInvariant().Equals(".lwi"))

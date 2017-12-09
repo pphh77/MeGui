@@ -1,4 +1,5 @@
-2790 [OneClick]             fixed MPLS handling (regression of 2790)
+2799 [OneClick]             fixed PCM handling. bug #900
+2798 [OneClick]             fixed MPLS handling (regression of 2790)
 2797 [Language]             added "reserved for local use"/qaa language support
 2796 [Chapter]              added UHD Blu-ray support
 2795 [MessageBoxEx]         cosmetics
