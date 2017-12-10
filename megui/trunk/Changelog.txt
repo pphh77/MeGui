@@ -1,3 +1,4 @@
+2800 [L-SMASH Indexer]      improved detection of LSMASH/LWLibav (regression of 2767). bug #899
 2799 [OneClick]             fixed PCM handling. bug #900
 2798 [OneClick]             fixed MPLS handling (regression of 2790)
 2797 [Language]             added "reserved for local use"/qaa language support
