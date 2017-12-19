@@ -988,7 +988,7 @@ namespace MeGUI.core.util
             string tracknameFilePath = Path.GetFullPath(fileName) + "_TRACKNAME" + trackNumber.ToString() + ".txt";
             try 
             {
-                using (StreamWriter sw = new StreamWriter(tracknameFilePath, true, Encoding.UTF8))
+                using (StreamWriter sw = new StreamWriter(tracknameFilePath, false, Encoding.UTF8))
                 {
                     sw.Write(trackName);
                     sw.Close();

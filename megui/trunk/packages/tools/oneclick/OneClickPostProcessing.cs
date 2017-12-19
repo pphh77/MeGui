@@ -272,7 +272,6 @@ namespace MeGUI
                     }
 
                     myVideo.Settings = videoSettings;
-                    videoSettings.VideoName = oInfo.VideoInfo.Track.Name;
                     myVideo.Framerate = (decimal)oInfo.VideoInfo.FPS;
                     myVideo.NumberOfFrames = oInfo.VideoInfo.FrameCount;
                 }
