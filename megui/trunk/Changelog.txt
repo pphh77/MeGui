@@ -1,3 +1,4 @@
+2804 [OneClick] + [FileIndexer] show playlist selection window for DVD/Blu-ray structures also if only one playlist is found
 2803 [HD Streams Extractor] added support for "E-AC3 Surround"
 2802 [OneClick]             enhanced suitable container type detection
 2801 [OneClick]             fixed video name not written sometimes (regression of 2791). bug #901

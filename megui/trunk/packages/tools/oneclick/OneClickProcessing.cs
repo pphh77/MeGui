@@ -107,10 +107,9 @@ namespace MeGUI.packages.tools.oneclick
                 if (!frm.IsDVDOrBluraySource)
                     return false;
 
-                // open the selection window if not exactly one title set with the desired minimum length is found
+                // open the selection window
                 DialogResult dr = DialogResult.OK;
-                if (frm.TitleCountWithRequiredLength != 1)
-                    dr = frm.ShowDialog();
+                dr = frm.ShowDialog();
 
                 if (dr != DialogResult.OK)
                 {
