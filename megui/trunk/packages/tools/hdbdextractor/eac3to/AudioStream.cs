@@ -155,6 +155,7 @@ namespace eac3to
                     break;
                 case "E-AC3":
                 case "E-AC3 EX":
+                case "E-AC3 SURROUND":
                     audioStream.AudioType = AudioStreamType.EAC3;
                     break;
                 case "TRUEHD":

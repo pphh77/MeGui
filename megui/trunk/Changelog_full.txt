@@ -89,7 +89,7 @@
 2713 [Update]               x64: do not check for the 32bit x265.exe
 2712 [HD Streams Extractor] fixed 3D MVC extraction (regression of 2710)
 2711 [x265]                 removed the option to enable x265 as it is now always enabled
-2710 [HD Streams Extractor] extract E-AC3 by default with -core (workaround for a eac3to issue). Bug #870
+2710 [HD Streams Extractor] extract E-AC3 by default with -core (workaround for an eac3to issue). Bug #870
                             Changed handling of unknown/unsupported tracks
 2709 [HD Streams Extractor] fixed extraction of DTS Express tracks. Bug #871
                             fixed extraction of E-AC3 with core tracks. Bug #870
