@@ -133,13 +133,13 @@ namespace MeGUI
                 this.containerFormat.SelectedIndex = 0;
             }
 
-            beingCalled = true;
+            beingCalled++;
             videoProfile.Manager = MainForm.Instance.Profiles;
             initTabs();
             initAudioHandler();
             avsProfile.Manager = MainForm.Instance.Profiles;
             initOneClickHandler();
-            beingCalled = false;
+            beingCalled--;
             updatePossibleContainers();
 
             //add device type
@@ -470,18 +470,18 @@ namespace MeGUI
             if (iFile == null)
                 return;
 
+            beingCalled++;
             if (!bAutomatedProcessing && arrFilesToProcess.Count > 0)
             {
                 string question = "Do you want to process all " + (arrFilesToProcess.Count + 1) + " files/tracks in the selection?\r\nThey all will be processed with the current settings\r\nin the OneClick profile \"" + oneclickProfile.SelectedProfile.Name + "\".\r\nOther settings will be ignored.";
                 DialogResult dr = MessageBox.Show(question, "Automated folder processing", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (dr == System.Windows.Forms.DialogResult.Yes)
                 {
-                    bAutomatedProcessing = beingCalled = true;
+                    bAutomatedProcessing = true;
                     SetOneClickProfile((OneClickSettings)oneclickProfile.SelectedProfile.BaseSettings);
                     _oSettings.LeadingName = MeGUI.core.gui.InputBox.Show("If desired please enter a leading name", "Please enter a leading name", _oSettings.LeadingName);
                 }
             }
-            beingCalled = true;
             bLock = true;
             if (input.SelectedSCItem == null || !iFile.FileName.Equals((string)input.SelectedObject))
             {
@@ -503,7 +503,7 @@ namespace MeGUI
                 arrSubtitleTrackInfo.Add(new OneClickStream(oInfo));
             SubtitleResetTrack(arrSubtitleTrackInfo, _oSettings);
 
-            beingCalled = false;
+            beingCalled--;
             updatePossibleContainers();
             
             // Detect Chapters
@@ -539,13 +539,13 @@ namespace MeGUI
             setControlState(false);
         }
 
-        private bool beingCalled;
+        private int beingCalled = 0;
         private void updatePossibleContainers()
         {
             // Since everything calls everything else, this is just a safeguard to make sure we don't infinitely recurse
-            if (beingCalled)
+            if (beingCalled > 0)
                 return;
-            beingCalled = true;
+            beingCalled = 1;
 
             List<AudioEncoderType> audioCodecs = new List<AudioEncoderType>();
             List<MuxableType> dictatedOutputTypes = new List<MuxableType>();
@@ -659,7 +659,7 @@ namespace MeGUI
                     this.containerFormat.SelectedIndex = 0;
                 this.output.Filename = Path.ChangeExtension(output.Filename, (this.containerFormat.SelectedItem as ContainerType).Extension);
             }
-            beingCalled = false;
+            beingCalled = 0;
         }
 
         private void SetOneClickProfile(OneClickSettings settings)
@@ -1741,6 +1741,8 @@ namespace MeGUI
 
         private void SubtitleAddTrack(bool bChangeFocus)
         {
+            beingCalled++;
+
             TabPage p = new TabPage("Subtitle " + (subtitleTracks.Count + 1));
             p.UseVisualStyleBackColor = subtitlesTab.TabPages[0].UseVisualStyleBackColor;
             p.Padding = subtitlesTab.TabPages[0].Padding;
@@ -1782,12 +1784,17 @@ namespace MeGUI
 
             if (bChangeFocus)
                 subtitlesTab.SelectedTab = p;
+
+            beingCalled--;
+            updatePossibleContainers();
         }
 
         private void SubtitleRemoveTrack(int iTabPageIndex)
         {
             if (iTabPageIndex == subtitlesTab.TabCount - 1)
                 return;
+
+            beingCalled++;
 
             if (iTabPageIndex == 0 && subtitlesTab.TabCount == 1)
                 SubtitleAddTrack(true);
@@ -1798,6 +1805,7 @@ namespace MeGUI
             for (int i = 0; i < subtitlesTab.TabCount - 1; i++)
                 subtitlesTab.TabPages[i].Text = "Subtitle " + (i + 1);
 
+            beingCalled--;
             updatePossibleContainers();
         }
 
@@ -1930,7 +1938,7 @@ namespace MeGUI
 
         private void audioAddTrack_Click(object sender, EventArgs e)
         {
-           AudioAddTrack(true);
+            AudioAddTrack(true);
         }
 
         private void audioRemoveTrack_Click(object sender, EventArgs e)
@@ -1940,6 +1948,8 @@ namespace MeGUI
 
         private void AudioAddTrack(bool bChangeFocus)
         {
+            beingCalled++;
+
             TabPage p = new TabPage("Audio " + (audioTracks.Count + 1));
             p.UseVisualStyleBackColor = audioTab.TabPages[0].UseVisualStyleBackColor;
             p.Padding = audioTab.TabPages[0].Padding;
@@ -1982,12 +1992,17 @@ namespace MeGUI
 
             if (bChangeFocus)
                 audioTab.SelectedTab = p;
+
+            beingCalled--;
+            updatePossibleContainers();
         }
 
         private void AudioRemoveTrack(int iTabPageIndex)
         {
             if (iTabPageIndex == audioTab.TabCount - 1)
                 return;
+
+            beingCalled++;
 
             if (iTabPageIndex == 0 && subtitlesTab.TabCount == 1)
                 AudioAddTrack(true);
@@ -1998,6 +2013,7 @@ namespace MeGUI
             for (int i = 0; i < audioTab.TabCount - 1; i++)
                 audioTab.TabPages[i].Text = "Audio " + (i + 1);
 
+            beingCalled--;
             updatePossibleContainers();
         }
 
