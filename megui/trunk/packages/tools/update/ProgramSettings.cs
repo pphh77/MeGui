@@ -166,21 +166,16 @@ namespace MeGUI
                 return false;
 
             // package is not available. Therefore an update check is necessary
-            if (MainForm.Instance.Settings.UpdateMode != UpdateMode.Disabled 
-                || (!bFilesAvailable && MessageBox.Show("The package " + _displayname + " is not installed.\n\nDo you want to search now online for updates?", "MeGUI package missing", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes))
-            {
-                MainForm.Instance.UpdateHandler.ForcePackageInstallation = this._name;
-                MainForm.Instance.UpdateHandler.ShowUpdateWindow(true, true);
-                MainForm.Instance.UpdateHandler.ForcePackageInstallation = string.Empty;
+            MainForm.Instance.UpdateHandler.ForcePackageInstallation = this._name;
+            MainForm.Instance.UpdateHandler.ShowUpdateWindow(true, true);
+            MainForm.Instance.UpdateHandler.ForcePackageInstallation = string.Empty;
 
-                if (FilesAvailable())
-                    return true;
+            if (FilesAvailable())
+                return true;
 
-                if (MainForm.Instance.Settings.UpdateMode == UpdateMode.Disabled)
-                    MessageBox.Show(String.Format("The update for {0} failed. Therefore {0} will not be available and the current job will fail. Run the updater on your own if you want to try it later.", _displayname), _displayname + " not installed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            else if (!bFilesAvailable)
-                MessageBox.Show(String.Format("You have selected to not update {0}. Therefore {0} will not be available and the current job will fail. Run the updater on your own if you want to download it later.", _displayname), _displayname + " not installed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            if (MainForm.Instance.Settings.UpdateMode == UpdateMode.Disabled)
+                MessageBox.Show(String.Format("The update for {0} failed. Therefore {0} will not be available and the current job will fail. Run the updater on your own if you want to try it later.", _displayname), _displayname + " not installed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
             return false;
         }
 

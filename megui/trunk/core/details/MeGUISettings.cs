@@ -59,7 +59,7 @@ namespace MeGUI
                      bAutoLoadDG, bAutoStartQueueStartup, bAlwayUsePortableAviSynth, bVobSubberSingleFileExport,
                      bEnsureCorrectPlaybackSpeed, bExternalMuxerX264, bUseNeroAacEnc, bOSx64, bEnableDirectShowSource,
                      bVobSubberExtractForced, bVobSubberShowAll, bUsex64Tools, bShowDebugInformation, bEac3toDefaultToHD,
-                     bEac3toEnableEncoder, bEac3toEnableDecoder;
+                     bEac3toEnableEncoder, bEac3toEnableDecoder, bFirstUpdateCheck;
         private decimal forceFilmThreshold, acceptableFPSError;
         private int nbPasses, autoUpdateServerSubList, minComplexity, updateFormSplitter,
                     maxComplexity, jobColumnWidth, inputColumnWidth, outputColumnWidth, codecColumnWidth,
@@ -187,6 +187,7 @@ namespace MeGUI
             chapterCreatorSortString = "duration";
             bShowDebugInformation = false;
             bEnableDirectShowSource = false;
+            bFirstUpdateCheck = true;
         }
 
         #region properties
@@ -439,6 +440,15 @@ namespace MeGUI
         {
             get { return bEnableDirectShowSource; }
             set { bEnableDirectShowSource = value; }
+        }
+
+        /// <summary>
+        /// True if no update check has been started yet
+        /// </summary>
+        public bool FirstUpdateCheck
+        {
+            get { return bFirstUpdateCheck; }
+            set { bFirstUpdateCheck = value; }
         }
 
         /// <summary>

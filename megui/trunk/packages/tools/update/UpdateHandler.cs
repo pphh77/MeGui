@@ -64,6 +64,7 @@ namespace MeGUI
         private UpdateMode _updateMode;
         private string _forcePackage;
         private WebClient wc;
+        private bool bManuallyStarted;
 
         public UpdateMode UpdateMode
         {
@@ -99,6 +100,16 @@ namespace MeGUI
             if (_updateLog == null)
                 _updateLog = MainForm.Instance.Log.Info("Update detection");
             _updateServerURL = MainForm.Instance.Settings.LastUpdateServer;
+            bManuallyStarted = false;
+
+            if (MainForm.Instance.Settings.FirstUpdateCheck)
+            {
+                if (MessageBox.Show("Do you want MeGUI to search for new updates at every start?\nThis setting can be changed later in the settings menu.", "MeGUI Automatic Update", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
+                    MainForm.Instance.Settings.AutoUpdate = true;
+                else
+                    MainForm.Instance.Settings.AutoUpdate = false;
+                MainForm.Instance.Settings.FirstUpdateCheck = false;
+            }
             _updateMode = MainForm.Instance.Settings.UpdateMode;
 
             // load saved _updateData
@@ -110,7 +121,7 @@ namespace MeGUI
             // start initial update check
             GetUpdateInformation(false);
 
-            if (_updateMode == UpdateMode.Disabled)
+            if (!MainForm.Instance.Settings.AutoUpdate)
                 _updateLog.LogEvent("Automatic update is disabled");
         }
 
@@ -224,6 +235,16 @@ namespace MeGUI
 
             if (UpdateCacher.VerifyLocalCacheFile(localFilename, ref result))
                 return result;
+
+            // if auto update is disabled ask if a download try should be made
+            if (MainForm.Instance.Settings.AutoUpdate == false)
+            {
+                string strMessage = "The package " + packageName + " is not available offline.\n\nDo you want to search now online for updates?";
+                if (packageName.Equals("update definition"))
+                    strMessage = "The update definition is not available offline or may be outdated.\n\nDo you want to search now online for updates?";
+                if (MessageBox.Show(strMessage, "MeGUI package missing", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                    return UpdateWindow.ErrorState.CouldNotDownloadFile;
+            }
 
             lock (this)
             {
@@ -590,6 +611,11 @@ namespace MeGUI
                     {
                         failedFiles.Add(file);
                         AddTextToLog(string.Format("Failed to download package {0}: {1}.", file.DisplayName, EnumProxy.Create(result).ToString()), ImageType.Error, true);
+                        if (result == UpdateWindow.ErrorState.FileNotOnServer)
+                        {
+                            // file not found on the server - potentially the update.xml is outdated
+                            GetUpdateXML();
+                        }
                     }
                     else if ((_updateMode != UpdateMode.Automatic || !String.IsNullOrEmpty(_forcePackage)))
                     {
@@ -707,8 +733,6 @@ namespace MeGUI
         {
             if (_updateWindow != null)
                 _updateWindow.CloseWindow();
-            if (_updateMode == UpdateMode.Disabled)
-                _updateMode = UpdateMode.Manual;
 
             _updateWindow = new UpdateWindow();
             
@@ -721,7 +745,11 @@ namespace MeGUI
             // refresh update information
             if (!_updateRunning)
             {
+                if (!bWait && !bAutoUpdate)
+                    bManuallyStarted = true;
                 GetUpdateInformation(true);
+                if (!bWait && !bAutoUpdate)
+                    bManuallyStarted = false;
                 _updateWindow.RefreshGUI();
                 _updateWindow.EnableUpdateButton();
             }
@@ -790,7 +818,60 @@ namespace MeGUI
                 }
             }
 
-            // new update.xml must be downloaded
+            // new update.xml must be downloaded - do this only if auto update is enabled or the update check has been initiated manually
+            result = UpdateWindow.ErrorState.ServerNotAvailable;
+            if (MainForm.Instance.Settings.AutoUpdate || bManuallyStarted)
+                result = GetUpdateXML();
+
+            if (result != UpdateWindow.ErrorState.Successful)
+            {
+                // update server not available, try the cached file first
+                if (UpdateCacher.VerifyLocalCacheFile(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update.xml"), ref result))
+                {
+                    // local xml file can be used
+                    AddTextToLog("Using cached update config and server: " + _updateServerURL, ImageType.Information, false);
+                    _updateXML = new XmlDocument();
+                    _updateXML.Load(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update.xml"));
+                    return UpdateWindow.ErrorState.Successful;
+                }
+            }
+
+            // cached file not available or new file downloaded
+            if (UpdateCacher.VerifyLocalCacheFile(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update_new.xml"), ref result))
+            {
+                // delete old file if available
+                File.Delete(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update.xml"));
+                File.Move(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update_new.xml"), Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update.xml"));
+                _updateXML = new XmlDocument();
+                _updateXML.Load(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update.xml"));
+                return UpdateWindow.ErrorState.Successful;
+            }
+
+            // no cached update.xml found, try to download it if autoupdate is disabled
+            result = UpdateWindow.ErrorState.ServerNotAvailable;
+            if (MainForm.Instance.Settings.AutoUpdate == false)
+            {
+                result = GetUpdateXML();
+                if (result == UpdateWindow.ErrorState.Successful && UpdateCacher.VerifyLocalCacheFile(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update_new.xml"), ref result))
+                {
+                    // delete old file if available
+                    File.Delete(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update.xml"));
+                    File.Move(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update_new.xml"), Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update.xml"));
+                    _updateXML = new XmlDocument();
+                    _updateXML.Load(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update.xml"));
+                    return UpdateWindow.ErrorState.Successful;
+                }
+            }
+
+            _updateXML = null;
+            return result;
+        }
+
+        /// <summary>
+        /// This method is called to retrieve the update data from the webserver
+        /// </summary>
+        public UpdateWindow.ErrorState GetUpdateXML()
+        {
             // get the current list of update servers to try
             List<string> _updateServerList = GetUpdateServerList();
             if (_updateServerList.Count == 0)
@@ -801,51 +882,21 @@ namespace MeGUI
             }
 
             // get the update.xml from the update server
-            result = UpdateWindow.ErrorState.ServerNotAvailable;
-            if (_updateMode != UpdateMode.Disabled)
+            UpdateWindow.ErrorState result = UpdateWindow.ErrorState.ServerNotAvailable;
+            foreach (string serverName in _updateServerList)
             {
-                foreach (string serverName in _updateServerList)
+                _updateServerURL = serverName;
+                result = GetUpdateXML(_updateServerURL, false);
+                if (result == UpdateWindow.ErrorState.Successful)
                 {
-                    _updateServerURL = serverName;
-                    result = GetUpdateXML(_updateServerURL, false);
-                    if (result == UpdateWindow.ErrorState.Successful)
-                    {
-                        MainForm.Instance.Settings.LastUpdateCheck = DateTime.Now.ToUniversalTime();
-                        MainForm.Instance.Settings.LastUpdateServer = _updateServerURL;
-                        AddTextToLog("Connected to server: " + _updateServerURL, ImageType.Information, false);
-                        break;
-                    }
-                    else
-                        AddTextToLog("Cannot use update server " + _updateServerURL + ". Reason: " + EnumProxy.Create(result).ToString(), ImageType.Information, true);
-                }
-            }
-
-            if (result != UpdateWindow.ErrorState.Successful)
-            {
-                // update server not available
-                if (UpdateCacher.VerifyLocalCacheFile(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update.xml"), ref result))
-                {
-                    // local xml file can be used
-                    AddTextToLog("Using cached update config and server: " + _updateServerURL, ImageType.Information, false);
-                    _updateXML = new XmlDocument();
-                    _updateXML.Load(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update.xml"));
-                    return UpdateWindow.ErrorState.Successful;
+                    MainForm.Instance.Settings.LastUpdateCheck = DateTime.Now.ToUniversalTime();
+                    MainForm.Instance.Settings.LastUpdateServer = _updateServerURL;
+                    AddTextToLog("Connected to server: " + _updateServerURL, ImageType.Information, false);
+                    break;
                 }
                 else
-                    _updateXML = null;
+                    AddTextToLog("Cannot use update server " + _updateServerURL + ". Reason: " + EnumProxy.Create(result).ToString(), ImageType.Information, true);
             }
-            else if (File.Exists(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update_new.xml")))
-            {
-                // delete old file if available
-                File.Delete(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update.xml"));
-                File.Move(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update_new.xml"), Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update.xml"));
-                _updateXML = new XmlDocument();
-                _updateXML.Load(Path.Combine(MainForm.Instance.Settings.MeGUIUpdateCache, "update.xml"));
-                return UpdateWindow.ErrorState.Successful;
-            }
-            else
-                _updateXML = null;
-
             return result;
         }
 

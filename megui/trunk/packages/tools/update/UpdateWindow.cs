@@ -693,9 +693,6 @@ namespace MeGUI
         /// <summary>
         /// Constructor for Updatewindow.
         /// </summary>
-        /// <param name="mainForm">MainForm instance</param>
-        /// <param name="savedSettings">Current MeGUI settings</param>
-        /// <param name="bSilent">whether the update window should be displayed</param>
         public UpdateWindow()
         {
             InitializeComponent();

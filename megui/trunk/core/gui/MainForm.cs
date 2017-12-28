@@ -168,7 +168,9 @@ namespace MeGUI
             if (MainForm.Instance.Settings.IsMeGUIx64)
                 this.TitleText += " x64";
             getVersionInformation();
-            if (MainForm.Instance.Settings.AutoUpdateServerSubList == 1)
+            if (!MainForm.Instance.Settings.AutoUpdate)
+                this.TitleText += " UPDATE SERVER DISABLED";
+            else if (MainForm.Instance.Settings.AutoUpdateServerSubList == 1)
                 this.TitleText += " DEVELOPMENT UPDATE SERVER";
             setGUIInfo();
             Jobs.showAfterEncodingStatus(Settings);
@@ -1355,6 +1357,17 @@ namespace MeGUI
                 i.LogValue("MeGUI", new System.Version(Application.ProductVersion).Build + " x64" + (bDebug ? " (DEBUG)" : string.Empty), false);
             if (File.Exists(Path.ChangeExtension(Application.ExecutablePath, ".pdb")))
                 i.LogValue("MeGUI Debug Data", "available", false);
+            string strUpdateCheck = "Disabled";
+            if (MainForm.Instance.Settings.AutoUpdate)
+            {
+                if (MainForm.Instance.Settings.AutoUpdateServerSubList == 0)
+                    strUpdateCheck = "stable update server";
+                else if (MainForm.Instance.Settings.AutoUpdateServerSubList == 1)
+                    strUpdateCheck = "development update server";
+                else if (MainForm.Instance.Settings.AutoUpdateServerSubList == 2)
+                    strUpdateCheck = "custom update server";
+            }
+            i.LogValue("Update Check", strUpdateCheck, false);
 
             LogItem s = new LogItem("System Information");
             s.LogValue("Operating System", OSInfo.GetOSName(), false);
@@ -1383,6 +1396,10 @@ namespace MeGUI
             LogItem a = new LogItem("AviSynth Information");
             FileUtil.CheckAviSynth(ref a);
             i.Add(a);
+
+            UpdateCacher.CheckPackage("libs");
+            UpdateCacher.CheckPackage("mediainfo");
+            UpdateCacher.CheckPackage("updater");
         }
 
         public void setOverlayIcon(Icon oIcon)
