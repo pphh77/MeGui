@@ -1,3 +1,5 @@
+2807 [OneClick]             fixed output file path is not updated properly. bug #891
+                            removed "project name" and moved the video track name to the "advanced config" page
 2806 [QAAC]                 increased maximum bitrate to 1280. feature request #631
 2805 [Update]               added a first startup question if the updater should be enabled or disabled (message will be shown also once to existing users)
                             if disabled no downloads will be made without confirmation. therefore e.g. no information of new updates will be available.

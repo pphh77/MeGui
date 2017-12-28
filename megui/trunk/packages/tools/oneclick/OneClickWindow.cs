@@ -63,11 +63,6 @@ namespace MeGUI
 
         private MuxProvider muxProvider;
         private MediaInfoFile _videoInputInfo;
-
-        /// <summary>
-        /// whether the user has selected an output filename
-        /// </summary>
-        private bool outputChosen = false;
         #endregion
 
         #region profiles
@@ -202,24 +197,20 @@ namespace MeGUI
                 cbGUIMode.SelectedItem = EnumProxy.Create(MainForm.Instance.Settings.OneClickGUIMode);
             else
                 MainForm.Instance.Settings.OneClickGUIMode = (MeGUISettings.OCGUIMode)o.RealValue;
-            
+
             if (MainForm.Instance.Settings.OneClickGUIMode == MeGUISettings.OCGUIMode.Advanced)
             {
-                videoTab.Height = 98;
                 audioTab.Height = 175;
-                audioTab.Location = new Point(audioTab.Location.X, 110);
-                subtitlesTab.Location = new Point(subtitlesTab.Location.X, 291);
+                subtitlesTab.Location = new Point(subtitlesTab.Location.X, 258);
                 subtitlesTab.Visible = true;
-                outputTab.Location = new Point(outputTab.Location.X, 412);
-                this.Height = 616;
+                outputTab.Location = new Point(outputTab.Location.X, 379);
+                this.Height = 583;
                 if (!tabControl1.TabPages.Contains(encoderConfigTab))
                     tabControl1.TabPages.Add(encoderConfigTab);
             }
             else if (MainForm.Instance.Settings.OneClickGUIMode == MeGUISettings.OCGUIMode.Basic)
             {
-                videoTab.Height = 65;
                 audioTab.Height = 90;
-                audioTab.Location = new Point(audioTab.Location.X, 77);
                 subtitlesTab.Visible = false;
                 outputTab.Location = new Point(outputTab.Location.X, 173);
                 this.Height = 377;
@@ -228,9 +219,7 @@ namespace MeGUI
             }
             else
             {
-                videoTab.Height = 65;
                 audioTab.Height = 115;
-                audioTab.Location = new Point(audioTab.Location.X, 77);
                 subtitlesTab.Location = new Point(subtitlesTab.Location.X, 198);
                 subtitlesTab.Visible = true;
                 outputTab.Location = new Point(outputTab.Location.X, 319);
@@ -246,8 +235,7 @@ namespace MeGUI
                 this.devicetype.Enabled = false;
             else 
                 this.devicetype.Enabled = true;
-            updateFilename();
-
+            
             //add device types
             devicetype.Items.Clear();
             devicetype.Items.Add("Standard");
@@ -267,6 +255,8 @@ namespace MeGUI
                 this.devicetype.SelectedIndex = 0;
 
             updateChapterSelection(null, null);
+            output.Filter = ((ContainerType)containerFormat.SelectedItem).OutputFilterString;
+            updateFilename(true, false, false);
         }
 
         private void updateChapterSelection(object sender, EventArgs e)
@@ -278,67 +268,60 @@ namespace MeGUI
                 chapterFile.Enabled = true;
         }
 
-        private void updateWorkingName(String strInputFile)
+        private void updateFilename(bool bUpdateExtension, bool bUpdateFilePath, bool bUpdateFileName)
         {
-            int iPGCNumber = 0;
-            if (_videoInputInfo != null)
-                iPGCNumber = _videoInputInfo.VideoInfo.PGCNumber;
+            string strInputFile = input.SelectedText;
+            if (String.IsNullOrEmpty(strInputFile))
+                return;
 
-            string filePath = FileUtil.GetOutputFolder(strInputFile);
-            string filePrefix = FileUtil.GetOutputFilePrefix(strInputFile);
-            string fileName = Path.GetFileNameWithoutExtension(strInputFile);
-            string strTempName = strInputFile;
-
-            if (iPGCNumber > 0)
+            string strFileName = Path.GetFileName(input.SelectedText);
+            if (bUpdateFileName || String.IsNullOrEmpty(output.Filename))
             {
-                // DVD structure found, create the output file name
-                if (FileUtil.RegExMatch(fileName, @"_\d{1,2}\z", false))
-                    fileName = fileName.Substring(0, fileName.LastIndexOf('_') + 1);
-                else
-                    fileName = fileName + "_";
-                fileName = filePrefix + fileName + iPGCNumber;
-                if (_videoInputInfo.VideoInfo.AngleNumber > 0)
-                    fileName += "_" + _videoInputInfo.VideoInfo.AngleNumber;
-                strTempName = Path.Combine(filePath, fileName + Path.GetExtension(strInputFile)); 
-            }
-            else
-                strTempName = Path.Combine(filePath, filePrefix + fileName + Path.GetExtension(strInputFile));
+                int iPGCNumber = 0;
+                if (_videoInputInfo != null)
+                    iPGCNumber = _videoInputInfo.VideoInfo.PGCNumber;
 
-            workingName.Text = PrettyFormatting.ExtractWorkingName(strTempName, _oSettings.LeadingName, _oSettings.WorkingNameReplace, _oSettings.WorkingNameReplaceWith);
+                string filePath = FileUtil.GetOutputFolder(strInputFile);
+                string filePrefix = FileUtil.GetOutputFilePrefix(strInputFile);
+                string fileName = Path.GetFileNameWithoutExtension(strInputFile);
+                string strTempName = strInputFile;
 
-            this.updateFilename();
-        }
-
-        private void updateFilename()
-        {
-            if (!outputChosen)
-            {
-                String strVideoInput = input.SelectedText;
-                if (!String.IsNullOrEmpty(strVideoInput) && File.Exists(strVideoInput))
+                if (iPGCNumber > 0)
                 {
-                    if (!String.IsNullOrEmpty(_oSettings.DefaultOutputDirectory) && Directory.Exists(_oSettings.DefaultOutputDirectory))
-                    {
-                        output.Filename = Path.Combine(_oSettings.DefaultOutputDirectory, workingName.Text + "." +
-                            ((ContainerType)containerFormat.SelectedItem).Extension);
-                    }
+                    // DVD structure found, create the output file name
+                    if (FileUtil.RegExMatch(fileName, @"_\d{1,2}\z", false))
+                        fileName = fileName.Substring(0, fileName.LastIndexOf('_') + 1);
                     else
-                    {
-                        string outputPath = FileUtil.GetOutputFolder(strVideoInput);
-                        output.Filename = Path.Combine(outputPath, workingName.Text + "." +
-                           ((ContainerType)containerFormat.SelectedItem).Extension);
-                    }
+                        fileName = fileName + "_";
+                    fileName = filePrefix + fileName + iPGCNumber;
+                    if (_videoInputInfo.VideoInfo.AngleNumber > 0)
+                        fileName += "_" + _videoInputInfo.VideoInfo.AngleNumber;
+                    strTempName = Path.Combine(filePath, fileName + Path.GetExtension(strInputFile));
+                }
+                else
+                    strTempName = Path.Combine(filePath, filePrefix + fileName + Path.GetExtension(strInputFile));
+
+                strFileName = PrettyFormatting.ExtractWorkingName(strTempName, _oSettings.LeadingName, _oSettings.WorkingNameReplace, _oSettings.WorkingNameReplaceWith);
+                if (!String.IsNullOrEmpty(output.Filename))
+                    output.Filename = Path.Combine(Path.GetDirectoryName(output.Filename), strFileName + "." + ((ContainerType)containerFormat.SelectedItem).Extension);
+            }
+            
+            if (bUpdateFilePath || String.IsNullOrEmpty(output.Filename))
+            {
+                if (!String.IsNullOrEmpty(_oSettings.DefaultOutputDirectory) && Directory.Exists(_oSettings.DefaultOutputDirectory))
+                {
+                    output.Filename = Path.Combine(_oSettings.DefaultOutputDirectory, strFileName + "." +
+                        ((ContainerType)containerFormat.SelectedItem).Extension);
                 }
                 else
                 {
-                    output.Filename = Path.ChangeExtension(output.Filename, ((ContainerType)containerFormat.SelectedItem).Extension);
+                    string outputPath = FileUtil.GetOutputFolder(strInputFile);
+                    output.Filename = Path.Combine(outputPath, strFileName + "." +
+                        ((ContainerType)containerFormat.SelectedItem).Extension);
                 }
-                outputChosen = false;
             }
-            else
-            {
-                output.Filename = Path.ChangeExtension(output.Filename, ((ContainerType)containerFormat.SelectedItem).Extension);
-            }
-            output.Filter = ((ContainerType)containerFormat.SelectedItem).OutputFilterString;
+            else if (bUpdateExtension)
+                output.Filename = Path.ChangeExtension(output.Filename, ((ContainerType)containerFormat.SelectedItem).Extension); 
         }
 
         private void input_SelectionChanged(object sender, string val)
@@ -352,32 +335,20 @@ namespace MeGUI
 
         private void setOutput(string strFileName)
         {
-            output.Filename = strFileName;
-            output_FileSelected(null, null);  
-        }
-
-        private void output_FileSelected(FileBar sender, FileBarEventArgs args)
-        {
-            outputChosen = true;
-            updateFilename();
+            output.Filename = strFileName; 
         }
 
         private void setWorkingDirectory(string strFolder)
         {
             workingDirectory.Filename = strFolder;
-            updateFilename();
+            updateFilename(false, true, false);
         }
 
         private void workingDirectory_FileSelected(FileBar sender, FileBarEventArgs args)
         {
             if (File.Exists(workingDirectory.Filename))
                 workingDirectory.Filename = Path.GetDirectoryName(workingDirectory.Filename);
-            updateFilename();
-        }
-
-        private void workingName_TextChanged(object sender, EventArgs e)
-        {
-            updateFilename();
+            updateFilename(false, true, false);
         }
 
         private void setControlState(bool bDisableControls)
@@ -525,7 +496,7 @@ namespace MeGUI
                     workingDirectory.Filename = strPath;
             }
 
-            updateWorkingName(iFile.FileName);
+            updateFilename(false, false, true);
 
             if (_oSettings.DAR.HasValue)
                 this.ar.Value = _oSettings.DAR;
@@ -643,6 +614,7 @@ namespace MeGUI
             if (supportedOutputTypes.Count > 0)
             {
                 ContainerType cType = (ContainerType)this.containerFormat.SelectedItem;
+                this.containerFormat.SelectedIndexChanged -= new System.EventHandler(this.containerFormat_SelectedIndexChanged);
                 this.containerFormat.Items.Clear();
                 this.containerFormat.Items.AddRange(supportedOutputTypes.ToArray());
                 bool bFound = false;
@@ -655,9 +627,9 @@ namespace MeGUI
                         break;
                     }
                 }
+                this.containerFormat.SelectedIndexChanged += new System.EventHandler(this.containerFormat_SelectedIndexChanged);
                 if (!bFound)
                     this.containerFormat.SelectedIndex = 0;
-                this.output.Filename = Path.ChangeExtension(output.Filename, (this.containerFormat.SelectedItem as ContainerType).Extension);
             }
             beingCalled = 0;
         }
@@ -715,10 +687,8 @@ namespace MeGUI
 
             // clean up after those settings were set
             updatePossibleContainers();
-            containerFormat_SelectedIndexChanged(null, null);
 
-            if (!string.IsNullOrEmpty(input.SelectedText))
-                updateWorkingName(input.SelectedText);
+            updateFilename(true, true, true);
 
             if (settings.DAR != null)
                 ar.Value = settings.DAR.Value;
@@ -1436,7 +1406,7 @@ namespace MeGUI
             {   
                 string indexFile = string.Empty;
                 IndexJob job = null;
-                indexFile = Path.Combine(dpp.WorkingDirectory, workingName.Text + ".d2v");
+                indexFile = Path.Combine(dpp.WorkingDirectory, Path.GetFileNameWithoutExtension(output.Filename) + ".d2v");
                 job = new D2VIndexJob(dpp.VideoInput, indexFile, 2, arrAudioTrackInfo, false, false);
                 OneClickPostProcessingJob ocJob = new OneClickPostProcessingJob(dpp.VideoInput, indexFile, dpp);
                 finalJobChain = new SequentialChain(prepareJobs, new SequentialChain(job), new SequentialChain(ocJob));
@@ -1448,7 +1418,7 @@ namespace MeGUI
             {
                 string indexFile = string.Empty;
                 if (dpp.IndexType == FileIndexerWindow.IndexType.DGI || dpp.IndexType == FileIndexerWindow.IndexType.DGM)
-                    indexFile = Path.Combine(dpp.WorkingDirectory, workingName.Text + ".dgi");
+                    indexFile = Path.Combine(dpp.WorkingDirectory, Path.GetFileNameWithoutExtension(output.Filename) + ".dgi");
                 else if (dpp.IndexType == FileIndexerWindow.IndexType.LSMASH)
                     indexFile = Path.Combine(dpp.WorkingDirectory, Path.GetFileName(dpp.VideoInput) + ".lwi");
                 else
@@ -1573,7 +1543,7 @@ namespace MeGUI
                 return false;
             }
 
-            if ((verifyStreamSettings() != null) || (VideoSettings == null) || string.IsNullOrEmpty(workingName.Text))
+            if (verifyStreamSettings() != null || VideoSettings == null)
             {
                 if (bAutomatedProcessing)
                     _oLog.LogEvent("cannot process this job");
