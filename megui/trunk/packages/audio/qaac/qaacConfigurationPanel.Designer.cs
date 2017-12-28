@@ -101,10 +101,11 @@ namespace MeGUI.packages.audio.qaac
             // trackBar
             // 
             this.trackBar.Location = new System.Drawing.Point(3, 50);
-            this.trackBar.Maximum = 127;
+            this.trackBar.Maximum = 1280;
             this.trackBar.Name = "trackBar";
             this.trackBar.Size = new System.Drawing.Size(393, 45);
             this.trackBar.TabIndex = 2;
+            this.trackBar.TickFrequency = 36;
             this.trackBar.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
             this.trackBar.Value = 90;
             this.trackBar.ValueChanged += new System.EventHandler(this.trackBar1_ValueChanged);
