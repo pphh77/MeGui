@@ -1694,11 +1694,6 @@ namespace MeGUI
 
 
         // Subtitle Track Handling
-        private void subtitleMenu_Opening(object sender, CancelEventArgs e)
-        {
-            subtitleRemoveTrack.Enabled = (iSelectedSubtitleTabPage != subtitleTracks.Count);
-        }
-
         private void subtitleAddTrack_Click(object sender, EventArgs e)
         {
             SubtitleAddTrack(true);
@@ -1713,7 +1708,7 @@ namespace MeGUI
         {
             beingCalled++;
 
-            TabPage p = new TabPage("Subtitle " + (subtitleTracks.Count + 1));
+            TabPage p = new TabPage("Subtitle " + (iSelectedSubtitleTabPage + 1));
             p.UseVisualStyleBackColor = subtitlesTab.TabPages[0].UseVisualStyleBackColor;
             p.Padding = subtitlesTab.TabPages[0].Padding;
 
@@ -1748,9 +1743,12 @@ namespace MeGUI
             if (this.Visible)
                 a.enableDragDrop();
 
-            subtitlesTab.TabPages.Insert(subtitlesTab.TabCount - 1, p);
+            subtitlesTab.TabPages.Insert(iSelectedSubtitleTabPage + 1, p);
+            subtitleTracks.Insert(iSelectedSubtitleTabPage + 1, a);
             p.Controls.Add(a);
-            subtitleTracks.Add(a);
+
+            for (int j = 0; j < subtitlesTab.TabCount - 2; j++)
+                subtitlesTab.TabPages[j].Text = "Subtitle " + (j + 1);
 
             if (bChangeFocus)
                 subtitlesTab.SelectedTab = p;
@@ -1761,44 +1759,38 @@ namespace MeGUI
 
         private void SubtitleRemoveTrack(int iTabPageIndex)
         {
-            if (iTabPageIndex == subtitlesTab.TabCount - 1)
+            if (iTabPageIndex >= subtitlesTab.TabCount - 2)
                 return;
 
             beingCalled++;
 
-            if (iTabPageIndex == 0 && subtitlesTab.TabCount == 1)
+            if (iTabPageIndex == 0 && subtitlesTab.TabCount == 2)
                 SubtitleAddTrack(true);
 
             subtitlesTab.TabPages.RemoveAt(iTabPageIndex);
             subtitleTracks.RemoveAt(iTabPageIndex);
 
-            for (int i = 0; i < subtitlesTab.TabCount - 1; i++)
+            for (int i = 0; i < subtitlesTab.TabCount - 2; i++)
                 subtitlesTab.TabPages[i].Text = "Subtitle " + (i + 1);
+
+            if (iTabPageIndex < subtitlesTab.TabCount - 2)
+                subtitlesTab.SelectedIndex = iTabPageIndex;
+            else
+                subtitlesTab.SelectedIndex = subtitlesTab.TabCount - 3;
 
             beingCalled--;
             updatePossibleContainers();
         }
 
-        private void chkDefaultStream_CheckedChanged(object sender, EventArgs e)
-        {
-            if (((CheckBox)sender).Checked == false)
-                return;
 
-            foreach (OneClickStreamControl oTrack in subtitleTracks)
-            {
-                if (sender != oTrack.chkDefaultStream && oTrack.chkDefaultStream.Checked == true)
-                    oTrack.chkDefaultStream.Checked = false;
-            }
-        }
-
-        private int iSelectedSubtitleTabPage = -1;
+        private int iSelectedSubtitleTabPage = 0;
         private void subtitlesTab_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Right)
                 return;
 
             Point p = e.Location;
-            for (int i = 0; i < subtitlesTab.TabCount; i++)
+            for (int i = 0; i < subtitlesTab.TabCount - 2; i++)
             {
                 Rectangle rect = subtitlesTab.GetTabRect(i);
                 rect.Offset(2, 2);
@@ -1856,10 +1848,10 @@ namespace MeGUI
             subtitleTracks[0].CustomStreams = new object[0];
             subtitleTracks[0].SelectedStreamIndex = 0;
 
-            // delete all tracks beside the first and last one
+            // delete all tracks beside the first one and the last two
             try
             {
-                while (subtitlesTab.TabCount > 2)
+                while (subtitlesTab.TabCount > 3)
                     subtitlesTab.TabPages.RemoveAt(1);
             }
             catch (Exception) {}
@@ -1899,13 +1891,19 @@ namespace MeGUI
             SubtitleAddTrack(true);
         }
 
-
-        // Audio Track Handling
-        private void audioMenu_Opening(object sender, CancelEventArgs e)
+        private void chkDefaultStream_CheckedChanged(object sender, EventArgs e)
         {
-            audioRemoveTrack.Enabled = (iSelectedAudioTabPage != audioTracks.Count);
+            if (((CheckBox)sender).Checked == false)
+                return;
+
+            foreach (OneClickStreamControl oTrack in subtitleTracks)
+            {
+                if (sender != oTrack.chkDefaultStream && oTrack.chkDefaultStream.Checked == true)
+                    oTrack.chkDefaultStream.Checked = false;
+            }
         }
 
+        // Audio Track Handling
         private void audioAddTrack_Click(object sender, EventArgs e)
         {
             AudioAddTrack(true);
@@ -1920,7 +1918,7 @@ namespace MeGUI
         {
             beingCalled++;
 
-            TabPage p = new TabPage("Audio " + (audioTracks.Count + 1));
+            TabPage p = new TabPage("Audio " + (iSelectedAudioTabPage + 1));
             p.UseVisualStyleBackColor = audioTab.TabPages[0].UseVisualStyleBackColor;
             p.Padding = audioTab.TabPages[0].Padding;
 
@@ -1956,9 +1954,12 @@ namespace MeGUI
             if (this.Visible)
                 a.enableDragDrop();
 
-            audioTab.TabPages.Insert(audioTab.TabCount - 1, p);
+            audioTab.TabPages.Insert(iSelectedAudioTabPage + 1, p);
+            audioTracks.Insert(iSelectedAudioTabPage + 1, a);
             p.Controls.Add(a);
-            audioTracks.Add(a);
+
+            for (int j = 0; j < audioTab.TabCount - 2; j++)
+                audioTab.TabPages[j].Text = "Audio " + (j + 1);
 
             if (bChangeFocus)
                 audioTab.SelectedTab = p;
@@ -1969,32 +1970,37 @@ namespace MeGUI
 
         private void AudioRemoveTrack(int iTabPageIndex)
         {
-            if (iTabPageIndex == audioTab.TabCount - 1)
+            if (iTabPageIndex >= audioTab.TabCount - 2)
                 return;
 
             beingCalled++;
 
-            if (iTabPageIndex == 0 && subtitlesTab.TabCount == 1)
+            if (iTabPageIndex == 0 && audioTab.TabCount == 2)
                 AudioAddTrack(true);
 
             audioTab.TabPages.RemoveAt(iTabPageIndex);
             audioTracks.RemoveAt(iTabPageIndex);
 
-            for (int i = 0; i < audioTab.TabCount - 1; i++)
+            for (int i = 0; i < audioTab.TabCount - 2; i++)
                 audioTab.TabPages[i].Text = "Audio " + (i + 1);
+
+            if (iTabPageIndex < audioTab.TabCount - 2)
+                audioTab.SelectedIndex = iTabPageIndex;
+            else
+                audioTab.SelectedIndex = audioTab.TabCount - 3;
 
             beingCalled--;
             updatePossibleContainers();
         }
 
-        private int iSelectedAudioTabPage = -1;
+        private int iSelectedAudioTabPage = 0;
         private void audioTab_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Right)
                 return;
 
             Point p = e.Location;
-            for (int i = 0; i < audioTab.TabCount; i++)
+            for (int i = 0; i < audioTab.TabCount - 2; i++)
             {
                 Rectangle rect = audioTab.GetTabRect(i);
                 rect.Offset(2, 2);
@@ -2055,10 +2061,10 @@ namespace MeGUI
             audioTracks[0].CustomStreams = new object[0];
             audioTracks[0].SelectedStreamIndex = 0;
 
-            // delete all tracks beside the first and last one
+            // delete all tracks beside the first one and the last two
             try
             {
-                while (audioTab.TabCount > 2)
+                while (audioTab.TabCount > 3)
                     audioTab.TabPages.RemoveAt(1);
             }
             catch (Exception) {}
@@ -2200,12 +2206,20 @@ namespace MeGUI
         {
             if (audioTab.SelectedTab.Text.Equals("   +"))
                 AudioAddTrack(true);
+            else if (audioTab.SelectedTab.Text.Equals("    -"))
+                AudioRemoveTrack(iSelectedAudioTabPage);
+            else
+                iSelectedAudioTabPage = audioTab.SelectedIndex;
         }
 
         private void subtitlesTab_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (subtitlesTab.SelectedTab.Text.Equals("   +"))
                 SubtitleAddTrack(true);
+            else if (subtitlesTab.SelectedTab.Text.Equals("    -"))
+                SubtitleRemoveTrack(iSelectedSubtitleTabPage);
+            else
+                iSelectedSubtitleTabPage = subtitlesTab.SelectedIndex;
         }
 
         /// <summary>

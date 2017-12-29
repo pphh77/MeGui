@@ -142,7 +142,7 @@ namespace MeGUI
                     if (File.Exists(Path.Combine(Path.GetDirectoryName(projectName), audioTracks[counter].DemuxFileName)))
                     {
                         string file = Path.Combine(Path.GetDirectoryName(projectName), audioTracks[counter].DemuxFileName);
-                        if (!audioFiles.ContainsValue(file))
+                        if (!audioFiles.ContainsValue(file) && !audioFiles.ContainsKey(audioTracks[counter].TrackID))
                             audioFiles.Add(audioTracks[counter].TrackID, file);
                         continue;
                     }

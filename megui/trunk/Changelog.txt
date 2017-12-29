@@ -1,3 +1,4 @@
+2808 [OneClick]             added button to remove tracks. feature request #632
 2807 [OneClick]             fixed output file path is not updated properly. bug #891
                             removed "project name" and moved the video track name to the "advanced config" page
 2806 [QAAC]                 increased maximum bitrate to 1280. feature request #631

@@ -65,6 +65,7 @@ namespace MeGUI
             this.audioTab = new System.Windows.Forms.TabControl();
             this.audioPage0 = new System.Windows.Forms.TabPage();
             this.oneClickAudioStreamControl1 = new MeGUI.OneClickStreamControl();
+            this.tabPage6 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.subtitlesTab = new System.Windows.Forms.TabControl();
             this.subPage0 = new System.Windows.Forms.TabPage();
@@ -116,6 +117,7 @@ namespace MeGUI
             this.openOnQueue = new System.Windows.Forms.CheckBox();
             this.cbGUIMode = new System.Windows.Forms.ComboBox();
             this.helpButton1 = new MeGUI.core.gui.HelpButton();
+            this.tabPage7 = new System.Windows.Forms.TabPage();
             label1 = new System.Windows.Forms.Label();
             this.tabPage1.SuspendLayout();
             this.outputTab.SuspendLayout();
@@ -276,6 +278,7 @@ namespace MeGUI
             this.audioTab.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.audioTab.Controls.Add(this.audioPage0);
+            this.audioTab.Controls.Add(this.tabPage6);
             this.audioTab.Controls.Add(this.tabPage2);
             this.audioTab.Location = new System.Drawing.Point(6, 77);
             this.audioTab.Name = "audioTab";
@@ -313,6 +316,15 @@ namespace MeGUI
             this.oneClickAudioStreamControl1.TrackNumber = 1;
             this.oneClickAudioStreamControl1.FileUpdated += new System.EventHandler(this.oneClickAudioStreamControl_FileUpdated);
             // 
+            // tabPage6
+            // 
+            this.tabPage6.Location = new System.Drawing.Point(4, 22);
+            this.tabPage6.Name = "tabPage6";
+            this.tabPage6.Size = new System.Drawing.Size(444, 149);
+            this.tabPage6.TabIndex = 4;
+            this.tabPage6.Text = "    -";
+            this.tabPage6.UseVisualStyleBackColor = true;
+            // 
             // tabPage2
             // 
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
@@ -328,6 +340,7 @@ namespace MeGUI
             this.subtitlesTab.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.subtitlesTab.Controls.Add(this.subPage0);
+            this.subtitlesTab.Controls.Add(this.tabPage7);
             this.subtitlesTab.Controls.Add(this.tabPage5);
             this.subtitlesTab.Location = new System.Drawing.Point(6, 258);
             this.subtitlesTab.Name = "subtitlesTab";
@@ -382,7 +395,6 @@ namespace MeGUI
             this.subtitleRemoveTrack});
             this.subtitleMenu.Name = "subtitleMenu";
             this.subtitleMenu.Size = new System.Drawing.Size(149, 48);
-            this.subtitleMenu.Opening += new System.ComponentModel.CancelEventHandler(this.subtitleMenu_Opening);
             // 
             // subtitleAddTrack
             // 
@@ -405,7 +417,6 @@ namespace MeGUI
             this.audioRemoveTrack});
             this.audioMenu.Name = "audioMenu";
             this.audioMenu.Size = new System.Drawing.Size(149, 48);
-            this.audioMenu.Opening += new System.ComponentModel.CancelEventHandler(this.audioMenu_Opening);
             // 
             // audioAddTrack
             // 
@@ -883,6 +894,15 @@ namespace MeGUI
             this.helpButton1.Size = new System.Drawing.Size(38, 23);
             this.helpButton1.TabIndex = 32;
             // 
+            // tabPage7
+            // 
+            this.tabPage7.Location = new System.Drawing.Point(4, 22);
+            this.tabPage7.Name = "tabPage7";
+            this.tabPage7.Size = new System.Drawing.Size(444, 89);
+            this.tabPage7.TabIndex = 4;
+            this.tabPage7.Text = "    -";
+            this.tabPage7.UseVisualStyleBackColor = true;
+            // 
             // OneClickWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -996,5 +1016,7 @@ namespace MeGUI
         private System.Windows.Forms.Button deleteWorking;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox inputName;
+        private System.Windows.Forms.TabPage tabPage6;
+        private System.Windows.Forms.TabPage tabPage7;
     }
 }
