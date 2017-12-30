@@ -1,3 +1,43 @@
+2808 [OneClick]             added button to remove tracks. feature request #632
+2807 [OneClick]             fixed output file path is not updated properly. bug #891
+                            removed "project name" and moved the video track name to the "advanced config" page
+2806 [QAAC]                 increased maximum bitrate to 1280. feature request #631
+2805 [Update]               added a first startup question if the updater should be enabled or disabled (message will be shown also once to existing users)
+                            if disabled no downloads will be made without confirmation. therefore e.g. no information of new updates will be available.
+2804 [OneClick] + [FileIndexer] show playlist selection window for DVD/Blu-ray structures also if only one playlist is found
+2803 [HD Streams Extractor] added support for "E-AC3 Surround"
+2802 [OneClick]             enhanced suitable container type detection
+2801 [OneClick]             fixed video name not written sometimes (regression of 2791). bug #901
+2800 [L-SMASH Indexer]      improved detection of LSMASH/LWLibav (regression of 2767). bug #899
+2799 [OneClick]             fixed PCM handling. bug #900
+2798 [OneClick]             fixed MPLS handling (regression of 2790)
+2797 [Language]             added "reserved for local use"/qaa language support
+2796 [Chapter]              added UHD Blu-ray support
+2795 [MessageBoxEx]         cosmetics
+2794 [MessageBoxEx]         removed external dependency to MessageBoxExLib.dll
+2793 [AVS Script Creator]   added information about DirectShowSource/AVISource when opening a file
+2792 [File Indexer]         removed the container warning when using the FFMS indexer
+2791 [OneClick]             added video track name. feature request #537
+                            removed the possibility to delete tracks with DEL/BACKSPACE
+2790 [File Indexer]         fixed MPLS handling (regression of 2787)
+2789 [Chapter]              fixed non-ASCII handling (regression of 2753). bug #898
+2788 [x264]                 adjusted --b-adapt default value for "--preset slow"
+2787 [AVS Script Creator]   added mpls as supported input type
+     [File Indexer]         added mpls as supported input type
+     [File Indexer]         do not reset the output path when selecting a different indexer if the path has already been set
+2786 [DGIndex* Indexer]     all: support absolute paths in the index files when written with Full_Path_In_Files=0
+                            IM/NV: ensure that ResponseOnAudioMismatch=0 is not set (if set, it will be set to 1)
+2785 [Nero AAC Encoder]     if VBR is used the profile will automatically be selected
+2784 [AVS Script Creator]   fixed DirectShowSource/AVISource not available if the portable AviSynth is used (regression of 2761). bug #896
+                            DirectShowSource/AVISource are disabled by default and have to be enabled in the MeGUI settings
+2783 [AVS Script Creator]   improved the file extension filters of the "video input" file open dialogue
+2782 [L-SMASH Indexer]      delete always the index file after it has been copied (and not only when "delete intermediate files" is selected)(regression of 2757)
+2781 [Settings]             removed "improved AVS opening" setting. It is now always enabled.
+2780 [Update]               removed the abort button
+2779 [Xvid]                 added a workaround to be able to use Xvid in portable AviSynth mode
+2778 [Chapter]              fixed non-ASCII handling (regression of 2753). bug #898
+2777 [Settings]             changed the default value of "delete completed jobs" to be enabled
+2776 [OneClick]             added support for MKV attachments. If the MKV source does have such attachments, it will be copied to the target MKV. feature request #617
 2774 [Chapter]              fixed XML chapter handling. part II (regression of 2753). bug #894
 2773 [Chapter]              fixed XML chapter handling (regression of 2753). bug #894
 2772 [MKV Muxer]            adjusted delay syntax (requires mkvmerge 17.0+)
