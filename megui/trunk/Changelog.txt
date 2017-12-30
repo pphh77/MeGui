@@ -1,3 +1,5 @@
+2810                        added High DPI support
+
 Changelog 2774 --> 2808
 
 Features/Changes:
@@ -16,9 +18,8 @@ Enhancements/Fixes:
 
 
 Known Problems:
-- Windows XP and older is not supported
+- Windows Vista and older is not supported
 - Unicode is not supported
-- non default DPI values are not supported
 - M2TS bitrate calculator does not calculate correct values as the specifications are unknown
 
 Full changelog: 

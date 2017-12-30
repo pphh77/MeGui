@@ -61,17 +61,17 @@ namespace MeGUI
             this.filename.Margin = new System.Windows.Forms.Padding(0);
             this.filename.Name = "filename";
             this.filename.ReadOnly = true;
-            this.filename.Size = new System.Drawing.Size(239, 20);
+            this.filename.Size = new System.Drawing.Size(240, 20);
             this.filename.TabIndex = 5;
             this.filename.TextChanged += new System.EventHandler(this.filename_TextChanged);
             // 
             // openButton
             // 
-            this.openButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.openButton.Location = new System.Drawing.Point(242, 1);
-            this.openButton.Margin = new System.Windows.Forms.Padding(3, 1, 1, 1);
+            this.openButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.openButton.Location = new System.Drawing.Point(243, 3);
+            this.openButton.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
             this.openButton.Name = "openButton";
-            this.openButton.Size = new System.Drawing.Size(26, 23);
+            this.openButton.Size = new System.Drawing.Size(26, 20);
             this.openButton.TabIndex = 1;
             this.openButton.Text = "...";
             this.openButton.Click += new System.EventHandler(this.openButton_Click);
@@ -94,8 +94,8 @@ namespace MeGUI
             // 
             // FileBar
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "FileBar";
             this.Size = new System.Drawing.Size(269, 26);

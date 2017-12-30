@@ -37,6 +37,7 @@ namespace MeGUI.core.gui
         public ProfilePorter()
         {
             InitializeComponent();
+            profileList.Height = 288;
         }
 
         private static object[] profilesToObjects(Profile[] ps)

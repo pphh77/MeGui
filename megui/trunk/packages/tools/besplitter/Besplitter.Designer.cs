@@ -68,8 +68,8 @@ namespace MeGUI.packages.tools.besplitter
             // 
             // input
             // 
-            this.input.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.input.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.input.Filename = "";
             this.input.Filter = "";
             this.input.FilterIndex = 0;
@@ -85,8 +85,8 @@ namespace MeGUI.packages.tools.besplitter
             // 
             // cuts
             // 
-            this.cuts.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.cuts.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.cuts.Filename = "";
             this.cuts.Filter = "MeGUI cutlist files (*.clt)|*.clt";
             this.cuts.FilterIndex = 0;
@@ -101,8 +101,8 @@ namespace MeGUI.packages.tools.besplitter
             // 
             // output
             // 
-            this.output.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.output.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.output.Filename = "";
             this.output.Filter = null;
             this.output.FilterIndex = 0;
@@ -140,8 +140,8 @@ namespace MeGUI.packages.tools.besplitter
             // 
             // Besplitter
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(309, 191);
             this.Controls.Add(this.helpButton1);
             this.Controls.Add(this.goButton);

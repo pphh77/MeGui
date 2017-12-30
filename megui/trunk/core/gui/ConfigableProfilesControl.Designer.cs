@@ -53,7 +53,7 @@ namespace MeGUI.core.gui
             // 
             // config
             // 
-            this.config.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.config.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.config.AutoSize = true;
             this.config.Location = new System.Drawing.Point(194, 0);
             this.config.Margin = new System.Windows.Forms.Padding(5, 0, 0, 0);
@@ -68,7 +68,9 @@ namespace MeGUI.core.gui
             // 
             // ConfigableProfilesControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.Margin = new System.Windows.Forms.Padding(3);
             this.Name = "ConfigableProfilesControl";
             this.Size = new System.Drawing.Size(241, 22);
             this.ResumeLayout(false);

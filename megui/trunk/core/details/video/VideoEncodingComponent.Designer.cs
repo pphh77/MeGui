@@ -92,9 +92,9 @@ namespace MeGUI
             this.queueVideoButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.queueVideoButton.AutoSize = true;
             this.queueVideoButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.queueVideoButton.Location = new System.Drawing.Point(428, 121);
+            this.queueVideoButton.Location = new System.Drawing.Point(432, 121);
             this.queueVideoButton.Name = "queueVideoButton";
-            this.queueVideoButton.Size = new System.Drawing.Size(53, 23);
+            this.queueVideoButton.Size = new System.Drawing.Size(49, 23);
             this.queueVideoButton.TabIndex = 11;
             this.queueVideoButton.Text = "Queue";
             this.queueVideoButton.Click += new System.EventHandler(this.queueVideoButton_Click);
@@ -104,9 +104,9 @@ namespace MeGUI
             this.addAnalysisPass.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.addAnalysisPass.AutoSize = true;
             this.addAnalysisPass.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.addAnalysisPass.Location = new System.Drawing.Point(282, 121);
+            this.addAnalysisPass.Location = new System.Drawing.Point(284, 121);
             this.addAnalysisPass.Name = "addAnalysisPass";
-            this.addAnalysisPass.Size = new System.Drawing.Size(140, 23);
+            this.addAnalysisPass.Size = new System.Drawing.Size(142, 23);
             this.addAnalysisPass.TabIndex = 9;
             this.addAnalysisPass.Text = "Queue Analysis Pass";
             this.addAnalysisPass.UseVisualStyleBackColor = true;
@@ -121,7 +121,7 @@ namespace MeGUI
             this.groupBox1.Size = new System.Drawing.Size(490, 168);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Video encoding";
+            this.groupBox1.Text = " Video encoding ";
             // 
             // tableLayoutPanel1
             // 
@@ -170,10 +170,9 @@ namespace MeGUI
             this.editZonesButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.editZonesButton.AutoSize = true;
             this.editZonesButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.editZonesButton.Location = new System.Drawing.Point(431, 90);
-            this.editZonesButton.Margin = new System.Windows.Forms.Padding(6, 3, 6, 3);
+            this.editZonesButton.Location = new System.Drawing.Point(432, 90);
             this.editZonesButton.Name = "editZonesButton";
-            this.editZonesButton.Size = new System.Drawing.Size(47, 23);
+            this.editZonesButton.Size = new System.Drawing.Size(49, 23);
             this.editZonesButton.TabIndex = 13;
             this.editZonesButton.Text = "Zones";
             this.editZonesButton.UseVisualStyleBackColor = true;
@@ -181,8 +180,8 @@ namespace MeGUI
             // 
             // videoProfile
             // 
+            this.videoProfile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.SetColumnSpan(this.videoProfile, 3);
-            this.videoProfile.Dock = System.Windows.Forms.DockStyle.Fill;
             this.videoProfile.Location = new System.Drawing.Point(136, 61);
             this.videoProfile.Name = "videoProfile";
             this.videoProfile.ProfileSet = "Video";
@@ -203,8 +202,8 @@ namespace MeGUI
             // videoInput
             // 
             this.videoInput.AllowDrop = true;
+            this.videoInput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.SetColumnSpan(this.videoInput, 3);
-            this.videoInput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.videoInput.Filename = "";
             this.videoInput.Filter = "AviSynth files (*.avs)|*.avs|All files (*.*)|*.*";
             this.videoInput.FilterIndex = 0;
@@ -220,8 +219,8 @@ namespace MeGUI
             // 
             // videoOutput
             // 
+            this.videoOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.SetColumnSpan(this.videoOutput, 3);
-            this.videoOutput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.videoOutput.Filename = "";
             this.videoOutput.Filter = null;
             this.videoOutput.FilterIndex = 0;
@@ -239,9 +238,10 @@ namespace MeGUI
             // 
             this.fileType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.fileType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.fileType.Location = new System.Drawing.Point(136, 91);
+            this.fileType.Location = new System.Drawing.Point(137, 91);
+            this.fileType.Margin = new System.Windows.Forms.Padding(4, 3, 3, 3);
             this.fileType.Name = "fileType";
-            this.fileType.Size = new System.Drawing.Size(140, 21);
+            this.fileType.Size = new System.Drawing.Size(141, 21);
             this.fileType.Sorted = true;
             this.fileType.TabIndex = 14;
             this.fileType.SelectedIndexChanged += new System.EventHandler(this.fileType_SelectedIndexChanged);
@@ -253,7 +253,7 @@ namespace MeGUI
             this.videopreview.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.videopreview.Location = new System.Drawing.Point(136, 121);
             this.videopreview.Name = "videopreview";
-            this.videopreview.Size = new System.Drawing.Size(140, 23);
+            this.videopreview.Size = new System.Drawing.Size(142, 23);
             this.videopreview.TabIndex = 16;
             this.videopreview.Text = "Reopen Video Preview";
             this.videopreview.UseVisualStyleBackColor = true;
@@ -261,7 +261,7 @@ namespace MeGUI
             // 
             // addPrerenderJob
             // 
-            this.addPrerenderJob.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.addPrerenderJob.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.addPrerenderJob.AutoSize = true;
             this.addPrerenderJob.Location = new System.Drawing.Point(3, 124);
             this.addPrerenderJob.Name = "addPrerenderJob";
@@ -272,8 +272,8 @@ namespace MeGUI
             // 
             // VideoEncodingComponent
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.Controls.Add(this.groupBox1);
             this.Name = "VideoEncodingComponent";
             this.Size = new System.Drawing.Size(490, 168);

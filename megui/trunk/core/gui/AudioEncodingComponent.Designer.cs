@@ -52,7 +52,7 @@ namespace MeGUI
             this.groupBox1.Size = new System.Drawing.Size(515, 230);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Audio";
+            this.groupBox1.Text = " Audio encoding ";
             // 
             // contextMenuStrip1
             // 
@@ -60,20 +60,20 @@ namespace MeGUI
             this.newTrackToolStripMenuItem,
             this.removeTrackToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(141, 48);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(147, 48);
             this.contextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip1_Opening);
             // 
             // newTrackToolStripMenuItem
             // 
             this.newTrackToolStripMenuItem.Name = "newTrackToolStripMenuItem";
-            this.newTrackToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+            this.newTrackToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.newTrackToolStripMenuItem.Text = "New track";
             this.newTrackToolStripMenuItem.Click += new System.EventHandler(this.newTrackToolStripMenuItem_Click);
             // 
             // removeTrackToolStripMenuItem
             // 
             this.removeTrackToolStripMenuItem.Name = "removeTrackToolStripMenuItem";
-            this.removeTrackToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+            this.removeTrackToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.removeTrackToolStripMenuItem.Text = "Remove track";
             this.removeTrackToolStripMenuItem.Click += new System.EventHandler(this.removeTrackToolStripMenuItem_Click);
             // 
@@ -99,16 +99,19 @@ namespace MeGUI
             // 
             // audioEncodingTab1
             // 
+            this.audioEncodingTab1.AudioContainer = "";
             this.audioEncodingTab1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.audioEncodingTab1.Location = new System.Drawing.Point(3, 3);
             this.audioEncodingTab1.Name = "audioEncodingTab1";
+            this.audioEncodingTab1.QueueButtonText = "Queue";
+            this.audioEncodingTab1.ShowReset = true;
             this.audioEncodingTab1.Size = new System.Drawing.Size(495, 179);
             this.audioEncodingTab1.TabIndex = 0;
             // 
             // AudioEncodingComponent
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.AutoScroll = true;
             this.Controls.Add(this.groupBox1);
             this.Name = "AudioEncodingComponent";

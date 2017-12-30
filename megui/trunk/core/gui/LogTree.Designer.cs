@@ -44,8 +44,8 @@ namespace MeGUI.core.gui
             this.collapseAllSubitemsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.collapseLog = new System.Windows.Forms.ToolStripMenuItem();
             this.collapseBranch = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveDialog = new System.Windows.Forms.SaveFileDialog();
             this.resetOverlayIcon = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveDialog = new System.Windows.Forms.SaveFileDialog();
             this.contextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -170,12 +170,6 @@ namespace MeGUI.core.gui
             this.collapseBranch.Text = "of branch";
             this.collapseBranch.Click += new System.EventHandler(this.CollapseBranch_Click);
             // 
-            // saveDialog
-            // 
-            this.saveDialog.Filter = "Log files (*.log)|*.log|All files (*.*)|*.*";
-            this.saveDialog.FilterIndex = 0;
-            this.saveDialog.Title = "Select output file";
-            // 
             // resetOverlayIcon
             // 
             this.resetOverlayIcon.Name = "resetOverlayIcon";
@@ -184,10 +178,16 @@ namespace MeGUI.core.gui
             this.resetOverlayIcon.ToolTipText = "Removes the applied error or warning icon from the taskbar";
             this.resetOverlayIcon.Click += new System.EventHandler(this.ResetOverlayIcon_Click);
             // 
+            // saveDialog
+            // 
+            this.saveDialog.Filter = "Log files (*.log)|*.log|All files (*.*)|*.*";
+            this.saveDialog.FilterIndex = 0;
+            this.saveDialog.Title = "Select output file";
+            // 
             // LogTree
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.Controls.Add(this.treeView);
             this.Name = "LogTree";
             this.Size = new System.Drawing.Size(596, 478);

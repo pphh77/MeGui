@@ -61,6 +61,8 @@ namespace MeGUI.packages.tools.oneclick
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.ARLabel = new System.Windows.Forms.Label();
+            this.ar = new MeGUI.core.gui.ARChooser();
             this.chkDontEncodeVideo = new System.Windows.Forms.CheckBox();
             this.usechaptersmarks = new System.Windows.Forms.CheckBox();
             this.videoProfile = new MeGUI.core.gui.ConfigableProfilesControl();
@@ -120,8 +122,6 @@ namespace MeGUI.packages.tools.oneclick
             this.audioMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.audioAddTrack = new System.Windows.Forms.ToolStripMenuItem();
             this.audioRemoveTrack = new System.Windows.Forms.ToolStripMenuItem();
-            this.ar = new MeGUI.core.gui.ARChooser();
-            this.ARLabel = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
             this.otherGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.horizontalResolution)).BeginInit();
@@ -298,6 +298,29 @@ namespace MeGUI.packages.tools.oneclick
             this.groupBox6.TabIndex = 47;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = " Video Setup ";
+            // 
+            // ARLabel
+            // 
+            this.ARLabel.AutoSize = true;
+            this.ARLabel.Location = new System.Drawing.Point(6, 80);
+            this.ARLabel.Name = "ARLabel";
+            this.ARLabel.Size = new System.Drawing.Size(87, 13);
+            this.ARLabel.TabIndex = 45;
+            this.ARLabel.Text = "Force Input DAR";
+            // 
+            // ar
+            // 
+            this.ar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ar.CustomDARs = new MeGUI.core.util.Dar[0];
+            this.ar.HasLater = true;
+            this.ar.Location = new System.Drawing.Point(99, 72);
+            this.ar.MaximumSize = new System.Drawing.Size(1000, 29);
+            this.ar.MinimumSize = new System.Drawing.Size(64, 29);
+            this.ar.Name = "ar";
+            this.ar.SelectedIndex = 0;
+            this.ar.Size = new System.Drawing.Size(308, 29);
+            this.ar.TabIndex = 44;
             // 
             // chkDontEncodeVideo
             // 
@@ -909,33 +932,10 @@ namespace MeGUI.packages.tools.oneclick
             this.audioRemoveTrack.Text = "Remove Track";
             this.audioRemoveTrack.Click += new System.EventHandler(this.audioRemoveTrack_Click);
             // 
-            // ar
-            // 
-            this.ar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ar.CustomDARs = new MeGUI.core.util.Dar[0];
-            this.ar.HasLater = true;
-            this.ar.Location = new System.Drawing.Point(99, 72);
-            this.ar.MaximumSize = new System.Drawing.Size(1000, 29);
-            this.ar.MinimumSize = new System.Drawing.Size(64, 29);
-            this.ar.Name = "ar";
-            this.ar.SelectedIndex = 0;
-            this.ar.Size = new System.Drawing.Size(308, 29);
-            this.ar.TabIndex = 44;
-            // 
-            // ARLabel
-            // 
-            this.ARLabel.AutoSize = true;
-            this.ARLabel.Location = new System.Drawing.Point(6, 80);
-            this.ARLabel.Name = "ARLabel";
-            this.ARLabel.Size = new System.Drawing.Size(87, 13);
-            this.ARLabel.TabIndex = 45;
-            this.ARLabel.Text = "Force Input DAR";
-            // 
             // OneClickConfigPanel
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.Controls.Add(this.tabControl1);
             this.Name = "OneClickConfigPanel";
             this.Size = new System.Drawing.Size(433, 280);

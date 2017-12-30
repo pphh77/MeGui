@@ -174,5 +174,3 @@ namespace MeGUI.core.gui
         }
     }
 }
-
-

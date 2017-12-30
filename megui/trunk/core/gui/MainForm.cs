@@ -178,7 +178,6 @@ namespace MeGUI
 
             this.ClientSize = settings.MainFormSize;
             this.Location = settings.MainFormLocation;
-            this.splitContainer2.SplitterDistance = (int)(0.42 * (this.splitContainer2.Panel1.Height + this.splitContainer2.Panel2.Height));
 
             Size oSizeScreen = Screen.GetWorkingArea(this).Size;
             Point oLocation = Screen.GetWorkingArea(this).Location;
@@ -1379,6 +1378,23 @@ namespace MeGUI
             string version = OSInfo.GetDotNetVersion();
             if (!String.IsNullOrEmpty(version) && !version40.Equals(version))
                 s.LogValue(".NET Framework", string.Format("{0}", version), false);
+
+            // get DPI and resolution
+            using (Graphics graphics = Graphics.FromHwnd(IntPtr.Zero))
+            {
+                float dpiX = graphics.DpiX;
+                float dpiY = graphics.DpiY;
+                s.LogValue("DPI", string.Format("{0}% ({1}/{2})", Math.Round(MainForm.Instance.settings.DPIScaleFactor*100, 0), dpiX, dpiY), false);  
+            }
+            int iCount = 1;
+            foreach (Screen screen in Screen.AllScreens)
+            {
+                LogItem m = new LogItem("Monitor " + iCount++);
+                m.LogValue("Resolution", screen.Bounds.Width + "x" + screen.Bounds.Height, false);
+                m.LogValue("Primary Screen", screen.Primary.ToString(), false);
+                s.Add(m);
+            }
+
             i.Add(s);
 
             this.UpdateHandler = new UpdateHandler();

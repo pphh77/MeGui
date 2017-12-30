@@ -908,7 +908,8 @@ namespace MeGUI
             // 
             // QuantizerMatrixDialog
             // 
-            this.AutoScaleBaseSize = new System.Drawing.Size(5, 14);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.CancelButton = this.okButton;
             this.ClientSize = new System.Drawing.Size(415, 277);
             this.Controls.Add(this.helpButton1);

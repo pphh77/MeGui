@@ -141,6 +141,7 @@ namespace MeGUI
             this.targetSize.MinimumSize = new System.Drawing.Size(64, 29);
             this.targetSize.Name = "targetSize";
             this.targetSize.NullString = "Not calculated";
+            this.targetSize.SaveCustomValues = false;
             this.targetSize.SelectedIndex = 0;
             this.targetSize.Size = new System.Drawing.Size(208, 29);
             this.targetSize.TabIndex = 25;
@@ -155,7 +156,7 @@ namespace MeGUI
             this.noTargetRadio.TabStop = true;
             this.noTargetRadio.Text = "No Target Size (use profile settings)";
             this.defaultToolTip.SetToolTip(this.noTargetRadio, "Checking this allows the use of a previously defined bitrate or a non bitrate mod" +
-                    "e (CQ, CRF)");
+        "e (CQ, CRF)");
             this.noTargetRadio.UseVisualStyleBackColor = true;
             this.noTargetRadio.CheckedChanged += new System.EventHandler(this.calculationMode_CheckedChanged);
             // 
@@ -247,6 +248,7 @@ namespace MeGUI
             this.splitting.MinimumSize = new System.Drawing.Size(64, 29);
             this.splitting.Name = "splitting";
             this.splitting.NullString = "No splitting";
+            this.splitting.SaveCustomValues = false;
             this.splitting.SelectedIndex = 0;
             this.splitting.Size = new System.Drawing.Size(208, 29);
             this.splitting.TabIndex = 26;
@@ -314,8 +316,8 @@ namespace MeGUI
             this.addSubsNChapters.TabIndex = 20;
             this.addSubsNChapters.Text = "Add additional content (audio, subs, chapters)";
             this.defaultToolTip.SetToolTip(this.addSubsNChapters, "Checking this option allows you to specify pre-encoded audio and subtitle files t" +
-                    "o be added to your output, as well as assign audio/subtitle languages and assign" +
-                    " a chapter file");
+        "o be added to your output, as well as assign audio/subtitle languages and assign" +
+        " a chapter file");
             // 
             // helpButton1
             // 
@@ -330,7 +332,8 @@ namespace MeGUI
             // 
             // AutoEncodeWindow
             // 
-            this.AutoScaleBaseSize = new System.Drawing.Size(5, 14);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(471, 258);
             this.Controls.Add(this.helpButton1);
             this.Controls.Add(this.addSubsNChapters);

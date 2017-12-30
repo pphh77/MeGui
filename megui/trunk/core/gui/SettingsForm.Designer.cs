@@ -59,6 +59,7 @@ namespace MeGUI
             this.saveButton = new System.Windows.Forms.Button();
             this.cancelButton = new System.Windows.Forms.Button();
             this.otherGroupBox = new System.Windows.Forms.GroupBox();
+            this.chkDirectShowSource = new System.Windows.Forms.CheckBox();
             this.chkDebugInformation = new System.Windows.Forms.CheckBox();
             this.lblMinimumLength = new System.Windows.Forms.Label();
             this.minimumTitleLength = new System.Windows.Forms.NumericUpDown();
@@ -153,7 +154,6 @@ namespace MeGUI
             this.autoEncodeDefaultsButton = new System.Windows.Forms.Button();
             this.toolTipHelp = new System.Windows.Forms.ToolTip(this.components);
             this.helpButton1 = new MeGUI.core.gui.HelpButton();
-            this.chkDirectShowSource = new System.Windows.Forms.CheckBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
             groupBox1.SuspendLayout();
             this.otherGroupBox.SuspendLayout();
@@ -295,6 +295,15 @@ namespace MeGUI
             this.otherGroupBox.Tag = "";
             this.otherGroupBox.Text = " Main Settings ";
             // 
+            // chkDirectShowSource
+            // 
+            this.chkDirectShowSource.AutoSize = true;
+            this.chkDirectShowSource.Location = new System.Drawing.Point(12, 142);
+            this.chkDirectShowSource.Name = "chkDirectShowSource";
+            this.chkDirectShowSource.Size = new System.Drawing.Size(278, 17);
+            this.chkDirectShowSource.TabIndex = 26;
+            this.chkDirectShowSource.Text = "Enable DirectShowSource() in the AVS Script Creator";
+            // 
             // chkDebugInformation
             // 
             this.chkDebugInformation.AutoSize = true;
@@ -370,7 +379,7 @@ namespace MeGUI
             0,
             0,
             196608});
-            this.acceptableFPSError.Location = new System.Drawing.Point(151, 197);
+            this.acceptableFPSError.Location = new System.Drawing.Point(171, 197);
             this.acceptableFPSError.Maximum = new decimal(new int[] {
             5,
             0,
@@ -394,15 +403,15 @@ namespace MeGUI
             // 
             this.label15.Location = new System.Drawing.Point(10, 194);
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(130, 32);
+            this.label15.Size = new System.Drawing.Size(155, 32);
             this.label15.TabIndex = 6;
             this.label15.Text = "Acceptable FPS rounding error (bitrate calculator)";
             // 
             // resetDialogs
             // 
-            this.resetDialogs.Location = new System.Drawing.Point(300, 164);
+            this.resetDialogs.Location = new System.Drawing.Point(300, 166);
             this.resetDialogs.Name = "resetDialogs";
-            this.resetDialogs.Size = new System.Drawing.Size(154, 23);
+            this.resetDialogs.Size = new System.Drawing.Size(154, 21);
             this.resetDialogs.TabIndex = 16;
             this.resetDialogs.Text = "Reset All Dialogs";
             this.resetDialogs.UseVisualStyleBackColor = true;
@@ -412,7 +421,7 @@ namespace MeGUI
             // 
             this.configSourceDetector.Location = new System.Drawing.Point(300, 197);
             this.configSourceDetector.Name = "configSourceDetector";
-            this.configSourceDetector.Size = new System.Drawing.Size(154, 23);
+            this.configSourceDetector.Size = new System.Drawing.Size(154, 21);
             this.configSourceDetector.TabIndex = 17;
             this.configSourceDetector.Text = "Configure Source Detector";
             this.configSourceDetector.UseVisualStyleBackColor = true;
@@ -485,7 +494,7 @@ namespace MeGUI
             "Normal",
             "Above Normal",
             "High"});
-            this.priority.Location = new System.Drawing.Point(151, 166);
+            this.priority.Location = new System.Drawing.Point(171, 166);
             this.priority.Name = "priority";
             this.priority.Size = new System.Drawing.Size(80, 21);
             this.priority.TabIndex = 1;
@@ -582,9 +591,9 @@ namespace MeGUI
             // btnClearOutputDirecoty
             // 
             this.btnClearOutputDirecoty.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.btnClearOutputDirecoty.Location = new System.Drawing.Point(257, 25);
+            this.btnClearOutputDirecoty.Location = new System.Drawing.Point(257, 27);
             this.btnClearOutputDirecoty.Name = "btnClearOutputDirecoty";
-            this.btnClearOutputDirecoty.Size = new System.Drawing.Size(24, 23);
+            this.btnClearOutputDirecoty.Size = new System.Drawing.Size(25, 20);
             this.btnClearOutputDirecoty.TabIndex = 43;
             this.btnClearOutputDirecoty.Text = "x";
             this.btnClearOutputDirecoty.Click += new System.EventHandler(this.btnClearOutputDirecoty_Click);
@@ -600,8 +609,7 @@ namespace MeGUI
             // 
             // defaultOutputDir
             // 
-            this.defaultOutputDir.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.defaultOutputDir.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.defaultOutputDir.Filename = "";
             this.defaultOutputDir.Filter = null;
             this.defaultOutputDir.FilterIndex = 0;
@@ -941,9 +949,10 @@ namespace MeGUI
             // 
             // label13
             // 
+            this.label13.AutoSize = true;
             this.label13.Location = new System.Drawing.Point(11, 22);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(100, 13);
+            this.label13.Size = new System.Drawing.Size(93, 13);
             this.label13.TabIndex = 0;
             this.label13.Text = "Number of passes";
             // 
@@ -1089,10 +1098,12 @@ namespace MeGUI
             // 
             this.lblForcedName.AutoSize = true;
             this.lblForcedName.Location = new System.Drawing.Point(11, 94);
+            this.lblForcedName.Margin = new System.Windows.Forms.Padding(3);
             this.lblForcedName.Name = "lblForcedName";
             this.lblForcedName.Size = new System.Drawing.Size(164, 13);
             this.lblForcedName.TabIndex = 33;
             this.lblForcedName.Text = "Add text to forced track names: ";
+            this.lblForcedName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // txtForcedName
             // 
@@ -1195,9 +1206,9 @@ namespace MeGUI
             // 
             // btnClearMP4TempDirectory
             // 
-            this.btnClearMP4TempDirectory.Location = new System.Drawing.Point(433, 21);
+            this.btnClearMP4TempDirectory.Location = new System.Drawing.Point(433, 23);
             this.btnClearMP4TempDirectory.Name = "btnClearMP4TempDirectory";
-            this.btnClearMP4TempDirectory.Size = new System.Drawing.Size(24, 23);
+            this.btnClearMP4TempDirectory.Size = new System.Drawing.Size(25, 20);
             this.btnClearMP4TempDirectory.TabIndex = 42;
             this.btnClearMP4TempDirectory.Text = "x";
             this.btnClearMP4TempDirectory.Click += new System.EventHandler(this.btnClearMP4TempDirectory_Click);
@@ -1342,18 +1353,10 @@ namespace MeGUI
             this.helpButton1.Size = new System.Drawing.Size(38, 23);
             this.helpButton1.TabIndex = 1;
             // 
-            // chkDirectShowSource
-            // 
-            this.chkDirectShowSource.AutoSize = true;
-            this.chkDirectShowSource.Location = new System.Drawing.Point(12, 142);
-            this.chkDirectShowSource.Name = "chkDirectShowSource";
-            this.chkDirectShowSource.Size = new System.Drawing.Size(278, 17);
-            this.chkDirectShowSource.TabIndex = 26;
-            this.chkDirectShowSource.Text = "Enable DirectShowSource() in the AVS Script Creator";
-            // 
             // SettingsForm
             // 
-            this.AutoScaleBaseSize = new System.Drawing.Size(5, 14);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(483, 446);
             this.Controls.Add(this.helpButton1);
             this.Controls.Add(this.tabControl1);

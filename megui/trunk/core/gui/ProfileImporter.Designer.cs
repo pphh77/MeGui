@@ -52,6 +52,7 @@ namespace MeGUI.core.gui
             // 
             // profileList
             // 
+            this.profileList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
             this.profileList.ContextMenuStrip = this.statusCheck;
             // 
             // statusCheck
@@ -84,9 +85,9 @@ namespace MeGUI.core.gui
             // 
             // ProfileImporter
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(383, 358);
-            this.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ProfileImporter";
             this.Text = "Preset Importer";

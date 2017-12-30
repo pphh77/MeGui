@@ -91,7 +91,8 @@ namespace MeGUI.packages.audio.opus
             // 
             // OpusConfigurationPanel
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.Name = "OpusConfigurationPanel";
             this.Size = new System.Drawing.Size(410, 322);
             this.encoderGroupBox.ResumeLayout(false);

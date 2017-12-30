@@ -30,10 +30,10 @@ namespace MeGUI
         {
             this.zonesGroupbox = new System.Windows.Forms.GroupBox();
             this.zoneListView = new System.Windows.Forms.ListView();
-            this.startFrameColumn = new System.Windows.Forms.ColumnHeader();
-            this.endFrameColumn = new System.Windows.Forms.ColumnHeader();
-            this.modeColumn = new System.Windows.Forms.ColumnHeader();
-            this.modifierColumn = new System.Windows.Forms.ColumnHeader();
+            this.startFrameColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.endFrameColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.modeColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.modifierColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.startFrame = new System.Windows.Forms.TextBox();
             this.endFrame = new System.Windows.Forms.TextBox();
@@ -286,8 +286,8 @@ namespace MeGUI
             // 
             // ZonesControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.Controls.Add(this.zonesGroupbox);
             this.Name = "ZonesControl";
             this.Size = new System.Drawing.Size(295, 412);

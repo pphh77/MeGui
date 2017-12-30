@@ -63,6 +63,8 @@ namespace MeGUI
             this.mainForm = mainForm;
 			InitializeComponent();
 
+            lblAspectError.Size = new System.Drawing.Size(MainForm.Instance.Settings.DPIRescale(75), MainForm.Instance.Settings.DPIRescale(21));
+
             this.controlsToDisable = new List<Control>();
             this.controlsToDisable.Add(reopenOriginal);
             this.controlsToDisable.Add(filtersGroupbox);

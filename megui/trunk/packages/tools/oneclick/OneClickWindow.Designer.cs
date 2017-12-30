@@ -164,6 +164,8 @@ namespace MeGUI
             // 
             // outputTab
             // 
+            this.outputTab.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.outputTab.Controls.Add(this.tabPage4);
             this.outputTab.Location = new System.Drawing.Point(6, 379);
             this.outputTab.Name = "outputTab";
@@ -229,6 +231,8 @@ namespace MeGUI
             // 
             // videoTab
             // 
+            this.videoTab.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.videoTab.Controls.Add(this.tabPage3);
             this.videoTab.Location = new System.Drawing.Point(6, 6);
             this.videoTab.Name = "videoTab";
@@ -905,8 +909,8 @@ namespace MeGUI
             // 
             // OneClickWindow
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(472, 550);
             this.Controls.Add(this.helpButton1);
             this.Controls.Add(this.openOnQueue);

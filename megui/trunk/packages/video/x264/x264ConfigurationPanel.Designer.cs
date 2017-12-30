@@ -2943,8 +2943,8 @@ namespace MeGUI.packages.video.x264
             // 
             // x264ConfigurationPanel
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.Name = "x264ConfigurationPanel";
             this.Size = new System.Drawing.Size(510, 523);
             this.tabControl1.ResumeLayout(false);

@@ -37,10 +37,10 @@ namespace MeGUI.core.gui
             this.abortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.shutDownLaterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.shutDownToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.showProgressWindowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showQueueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.renameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.workerNameAndJob.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -116,6 +116,11 @@ namespace MeGUI.core.gui
             this.shutDownToolStripMenuItem.Text = "Delete worker now";
             this.shutDownToolStripMenuItem.Click += new System.EventHandler(this.shutDownToolStripMenuItem_Click);
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(284, 6);
+            // 
             // showProgressWindowToolStripMenuItem
             // 
             this.showProgressWindowToolStripMenuItem.Name = "showProgressWindowToolStripMenuItem";
@@ -137,15 +142,10 @@ namespace MeGUI.core.gui
             this.renameToolStripMenuItem.Text = "Rename worker";
             this.renameToolStripMenuItem.Click += new System.EventHandler(this.renameToolStripMenuItem_Click);
             // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(284, 6);
-            // 
             // IndividualWorkerSummary
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.AutoSize = true;
             this.ContextMenuStrip = this.contextMenuStrip1;
             this.Controls.Add(this.workerNameAndJob);

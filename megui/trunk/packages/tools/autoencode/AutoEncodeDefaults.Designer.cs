@@ -73,6 +73,7 @@ namespace MeGUI
             this.fileSize.MinimumSize = new System.Drawing.Size(64, 29);
             this.fileSize.Name = "fileSize";
             this.fileSize.NullString = null;
+            this.fileSize.SaveCustomValues = false;
             this.fileSize.SelectedIndex = 0;
             this.fileSize.Size = new System.Drawing.Size(171, 29);
             this.fileSize.TabIndex = 23;
@@ -197,6 +198,7 @@ namespace MeGUI
             this.splitSize.MinimumSize = new System.Drawing.Size(64, 29);
             this.splitSize.Name = "splitSize";
             this.splitSize.NullString = "No splitting";
+            this.splitSize.SaveCustomValues = false;
             this.splitSize.SelectedIndex = 0;
             this.splitSize.Size = new System.Drawing.Size(148, 29);
             this.splitSize.TabIndex = 26;
@@ -230,8 +232,8 @@ namespace MeGUI
             // 
             // AutoEncodeDefaults
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.CancelButton = this.cancelButton;
             this.ClientSize = new System.Drawing.Size(433, 241);
             this.Controls.Add(this.addSubsNChapters);

@@ -30,20 +30,20 @@ namespace MeGUI
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(VobSubIndexWindow));
             this.inputGroupbox = new System.Windows.Forms.GroupBox();
+            this.input = new MeGUI.FileBar();
             this.inputLabel = new System.Windows.Forms.Label();
             this.outputGroupbox = new System.Windows.Forms.GroupBox();
+            this.output = new MeGUI.FileBar();
             this.nameLabel = new System.Windows.Forms.Label();
             this.subtitleGroupbox = new System.Windows.Forms.GroupBox();
+            this.chkExtractForced = new System.Windows.Forms.CheckBox();
             this.chkKeepAllStreams = new System.Windows.Forms.CheckBox();
             this.chkSingleFileExport = new System.Windows.Forms.CheckBox();
             this.chkShowAllStreams = new System.Windows.Forms.CheckBox();
             this.subtitleTracks = new System.Windows.Forms.CheckedListBox();
             this.closeOnQueue = new System.Windows.Forms.CheckBox();
             this.queueButton = new System.Windows.Forms.Button();
-            this.chkExtractForced = new System.Windows.Forms.CheckBox();
             this.helpButton1 = new MeGUI.core.gui.HelpButton();
-            this.output = new MeGUI.FileBar();
-            this.input = new MeGUI.FileBar();
             this.inputGroupbox.SuspendLayout();
             this.outputGroupbox.SuspendLayout();
             this.subtitleGroupbox.SuspendLayout();
@@ -59,6 +59,21 @@ namespace MeGUI
             this.inputGroupbox.TabIndex = 1;
             this.inputGroupbox.TabStop = false;
             this.inputGroupbox.Text = "Input";
+            // 
+            // input
+            // 
+            this.input.Filename = "";
+            this.input.Filter = "IFO Files|*.ifo";
+            this.input.FilterIndex = 0;
+            this.input.FolderMode = false;
+            this.input.Location = new System.Drawing.Point(120, 13);
+            this.input.Name = "input";
+            this.input.ReadOnly = true;
+            this.input.SaveMode = false;
+            this.input.Size = new System.Drawing.Size(286, 26);
+            this.input.TabIndex = 5;
+            this.input.Title = null;
+            this.input.FileSelected += new MeGUI.FileBarEventHandler(this.input_FileSelected);
             // 
             // inputLabel
             // 
@@ -78,6 +93,21 @@ namespace MeGUI
             this.outputGroupbox.TabIndex = 13;
             this.outputGroupbox.TabStop = false;
             this.outputGroupbox.Text = "Output";
+            // 
+            // output
+            // 
+            this.output.Filename = "";
+            this.output.Filter = "VobSub Files|*.idx";
+            this.output.FilterIndex = 0;
+            this.output.FolderMode = false;
+            this.output.Location = new System.Drawing.Point(120, 17);
+            this.output.Name = "output";
+            this.output.ReadOnly = true;
+            this.output.SaveMode = true;
+            this.output.Size = new System.Drawing.Size(286, 26);
+            this.output.TabIndex = 5;
+            this.output.Title = "Choose an output file";
+            this.output.FileSelected += new MeGUI.FileBarEventHandler(this.output_FileSelected);
             // 
             // nameLabel
             // 
@@ -100,6 +130,16 @@ namespace MeGUI
             this.subtitleGroupbox.TabIndex = 14;
             this.subtitleGroupbox.TabStop = false;
             this.subtitleGroupbox.Text = "Subtitles";
+            // 
+            // chkExtractForced
+            // 
+            this.chkExtractForced.AutoSize = true;
+            this.chkExtractForced.Location = new System.Drawing.Point(19, 46);
+            this.chkExtractForced.Name = "chkExtractForced";
+            this.chkExtractForced.Size = new System.Drawing.Size(225, 17);
+            this.chkExtractForced.TabIndex = 13;
+            this.chkExtractForced.Text = "Extract forced subtitles in separate file(s)";
+            this.chkExtractForced.UseVisualStyleBackColor = true;
             // 
             // chkKeepAllStreams
             // 
@@ -161,16 +201,6 @@ namespace MeGUI
             this.queueButton.Text = "Queue";
             this.queueButton.Click += new System.EventHandler(this.queueButton_Click);
             // 
-            // chkExtractForced
-            // 
-            this.chkExtractForced.AutoSize = true;
-            this.chkExtractForced.Location = new System.Drawing.Point(19, 46);
-            this.chkExtractForced.Name = "chkExtractForced";
-            this.chkExtractForced.Size = new System.Drawing.Size(225, 17);
-            this.chkExtractForced.TabIndex = 13;
-            this.chkExtractForced.Text = "Extract forced subtitles in separate file(s)";
-            this.chkExtractForced.UseVisualStyleBackColor = true;
-            // 
             // helpButton1
             // 
             this.helpButton1.ArticleName = "Tools/VobSubber";
@@ -180,40 +210,10 @@ namespace MeGUI
             this.helpButton1.Size = new System.Drawing.Size(47, 23);
             this.helpButton1.TabIndex = 17;
             // 
-            // output
-            // 
-            this.output.Filename = "";
-            this.output.Filter = "VobSub Files|*.idx";
-            this.output.FilterIndex = 0;
-            this.output.FolderMode = false;
-            this.output.Location = new System.Drawing.Point(120, 17);
-            this.output.Name = "output";
-            this.output.ReadOnly = true;
-            this.output.SaveMode = true;
-            this.output.Size = new System.Drawing.Size(286, 26);
-            this.output.TabIndex = 5;
-            this.output.Title = "Choose an output file";
-            this.output.FileSelected += new MeGUI.FileBarEventHandler(this.output_FileSelected);
-            // 
-            // input
-            // 
-            this.input.Filename = "";
-            this.input.Filter = "IFO Files|*.ifo";
-            this.input.FilterIndex = 0;
-            this.input.FolderMode = false;
-            this.input.Location = new System.Drawing.Point(120, 13);
-            this.input.Name = "input";
-            this.input.ReadOnly = true;
-            this.input.SaveMode = false;
-            this.input.Size = new System.Drawing.Size(286, 26);
-            this.input.TabIndex = 5;
-            this.input.Title = null;
-            this.input.FileSelected += new MeGUI.FileBarEventHandler(this.input_FileSelected);
-            // 
             // VobSubIndexWindow
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(434, 393);
             this.Controls.Add(this.helpButton1);
             this.Controls.Add(this.closeOnQueue);

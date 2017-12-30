@@ -93,7 +93,8 @@ namespace MeGUI.core.gui.MessageBoxExLib
             // 
             // MessageBoxExForm
             // 
-            this.AutoScaleBaseSize = new System.Drawing.Size(5, 14);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(322, 224);
             this.Controls.Add(this.rtbMessage);
             this.Controls.Add(this.chbSaveResponse);

@@ -73,31 +73,32 @@ namespace MeGUI.core.gui
             // 
             // label1
             // 
-            this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.Location = new System.Drawing.Point(3, 28);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(86, 28);
+            this.label1.Size = new System.Drawing.Size(124, 28);
             this.label1.TabIndex = 17;
             this.label1.Text = "Cuts";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // audioContainer
             // 
-            this.audioContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.audioContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.audioContainer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.audioContainer.FormattingEnabled = true;
-            this.audioContainer.Location = new System.Drawing.Point(95, 115);
+            this.audioContainer.Location = new System.Drawing.Point(134, 115);
+            this.audioContainer.Margin = new System.Windows.Forms.Padding(4, 3, 3, 3);
             this.audioContainer.Name = "audioContainer";
-            this.audioContainer.Size = new System.Drawing.Size(143, 21);
+            this.audioContainer.Size = new System.Drawing.Size(121, 21);
             this.audioContainer.TabIndex = 25;
             this.audioContainer.SelectedIndexChanged += new System.EventHandler(this.audioContainer_SelectedIndexChanged);
             // 
             // audioContainerLabel
             // 
-            this.audioContainerLabel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.audioContainerLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.audioContainerLabel.Location = new System.Drawing.Point(3, 112);
             this.audioContainerLabel.Name = "audioContainerLabel";
-            this.audioContainerLabel.Size = new System.Drawing.Size(86, 28);
+            this.audioContainerLabel.Size = new System.Drawing.Size(124, 28);
             this.audioContainerLabel.TabIndex = 24;
             this.audioContainerLabel.Text = "Extension ";
             this.audioContainerLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -106,7 +107,7 @@ namespace MeGUI.core.gui
             // 
             this.queueAudioButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.queueAudioButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.queueAudioButton.Location = new System.Drawing.Point(112, 3);
+            this.queueAudioButton.Location = new System.Drawing.Point(91, 3);
             this.queueAudioButton.Name = "queueAudioButton";
             this.queueAudioButton.Size = new System.Drawing.Size(60, 23);
             this.queueAudioButton.TabIndex = 27;
@@ -115,20 +116,20 @@ namespace MeGUI.core.gui
             // 
             // audioInputLabel
             // 
-            this.audioInputLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.audioInputLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.audioInputLabel.Location = new System.Drawing.Point(3, 0);
             this.audioInputLabel.Name = "audioInputLabel";
-            this.audioInputLabel.Size = new System.Drawing.Size(86, 28);
+            this.audioInputLabel.Size = new System.Drawing.Size(124, 28);
             this.audioInputLabel.TabIndex = 15;
             this.audioInputLabel.Text = "Audio Input";
             this.audioInputLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // audioOutputLabel
             // 
-            this.audioOutputLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.audioOutputLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.audioOutputLabel.Location = new System.Drawing.Point(3, 56);
             this.audioOutputLabel.Name = "audioOutputLabel";
-            this.audioOutputLabel.Size = new System.Drawing.Size(86, 28);
+            this.audioOutputLabel.Size = new System.Drawing.Size(124, 28);
             this.audioOutputLabel.TabIndex = 19;
             this.audioOutputLabel.Text = "Audio Output";
             this.audioOutputLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -136,7 +137,7 @@ namespace MeGUI.core.gui
             // deleteAudioButton
             // 
             this.deleteAudioButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.deleteAudioButton.Location = new System.Drawing.Point(58, 3);
+            this.deleteAudioButton.Location = new System.Drawing.Point(37, 3);
             this.deleteAudioButton.Name = "deleteAudioButton";
             this.deleteAudioButton.Size = new System.Drawing.Size(48, 23);
             this.deleteAudioButton.TabIndex = 26;
@@ -145,18 +146,19 @@ namespace MeGUI.core.gui
             // 
             // label2
             // 
-            this.label2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.label2.Location = new System.Drawing.Point(244, 112);
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.label2.Location = new System.Drawing.Point(268, 112);
+            this.label2.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(34, 28);
             this.label2.TabIndex = 28;
             this.label2.Text = "Delay";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // delay
             // 
-            this.delay.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.delay.Location = new System.Drawing.Point(284, 115);
+            this.delay.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.delay.Location = new System.Drawing.Point(305, 116);
             this.delay.Maximum = new decimal(new int[] {
             2147483647,
             0,
@@ -168,12 +170,12 @@ namespace MeGUI.core.gui
             0,
             -2147483648});
             this.delay.Name = "delay";
-            this.delay.Size = new System.Drawing.Size(143, 20);
+            this.delay.Size = new System.Drawing.Size(122, 20);
             this.delay.TabIndex = 29;
             // 
             // label3
             // 
-            this.label3.Dock = System.Windows.Forms.DockStyle.Top;
+            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.Location = new System.Drawing.Point(433, 112);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(20, 28);
@@ -183,10 +185,10 @@ namespace MeGUI.core.gui
             // 
             // label4
             // 
-            this.label4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.label4.Location = new System.Drawing.Point(3, 84);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(86, 28);
+            this.label4.Size = new System.Drawing.Size(124, 28);
             this.label4.TabIndex = 19;
             this.label4.Text = "Encoder settings";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -194,7 +196,7 @@ namespace MeGUI.core.gui
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.ColumnCount = 5;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 130F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
@@ -228,61 +230,61 @@ namespace MeGUI.core.gui
             // 
             // audioProfile
             // 
+            this.audioProfile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.SetColumnSpan(this.audioProfile, 4);
-            this.audioProfile.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.audioProfile.Location = new System.Drawing.Point(95, 87);
+            this.audioProfile.Location = new System.Drawing.Point(133, 87);
             this.audioProfile.Name = "audioProfile";
             this.audioProfile.ProfileSet = "Audio";
-            this.audioProfile.Size = new System.Drawing.Size(358, 22);
+            this.audioProfile.Size = new System.Drawing.Size(320, 22);
             this.audioProfile.TabIndex = 31;
             this.audioProfile.SelectedProfileChanged += new System.EventHandler(this.audioProfile_SelectedProfileChanged);
             // 
             // audioOutput
             // 
+            this.audioOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.SetColumnSpan(this.audioOutput, 4);
-            this.audioOutput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.audioOutput.Filename = "";
             this.audioOutput.Filter = null;
             this.audioOutput.FilterIndex = 0;
             this.audioOutput.FolderMode = false;
-            this.audioOutput.Location = new System.Drawing.Point(95, 59);
+            this.audioOutput.Location = new System.Drawing.Point(133, 59);
             this.audioOutput.Name = "audioOutput";
             this.audioOutput.ReadOnly = false;
             this.audioOutput.SaveMode = true;
-            this.audioOutput.Size = new System.Drawing.Size(358, 22);
+            this.audioOutput.Size = new System.Drawing.Size(320, 22);
             this.audioOutput.TabIndex = 20;
             this.audioOutput.Title = "Enter name of output";
             // 
             // cuts
             // 
+            this.cuts.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.SetColumnSpan(this.cuts, 4);
-            this.cuts.Dock = System.Windows.Forms.DockStyle.Fill;
             this.cuts.Filename = "";
             this.cuts.Filter = "MeGUI cutlist files (*.clt)|*.clt";
             this.cuts.FilterIndex = 0;
             this.cuts.FolderMode = false;
-            this.cuts.Location = new System.Drawing.Point(95, 31);
+            this.cuts.Location = new System.Drawing.Point(133, 31);
             this.cuts.Name = "cuts";
             this.cuts.ReadOnly = true;
             this.cuts.SaveMode = false;
-            this.cuts.Size = new System.Drawing.Size(358, 22);
+            this.cuts.Size = new System.Drawing.Size(320, 22);
             this.cuts.TabIndex = 18;
             this.cuts.Title = "Select a file with cuts";
             // 
             // audioInput
             // 
             this.audioInput.AllowDrop = true;
+            this.audioInput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.SetColumnSpan(this.audioInput, 4);
-            this.audioInput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.audioInput.Filename = "";
             this.audioInput.Filter = "All files (*.*)|*.*";
             this.audioInput.FilterIndex = 0;
             this.audioInput.FolderMode = false;
-            this.audioInput.Location = new System.Drawing.Point(95, 3);
+            this.audioInput.Location = new System.Drawing.Point(133, 3);
             this.audioInput.Name = "audioInput";
             this.audioInput.ReadOnly = true;
             this.audioInput.SaveMode = false;
-            this.audioInput.Size = new System.Drawing.Size(358, 22);
+            this.audioInput.Size = new System.Drawing.Size(320, 22);
             this.audioInput.TabIndex = 16;
             this.audioInput.Title = "Select your audio input";
             this.audioInput.FileSelected += new MeGUI.FileBarEventHandler(this.audioInput_FileSelected);
@@ -296,16 +298,16 @@ namespace MeGUI.core.gui
             this.flowLayoutPanel1.Controls.Add(this.deleteAudioButton);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(281, 140);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(302, 140);
             this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(175, 33);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(154, 33);
             this.flowLayoutPanel1.TabIndex = 32;
             // 
             // AudioEncodingTab
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "AudioEncodingTab";
             this.Size = new System.Drawing.Size(456, 173);

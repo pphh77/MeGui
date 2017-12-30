@@ -73,17 +73,9 @@ namespace MeGUI
 			InitializeComponent();
             this.Resize += new EventHandler(formResized);
 
-            decimal dpiX = 96, dpiY = 96;
-            using (Graphics graphics = this.CreateGraphics())
-            {
-                dpiX = (decimal)graphics.DpiX;
-                dpiY = (decimal)graphics.DpiY;
-            }
-            dpiX /= 96;
-            dpiY /= 96;
+            formHeightDelta = (int)((buttonPanel.Size.Height + 4 * defaultSpacing));
+            buttonPanelMinWidth = (int)((showPAR.Location.X + showPAR.Size.Width));
 
-            formHeightDelta = (int)((buttonPanel.Size.Height + 4 * defaultSpacing) * dpiY);
-            buttonPanelMinWidth = (int)((showPAR.Location.X + showPAR.Size.Width) * dpiX);
             zoomFactor = 100;
             setZoomButtons();
             sizeLock = false;
@@ -471,7 +463,7 @@ namespace MeGUI
                 buttonPanel.Controls.Remove(showPAR);
             }
             SuspendLayout();
-            
+           
             // resize main window
             sizeLock = true;
             int iMainHeight = this.videoWindowHeight + formHeightDelta;
@@ -610,7 +602,7 @@ namespace MeGUI
                 videoPanel.VerticalScroll.Value = videoPanel.VerticalScroll.Maximum;
                 videoPanel.VerticalScroll.Value = videoPanel.VerticalScroll.Maximum;
             }
-            
+
             videoPreview.CropMargin = new Padding(left, top, right, bottom);
 		}
 		#endregion
@@ -879,8 +871,8 @@ namespace MeGUI
 
             int height = (int)Math.Round((decimal)targetWidth / d.AR);
 
-            videoWindowWidth = targetWidth;
-            videoWindowHeight = (int)height;
+            videoWindowWidth = MainForm.Instance.Settings.DPIRescale(targetWidth);
+            videoWindowHeight = MainForm.Instance.Settings.DPIRescale((int)height);
             sizeLock = true;
             adjustSize();
             VideoPlayer_Shown(null, null);

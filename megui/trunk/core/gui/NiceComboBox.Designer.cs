@@ -44,14 +44,12 @@ namespace MeGUI.core.gui
             // 
             // dropDownButton
             // 
-            this.dropDownButton.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.dropDownButton.AutoSize = true;
-            this.dropDownButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.dropDownButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.dropDownButton.Font = new System.Drawing.Font("Marlett", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(2)));
-            this.dropDownButton.Location = new System.Drawing.Point(179, 3);
-            this.dropDownButton.Margin = new System.Windows.Forms.Padding(3, 1, 1, 1);
+            this.dropDownButton.Location = new System.Drawing.Point(180, 3);
+            this.dropDownButton.Margin = new System.Windows.Forms.Padding(3, 0, 0, 1);
             this.dropDownButton.Name = "dropDownButton";
-            this.dropDownButton.Size = new System.Drawing.Size(28, 22);
+            this.dropDownButton.Size = new System.Drawing.Size(28, 20);
             this.dropDownButton.TabIndex = 0;
             this.dropDownButton.Text = "6";
             this.dropDownButton.UseVisualStyleBackColor = true;
@@ -60,11 +58,11 @@ namespace MeGUI.core.gui
             // textBox1
             // 
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(1, 4);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(1, 0, 0, 0);
+            this.textBox1.Location = new System.Drawing.Point(0, 4);
+            this.textBox1.Margin = new System.Windows.Forms.Padding(0);
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(175, 20);
+            this.textBox1.Size = new System.Drawing.Size(177, 20);
             this.textBox1.TabIndex = 1;
             // 
             // contextMenuStrip1
@@ -127,8 +125,8 @@ namespace MeGUI.core.gui
             // 
             // NiceComboBox
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.Controls.Add(this.tableLayoutPanel1);
             this.MaximumSize = new System.Drawing.Size(1000, 28);
             this.MinimumSize = new System.Drawing.Size(64, 28);

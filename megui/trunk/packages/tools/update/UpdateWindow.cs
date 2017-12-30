@@ -1135,7 +1135,7 @@ namespace MeGUI
 
         private void splitContainer1_SizeChanged(object sender, EventArgs e)
         {
-            this.splitContainer1.SplitterDistance = this.splitContainer1.Size.Height - 65;
+            this.splitContainer1.SplitterDistance = this.splitContainer1.Size.Height - MainForm.Instance.Settings.DPIRescale(65);
         }
 
         private void UpdateWindow_Shown(object sender, EventArgs e)

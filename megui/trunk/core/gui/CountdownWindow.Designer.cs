@@ -43,7 +43,7 @@ namespace MeGUI.core.gui
             this.label1.Size = new System.Drawing.Size(330, 32);
             this.label1.TabIndex = 5;
             this.label1.Text = "MeGUI has finished processing the job queue and is about to shut down your comput" +
-                "er.";
+    "er.";
             // 
             // cancelButton
             // 
@@ -69,8 +69,8 @@ namespace MeGUI.core.gui
             // 
             // CountdownWindow
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(347, 134);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cancelButton);

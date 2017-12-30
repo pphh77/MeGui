@@ -200,30 +200,31 @@ namespace MeGUI
 
             if (MainForm.Instance.Settings.OneClickGUIMode == MeGUISettings.OCGUIMode.Advanced)
             {
-                audioTab.Height = 175;
-                subtitlesTab.Location = new Point(subtitlesTab.Location.X, 258);
+                audioTab.Height = MainForm.Instance.Settings.DPIRescale(175);
+                subtitlesTab.Location = new Point(subtitlesTab.Location.X, MainForm.Instance.Settings.DPIRescale(258));
                 subtitlesTab.Visible = true;
-                outputTab.Location = new Point(outputTab.Location.X, 379);
-                this.Height = 583;
+                outputTab.Location = new Point(outputTab.Location.X, MainForm.Instance.Settings.DPIRescale(379));
+                this.Height = MainForm.Instance.Settings.DPIRescale(583);
                 if (!tabControl1.TabPages.Contains(encoderConfigTab))
                     tabControl1.TabPages.Add(encoderConfigTab);
             }
             else if (MainForm.Instance.Settings.OneClickGUIMode == MeGUISettings.OCGUIMode.Basic)
             {
-                audioTab.Height = 90;
+                audioTab.Height = MainForm.Instance.Settings.DPIRescale(90);
+                subtitlesTab.Location = new Point(subtitlesTab.Location.X, MainForm.Instance.Settings.DPIRescale(198));
                 subtitlesTab.Visible = false;
-                outputTab.Location = new Point(outputTab.Location.X, 173);
-                this.Height = 377;
+                outputTab.Location = new Point(outputTab.Location.X, MainForm.Instance.Settings.DPIRescale(173));
+                this.Height = MainForm.Instance.Settings.DPIRescale(377);
                 if (tabControl1.TabPages.Contains(encoderConfigTab))
                     tabControl1.TabPages.Remove(encoderConfigTab);
             }
             else
             {
-                audioTab.Height = 115;
-                subtitlesTab.Location = new Point(subtitlesTab.Location.X, 198);
+                audioTab.Height = MainForm.Instance.Settings.DPIRescale(115);
+                subtitlesTab.Location = new Point(subtitlesTab.Location.X, MainForm.Instance.Settings.DPIRescale(198));
                 subtitlesTab.Visible = true;
-                outputTab.Location = new Point(outputTab.Location.X, 319);
-                this.Height = 523;
+                outputTab.Location = new Point(outputTab.Location.X, MainForm.Instance.Settings.DPIRescale(319));
+                this.Height = MainForm.Instance.Settings.DPIRescale(523);
                 if (tabControl1.TabPages.Contains(encoderConfigTab))
                     tabControl1.TabPages.Remove(encoderConfigTab);
             }

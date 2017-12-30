@@ -510,8 +510,8 @@ namespace MeGUI
             // 
             // containerFormat
             // 
-            this.containerFormat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.containerFormat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.containerFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.containerFormat.FormattingEnabled = true;
             this.containerFormat.ItemHeight = 13;
@@ -625,6 +625,7 @@ namespace MeGUI
             this.targetSize.MinimumSize = new System.Drawing.Size(64, 29);
             this.targetSize.Name = "targetSize";
             this.targetSize.NullString = "Not calculated";
+            this.targetSize.SaveCustomValues = false;
             this.targetSize.SelectedIndex = 0;
             this.targetSize.Size = new System.Drawing.Size(173, 29);
             this.targetSize.TabIndex = 18;
@@ -756,9 +757,9 @@ namespace MeGUI
             // 
             // audioExtraFlow
             // 
-            this.audioExtraFlow.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.audioExtraFlow.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.audioExtraFlow.AutoScroll = true;
             this.audioExtraFlow.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.audioExtraFlow.Location = new System.Drawing.Point(3, 18);
@@ -783,7 +784,8 @@ namespace MeGUI
             // 
             // Calculator
             // 
-            this.AutoScaleBaseSize = new System.Drawing.Size(5, 14);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.CancelButton = this.cancelButton;
             this.ClientSize = new System.Drawing.Size(701, 349);
             this.Controls.Add(this.audioExtraGroupbox);

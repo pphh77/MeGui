@@ -416,7 +416,8 @@ namespace MeGUI
             // 
             // FileIndexerWindow
             // 
-            this.AutoScaleBaseSize = new System.Drawing.Size(5, 14);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(471, 425);
             this.Controls.Add(this.gbFileInformation);
             this.Controls.Add(this.gbIndexer);

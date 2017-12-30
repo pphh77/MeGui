@@ -71,7 +71,6 @@ namespace MeGUI
             this.btnReloadVideo = new System.Windows.Forms.Button();
             this.zoomOutButton = new System.Windows.Forms.Button();
             this.zoomInButton = new System.Windows.Forms.Button();
-            this.arChooser = new MeGUI.core.gui.ARChooser();
             this.showPAR = new System.Windows.Forms.CheckBox();
             this.originalSizeButton = new System.Windows.Forms.Button();
             this.introEndButton = new System.Windows.Forms.Button();
@@ -82,6 +81,7 @@ namespace MeGUI
             this.defaultToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.videoPanel = new System.Windows.Forms.Panel();
             this.videoPreview = new MeGUI.core.gui.VideoPlayerControl();
+            this.arChooser = new MeGUI.core.gui.ARChooser();
             goToFrameButton = new System.Windows.Forms.Button();
             this.buttonPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.positionSlider)).BeginInit();
@@ -287,19 +287,6 @@ namespace MeGUI
             this.zoomInButton.UseVisualStyleBackColor = true;
             this.zoomInButton.Click += new System.EventHandler(this.zoomInButton_Click);
             // 
-            // arChooser
-            // 
-            this.arChooser.CustomDARs = new MeGUI.core.util.Dar[0];
-            this.arChooser.HasLater = false;
-            this.arChooser.Location = new System.Drawing.Point(241, 45);
-            this.arChooser.MaximumSize = new System.Drawing.Size(1000, 29);
-            this.arChooser.MinimumSize = new System.Drawing.Size(64, 29);
-            this.arChooser.Name = "arChooser";
-            this.arChooser.SelectedIndex = 0;
-            this.arChooser.Size = new System.Drawing.Size(170, 29);
-            this.arChooser.TabIndex = 11;
-            this.arChooser.SelectionChanged += new MeGUI.StringChanged(this.arChooser_SelectionChanged);
-            // 
             // showPAR
             // 
             this.showPAR.AutoSize = true;
@@ -397,9 +384,23 @@ namespace MeGUI
             this.videoPreview.TabIndex = 11;
             this.videoPreview.PositionChanged += new System.EventHandler(this.videoPreview_PositionChanged);
             // 
+            // arChooser
+            // 
+            this.arChooser.CustomDARs = new MeGUI.core.util.Dar[0];
+            this.arChooser.HasLater = false;
+            this.arChooser.Location = new System.Drawing.Point(241, 45);
+            this.arChooser.MaximumSize = new System.Drawing.Size(1000, 29);
+            this.arChooser.MinimumSize = new System.Drawing.Size(64, 29);
+            this.arChooser.Name = "arChooser";
+            this.arChooser.SelectedIndex = 0;
+            this.arChooser.Size = new System.Drawing.Size(170, 29);
+            this.arChooser.TabIndex = 11;
+            this.arChooser.SelectionChanged += new MeGUI.StringChanged(this.arChooser_SelectionChanged);
+            // 
             // VideoPlayer
             // 
-            this.AutoScaleBaseSize = new System.Drawing.Size(5, 14);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(518, 327);
             this.Controls.Add(this.videoPanel);
             this.Controls.Add(this.buttonPanel);

@@ -58,20 +58,20 @@ namespace MeGUI
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.label2 = new System.Windows.Forms.Label();
             this.cbEncodingMode = new System.Windows.Forms.ComboBox();
-            this.encoderProfile = new MeGUI.core.gui.ConfigableProfilesControl();
             this.chkDefaultStream = new System.Windows.Forms.CheckBox();
             this.chkForceStream = new System.Windows.Forms.CheckBox();
-            this.input = new MeGUI.core.gui.FileSCBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.encoderProfile = new MeGUI.core.gui.ConfigableProfilesControl();
+            this.input = new MeGUI.core.gui.FileSCBox();
             ((System.ComponentModel.ISupportInitialize)(this.delay)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // subName
             // 
+            this.subName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.SetColumnSpan(this.subName, 3);
-            this.subName.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.subName.Location = new System.Drawing.Point(232, 33);
+            this.subName.Location = new System.Drawing.Point(232, 35);
             this.subName.MaxLength = 100;
             this.subName.Name = "subName";
             this.subName.Size = new System.Drawing.Size(199, 20);
@@ -193,33 +193,19 @@ namespace MeGUI
             // 
             // cbEncodingMode
             // 
-            this.cbEncodingMode.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbEncodingMode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.SetColumnSpan(this.cbEncodingMode, 3);
             this.cbEncodingMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbEncodingMode.FormattingEnabled = true;
-            this.cbEncodingMode.Location = new System.Drawing.Point(64, 123);
+            this.cbEncodingMode.Location = new System.Drawing.Point(64, 124);
             this.cbEncodingMode.Name = "cbEncodingMode";
             this.cbEncodingMode.Size = new System.Drawing.Size(253, 21);
             this.cbEncodingMode.TabIndex = 49;
             this.cbEncodingMode.SelectedIndexChanged += new System.EventHandler(this.cbEncodingMode_SelectedIndexChanged);
             // 
-            // encoderProfile
-            // 
-            this.encoderProfile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableLayoutPanel1.SetColumnSpan(this.encoderProfile, 5);
-            this.encoderProfile.Location = new System.Drawing.Point(64, 93);
-            this.encoderProfile.Name = "encoderProfile";
-            this.encoderProfile.ProfileSet = "Audio";
-            this.encoderProfile.Size = new System.Drawing.Size(367, 22);
-            this.encoderProfile.TabIndex = 48;
-            this.encoderProfile.SelectedProfileChanged += new System.EventHandler(this.encoderProfile_SelectedProfileChanged);
-            // 
             // chkDefaultStream
             // 
-            this.chkDefaultStream.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.chkDefaultStream.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.chkDefaultStream.AutoSize = true;
             this.chkDefaultStream.Location = new System.Drawing.Point(232, 66);
             this.chkDefaultStream.Name = "chkDefaultStream";
@@ -232,34 +218,17 @@ namespace MeGUI
             // 
             // chkForceStream
             // 
-            this.chkForceStream.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.chkForceStream.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.chkForceStream.AutoSize = true;
             this.tableLayoutPanel1.SetColumnSpan(this.chkForceStream, 2);
             this.chkForceStream.Location = new System.Drawing.Point(323, 66);
             this.chkForceStream.Name = "chkForceStream";
-            this.chkForceStream.Size = new System.Drawing.Size(83, 17);
+            this.chkForceStream.Size = new System.Drawing.Size(108, 17);
             this.chkForceStream.TabIndex = 45;
             this.chkForceStream.Text = "forced track";
             this.chkForceStream.UseVisualStyleBackColor = true;
             this.chkForceStream.Visible = false;
             this.chkForceStream.CheckedChanged += new System.EventHandler(this.chkForceStream_CheckedChanged);
-            // 
-            // input
-            // 
-            this.input.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableLayoutPanel1.SetColumnSpan(this.input, 5);
-            this.input.Filter = "All files (*.*)|*.*";
-            this.input.Location = new System.Drawing.Point(64, 3);
-            this.input.MaximumSize = new System.Drawing.Size(1000, 29);
-            this.input.MinimumSize = new System.Drawing.Size(64, 29);
-            this.input.Name = "input";
-            this.input.SelectedIndex = -1;
-            this.input.SelectedItem = null;
-            this.input.Size = new System.Drawing.Size(367, 29);
-            this.input.TabIndex = 47;
-            this.input.Type = MeGUI.core.gui.FileSCBox.FileSCBoxType.OC_FILE;
-            this.input.SelectionChanged += new MeGUI.StringChanged(this.input_SelectionChanged);
             // 
             // label1
             // 
@@ -271,10 +240,36 @@ namespace MeGUI
             this.label1.TabIndex = 50;
             this.label1.Text = "Encoder";
             // 
+            // encoderProfile
+            // 
+            this.encoderProfile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel1.SetColumnSpan(this.encoderProfile, 5);
+            this.encoderProfile.Location = new System.Drawing.Point(64, 94);
+            this.encoderProfile.Name = "encoderProfile";
+            this.encoderProfile.ProfileSet = "Audio";
+            this.encoderProfile.Size = new System.Drawing.Size(367, 22);
+            this.encoderProfile.TabIndex = 48;
+            this.encoderProfile.SelectedProfileChanged += new System.EventHandler(this.encoderProfile_SelectedProfileChanged);
+            // 
+            // input
+            // 
+            this.input.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel1.SetColumnSpan(this.input, 5);
+            this.input.Filter = "All files (*.*)|*.*";
+            this.input.Location = new System.Drawing.Point(64, 3);
+            this.input.MaximumSize = new System.Drawing.Size(1000, 29);
+            this.input.MinimumSize = new System.Drawing.Size(64, 29);
+            this.input.Name = "input";
+            this.input.SelectedIndex = -1;
+            this.input.Size = new System.Drawing.Size(367, 29);
+            this.input.TabIndex = 47;
+            this.input.Type = MeGUI.core.gui.FileSCBox.FileSCBoxType.OC_FILE;
+            this.input.SelectionChanged += new MeGUI.StringChanged(this.input_SelectionChanged);
+            // 
             // OneClickStreamControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "OneClickStreamControl";
             this.Size = new System.Drawing.Size(434, 150);

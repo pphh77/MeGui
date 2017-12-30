@@ -68,6 +68,7 @@ namespace MeGUI
                     updateFormServerVersionColumnWidth, updateFormLocalDateColumnWidth, updateFormServerDateColumnWidth, 
                     updateFormLastUsedColumnWidth, updateFormStatusColumnWidth, updateFormServerArchitectureColumnWidth, 
                     ffmsThreads, chapterCreatorMinimumLength, updateCheckInterval, disablePackageInterval;
+        private double dpiScaleFactor;
         private SourceDetectorSettings sdSettings;
         private AutoEncodeDefaultsSettings aedSettings;
         private DialogSettings dialogSettings;
@@ -165,7 +166,7 @@ namespace MeGUI
             inputColumnWidth = 89;
             outputColumnWidth = 89;
             codecColumnWidth = 79;
-            ModeColumnWidth = 51;
+            modeColumnWidth = 51;
             statusColumnWidth = 65;
             ownerColumnWidth = 60;
             startColumnWidth = 58;
@@ -187,6 +188,14 @@ namespace MeGUI
             chapterCreatorSortString = "duration";
             bShowDebugInformation = false;
             bEnableDirectShowSource = false;
+
+            // get the DPI scale factor
+            using (Graphics graphics = Graphics.FromHwnd(IntPtr.Zero))
+            {
+                float dpiX = graphics.DpiX;
+                float dpiY = graphics.DpiY;
+                dpiScaleFactor = dpiX / 96.0;
+            }
             bFirstUpdateCheck = true;
         }
 
@@ -221,6 +230,12 @@ namespace MeGUI
         {
             get { return bShowDebugInformation; }
             set { bShowDebugInformation = value; }
+        }
+
+        [XmlIgnore]
+        public double DPIScaleFactor
+        {
+            get { return dpiScaleFactor; }
         }
 
         public Point MainFormLocation
@@ -288,7 +303,7 @@ namespace MeGUI
             get { return updateFormLocalDateColumnWidth; }
             set { updateFormLocalDateColumnWidth = value; }
         }
-                
+
         public int UpdateFormServerDateColumnWidth
         {
             get { return updateFormServerDateColumnWidth; }
@@ -1300,7 +1315,11 @@ namespace MeGUI
             set { bAviSynthPlus = value; }
         }
 
-#region Methods
+        #region Methods
+        public int DPIRescale(int iOriginalValue)
+        {
+            return (int)Math.Round(iOriginalValue * dpiScaleFactor, 0);
+        }
 
         public bool IsDGIIndexerAvailable()
         {

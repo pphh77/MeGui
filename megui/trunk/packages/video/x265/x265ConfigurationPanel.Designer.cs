@@ -2369,8 +2369,8 @@ namespace MeGUI.packages.video.x265
             // 
             // x265ConfigurationPanel
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.Name = "x265ConfigurationPanel";
             this.Size = new System.Drawing.Size(510, 362);
             this.tabControl1.ResumeLayout(false);
