@@ -1765,7 +1765,7 @@ namespace MeGUI
 
             beingCalled++;
 
-            if (iTabPageIndex == 0 && subtitlesTab.TabCount == 2)
+            if (iTabPageIndex == 0 && subtitlesTab.TabCount == 3)
                 SubtitleAddTrack(true);
 
             subtitlesTab.TabPages.RemoveAt(iTabPageIndex);
@@ -1778,6 +1778,7 @@ namespace MeGUI
                 subtitlesTab.SelectedIndex = iTabPageIndex;
             else
                 subtitlesTab.SelectedIndex = subtitlesTab.TabCount - 3;
+            iSelectedSubtitleTabPage = subtitlesTab.SelectedIndex;
 
             beingCalled--;
             updatePossibleContainers();
@@ -1976,7 +1977,7 @@ namespace MeGUI
 
             beingCalled++;
 
-            if (iTabPageIndex == 0 && audioTab.TabCount == 2)
+            if (iTabPageIndex == 0 && audioTab.TabCount == 3)
                 AudioAddTrack(true);
 
             audioTab.TabPages.RemoveAt(iTabPageIndex);
@@ -1989,6 +1990,7 @@ namespace MeGUI
                 audioTab.SelectedIndex = iTabPageIndex;
             else
                 audioTab.SelectedIndex = audioTab.TabCount - 3;
+            iSelectedAudioTabPage = audioTab.SelectedIndex;
 
             beingCalled--;
             updatePossibleContainers();

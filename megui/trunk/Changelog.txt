@@ -1,3 +1,4 @@
+2811 [OneClick]             fixed "-" button behaviour if only one track is available (regression of 2808)
 2810                        added High DPI support
 
 Changelog 2774 --> 2808
