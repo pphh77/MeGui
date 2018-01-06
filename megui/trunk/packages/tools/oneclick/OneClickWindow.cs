@@ -497,7 +497,7 @@ namespace MeGUI
                     workingDirectory.Filename = strPath;
             }
 
-            updateFilename(false, false, true);
+            updateFilename(false, true, true);
 
             if (_oSettings.DAR.HasValue)
                 this.ar.Value = _oSettings.DAR;

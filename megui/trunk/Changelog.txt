@@ -1,3 +1,4 @@
+2812 [OneClick]             fixed not updating the output folder path properly (regression of 2807)
 2811 [OneClick]             fixed "-" button behaviour if only one track is available (regression of 2808)
 2810                        added High DPI support
 
