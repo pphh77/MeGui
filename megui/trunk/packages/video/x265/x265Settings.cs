@@ -33,8 +33,12 @@ namespace MeGUI
         public static string ID = "x265";
 
         public static readonly x265PsyTuningModes[] SupportedPsyTuningModes = new x265PsyTuningModes[] 
-        { x265PsyTuningModes.NONE, x265PsyTuningModes.PSNR, x265PsyTuningModes.SSIM, x265PsyTuningModes.ZeroLatency, x265PsyTuningModes.FastDecode 
-        };
+        { x265PsyTuningModes.NONE,
+          x265PsyTuningModes.PSNR,
+          x265PsyTuningModes.SSIM,
+          x265PsyTuningModes.ZeroLatency,
+          x265PsyTuningModes.FastDecode,
+          x265PsyTuningModes.Grain };
 
         public enum x265PsyTuningModes
         {
@@ -47,7 +51,9 @@ namespace MeGUI
             [EnumTitle("ZeroLatency")]
             ZeroLatency,
             [EnumTitle("FastDecode")]
-            FastDecode
+            FastDecode,
+            [EnumTitle("Grain")]
+            Grain
         };
 
         public enum x265PresetLevelModes : int 
@@ -190,26 +196,12 @@ namespace MeGUI
             set { preset = value; }
         }
 
-        public string x265Tuning
-        {
-            get { return "migrated"; }
-            set 
-            {
-                if (value.Equals("migrated"))
-                    return;
-                if (value.Equals("4"))
-                    psyTuningMode = x265PsyTuningModes.PSNR;
-                if (value.Equals("5"))
-                    psyTuningMode = x265PsyTuningModes.SSIM;
-                if (value.Equals("6"))
-                    tuneFastDecode = true;
-            }
-        }
         public x265PsyTuningModes x265PsyTuning
         {
             get { return psyTuningMode; }
             set { psyTuningMode = value; }
         }
+
         public decimal QuantizerCRF
         {
             get { return quantizerCrf; }
@@ -218,7 +210,6 @@ namespace MeGUI
 
         [XmlIgnore()]
         [MeGUI.core.plugins.interfaces.PropertyEqualityIgnoreAttribute()]
-
         public bool NoDCTDecimate
         {
             get { return noDctDecimate; }

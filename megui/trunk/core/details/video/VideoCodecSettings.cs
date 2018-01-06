@@ -106,36 +106,6 @@ namespace MeGUI
             get { return videoEncodyingType; }
             set { videoEncodyingType = value; }
         }
-        public string EncodingMode
-        {
-            get { return "migrated"; }
-            set
-            {
-                if (value.Equals("migrated"))
-                    return;
-
-                if (value.Equals("0"))
-                    videoEncodyingType = VideoEncodingMode.CBR;
-                else if (value.Equals("1"))
-                    videoEncodyingType = VideoEncodingMode.CQ;
-                else if (value.Equals("2") && !id.Equals("x265"))
-                    videoEncodyingType = VideoEncodingMode.twopass1;
-                else if (value.Equals("3") && !id.Equals("x265"))
-                    videoEncodyingType = VideoEncodingMode.twopass2;
-                else if (value.Equals("4") && !id.Equals("x265"))
-                    videoEncodyingType = VideoEncodingMode.twopassAutomated;
-                else if (value.Equals("5") && !id.Equals("x265"))
-                    videoEncodyingType = VideoEncodingMode.threepass1;
-                else if (value.Equals("6") && !id.Equals("x265"))
-                    videoEncodyingType = VideoEncodingMode.threepass2;
-                else if (value.Equals("7") && !id.Equals("x265"))
-                    videoEncodyingType = VideoEncodingMode.threepass3;
-                else if (value.Equals("8") && !id.Equals("x265"))
-                    videoEncodyingType = VideoEncodingMode.threepassAutomated;
-                else
-                    videoEncodyingType = VideoEncodingMode.quality;
-            }
-        }
 		public int BitrateQuantizer
 		{
 			get { return bitrateQuantizer; }

@@ -118,6 +118,7 @@ namespace MeGUI
                     case x265Settings.x265PsyTuningModes.SSIM: sb.Append("--tune ssim "); break;
                     case x265Settings.x265PsyTuningModes.FastDecode: sb.Append("--tune fastdecode "); break;
                     case x265Settings.x265PsyTuningModes.ZeroLatency: sb.Append("--tune zerolatency "); break;
+                    case x265Settings.x265PsyTuningModes.Grain: sb.Append("--tune grain "); break;
                     default: break;
                 }
             }
