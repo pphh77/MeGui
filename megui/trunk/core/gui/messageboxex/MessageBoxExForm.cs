@@ -324,34 +324,41 @@ namespace MeGUI.core.gui.MessageBoxExLib
 			return maxStr;
 		}
 
-		/// <summary>
-		/// Sets the size and visibility of the Message
-		/// </summary>
-		private void SetMessageSizeAndVisibility()
-		{
-			if(rtbMessage.Text == null || rtbMessage.Text.Trim().Length == 0)
-			{
-				rtbMessage.Size = Size.Empty;
-				rtbMessage.Visible = false;
-			}
-			else
-			{
-				int maxWidth = _maxLayoutWidth;
-				if(panelIcon.Size.Width != 0)
-					maxWidth = maxWidth - (panelIcon.Size.Width + ICON_MESSAGE_PADDING);
+        /// <summary>
+        /// Sets the size and visibility of the Message
+        /// </summary>
+        private void SetMessageSizeAndVisibility()
+        {
+            if (rtbMessage.Text == null || rtbMessage.Text.Trim().Length == 0)
+            {
+                rtbMessage.Size = Size.Empty;
+                rtbMessage.Visible = false;
+            }
+            else
+            {
+                int maxWidth = _maxLayoutWidth;
+                if (panelIcon.Size.Width != 0)
+                {
+                    maxWidth = maxWidth - (panelIcon.Size.Width + ICON_MESSAGE_PADDING);
+                }
 
-				Size messageRectSize = MeasureString(rtbMessage.Text, maxWidth);
-				messageRectSize.Height = Math.Max(panelIcon.Height, messageRectSize.Height);
+                //We need to account for scroll bar width and height, otherwise for certains
+                //kinds of text the scroll bar shows up unnecessarily
+                maxWidth = maxWidth - SystemInformation.VerticalScrollBarWidth;
+                Size messageRectSize = MeasureString(rtbMessage.Text, maxWidth);
+
+                messageRectSize.Width += SystemInformation.VerticalScrollBarWidth;
+                messageRectSize.Height = Math.Max(panelIcon.Height, messageRectSize.Height) + SystemInformation.HorizontalScrollBarHeight;
 
                 rtbMessage.Size = messageRectSize;
-				rtbMessage.Visible = true;
-			}
-		}
+                rtbMessage.Visible = true;
+            }
+        }
 
-		/// <summary>
-		/// Sets the size and visibility of the Icon
-		/// </summary>
-		private void SetIconSizeAndVisibility()
+        /// <summary>
+        /// Sets the size and visibility of the Icon
+        /// </summary>
+        private void SetIconSizeAndVisibility()
 		{
 			if(_iconImage == null)
 			{

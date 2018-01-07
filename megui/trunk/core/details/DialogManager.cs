@@ -311,7 +311,7 @@ namespace MeGUI
                     "they could be in violation of your local laws. MeGUI will let you choose\r\n" + 
                     "what files to update but please check your local laws about patents\r\n" + 
                     "before proceeding. By clicking on the 'Yes' button you declare you have\r\n" + 
-                    "read and accepted this information.\n\r\n\rDo you wish to proceed reviewing the updates?",
+                    "read and accepted this information.\n\rDo you wish to proceed reviewing the updates?",
                                         "Updates Available", MessageBoxIcon.Question, out askAgain);
 
                 if (!bResult && !askAgain)
