@@ -1,3 +1,4 @@
+2817 [HD Streams Extractor] improved deletion of log and gaps files
 2816 [Jobs]                 aborting a job also deletes the temporary files assigned to it
 2815 [MessageBoxEx]         cosmetics
 2813 [x265]                 added support for --tune grain

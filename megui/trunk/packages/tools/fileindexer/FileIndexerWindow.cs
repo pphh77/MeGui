@@ -596,8 +596,6 @@ namespace MeGUI
                 }
 
                 HDStreamsExJob oJob = new HDStreamsExJob(new List<string>() { input.Filename }, Path.GetDirectoryName(output.Text), null, sb.ToString(), 2);
-                oJob.FilesToDelete.Add(strTempMKVFile + ".gaps");
-                oJob.FilesToDelete.Add(Path.Combine(Path.GetDirectoryName(output.Text), Path.GetFileNameWithoutExtension(strTempMKVFile) + " - Log.txt"));
                 prepareJobs = new SequentialChain(oJob);
                 videoInput = strTempMKVFile;
             }

@@ -199,6 +199,18 @@ namespace MeGUI
                     sb.Append(string.Format("{0} {1}", strSource, job.Args.Trim() + " -progressnumbers"));
                 }
 
+                MatchCollection arrOutputFiles = Regex.Matches(job.Args, "[0-9]:\".+?\"");
+                foreach (Match oOutputFile in arrOutputFiles)
+                {
+                    string strOutputFile = oOutputFile.Groups[0].Value.Substring(3, oOutputFile.Groups[0].Value.Length - 4);
+                    if (!job.FilesToDelete.Contains(strOutputFile + ".gaps"))
+                        job.FilesToDelete.Add(strOutputFile + ".gaps");
+
+                    string strLogFile = System.IO.Path.Combine(job.Output, System.IO.Path.GetFileNameWithoutExtension(strOutputFile) + " - Log.txt");
+                    if (!job.FilesToDelete.Contains(strLogFile))
+                        job.FilesToDelete.Add(strLogFile);
+                }
+
                 return sb.ToString();
             }
         }
