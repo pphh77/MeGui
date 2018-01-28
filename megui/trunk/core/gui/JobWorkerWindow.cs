@@ -716,37 +716,31 @@ namespace MeGUI.core.gui
         {
             if (currentJob == null)
                 return;
+
             TaggedJob job = currentJob;
             job.Status = JobStatus.ABORTED;
             job.End = DateTime.Now;
-            long iCounter = 0;
-            
-            LogItem i = new LogItem("Deleting aborted output");
 
+            LogItem i = new LogItem(string.Format("[{0:G}] {1}", DateTime.Now, "Deleting aborted output"));
             i.LogValue("Delete aborted output set", mainForm.Settings.DeleteAbortedOutput);
-
             if (mainForm.Settings.DeleteAbortedOutput && File.Exists(job.Job.Output))
             {
-                i.LogValue("File to delete", job.Job.Output);
-                while (File.Exists(job.Job.Output))
+                // delete outout file and temporary files
+                if (File.Exists(job.Job.Output))
                 {
-                    try
-                    {
-                        File.Delete(job.Job.Output);
-                    }
-                    catch (Exception e)
-                    {
-                        if (++iCounter >= 3)
-                        {
-                            i.LogValue("Problem deleting file", e.Message, ImageType.Warning);
-                            break;
-                        }
-                        else
-                            System.Threading.Thread.Sleep(2000);
-                    }
+                    FileUtil.DeleteFile(job.Job.Output, i);
+                    if (!File.Exists(job.Job.Output))
+                        i.LogValue("File deleted", job.Job.Output);
                 }
-                if (!File.Exists(job.Job.Output))
-                    i.LogEvent("File deleted");
+                foreach (string strFile in job.Job.FilesToDelete)
+                {
+                    if (!File.Exists(strFile))
+                        continue;
+
+                    FileUtil.DeleteFile(strFile, i);
+                    if (!File.Exists(strFile))
+                        i.LogValue("File deleted", strFile);
+                }
             }
             log.Add(i);
         }

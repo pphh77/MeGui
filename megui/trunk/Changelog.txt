@@ -1,3 +1,4 @@
+2816 [Jobs]                 aborting a job also deletes the temporary files assigned to it
 2815 [MessageBoxEx]         cosmetics
 2813 [x265]                 added support for --tune grain
 2812 [OneClick]             fixed not updating the output folder path properly (regression of 2807)
