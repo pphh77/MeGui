@@ -176,7 +176,7 @@ namespace MeGUI
             if (player != null)
 				player.Close();
             if (detector != null)
-                detector.stop();
+                detector.Stop();
             detector = null;
 			base.OnClosing (e);
 		}
@@ -1085,14 +1085,14 @@ namespace MeGUI
                     mainForm.Settings.SourceDetectorSettings,
                     new UpdateSourceDetectionStatus(analyseUpdate),
                     new FinishedAnalysis(finishedAnalysis));
-                    detector.analyse();
+                    detector.Analyse();
                 deintStatusLabel.Text = "Analysing...";
             }
             else // We want to cancel the analysis
             {
                 if (detector != null)
                 {
-                    detector.stop();
+                    detector.Stop();
                     detector = null;
                 }
                 analyseButton.Text = "Analyse";
@@ -1106,7 +1106,7 @@ namespace MeGUI
         {
             if (error)
             {
-                detector.stop();
+                detector.Stop();
                 Invoke(new MethodInvoker(delegate
                 {
                     MessageBox.Show(this, errorMessage, "Error in analysis", MessageBoxButtons.OK, MessageBoxIcon.Error);

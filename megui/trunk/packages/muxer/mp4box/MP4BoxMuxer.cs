@@ -99,7 +99,7 @@ namespace MeGUI
                         if (String.IsNullOrEmpty(su.Status) || !su.Status.Equals("Importing Video Track..."))
                         {
                             su.Status = "Importing Video Track...";
-                            startTime = DateTime.Now;
+                            su.ResetTime();
                         }
                     }
                     else if (trackNumber == 2 && numberOfAudioTracks > 0) // first audio track
@@ -107,7 +107,7 @@ namespace MeGUI
                         if (String.IsNullOrEmpty(su.Status) || !su.Status.Equals("Importing Audio Track 1..."))
                         {
                             su.Status = "Importing Audio Track 1...";
-                            startTime = DateTime.Now;
+                            su.ResetTime();
                         }
                     }
                     else if (trackNumber == 3 && numberOfAudioTracks > 1) // second audio track
@@ -115,7 +115,7 @@ namespace MeGUI
                         if (String.IsNullOrEmpty(su.Status) || !su.Status.Equals("Importing Audio Track 2..."))
                         {
                             su.Status = "Importing Audio Track 2...";
-                            startTime = DateTime.Now;
+                            su.ResetTime();
                         }
                     }
                     else
@@ -123,7 +123,7 @@ namespace MeGUI
                         if (String.IsNullOrEmpty(su.Status) || !su.Status.Equals("Importing Tracks..."))
                         {
                             su.Status = "Importing Tracks...";
-                            startTime = DateTime.Now;
+                            su.ResetTime();
                         }
                     }
                     break;
@@ -138,7 +138,7 @@ namespace MeGUI
                     if (String.IsNullOrEmpty(su.Status) || !su.Status.Equals("Writing..."))
                     {
                         su.Status = "Writing...";
-                        startTime = DateTime.Now;
+                        su.ResetTime();
                     }
                     break;
 

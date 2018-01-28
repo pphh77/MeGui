@@ -342,7 +342,6 @@ namespace MeGUI.core.gui
             this.pauseButton.TabIndex = 2;
             this.pauseButton.UseVisualStyleBackColor = true;
             this.pauseButton.Visible = false;
-            this.pauseButton.Click += new System.EventHandler(this.pauseButton_Click);
             // 
             // editJobButton
             // 

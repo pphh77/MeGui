@@ -19,6 +19,7 @@
 // ****************************************************************************
 
 using System;
+using System.Diagnostics;
 
 using MeGUI.core.util;
 
@@ -31,35 +32,38 @@ namespace MeGUI
 	public class StatusUpdate
 	{
 		private bool hasError, isComplete, wasAborted;
-        private string error, log, jobName, status;
-        private TimeSpan? audioPosition, cliplength, estimatedTime;
+        private string jobName, status;
+        private TimeSpan? clipPosition, clipLength, estimatedTime;
         private ulong? nbFramesDone, nbFramesTotal;
-		private TimeSpan timeElapsed;
-        private FileSize? filesize, audioFileSize, projectedFileSize;
+        private FileSize? filesize, projectedFileSize;
         private string processingspeed;
 		private decimal percentage;
         private JobStatus jobStatus;
-		internal StatusUpdate(string name)
+        private static readonly TimeSpan FiveSeconds = new TimeSpan(0, 0, 5);
+        private const int UpdatesPerEstimate = 10;
+        private TimeSpan[] previousUpdates = new TimeSpan[UpdatesPerEstimate];
+        private decimal[] previousUpdatesProgress = new decimal[UpdatesPerEstimate];
+        private int updateIndex = 0;
+        private Stopwatch oTimePaused = new Stopwatch();
+        private DateTime oTimeStart;
+        private TimeSpan oTimeElapsed;
+
+        internal StatusUpdate(string name)
 		{
             jobName = name;
-
             estimatedTime = null;
 			hasError = false;
 			isComplete = false;
 			wasAborted = false;
-			error = null;
-			log = null;
-			audioPosition = null;
-            cliplength = null;
-			audioFileSize = null;
+			clipPosition = null;
+            clipLength = null;
             nbFramesDone = null;
             nbFramesTotal = null;
 			projectedFileSize = null;
-			timeElapsed = TimeSpan.Zero;
             processingspeed = null;
 			filesize = null;
             jobStatus = MeGUI.JobStatus.PROCESSING;
-
+            ResetTime();
             for (int i = 0; i < UpdatesPerEstimate; ++i)
             {
                 previousUpdates[i] = TimeSpan.Zero;
@@ -82,25 +86,14 @@ namespace MeGUI
         public JobStatus JobStatus
         {
             get { return jobStatus; }
-            set { jobStatus = value; }
-        }
-
-        /// <summary>
-        /// Does the job have any Log?
-        /// </summary>
-        public string Log
-        {
-            get { return log; }
-            set { log = value; }
-        }
-
-        /// <summary>
-        /// What is the error ?
-        /// </summary>
-        public string Error
-        {
-            get { return error; }
-            set { error = value; }
+            set
+            {
+                jobStatus = value;
+                if (jobStatus == JobStatus.PAUSED)
+                    oTimePaused.Start();
+                else
+                    oTimePaused.Stop();
+            }
         }
 
 		/// <summary>
@@ -108,73 +101,73 @@ namespace MeGUI
 		/// </summary>
 		public bool HasError
 		{
-			get {return hasError;}
-			set {hasError = value;}
+			get { return hasError; }
+			set { hasError = value; }
 		}
+
 		/// <summary>
 		///  has the encoding job completed?
 		/// </summary>
 		public bool IsComplete
 		{
-			get {return isComplete;}
-			set {isComplete = value;}
+			get { return isComplete; }
+			set { isComplete = value; }
 		}
+
 		/// <summary>
 		/// did we get this statusupdate because the job was aborted?
 		/// </summary>
 		public bool WasAborted
 		{
-			get {return wasAborted;}
-			set {wasAborted = value;}
+			get { return wasAborted; }
+			set { wasAborted = value; }
 		}
+
 		/// <summary>
 		/// name of the job this statusupdate is refering to
 		/// </summary>
 		public string JobName
 		{
-			get {return jobName;}
-			set {jobName = value;}
+			get { return jobName; }
+			set { jobName = value; }
 		}
+
 		/// <summary>
 		///  position in clip
 		/// </summary>
 		public TimeSpan? ClipPosition
 		{
-			get {return audioPosition;}
-            set { _currentTime = value ?? _currentTime; audioPosition = _currentTime; }
+			get { return clipPosition; }
+            set { _currentTime = value ?? _currentTime; clipPosition = _currentTime; }
 		}
+
         /// <summary>
         /// Length of clip
         /// </summary>
         public TimeSpan? ClipLength
         {
-            get { return cliplength; }
-            set { _totalTime = value ?? _totalTime; cliplength = _totalTime;  }
+            get { return clipLength; }
+            set { _totalTime = value ?? _totalTime; clipLength = _totalTime;  }
         }
+
 		/// <summary>
 		/// number of frames that have been encoded so far
 		/// </summary>
 		public ulong? NbFramesDone
 		{
-			get {return nbFramesDone;}
+			get { return nbFramesDone; }
             set { _frame = value ?? _frame; nbFramesDone = _frame; }
 		}
+
 		/// <summary>
 		/// number of frames of the source
 		/// </summary>
 		public ulong? NbFramesTotal
 		{
-			get {return nbFramesTotal;}
+			get { return nbFramesTotal; }
             set { _framecount = value ?? _framecount; nbFramesTotal = _framecount; }
 		}
-		/// <summary>
-		///  current encoding speed
-		/// </summary>
-		public decimal? FPS
-		{
-//			get {return fps;}
-			set {_fps = value ?? _fps;}
-		}
+
         /// <summary>
         /// Some estimate of the encoding speed (eg FPS, or ratio to realtime)
         /// </summary>
@@ -182,18 +175,21 @@ namespace MeGUI
         {
             get { return processingspeed; }
         }
+
 		/// <summary>
 		/// projected output size
 		/// </summary>
 		public FileSize? ProjectedFileSize
 		{
-			get {return projectedFileSize;}
+			get { return projectedFileSize; }
             set { _totalSize = value ?? _totalSize; projectedFileSize = _totalSize; }
 		}
+
         public int PercentageDone
         {
             get { return (int)PercentageDoneExact; }
         }
+
 		/// <summary>
 		/// gets / sets the exact percentage of the encoding progress
 		/// </summary>
@@ -202,54 +198,33 @@ namespace MeGUI
             get { return percentage; }
             set { _percent = value ?? _percent; percentage = _percent ?? 0M; }
         }
+
 		/// <summary>
 		/// size of the encoded file at this point
 		/// </summary>
 		public FileSize? CurrentFileSize
 		{
-			get {return filesize;}
+			get { return filesize; }
             set { _currentSize = value ?? _currentSize; filesize = _currentSize; }
 		}
 
-		/// <summary>
-		/// current size of the audio
-		/// this field is filled when muxing and contains the current size of the audio data
-		/// </summary>
-		public FileSize? AudioFileSize
-		{
-			set {audioFileSize = value;}
-		}
 		/// <summary>
 		/// time elapsed between start of encoding and the point where this status update is being sent
 		/// </summary>
 		public TimeSpan TimeElapsed
 		{
-			get {return timeElapsed;}
-			set {timeElapsed = value;}
+			get { return oTimeElapsed; }
 		}
-		/// <summary>
-		/// gets the elapsed time as a pretty string
-		/// </summary>
-        public string TimeElapsedString
-        {
-            get { return Util.ToString(TimeElapsed); }
-        }
 
-        /// <summary>
-        /// Gets/sets the estimated time for this encode
-        /// </summary>
-        public TimeSpan? EstimatedTime
+        public void ResetTime()
         {
-            get { return estimatedTime; }
-            set { _timeEstimate = value ?? _timeEstimate; estimatedTime = _timeEstimate; }
+            oTimePaused.Reset();
+            oTimeStart = DateTime.Now;
         }
-
 
         #region REAL variables
         TimeSpan? _timeEstimate = null;
         public FileSize? _audioSize = null;
-        decimal? _fps = null;
-
 
         // The following groups each allow progress to be calculated (in percent)
         decimal? _percent = null;
@@ -268,6 +243,8 @@ namespace MeGUI
         {
             try
             {
+                oTimeElapsed = (DateTime.Now - oTimeStart) - oTimePaused.Elapsed;
+
                 // First we attempt to find the percent done
                 decimal? fraction = null;
 
@@ -276,7 +253,7 @@ namespace MeGUI
                     fraction = _percent / 100M;
                 // Time estimates
                 else if (_timeEstimate.HasValue && _timeEstimate != TimeSpan.Zero)
-                    fraction = ((decimal)timeElapsed.Ticks / (decimal)_timeEstimate.Value.Ticks);
+                    fraction = ((decimal)oTimeElapsed.Ticks / (decimal)_timeEstimate.Value.Ticks);
                 // Frame counts
                 else if (_frame.HasValue && _framecount.HasValue && _framecount != 0)
                     fraction = ((decimal)_frame.Value / (decimal)_framecount.Value);
@@ -287,8 +264,8 @@ namespace MeGUI
                 else if (_currentTime.HasValue && _totalTime.HasValue && _totalTime != TimeSpan.Zero)
                     fraction = ((decimal)_currentTime.Value.Ticks / (decimal)_totalTime.Value.Ticks);
 
-
-                if (fraction.HasValue) percentage = fraction.Value * 100M;
+                if (fraction.HasValue)
+                    percentage = fraction.Value * 100M;
 
                 /// Frame counts
                 if (_frame.HasValue)
@@ -314,38 +291,37 @@ namespace MeGUI
                 // We don't estimate the current time or total time
                 // in the clip, because it would suggest we are measuring it.
                 if (_currentTime.HasValue)
-                    audioPosition = _currentTime;
+                    clipPosition = _currentTime;
                 if (_totalTime.HasValue)
-                    cliplength = _totalTime;
+                    clipLength = _totalTime;
                 // However, if we know the total time and the percent, it is
                 // ok to estimate the current position
                 if (_totalTime.HasValue && !_currentTime.HasValue && fraction.HasValue)
-                    audioPosition = new TimeSpan((long)((decimal)_totalTime.Value.Ticks * fraction.Value));
+                    clipPosition = new TimeSpan((long)((decimal)_totalTime.Value.Ticks * fraction.Value));
 
                 // FPS
-                if (_frame.HasValue && timeElapsed.TotalSeconds > 0)
+                if (_frame.HasValue && oTimeElapsed.TotalSeconds > 0)
                     processingspeed =
-                        Util.ToString((decimal)_frame.Value / (decimal)timeElapsed.TotalSeconds, false) + " FPS";
+                        Util.ToString((decimal)_frame.Value / (decimal)oTimeElapsed.TotalSeconds, false) + " FPS";
                 // Other processing speeds
-                else if (_currentTime.HasValue && timeElapsed.Ticks > 0)
+                else if (_currentTime.HasValue && oTimeElapsed.Ticks > 0)
                     processingspeed =
-                        Util.ToString((decimal)_currentTime.Value.Ticks / (decimal)timeElapsed.Ticks, false) + "x realtime";
-                else if (fraction.HasValue && _totalTime.HasValue && timeElapsed.Ticks > 0)
+                        Util.ToString((decimal)_currentTime.Value.Ticks / (decimal)oTimeElapsed.Ticks, false) + "x realtime";
+                else if (fraction.HasValue && _totalTime.HasValue && oTimeElapsed.Ticks > 0)
                     processingspeed =
-                        Util.ToString((decimal)_totalTime.Value.Ticks * fraction.Value / (decimal)timeElapsed.Ticks, false) + "x realtime";
-
+                        Util.ToString((decimal)_totalTime.Value.Ticks * fraction.Value / (decimal)oTimeElapsed.Ticks, false) + "x realtime";
 
                 // Processing time
                 if (fraction.HasValue)
                 {
-                    TimeSpan time = timeElapsed - previousUpdates[updateIndex];
+                    TimeSpan time = oTimeElapsed - previousUpdates[updateIndex];
                     decimal progress = fraction.Value - previousUpdatesProgress[updateIndex];
                     if (progress > 0 && time > FiveSeconds)
                         estimatedTime = new TimeSpan((long)((decimal)time.Ticks * (1M - fraction) / progress));
                     else
-                        estimatedTime = new TimeSpan((long)((decimal)timeElapsed.Ticks * ((1 / fraction.Value) - 1)));
+                        estimatedTime = new TimeSpan((long)((decimal)oTimeElapsed.Ticks * ((1 / fraction.Value) - 1)));
 
-                    previousUpdates[updateIndex] = timeElapsed;
+                    previousUpdates[updateIndex] = oTimeElapsed;
                     previousUpdatesProgress[updateIndex] = fraction.Value;
                     updateIndex = (updateIndex+1)% UpdatesPerEstimate;
                 }
@@ -354,11 +330,5 @@ namespace MeGUI
             {
             }
         }
-
-        static readonly TimeSpan FiveSeconds = new TimeSpan(0, 0, 5);
-        const int UpdatesPerEstimate = 10;
-        TimeSpan[] previousUpdates = new TimeSpan[UpdatesPerEstimate];
-        decimal[] previousUpdatesProgress = new decimal[UpdatesPerEstimate];
-        int updateIndex = 0;
 	}
 }

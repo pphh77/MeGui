@@ -137,6 +137,8 @@ namespace MeGUI.core.details
                         return "waiting";
                     case JobStatus.PROCESSING:
                         return "processing";
+                    case JobStatus.PAUSED:
+                        return "paused";
                     case JobStatus.POSTPONED:
                         return "postponed";
                     case JobStatus.ERROR:

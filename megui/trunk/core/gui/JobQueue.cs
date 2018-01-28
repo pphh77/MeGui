@@ -37,28 +37,15 @@ namespace MeGUI.core.gui
     internal delegate void SingleJobHandler(TaggedJob job);
     internal delegate void MultiJobHandler(List<TaggedJob> jobs);
     public enum StartStopMode { Start, Stop };
-    public enum PauseResumeMode { Pause, Resume, Disabled };
     public enum Dependencies { DeleteAll, RemoveDependencies }
 
     public partial class JobQueue : UserControl
     {
-        #region pause/play image
-#if CSC
-        private static readonly string __Name = "";
-#else
-        private static readonly string __Name = "MeGUI.";
-#endif
-        private static readonly System.Reflection.Assembly myAssembly = typeof(JobQueue).Assembly;
-        private static readonly Bitmap pauseImage = new Bitmap(myAssembly.GetManifestResourceStream(__Name + "pause.ico"));
-        private static readonly Bitmap playImage = new Bitmap(myAssembly.GetManifestResourceStream(__Name + "play.ico"));
-        #endregion
-
         private Dictionary<string, TaggedJob> jobs = new Dictionary<string, TaggedJob>();
         private List<ToolStripItem> singleJobHandlers = new List<ToolStripItem>();
         private List<ToolStripItem> multiJobHandlers = new List<ToolStripItem>();
         private List<Pair<ToolStripMenuItem, MultiJobMenuGenerator>> menuGenerators = new List<Pair<ToolStripMenuItem, MultiJobMenuGenerator>>();
         private StartStopMode startStopMode;
-        private PauseResumeMode pauseResumeMode;
 
         [Browsable(false)]
         public StartStopMode StartStopMode
@@ -81,39 +68,6 @@ namespace MeGUI.core.gui
 
                     case StartStopMode.Stop:
                         startStopButton.Text = "Stop";;
-                        break;
-                }
-            }
-        }
-
-        [Browsable(false)]
-        public PauseResumeMode PauseResumeMode
-        {
-            get { return pauseResumeMode; }
-            set
-            {
-                if (InvokeRequired)
-                {
-                    Invoke(new MethodInvoker(delegate { PauseResumeMode = value; }));
-                    return;
-                }
-
-                pauseResumeMode = value;
-                switch (value)
-                {
-                    case PauseResumeMode.Disabled:
-                        pauseButton.Enabled = false;
-                        pauseButton.Image = pauseImage;
-                        break;
-
-                    case PauseResumeMode.Pause:
-                        pauseButton.Enabled = true;
-                        pauseButton.Image = pauseImage;
-                        break;
-
-                    case PauseResumeMode.Resume:
-                        pauseButton.Enabled = true;
-                        pauseButton.Image = playImage;
                         break;
                 }
             }
@@ -298,9 +252,7 @@ namespace MeGUI.core.gui
         public JobQueue()
         {
             InitializeComponent();
-            StartStopMode = StartStopMode.Start;
-            PauseResumeMode = PauseResumeMode.Disabled;
-            
+            StartStopMode = StartStopMode.Start;            
             this.LoadComponentSettings();
         }
 
@@ -309,8 +261,6 @@ namespace MeGUI.core.gui
         public event EventHandler AbortClicked;
         public event EventHandler StartClicked;
         public event EventHandler StopClicked;
-        public event EventHandler PauseClicked;
-        public event EventHandler ResumeClicked;
 
         private List<TaggedJob> removeAllDependantJobsFromQueue(TaggedJob job)
         {
@@ -580,7 +530,7 @@ namespace MeGUI.core.gui
             {
                 int position = this.queueListView.SelectedItems[0].Index;
                 TaggedJob job = jobs[this.queueListView.SelectedItems[0].Text];
-                if (job.Status == JobStatus.PROCESSING || job.Status == JobStatus.ABORTING) // job is being processed -> do nothing
+                if (job.Status == JobStatus.PROCESSING || job.Status == JobStatus.PAUSED || job.Status == JobStatus.ABORTING) // job is being processed -> do nothing
                     return;
                 if (job.Status == JobStatus.WAITING) // waiting -> postponed
                     job.Status = JobStatus.POSTPONED;
@@ -602,7 +552,7 @@ namespace MeGUI.core.gui
                 int position = item.Index;
                 TaggedJob job = jobs[item.Text];
 
-                Debug.Assert(job.Status != JobStatus.PROCESSING, "shouldn't be able to postpone an active job");
+                Debug.Assert(job.Status != JobStatus.PROCESSING && job.Status != JobStatus.PAUSED, "shouldn't be able to postpone an active job");
 
                 job.Status = JobStatus.POSTPONED;
                 this.queueListView.Items[position].SubItems[5].Text = job.StatusString;
@@ -622,7 +572,7 @@ namespace MeGUI.core.gui
                 int position = item.Index;
                 TaggedJob job = jobs[item.Text];
 
-                Debug.Assert(job.Status != JobStatus.PROCESSING, "shouldn't be able to set an active job back to waiting");
+                Debug.Assert(job.Status != JobStatus.PROCESSING && job.Status != JobStatus.PAUSED, "shouldn't be able to set an active job back to waiting");
 
                 job.Status = JobStatus.WAITING;
                 queueListView.Items[position].SubItems[5].Text = job.StatusString;
@@ -660,13 +610,13 @@ namespace MeGUI.core.gui
                 }
             }
         
-            AbortMenuItem.Enabled = AllJobsHaveStatus(JobStatus.PROCESSING) || AllJobsHaveStatus(JobStatus.ABORTED);
+            AbortMenuItem.Enabled = AllJobsHaveStatus(JobStatus.PROCESSING) || AllJobsHaveStatus(JobStatus.PAUSED) || AllJobsHaveStatus(JobStatus.ABORTED);
             AbortMenuItem.Checked = AllJobsHaveStatus(JobStatus.ABORTED);
 
             EditMenuItem.Enabled = isSelectionEditable();
             EditMenuItem.Checked = false;
 
-            bool canModifySelectedJobs = !AnyJobsHaveStatus(JobStatus.PROCESSING) && !AnyJobsHaveStatus(JobStatus.ABORTING) && this.queueListView.SelectedItems.Count > 0;
+            bool canModifySelectedJobs = !AnyJobsHaveStatus(JobStatus.PROCESSING) && !AnyJobsHaveStatus(JobStatus.PAUSED) && !AnyJobsHaveStatus(JobStatus.ABORTING) && this.queueListView.SelectedItems.Count > 0;
             DeleteMenuItem.Enabled = PostponedMenuItem.Enabled = WaitingMenuItem.Enabled = canModifySelectedJobs;
 
             DeleteMenuItem.Checked = false;
@@ -712,29 +662,6 @@ namespace MeGUI.core.gui
                     break;
             }
         }
-
-        private void pauseButton_Click(object sender, EventArgs e)
-        {
-            switch (pauseResumeMode)
-            {
-                case PauseResumeMode.Disabled:
-                    throw new Exception("The supposedly disabled pause button was clicked");
-
-                case PauseResumeMode.Pause:
-				    if (PauseClicked != null)
-				    {
-				        PauseClicked(this, e);
-				    }
-                    break;
-
-                case PauseResumeMode.Resume:
-					if (ResumeClicked != null)
-					{
-						ResumeClicked(this, e);
-					}
-                    break;
-            }
-        }
         #endregion
 
         #region redrawing
@@ -771,7 +698,7 @@ namespace MeGUI.core.gui
                     item.SubItems[8].Text = "";
                     item.SubItems[9].Text = "";
                 }
-                if (job.Status == JobStatus.DONE || job.Status == JobStatus.PROCESSING || job.Status == JobStatus.ABORTING)
+                if (job.Status == JobStatus.DONE || job.Status == JobStatus.PROCESSING || job.Status == JobStatus.PAUSED || job.Status == JobStatus.ABORTING)
                     item.SubItems[7].Text = job.Start.ToLongTimeString();
                 else
                     item.SubItems[7].Text = "";

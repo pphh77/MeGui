@@ -108,6 +108,22 @@ namespace MeGUI.core.gui
         }
 
         /// <summary>
+        /// callback for the progress window
+        /// this method is called if the suspend button in the progress window is called
+        /// it stops the encoder cold
+        /// </summary>
+        public void pw_Suspend()
+        {
+            if (currentJob.Status != JobStatus.PROCESSING && currentJob.Status != JobStatus.PAUSED)
+                return;
+
+            if (currentJob.Status == JobStatus.PROCESSING)
+                Pause();
+            else
+                Resume();
+        }
+
+        /// <summary>
         /// catches the ChangePriority event from the progresswindow and forward it to the encoder class
         /// </summary>
         /// <param name="priority"></param>
@@ -130,12 +146,6 @@ namespace MeGUI.core.gui
             get { return progress; }
         }
 
-        private PauseState pauseStatus;
-        public PauseState PauseStatus
-        {
-            get { return pauseStatus; }
-        }
-
         public string StatusString
         {
             get
@@ -153,11 +163,22 @@ namespace MeGUI.core.gui
                     _status += " (delete worker after current job)";
                 else if (status == JobWorkerStatus.Stopping)
                     _status += " (stop worker after current job)";
-                if (pauseStatus == PauseState.Paused)
+                if (currentJob != null && currentJob.Status == JobStatus.PAUSED)
                     _status += " (paused)";
                 return _status;
             }
-        }                        
+        }
+
+        public JobStatus JobStatus
+        {
+            get
+            {
+                if (currentJob != null)
+                    return currentJob.Status;
+                else
+                    return JobStatus.WAITING;
+            }
+        }
 
         private JobWorkerMode mode;
         public JobWorkerMode Mode
@@ -237,6 +258,7 @@ namespace MeGUI.core.gui
             
             pw = new ProgressWindow();
             pw.Abort += new AbortCallback(pw_Abort);
+            pw.Suspend += new SuspendCallback(pw_Suspend);
             pw.PriorityChanged += new PriorityChangedCallback(pw_PriorityChanged);
             pw.CreateControl();
             mainForm.RegisterForm(pw);
@@ -331,27 +353,22 @@ namespace MeGUI.core.gui
             {
                 case JobWorkerStatus.Idle:
                     jobQueue1.StartStopMode = StartStopMode.Start;
-                    jobQueue1.PauseResumeMode = PauseResumeMode.Disabled;
                     break;
 
                 case JobWorkerStatus.Postponed:
                     jobQueue1.StartStopMode = StartStopMode.Start;
-                    jobQueue1.PauseResumeMode = PauseResumeMode.Disabled;
                     break;
 
                 case JobWorkerStatus.Stopped:
                     jobQueue1.StartStopMode = StartStopMode.Start;
-                    jobQueue1.PauseResumeMode = PauseResumeMode.Disabled;
                     break;
 
                 case JobWorkerStatus.Running:
                     jobQueue1.StartStopMode = StartStopMode.Stop;
-                    jobQueue1.PauseResumeMode = (pauseStatus == PauseState.Paused) ? PauseResumeMode.Resume : PauseResumeMode.Pause;
                     break;
 
                 case JobWorkerStatus.Stopping:
                     jobQueue1.StartStopMode = StartStopMode.Start;
-                    jobQueue1.PauseResumeMode = (pauseStatus == PauseState.Paused) ? PauseResumeMode.Resume : PauseResumeMode.Pause;
                     break;
             }
             updateProgress();
@@ -536,7 +553,8 @@ namespace MeGUI.core.gui
                     {
                         TaggedJob job = mainForm.Jobs.ByName(su.JobName);
                         su.JobStatus = job.Status;
-                        pw.BeginInvoke(new UpdateStatusCallback(pw.UpdateStatus), su);
+                        if (job.Status != JobStatus.PAUSED)
+                            pw.BeginInvoke(new UpdateStatusCallback(pw.UpdateStatus), su);
                     }
                 }
                 catch (Exception e)
@@ -630,7 +648,6 @@ namespace MeGUI.core.gui
                 job.Status = JobStatus.PROCESSING;
                 job.Start = DateTime.Now;
                 status = JobWorkerStatus.Running;
-                pauseStatus = PauseState.Encoding;
                 currentJob = job;
 
                 // Start
@@ -657,7 +674,6 @@ namespace MeGUI.core.gui
                 currentProcessor = null;
                 currentJob = null;
                 status = JobWorkerStatus.Idle;
-                pauseStatus = PauseState.NotEncoding;
                 refreshAll();
                 return false;
             }
@@ -748,11 +764,11 @@ namespace MeGUI.core.gui
         #region pause / resume
         public void Pause()
         {
-            Debug.Assert(pauseStatus == PauseState.Encoding);
+            Debug.Assert(currentJob.Status == JobStatus.PROCESSING);
             try
             {
                 currentProcessor.pause();
-                pauseStatus = PauseState.Paused;
+                currentJob.Status = JobStatus.PAUSED;
                 refreshAll();
             }
             catch (JobRunException ex)
@@ -763,11 +779,11 @@ namespace MeGUI.core.gui
 
         public void Resume()
         {
-            Debug.Assert(pauseStatus == PauseState.Paused);
+            Debug.Assert(currentJob.Status == JobStatus.PAUSED);
             try
             {
                 currentProcessor.resume();
-                pauseStatus = PauseState.Encoding;
+                currentJob.Status = JobStatus.PROCESSING;
             }
             catch (JobRunException ex)
             {
@@ -802,7 +818,6 @@ namespace MeGUI.core.gui
             if (r == DialogResult.Yes)
                 Abort();
         }
-
 
         internal IEnumerable<TaggedJob> Jobs
         {
@@ -945,10 +960,8 @@ namespace MeGUI.core.gui
         }
     }
 
-    public enum PauseState { NotEncoding, Encoding, Paused }
     public enum JobWorkerMode { RequestNewJobs, CloseOnLocalListCompleted }
     public enum JobWorkerStatus { Idle, Running, Stopping, Stopped, Postponed }
     public enum JobsOnQueue { Delete, ReturnToMainQueue }
     public enum IdleReason { FinishedQueue, Stopped, Aborted }
-    
 }

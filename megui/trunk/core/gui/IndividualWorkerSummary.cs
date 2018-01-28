@@ -94,9 +94,18 @@ namespace MeGUI.core.gui
                 w.Show();
         }
 
+        private void pauseResumeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            w.pw_Suspend();
+        }
+
         private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
         {
             startEncodingToolStripMenuItem.Enabled = !w.IsEncoding;
+
+            pauseResumeToolStripMenuItem.Enabled = w.IsEncoding;
+            pauseResumeToolStripMenuItem.Checked = w.JobStatus == JobStatus.PAUSED;
+
             abortToolStripMenuItem.Enabled = w.IsEncoding;
             
             stopToolStripMenuItem.Enabled = w.IsEncoding;

@@ -114,7 +114,6 @@ namespace MeGUI.core.details
             this.jobQueue.Dock = System.Windows.Forms.DockStyle.Fill;
             this.jobQueue.Location = new System.Drawing.Point(0, 0);
             this.jobQueue.Name = "jobQueue";
-            this.jobQueue.PauseResumeMode = MeGUI.core.gui.PauseResumeMode.Disabled;
             this.jobQueue.Size = new System.Drawing.Size(553, 521);
             this.jobQueue.StartStopMode = MeGUI.core.gui.StartStopMode.Start;
             this.jobQueue.TabIndex = 0;

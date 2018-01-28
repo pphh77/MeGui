@@ -90,6 +90,7 @@ namespace MeGUI
         }
 
         #region local info
+
         private bool isAnime;
         bool error = false, continueWorking = true;
         string errorMessage = "";
@@ -103,9 +104,10 @@ namespace MeGUI
         private int tffCount = 0, bffCount = 0;
         private FieldOrder fieldOrder = FieldOrder.UNKNOWN;
         public bool majorityFilm, usingPortions;
-
         private string analysis;
         private List<DeinterlaceFilter> filters = new List<DeinterlaceFilter>();
+        private ManualResetEvent _mre = new System.Threading.ManualResetEvent(true); // lock used to pause processing
+
         #endregion
         #region Processing
         #region helper methods
@@ -170,6 +172,7 @@ namespace MeGUI
                     IntPtr zero = new IntPtr(0);
                     for (i = 0; i < frameCount && continueWorking; i++)
                     {
+                        _mre.WaitOne();
                         af.Clip.ReadFrame(zero, 0, i);
                     }
                     running = false;
@@ -686,6 +689,8 @@ namespace MeGUI
         #region finalizing
         private void finishProcessing()
         {
+            _mre.Set();  // Make sure nothing is waiting for pause to stop
+
             if (error)
             {
                 finishedAnalysis(null, true, errorMessage);
@@ -715,13 +720,21 @@ namespace MeGUI
         #endregion
         #endregion
         #region Program interface
-        public void analyse()
+        public void Analyse()
         {
             runScript(0, "#no trimming");
         }
-        public void stop()
+        public void Stop()
         {
             continueWorking = false;
+        }
+        public void Pause()
+        {
+            _mre.Reset();
+        }
+        public void Resume()
+        {
+            _mre.Set();
         }
         #endregion
     }

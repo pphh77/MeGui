@@ -258,7 +258,7 @@ namespace MeGUI
                                 {
                                     if (osInfo.Version.Revision.ToString() == "2222A")
                                         osName = "Windows 98 Second Edition";
-                                    else 
+                                    else
                                         osName = "Windows 98";
                                 }
                                 break;
@@ -272,7 +272,7 @@ namespace MeGUI
                         {
                             case 3:
                                 x64Detection = false;
-                                osName = "Windows NT 3.51"; 
+                                osName = "Windows NT 3.51";
                                 break;
                             case 4:
                                 {
@@ -315,7 +315,7 @@ namespace MeGUI
                                                     osName = "Windows Server 2003 Enterprise";
                                                 else if ((osVersionInfo.wSuiteMask & VER_SUITE_BLADE) == VER_SUITE_BLADE)
                                                     osName = "Windows Server 2003 Web";
-                                                else 
+                                                else
                                                     osName = "Windows Server 2003 Standard";
                                                 break;
                                             }
@@ -518,10 +518,10 @@ namespace MeGUI
             using (Microsoft.Win32.RegistryKey componentsKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(componentsKeyName))
             {
                 try
-                {                       
+                {
                     string[] instComps = componentsKey.GetSubKeyNames();
                     ArrayList versions = new ArrayList();
-                    
+
                     foreach (string instComp in instComps)
                     {
                         if (!instComp.StartsWith("v"))
@@ -561,7 +561,7 @@ namespace MeGUI
 
                     foreach (string version in versions)
                     {
-                        if (!String.IsNullOrEmpty(getSpecificVersion) && (version.StartsWith(getSpecificVersion) || DotNetVersionFormated(version).StartsWith(getSpecificVersion)) )
+                        if (!String.IsNullOrEmpty(getSpecificVersion) && (version.StartsWith(getSpecificVersion) || DotNetVersionFormated(version).StartsWith(getSpecificVersion)))
                             return DotNetVersionFormated(version);
                         fv = version;
                     }
@@ -830,7 +830,8 @@ namespace MeGUI
                 // make sure that the required child processes have been started already
                 DateTime oCheckStarted = DateTime.Now;
                 List<Process> arrProc = new List<Process>();
-                do {
+                do
+                {
                     arrProc = GetChildProcesses(oMainProcess);
                     int iCount = 0;
                     foreach (Process oProc in arrProc)
@@ -900,6 +901,83 @@ namespace MeGUI
             else
                 SetThreadPriority(handle, THREAD_MODE_BACKGROUND_END);
         }
-#endregion
+        #endregion
+
+        #region start/stop process
+        [Flags()]
+        public enum ThreadAccess : int
+        {
+            TERMINATE = (0x0001),
+            SUSPEND_RESUME = (0x0002),
+            GET_CONTEXT = (0x0008),
+            SET_CONTEXT = (0x0010),
+            SET_INFORMATION = (0x0020),
+            QUERY_INFORMATION = (0x0040),
+            SET_THREAD_TOKEN = (0x0080),
+            IMPERSONATE = (0x0100),
+            DIRECT_IMPERSONATION = (0x0200)
+        }
+
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr OpenThread(ThreadAccess dwDesiredAccess, bool bInheritHandle, uint dwThreadId);
+        [DllImport("kernel32.dll")]
+        private static extern uint SuspendThread(IntPtr hThread);
+        [DllImport("kernel32.dll")]
+        private static extern int ResumeThread(IntPtr hThread);
+        [DllImport("kernel32", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern bool CloseHandle(IntPtr handle);
+
+        public static void SuspendProcess(Process oMainProcess)
+        {
+            List<Process> arrProc = GetChildProcesses(oMainProcess);
+            arrProc.Insert(0, oMainProcess);
+
+            foreach (Process oProc in arrProc)
+            {
+                if (oProc.HasExited || oProc.ProcessName == string.Empty)
+                    continue;
+
+                foreach (ProcessThread pT in oProc.Threads)
+                {
+                    IntPtr pOpenThread = OpenThread(ThreadAccess.SUSPEND_RESUME, false, (uint)pT.Id);
+
+                    if (pOpenThread == IntPtr.Zero)
+                        continue;
+
+                    SuspendThread(pOpenThread);
+                    CloseHandle(pOpenThread);
+                }
+            }
+        }
+
+        public static void ResumeProcess(Process oMainProcess)
+        {
+            List<Process> arrProc = GetChildProcesses(oMainProcess);
+            arrProc.Insert(0, oMainProcess);
+
+            foreach (Process oProc in arrProc)
+            {
+                if (oProc.HasExited || oProc.ProcessName == string.Empty)
+                    continue;
+
+                foreach (ProcessThread pT in oProc.Threads)
+                {
+                    IntPtr pOpenThread = OpenThread(ThreadAccess.SUSPEND_RESUME, false, (uint)pT.Id);
+
+                    if (pOpenThread == IntPtr.Zero)
+                        continue;
+
+                    var suspendCount = 0;
+                    do
+                    {
+                        suspendCount = ResumeThread(pOpenThread);
+                    } while (suspendCount > 0);
+
+                    CloseHandle(pOpenThread);
+                }
+            }
+        }
+
+        #endregion
     }
 }

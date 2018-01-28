@@ -35,7 +35,6 @@ namespace MeGUI
     {
         #region variables
         protected TJob job;
-        protected DateTime startTime;
         protected bool isProcessing = false;
         protected Process proc = new Process(); // the encoder process
         protected string executable; // path and filename of the commandline encoder to be used
@@ -240,7 +239,7 @@ namespace MeGUI
             {
                 bool started = proc.Start();
                 if (bFirstPass)
-                    startTime = DateTime.Now;
+                    su.ResetTime();
                 isProcessing = true;
                 log.LogEvent("Process started");
                 stdoutLog = log.Info(string.Format("[{0:G}] {1}", DateTime.Now, "Standard output stream"));
@@ -300,6 +299,7 @@ namespace MeGUI
         {
             if (!canPause)
                 throw new JobRunException("Can't pause this kind of job.");
+            OSInfo.SuspendProcess(proc);
             if (!mre.Reset())
                 throw new JobRunException("Could not reset mutex. pause failed");
         }
@@ -308,6 +308,7 @@ namespace MeGUI
         {
             if (!canPause)
                 throw new JobRunException("Can't resume this kind of job.");
+            OSInfo.ResumeProcess(proc);
             if (!mre.Set())
                 throw new JobRunException("Could not set mutex. pause failed");
         }
@@ -325,14 +326,14 @@ namespace MeGUI
                 {
                     OSInfo.SetProcessPriority(proc, priority, iMinimumChildProcessCount);
                     MainForm.Instance.Settings.ProcessingPriority = priority;
-				    return;
+                    return;
                 }
                 catch (Exception e) // process could not be running anymore
                 {
                     throw new JobRunException(e);
                 }
             }
-            else 
+            else
             {
                 if (proc == null)
                     throw new JobRunException("Process has not been started yet");
@@ -426,9 +427,7 @@ namespace MeGUI
         {
             while (isRunning())
             {
-                su.TimeElapsed = DateTime.Now - startTime;
                 su.CurrentFileSize = FileSize.Of2(job.Output);
-
                 doStatusCycleOverrides();
                 su.FillValues();
                 if (StatusUpdate != null && proc != null && !proc.HasExited)

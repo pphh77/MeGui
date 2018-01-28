@@ -50,6 +50,7 @@
             this.jobNameLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.helpButton1 = new MeGUI.core.gui.HelpButton();
+            this.btnSuspend = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -283,11 +284,22 @@
             this.helpButton1.Size = new System.Drawing.Size(38, 23);
             this.helpButton1.TabIndex = 5;
             // 
+            // btnSuspend
+            // 
+            this.btnSuspend.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSuspend.Location = new System.Drawing.Point(158, 252);
+            this.btnSuspend.Name = "btnSuspend";
+            this.btnSuspend.Size = new System.Drawing.Size(75, 23);
+            this.btnSuspend.TabIndex = 8;
+            this.btnSuspend.Text = "Suspend";
+            this.btnSuspend.Click += new System.EventHandler(this.btnSuspend_Click);
+            // 
             // ProgressWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(326, 306);
+            this.Controls.Add(this.btnSuspend);
             this.Controls.Add(this.helpButton1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.priority);
@@ -304,6 +316,7 @@
             this.Name = "ProgressWindow";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "Status";
+            this.VisibleChanged += new System.EventHandler(this.ProgressWindow_VisibleChanged);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
@@ -315,6 +328,7 @@
         #endregion
 
         public event AbortCallback Abort; // event fired if the abort button has been pressed
+        public event SuspendCallback Suspend; // event fired if the suspend button has been pressed
         public event PriorityChangedCallback PriorityChanged; // event fired if the priority dropdown has changed
         private System.Windows.Forms.Label currentVideoFrameLabel;
         private System.Windows.Forms.TextBox currentVideoFrame;
@@ -339,5 +353,6 @@
         private MeGUI.core.gui.HelpButton helpButton1;
         private ITaskbarList3 taskbarProgress;
         private System.Windows.Forms.ToolStripStatusLabel jobNameLabel;
+        private System.Windows.Forms.Button btnSuspend;
     }
 }

@@ -39,10 +39,10 @@ namespace MeGUI
             return null;
         }
 
+        private ManualResetEvent _mre = new System.Threading.ManualResetEvent(true); // lock used to pause encoding
         private Thread _processThread = null;
         private Thread _processTime = null;
         private SourceDetector _sourceDetector = null;
-        private DateTime _start;
         private StatusUpdate su;
         private OneClickPostProcessingJob job;
         private LogItem _log;
@@ -78,7 +78,7 @@ namespace MeGUI
             }
             if (_sourceDetector != null)
             {
-                _sourceDetector.stop();
+                _sourceDetector.Stop();
                 _sourceDetector = null;
             }
         }
@@ -97,6 +97,8 @@ namespace MeGUI
 
         private void raiseEvent()
         {
+            if (su.IsComplete || su.WasAborted || su.HasError)
+                _mre.Set();  // Make sure nothing is waiting for pause to stop
             if (StatusUpdate != null)
                 StatusUpdate(su);
         }
@@ -104,16 +106,14 @@ namespace MeGUI
         private void setProgress(decimal n)
         {
             if (n * 100M < su.PercentageDoneExact)
-                _start = DateTime.Now;
+                su.ResetTime();
             su.PercentageDoneExact = n * 100M;
-            su.TimeElapsed = DateTime.Now - _start;
             su.FillValues();
             raiseEvent();
         }
 
         private void updateTime()
         {
-            su.TimeElapsed = DateTime.Now - _start;
             su.FillValues();
             raiseEvent();
         }
@@ -134,7 +134,7 @@ namespace MeGUI
             {
                 _log.LogEvent("Processing thread started");
                 raiseEvent("Preprocessing...   ***PLEASE WAIT***");
-                _start = DateTime.Now;
+                su.ResetTime();
                 _processTime = new Thread(new ThreadStart(delegate
                 {
                     while (true)
@@ -157,6 +157,7 @@ namespace MeGUI
                 // audio handling
                 foreach (OneClickAudioTrack oAudioTrack in job.PostprocessingProperties.AudioTracks)
                 {
+                    _mre.WaitOne();
                     if (oAudioTrack.AudioTrackInfo != null)
                     {
                         if (oAudioTrack.AudioTrackInfo.ExtractMKVTrack)
@@ -219,6 +220,7 @@ namespace MeGUI
                     _log.LogEvent("Desired size: " + job.PostprocessingProperties.OutputSize);
                 _log.LogEvent("Split size: " + job.PostprocessingProperties.Splitting);
 
+                _mre.WaitOne();
 
                 // video file handling
                 string avsFile = String.Empty;
@@ -232,6 +234,8 @@ namespace MeGUI
                         job.PostprocessingProperties.AvsSettings, job.PostprocessingProperties.AutoDeinterlace, videoSettings,
                         job.PostprocessingProperties.AutoCrop, job.PostprocessingProperties.KeepInputResolution,
                         job.PostprocessingProperties.UseChaptersMarks);
+
+                    _mre.WaitOne();
 
                     // check AVS file 
                     ulong frameCount;
@@ -275,6 +279,8 @@ namespace MeGUI
                     myVideo.Framerate = (decimal)oInfo.VideoInfo.FPS;
                     myVideo.NumberOfFrames = oInfo.VideoInfo.FrameCount;
                 }
+
+                _mre.WaitOne();
 
                 intermediateFiles.Add(avsFile);
                 intermediateFiles.Add(job.IndexFile);
@@ -346,6 +352,8 @@ namespace MeGUI
                         }
                     }
 
+                    _mre.WaitOne();
+
                     JobChain c = VideoUtil.GenerateJobSeries(myVideo, job.PostprocessingProperties.FinalOutput, arrAudioJobs.ToArray(), 
                         subtitles.ToArray(), job.PostprocessingProperties.Attachments, job.PostprocessingProperties.ChapterInfo, job.PostprocessingProperties.OutputSize,
                         job.PostprocessingProperties.Splitting, job.PostprocessingProperties.Container,
@@ -371,7 +379,8 @@ namespace MeGUI
             }
             catch (Exception e)
             {
-                _processTime.Abort();
+                if (_processTime != null)
+                    _processTime.Abort();
                 if (e is ThreadAbortException)
                 {
                     _log.LogEvent("Aborting...");
@@ -388,7 +397,9 @@ namespace MeGUI
                 }
                 return;
             }
-            _processTime.Abort();
+
+            if (_processTime != null)
+                _processTime.Abort();
             su.IsComplete = true;
             raiseEvent();
         }
@@ -646,9 +657,9 @@ namespace MeGUI
                     new UpdateSourceDetectionStatus(analyseUpdate),
                     new FinishedAnalysis(finishedAnalysis));
                 finished = false;
-                _sourceDetector.analyse();
+                _sourceDetector.Analyse();
                 waitTillAnalyseFinished();
-                _sourceDetector.stop();
+                _sourceDetector.Stop();
                 _sourceDetector = null;
                 deinterlaceLines = filters[0].Script;
                 if (interlaced)
@@ -807,16 +818,6 @@ namespace MeGUI
             this.su = su;
         }
 
-        public void resume()
-        {
-
-        }
-
-        public void pause()
-        {
-
-        }
-
         public void start()
         {
             try
@@ -839,6 +840,22 @@ namespace MeGUI
             {
                 throw new JobRunException(e);
             }
+        }
+
+        public void pause()
+        {
+            if (_sourceDetector != null)
+                _sourceDetector.Pause();
+            if (!_mre.Reset())
+                throw new JobRunException("Could not reset mutex. pause failed");
+        }
+
+        public void resume()
+        {
+            if (_sourceDetector != null)
+                _sourceDetector.Resume();
+            if (!_mre.Set())
+                throw new JobRunException("Could not set mutex. pause failed");
         }
 
         public void changePriority(ProcessPriority priority)

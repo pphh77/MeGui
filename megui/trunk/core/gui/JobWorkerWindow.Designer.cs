@@ -70,7 +70,6 @@ namespace MeGUI.core.gui
             this.jobQueue1.Location = new System.Drawing.Point(3, 17);
             this.jobQueue1.Name = "jobQueue1";
             this.jobQueue1.Padding = new System.Windows.Forms.Padding(2);
-            this.jobQueue1.PauseResumeMode = MeGUI.core.gui.PauseResumeMode.Disabled;
             this.jobQueue1.Size = new System.Drawing.Size(629, 155);
             this.jobQueue1.StartStopMode = MeGUI.core.gui.StartStopMode.Start;
             this.jobQueue1.TabIndex = 0;

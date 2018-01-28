@@ -41,6 +41,7 @@ namespace MeGUI.core.gui
             this.showProgressWindowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showQueueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.renameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pauseResumeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.workerNameAndJob.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -69,6 +70,7 @@ namespace MeGUI.core.gui
             // 
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.startEncodingToolStripMenuItem,
+            this.pauseResumeToolStripMenuItem,
             this.stopToolStripMenuItem,
             this.abortToolStripMenuItem,
             this.shutDownLaterToolStripMenuItem,
@@ -78,7 +80,7 @@ namespace MeGUI.core.gui
             this.showQueueToolStripMenuItem,
             this.renameToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(288, 208);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(288, 230);
             this.contextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip1_Opening);
             // 
             // startEncodingToolStripMenuItem
@@ -142,6 +144,13 @@ namespace MeGUI.core.gui
             this.renameToolStripMenuItem.Text = "Rename worker";
             this.renameToolStripMenuItem.Click += new System.EventHandler(this.renameToolStripMenuItem_Click);
             // 
+            // pauseResumeToolStripMenuItem
+            // 
+            this.pauseResumeToolStripMenuItem.Name = "pauseResumeToolStripMenuItem";
+            this.pauseResumeToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
+            this.pauseResumeToolStripMenuItem.Text = "Suspend worker";
+            this.pauseResumeToolStripMenuItem.Click += new System.EventHandler(this.pauseResumeToolStripMenuItem_Click);
+            // 
             // IndividualWorkerSummary
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -173,5 +182,6 @@ namespace MeGUI.core.gui
         private System.Windows.Forms.ToolStripMenuItem showQueueToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem shutDownLaterToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem pauseResumeToolStripMenuItem;
     }
 }

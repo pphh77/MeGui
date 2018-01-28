@@ -32,9 +32,8 @@ namespace MeGUI
 
     public class AviSynthProcessor : IJobProcessor
     {
-        DateTime startTime;
         public static readonly JobProcessorFactory Factory =
-       new JobProcessorFactory(new ProcessorFactory(init), "AviSynthProcessor");
+            new JobProcessorFactory(new ProcessorFactory(init), "AviSynthProcessor");
 
         private static IJobProcessor init(MainForm mf, Job j)
         {
@@ -49,7 +48,7 @@ namespace MeGUI
         private bool aborted;
         private ulong position;
         private Thread processorThread, statusThread;
-        public StatusUpdate stup = null;
+        public StatusUpdate su = null;
         private AviSynthJob job;
         #endregion
         #region start / stop
@@ -61,22 +60,21 @@ namespace MeGUI
 
         private void update()
         {
-            while (!aborted && position < stup.NbFramesTotal)
+            while (!aborted && position < su.NbFramesTotal)
             {
-                stup.NbFramesDone = position;
-                stup.TimeElapsed = DateTime.Now - startTime;
-                stup.FillValues();
-                StatusUpdate(stup);
+                su.NbFramesDone = position;
+                su.FillValues();
+                StatusUpdate(su);
                 Thread.Sleep(1000);
             }
-            stup.IsComplete = true;
-            StatusUpdate(stup);
+            su.IsComplete = true;
+            StatusUpdate(su);
         }
 
         private void process()
         {
             IntPtr zero = new IntPtr(0);
-            for (position = 0; position < stup.NbFramesTotal && !aborted; position++)
+            for (position = 0; position < su.NbFramesTotal && !aborted; position++)
             {
                 file.Clip.ReadFrame(zero, 0, (int)position);
                 mre.WaitOne();
@@ -92,7 +90,7 @@ namespace MeGUI
         public void setup(Job job, StatusUpdate su, LogItem _)
         {
             Debug.Assert(job is AviSynthJob, "Job isn't an AviSynthJob");
-            stup = su;
+            this.su = su;
             this.job = (AviSynthJob)job;
 
             try 
@@ -104,9 +102,9 @@ namespace MeGUI
             {
                 throw new JobRunException(ex);
             }
-            stup.NbFramesTotal = (ulong)reader.FrameCount;
-            stup.ClipLength = TimeSpan.FromSeconds((double)stup.NbFramesTotal / file.VideoInfo.FPS);
-            stup.Status = "Playing through file...";
+            this.su.NbFramesTotal = (ulong)reader.FrameCount;
+            this.su.ClipLength = TimeSpan.FromSeconds((double)this.su.NbFramesTotal / file.VideoInfo.FPS);
+            this.su.Status = "Playing through file...";
             position = 0;
             try
             {
@@ -136,7 +134,7 @@ namespace MeGUI
             {
                 statusThread.Start();
                 processorThread.Start();
-                startTime = DateTime.Now;
+                su.ResetTime();
             }
             catch (Exception e)
             {

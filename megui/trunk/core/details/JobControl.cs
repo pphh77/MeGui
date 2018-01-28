@@ -159,7 +159,7 @@ namespace MeGUI.core.details
             {
                 foreach (TaggedJob j in jobs)
                 {
-                    if (j.Status == JobStatus.PROCESSING || j.Status == JobStatus.ABORTING)
+                    if (j.Status == JobStatus.PROCESSING || j.Status == JobStatus.PAUSED || j.Status == JobStatus.ABORTING)
                     {
                         MessageBox.Show("Can't move '" + j.Name + "' because it is currently processing.", "Can't move job", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         continue;
@@ -271,7 +271,7 @@ namespace MeGUI.core.details
         #region deleting jobs
         internal void DeleteJob(TaggedJob job)
         {
-            if (job.Status == JobStatus.PROCESSING || job.Status == JobStatus.ABORTING)
+            if (job.Status == JobStatus.PROCESSING || job.Status == JobStatus.PAUSED || job.Status == JobStatus.ABORTING)
             {
                 MessageBox.Show("You cannot delete a job while it is being processed.", "Deleting " + job.Name + " failed", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 return;
@@ -317,7 +317,7 @@ namespace MeGUI.core.details
 
         private void reallyDeleteJob(TaggedJob job)
         {
-            if (job.Status == JobStatus.PROCESSING || job.Status == JobStatus.ABORTING) 
+            if (job.Status == JobStatus.PROCESSING || job.Status == JobStatus.PAUSED || job.Status == JobStatus.ABORTING) 
                 return;
 
             if (job.Status != JobStatus.DONE && MainForm.Instance.Settings.DeleteIntermediateFiles)
@@ -507,7 +507,7 @@ namespace MeGUI.core.details
 
             foreach (TaggedJob job in allJobs.Values)
             {
-                if (job.Status == JobStatus.PROCESSING || job.Status == JobStatus.ABORTING)
+                if (job.Status == JobStatus.PROCESSING || job.Status == JobStatus.PAUSED || job.Status == JobStatus.ABORTING)
                     job.Status = JobStatus.ABORTED;
 
                 job.RequiredJobs = toJobList(job.RequiredJobNames);

@@ -20,46 +20,48 @@
 
 
 using System;
-using System.Collections;
 using System.ComponentModel;
-using System.Drawing;
 using System.Windows.Forms;
 
 using MeGUI.core.util;
 
 namespace MeGUI
 {
-	public delegate void WindowClosedCallback(bool hideOnly); // delegate for WindowClosed event
-	public delegate void AbortCallback(); // delegate for Abort event
-	public delegate void UpdateStatusCallback(StatusUpdate su); // delegate for UpdateStatus event
-	public delegate void PriorityChangedCallback(ProcessPriority priority); // delegate for PriorityChanged event
+    public delegate void WindowClosedCallback(bool hideOnly); // delegate for WindowClosed event
+    public delegate void AbortCallback(); // delegate for Abort event
+    public delegate void SuspendCallback(); // delegate for Suspend event
+    public delegate void UpdateStatusCallback(StatusUpdate su); // delegate for UpdateStatus event
+    public delegate void PriorityChangedCallback(ProcessPriority priority); // delegate for PriorityChanged event
 
-	/// <summary>
-	/// ProgressWindow is a window that is being shown during encoding and shows the current encoding status
-	/// it is being fed by UpdateStatus events fired from the main GUI class (Form1)
-	/// </summary>
-	public partial class ProgressWindow : Form
+    /// <summary>
+    /// ProgressWindow is a window that is being shown during encoding and shows the current encoding status
+    /// it is being fed by UpdateStatus events fired from the main GUI class (Form1)
+    /// </summary>
+    public partial class ProgressWindow : Form
     {
         private bool isUserClosing;
+        private bool bIsSuspended;
 
         #region start / stop & show / hide
         /// <summary>
 		/// default constructor, initializes the GUI components
 		/// </summary>
 		public ProgressWindow()
-		{
-			InitializeComponent();
-			isUserClosing = true;
+        {
+            InitializeComponent();
+            isUserClosing = true;
+            bIsSuspended = false;
 
             if (OSInfo.IsWindows7OrNewer)
                 taskbarProgress = (ITaskbarList3)new ProgressTaskbar();
-		}
-		/// <summary>
-		/// handles the onclosing event
-		/// ensures that if the user closed the window, it will only be hidden
-		/// whereas if the system closed it, it is allowed to close
-		/// </summary>
-		/// <param name="e"></param>
+        }
+
+        /// <summary>
+        /// handles the onclosing event
+        /// ensures that if the user closed the window, it will only be hidden
+        /// whereas if the system closed it, it is allowed to close
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnClosing(CancelEventArgs e)
         {
             if (this.IsUserAbort)
@@ -82,15 +84,28 @@ namespace MeGUI
 
         #region statusupdate processing
         /// <summary>
-		/// catches the StatusUpdate event fired from Form1 and updates the GUI accordingly
-		/// </summary>
-		/// <param name="su"></param>
-		public void UpdateStatus(StatusUpdate su)
-		{
+        /// catches the StatusUpdate event fired from Form1 and updates the GUI accordingly
+        /// </summary>
+        /// <param name="su"></param>
+        public void UpdateStatus(StatusUpdate su)
+        {
             try
             {
                 // possible to abort job
-                abortButton.Enabled = (su.JobStatus == JobStatus.PROCESSING);
+                abortButton.Enabled = (su.JobStatus == JobStatus.PROCESSING || su.JobStatus == JobStatus.PAUSED);
+
+                // possible to suspend/resume job
+                btnSuspend.Enabled = (su.JobStatus == JobStatus.PROCESSING || su.JobStatus == JobStatus.PAUSED);
+                if (su.JobStatus == JobStatus.PROCESSING)
+                {
+                    bIsSuspended = false;
+                    btnSuspend.Text = "Suspend";
+                }
+                else if (su.JobStatus == JobStatus.PAUSED)
+                {
+                    bIsSuspended = true;
+                    btnSuspend.Text = "Resume";
+                }
 
                 // Current position
                 positionInClip.Text = (Util.ToString(su.ClipPosition) ?? "---") +
@@ -112,7 +127,7 @@ namespace MeGUI
                 if (su.TimeElapsed.TotalHours > 24)
                     timeElapsed.Text = string.Format("{0:00}:{1:00}:{2:00}:{3:00}", (int)su.TimeElapsed.TotalDays, su.TimeElapsed.Hours, su.TimeElapsed.Minutes, su.TimeElapsed.Seconds);
                 else
-                    timeElapsed.Text = string.Format("{0:00}:{1:00}:{2:00}", (int)su.TimeElapsed.Hours, su.TimeElapsed.Minutes, su.TimeElapsed.Seconds);
+                    timeElapsed.Text = string.Format("{0:00}:{1:00}:{2:00}", su.TimeElapsed.Hours, su.TimeElapsed.Minutes, su.TimeElapsed.Seconds);
 
                 // Estimated time
                 // go back to the old function ;-)
@@ -132,21 +147,21 @@ namespace MeGUI
         }
         #endregion
         #region helper methods
-        
+
         /// <summary>
-		/// calculates the remaining encoding time from the elapsed timespan and the percentage the job is done
-		/// </summary>
-		/// <param name="span">timespan elapsed since the start of the job</param>
-		/// <param name="percentageDone">percentage the job is currently done</param>
-		/// <returns>presentable string in hh:mm:ss format</returns>
-		private string getTimeString(TimeSpan span, decimal percentageDone)
-		{
-			if (percentageDone == 0)
-				return "---";
-			else
-			{
+        /// calculates the remaining encoding time from the elapsed timespan and the percentage the job is done
+        /// </summary>
+        /// <param name="span">timespan elapsed since the start of the job</param>
+        /// <param name="percentageDone">percentage the job is currently done</param>
+        /// <returns>presentable string in hh:mm:ss format</returns>
+        private string getTimeString(TimeSpan span, decimal percentageDone)
+        {
+            if (percentageDone == 0)
+                return "---";
+            else
+            {
                 long ratio = (long)((decimal)span.Ticks / percentageDone * 100M);
-				TimeSpan t = new TimeSpan(ratio - span.Ticks);
+                TimeSpan t = new TimeSpan(ratio - span.Ticks);
                 string retval = "";
                 if (t.TotalHours > 24)
                 {
@@ -156,9 +171,9 @@ namespace MeGUI
                 {
                     retval += string.Format("{0:00}:{1:00}:{2:00}", (int)t.Hours, t.Minutes, t.Seconds);
                 }
-				return retval;
-			}
-		}         
+                return retval;
+            }
+        }
 
         private bool isSettingPriority = false;
         /// <summary>
@@ -183,13 +198,28 @@ namespace MeGUI
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		private void abortButton_Click(object sender, System.EventArgs e)
-		{
-		    Abort();
-		}
+        {
+            Abort();
+        }
 
-		/// <summary>Handles changes in the priority dropdwon</summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnSuspend_Click(object sender, EventArgs e)
+        {
+            Suspend();
+            bIsSuspended = !bIsSuspended;
+            if (bIsSuspended)
+                btnSuspend.Text = "Resume";
+            else
+                btnSuspend.Text = "Suspend";
+        }
+
+        /// <summary>Handles changes in the priority dropdwon</summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void priority_SelectedIndexChanged(object sender, System.EventArgs e)
         {
             if (PriorityChanged != null && !isSettingPriority)
@@ -207,28 +237,71 @@ namespace MeGUI
             }
             if (priority.SelectedIndex >= 0)
                 priority.Tag = priority.SelectedIndex;
-		}
+        }
 
-		private bool WarnPriority(ProcessPriority priority)
-		{
+        private bool WarnPriority(ProcessPriority priority)
+        {
             if (priority == ProcessPriority.HIGH)
-			{
-			    // when user selected 'HIGH' priority
-				DialogResult res = MessageBox.Show("On Windows System, running processes at high priority causes them to compete against the window manager and compositor processes. Are you sure you want to proceed?", "MeGUI", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            {
+                // when user selected 'HIGH' priority
+                DialogResult res = MessageBox.Show("On Windows System, running processes at high priority causes them to compete against the window manager and compositor processes. Are you sure you want to proceed?", "MeGUI", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 return res == DialogResult.Yes;
-			}
-			else return true;
- 		}
-		#endregion
-        #region properties
-        /// <summary>
-		/// gets / sets whether the user closed this window or if the system is closing it
-		/// </summary>
-		public bool IsUserAbort
-		{
-			get {return isUserClosing;}
-			set {isUserClosing = value;}
+            }
+            else return true;
         }
         #endregion
+        #region properties
+        /// <summary>
+        /// gets / sets whether the user closed this window or if the system is closing it
+        /// </summary>
+        public bool IsUserAbort
+        {
+            get { return isUserClosing; }
+            set { isUserClosing = value; }
+        }
+        #endregion
+
+        private void ProgressWindow_VisibleChanged(object sender, EventArgs e)
+        {
+            if (this.Visible)
+                return;
+
+            // possible to abort job
+            abortButton.Enabled = false;
+
+            // possible to suspend/resume job
+            btnSuspend.Enabled = false;
+            bIsSuspended = false;
+            btnSuspend.Text = "Suspend";
+
+            // Current position
+            positionInClip.Text = "--- / ---";
+
+            // Current frame
+            currentVideoFrame.Text = "--- / ---";
+
+            // Data
+            videoData.Text = "--- / ---";
+
+            // Processing speed
+            fps.Text = "---";
+
+            TimeSpan oTimeSpan = new TimeSpan(0);
+
+            // Time elapsed 
+            timeElapsed.Text = string.Format("{0:00}:{1:00}:{2:00}", (int)oTimeSpan.Hours, oTimeSpan.Minutes, oTimeSpan.Seconds);
+
+            // Estimated time
+            totalTime.Text = getTimeString(oTimeSpan, 0M);
+
+            this.Text = "Status: " + 0M.ToString("0.00") + " %";
+            statusLabel.Text = string.Empty;
+
+            jobNameLabel.Text = string.Empty;
+
+            progress.Value = 0;
+            if (OSInfo.IsWindows7OrNewer)
+                taskbarProgress.SetProgressValue(this.Handle, 0, 100);
+        }
     }
 }

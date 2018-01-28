@@ -136,8 +136,7 @@ namespace MeGUI
             else if (line.ToLowerInvariant().Contains("starting 2nd pass"))
             {
                 su.PercentageDoneExact = 0;
-                startTime = DateTime.Now;
-                su.TimeElapsed = TimeSpan.Zero;
+                su.ResetTime();
                 base.bFirstPass = false;
                 su.Status = "Fixing audio gaps/overlaps...";
                 base.ProcessLine(line, stream, oType);

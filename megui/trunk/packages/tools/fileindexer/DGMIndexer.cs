@@ -56,7 +56,7 @@ namespace MeGUI
                 su.Status = "Creating DGI...";
             else
                 su.Status = "Creating " + line;
-            base.startTime = DateTime.Now;
+            base.su.ResetTime();
             base.ProcessLine(line, stream, oType);
         }
 
