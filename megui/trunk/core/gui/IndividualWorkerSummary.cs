@@ -108,8 +108,6 @@ namespace MeGUI.core.gui
 
             showProgressWindowToolStripMenuItem.Enabled = w.IsProgressWindowAvailable;
             showProgressWindowToolStripMenuItem.Checked = w.IsProgressWindowVisible;
-
-            showQueueToolStripMenuItem.Checked = w.Visible;
         }
     }
 }
