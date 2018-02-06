@@ -1,3 +1,4 @@
+2819 [Worker]               removed the individual worker queue view
 2818 [Jobs]                 added option to pause/resume jobs
 2817 [HD Streams Extractor] improved deletion of log and gaps files
 2816 [Jobs]                 aborting a job also deletes the temporary files assigned to it

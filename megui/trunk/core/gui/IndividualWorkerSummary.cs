@@ -86,14 +86,6 @@ namespace MeGUI.core.gui
                 w.ShowProcessWindow();
         }
 
-        private void showQueueToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (showQueueToolStripMenuItem.Checked)
-                w.Hide();
-            else
-                w.Show();
-        }
-
         private void pauseResumeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             w.pw_Suspend();

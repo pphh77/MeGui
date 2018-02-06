@@ -1218,49 +1218,6 @@ namespace MeGUI
             videoEncodingComponent1.showPlayer();
         }
 
-
-        private void showAllWorkers_Click(object sender, EventArgs e)
-        {
-            Jobs.ShowAllWorkers();
-        }
-
-        private void hideAllWorkers_Click(object sender, EventArgs e)
-        {
-            Jobs.HideAllWorkers();
-        }
-
-        private void showAllWorkers_Popup(object sender, EventArgs e)
-        {
-            viewSummary.Checked = Jobs.SummaryVisible;
-
-            List<Pair<string, bool>> workers = Jobs.ListWorkers();
-            workersMenu.MenuItems.Clear();
-            workersMenu.MenuItems.Add(showAllWorkers);
-            workersMenu.MenuItems.Add(hideAllWorkers);
-            workersMenu.MenuItems.Add(separator);
-
-            foreach (Pair<string, bool> p in workers)
-            {
-                MenuItem i = new MenuItem(p.fst);
-                i.Checked = p.snd;
-                i.Click += new EventHandler(mnuWorker_Click);
-                workersMenu.MenuItems.Add(i);
-            }
-
-            if (workers.Count == 0)
-            {
-                MenuItem i = new MenuItem("(No workers to show)");
-                i.Enabled = false;
-                workersMenu.MenuItems.Add(i);
-            }
-        }
-
-        void mnuWorker_Click(object sender1, EventArgs e)
-        {
-            MenuItem sender = (MenuItem)sender1;
-            Jobs.SetWorkerVisible(sender.Text, !sender.Checked);
-        }
-
         private void viewSummary_Click(object sender, EventArgs e)
         {
             if (viewSummary.Checked)
