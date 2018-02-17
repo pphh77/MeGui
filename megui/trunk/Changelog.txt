@@ -1,4 +1,5 @@
-2821 [x264]                 added support for AVL level 6, 6.1 and 6.2 (requires x264 2851+)
+2822 [AVC Levels Tool]      removed the AVC Levels Tool
+2821 [x264]                 added support for AVC level 6, 6.1 and 6.2 (requires x264 2851+)
 2820 [Worker]               removed the individual worker queue view. part II
 2819 [Worker]               removed the individual worker queue view
 2818 [Jobs]                 added option to pause/resume jobs

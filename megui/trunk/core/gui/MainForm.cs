@@ -981,7 +981,6 @@ namespace MeGUI
             PackageSystem.Tools.Register(new MeGUI.packages.tools.besplitter.BesplitterTool());
             PackageSystem.Tools.Register(new OneClickTool());
             PackageSystem.Tools.Register(new D2VCreatorTool());
-            PackageSystem.Tools.Register(new AVCLevelTool());
             PackageSystem.Tools.Register(new VobSubTool());
             PackageSystem.Tools.Register(new MeGUI.packages.tools.hdbdextractor.HdBdExtractorTool());
             PackageSystem.MediaFileTypes.Register(new AvsFileFactory());        // HandleLevel 30
