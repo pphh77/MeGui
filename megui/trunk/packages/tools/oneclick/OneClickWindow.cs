@@ -302,7 +302,7 @@ namespace MeGUI
                 else
                     strTempName = Path.Combine(filePath, filePrefix + fileName + Path.GetExtension(strInputFile));
 
-                strFileName = PrettyFormatting.ExtractWorkingName(strTempName, _oSettings.LeadingName, _oSettings.WorkingNameReplace, _oSettings.WorkingNameReplaceWith);
+                strFileName = PrettyFormatting.ExtractWorkingName(strTempName, _oSettings.LeadingName, _oSettings.SuffixName, _oSettings.WorkingNameReplace, _oSettings.WorkingNameReplaceWith);
                 if (!String.IsNullOrEmpty(output.Filename))
                     output.Filename = Path.Combine(Path.GetDirectoryName(output.Filename), strFileName + "." + ((ContainerType)containerFormat.SelectedItem).Extension);
             }

@@ -29,7 +29,7 @@ namespace MeGUI.core.util
 {
     public class PrettyFormatting
     {
-        public static string ExtractWorkingName(string fileName, string strLeading, string strReplace, string strReplaceWith)
+        public static string ExtractWorkingName(string fileName, string strPrefix, string strSuffix, string strReplace, string strReplaceWith)
         {
             string A = Path.GetFileNameWithoutExtension(fileName); // In case they all fail
 
@@ -57,7 +57,7 @@ namespace MeGUI.core.util
             // Format it nicely:
             if (!String.IsNullOrEmpty(strReplace))
                 A = A.Replace(strReplace, strReplaceWith);
-            return strLeading + A;
+            return strPrefix + A + strSuffix;
         }
 
         private static readonly Regex delayRegex = new Regex("(?<match>-?[0-9]+)ms");

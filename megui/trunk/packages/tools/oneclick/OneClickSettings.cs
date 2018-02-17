@@ -191,6 +191,13 @@ namespace MeGUI
             set { leadingName = value; }
         }
 
+        private string suffixName;
+        public string SuffixName
+        {
+            get { return suffixName; }
+            set { suffixName = value; }
+        }
+
         private string workingNameReplace;
         public string WorkingNameReplace
         {
