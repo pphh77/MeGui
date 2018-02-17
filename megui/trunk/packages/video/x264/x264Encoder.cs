@@ -38,13 +38,7 @@ namespace MeGUI
                 UpdateCacher.CheckPackage("x264");
 
                 string encoderPath = mf.Settings.X264.Path;
-                if (!UseAvs4x26x())
-                {
-                    x264Settings xs = (x264Settings)((j as VideoJob).Settings);
-                    if (xs.X26410Bits)
-                        encoderPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path), "x264-10b.exe");
-                }
-                else
+                if (UseAvs4x26x())
                     encoderPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path), "avs4x26x.exe");
                 return new x264Encoder(encoderPath);
             }
@@ -102,10 +96,7 @@ namespace MeGUI
                 if (UseAvs4x26x())
                 {
                     // add executable
-                    if (xs.X26410Bits)
-                        sb.Append("--x26x-binary \"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path), "x264-10b.exe") + "\" ");
-                    else
-                        sb.Append("--x26x-binary \"" + MainForm.Instance.Settings.X264.Path + "\" ");
+                    sb.Append("--x26x-binary \"" + MainForm.Instance.Settings.X264.Path + "\" ");
                 }
             }
 
@@ -132,6 +123,12 @@ namespace MeGUI
             xs.AVCLevel = oSettingsHandler.getLevel();
             if (xs.AVCLevel != AVCLevels.Levels.L_UNRESTRICTED) // unrestricted
                 sb.Append("--level " + AVCLevels.GetLevelText(xs.AVCLevel) + " ");
+
+            // bit-depth
+            if (xs.X26410Bits)
+                sb.Append("--output-depth 10 ");
+            else
+                sb.Append("--output-depth 8 ");
 
             // --bluray-compat
             xs.BlurayCompat = oSettingsHandler.getBlurayCompat();
@@ -411,7 +408,7 @@ namespace MeGUI
                 if (xs.MinQuantizer != 0)
                     sb.Append("--qpmin " + xs.MinQuantizer + " ");
             if (!xs.CustomEncoderOptions.Contains("--qpmax "))
-                if (xs.MaxQuantizer != 69)
+                if (xs.MaxQuantizer != 81)
                     sb.Append("--qpmax " + xs.MaxQuantizer + " ");
             if (!xs.CustomEncoderOptions.Contains("--qpstep "))
                 if (xs.MaxQuantDelta != 4)

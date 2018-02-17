@@ -1637,7 +1637,7 @@ namespace MeGUI.packages.video.x264
             this.x264MaximumQuantizer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.x264MaximumQuantizer.Location = new System.Drawing.Point(175, 17);
             this.x264MaximumQuantizer.Maximum = new decimal(new int[] {
-            69,
+            81,
             0,
             0,
             0});
