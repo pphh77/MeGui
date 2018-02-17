@@ -151,13 +151,20 @@ namespace MeGUI
             L_51,
             [EnumTitle("Level 5.2")]
             L_52,
+            [EnumTitle("Level 6")]
+            L_60,
+            [EnumTitle("Level 6.1")]
+            L_61,
+            [EnumTitle("Level 6.2")]
+            L_62,
             [EnumTitle("Unrestricted/Autoguess")]
             L_UNRESTRICTED
         };
 
         public static readonly Levels[] SupportedLevels = new Levels[] { Levels.L_10, Levels.L_1B, Levels.L_11, 
             Levels.L_12, Levels.L_13, Levels.L_20, Levels.L_21, Levels.L_22, Levels.L_30, Levels.L_31, Levels.L_32, 
-            Levels.L_40, Levels.L_41, Levels.L_42, Levels.L_50, Levels.L_51, Levels.L_52, Levels.L_UNRESTRICTED };
+            Levels.L_40, Levels.L_41, Levels.L_42, Levels.L_50, Levels.L_51, Levels.L_52,
+            Levels.L_60, Levels.L_61, Levels.L_62, Levels.L_UNRESTRICTED };
 
         /// <summary>
         /// gets the level number as text
@@ -184,47 +191,21 @@ namespace MeGUI
                 case Levels.L_42: return "4.2";
                 case Levels.L_50: return "5.0";
                 case Levels.L_51: return "5.1";
+                case Levels.L_52: return "5.2";
+                case Levels.L_60: return "6.0";
+                case Levels.L_61: return "6.1";
+                case Levels.L_62: return "6.2";
                 default: return "5.2";
             }
         }
 
         #region internal logic and calculation routines for level verification
-        /// <summary>
-        /// Check functions to verify elements of the level
-        /// </summary>
-        /// <param name="level"></param>
-        /// <param name="settings"></param>
-        /// <returns>true if the settings are compliant with the level</returns>
-        private bool checkP4x4Enabled(Levels avcLevel, x264Settings settings)
-        {
-            //if (level != 15 && (level > 7 || (level == 7 && settings.NbBframes != 0)))
-            //    return false;
-            //else
-                return true;
-        }
-
-        private bool checkP4x4(Levels avcLevel, x264Settings settings)
-        {
-            if (!checkP4x4Enabled(avcLevel, settings))
-                if (settings.P4x4mv)
-                    return false;
-            return true;
-        }
-
         private double pictureBufferSize(x264Settings settings, double bytesInUncompressedFrame)
         {
             double decodedPictureBufferSizeTestValue = 0;
             if (settings != null)
                 decodedPictureBufferSizeTestValue = bytesInUncompressedFrame * Math.Min(16, settings.NbRefFrames);
             return decodedPictureBufferSizeTestValue;
-        }
-
-        private bool checkMaxDPB(Levels avcLevel, x264Settings settings, double bytesInUncompressedFrame)
-        {
-            if (pictureBufferSize(settings, bytesInUncompressedFrame) > this.getMaxDPB(avcLevel))
-                return false;
-            else
-                return true;
         }
 
         private int macroblocks(int res)
@@ -310,6 +291,9 @@ namespace MeGUI
                 case Levels.L_50: maxCBP = 135000; break;
                 case Levels.L_51: maxCBP = 240000; break;
                 case Levels.L_52: maxCBP = 240000; break;
+                case Levels.L_60: maxCBP = 240000; break;
+                case Levels.L_61: maxCBP = 480000; break;
+                case Levels.L_62: maxCBP = 800000; break;
             }
 
             if (isHighProfile) // all bitrates and CBPs are multiplied by 1.25 in high profile
@@ -345,6 +329,9 @@ namespace MeGUI
                 case Levels.L_50: maxBR = 135000; break;
                 case Levels.L_51: maxBR = 240000; break;
                 case Levels.L_52: maxBR = 240000; break;
+                case Levels.L_60: maxBR = 240000; break;
+                case Levels.L_61: maxBR = 480000; break;
+                case Levels.L_62: maxBR = 800000; break;
             }
 
             if (isHighProfile) // all bitrates and cbps are multiplied by 1.25 in high profile
@@ -378,6 +365,10 @@ namespace MeGUI
                 case Levels.L_42: return 491520;
                 case Levels.L_50: return 589824;
                 case Levels.L_51: return 983040;
+                case Levels.L_52: return 2073600;
+                case Levels.L_60: return 4177920;
+                case Levels.L_61: return 8355840;
+                case Levels.L_62: return 16711680;
                 default: return 2073600; // level 5.2
 			}
 		}
@@ -408,6 +399,10 @@ namespace MeGUI
                 case Levels.L_42: return 8192;
                 case Levels.L_50: return 22080;
                 case Levels.L_51: return 36864;
+                case Levels.L_52: return 36864;
+                case Levels.L_60: return 139264;
+                case Levels.L_61: return 139264;
+                case Levels.L_62: return 139264;
                 default: return 36864; // level 5.2
 			}
 		}
@@ -419,118 +414,35 @@ namespace MeGUI
 		/// <returns>the size of the decoding buffer in bytes</returns>
 		public double getMaxDPB(Levels avcLevel)
 		{
-			double maxDPB = 69120;
+			double maxDPB = 184320; // level 5.2
 			switch (avcLevel)
 			{
-				case Levels.L_10: maxDPB = 148.5;  break;
-                case Levels.L_1B: maxDPB = 148.5;  break;
-				case Levels.L_11: maxDPB = 337.5;  break;
-                case Levels.L_12: maxDPB = 891;    break;
-                case Levels.L_13: maxDPB = 891;    break;
-                case Levels.L_20: maxDPB = 891;    break;
-                case Levels.L_21: maxDPB = 1782;   break;
-                case Levels.L_22: maxDPB = 3037.5; break;
-                case Levels.L_30: maxDPB = 3037.5; break;
-                case Levels.L_31: maxDPB = 6750;   break;
-                case Levels.L_32: maxDPB = 7680;   break;
-                case Levels.L_40: maxDPB = 12288;  break;
-                case Levels.L_41: maxDPB = 12288;  break;
-                case Levels.L_42: maxDPB = 12288;  break;
-                case Levels.L_50: maxDPB = 41310;  break;
-                case Levels.L_51: maxDPB = 69120;  break;
-                case Levels.L_52: maxDPB = 69120;  break;
-			}
-			return maxDPB * 1024;
+				case Levels.L_10: maxDPB = 396; break;
+                case Levels.L_1B: maxDPB = 396; break;
+				case Levels.L_11: maxDPB = 900; break;
+                case Levels.L_12: maxDPB = 2376; break;
+                case Levels.L_13: maxDPB = 2376; break;
+                case Levels.L_20: maxDPB = 2376; break;
+                case Levels.L_21: maxDPB = 4752; break;
+                case Levels.L_22: maxDPB = 8100; break;
+                case Levels.L_30: maxDPB = 8100; break;
+                case Levels.L_31: maxDPB = 18000; break;
+                case Levels.L_32: maxDPB = 20480; break;
+                case Levels.L_40: maxDPB = 32768; break;
+                case Levels.L_41: maxDPB = 32768; break;
+                case Levels.L_42: maxDPB = 34816; break;
+                case Levels.L_50: maxDPB = 110400; break;
+                case Levels.L_51: maxDPB = 184320; break;
+                case Levels.L_52: maxDPB = 184320; break;
+                case Levels.L_60: maxDPB = 696320; break;
+                case Levels.L_61: maxDPB = 696320; break;
+                case Levels.L_62: maxDPB = 696320; break;
+            }
+			return maxDPB;
         }
 
         #endregion
         #region verify and enforce
-        /// <summary>
-        /// Verifies a group of x264Settings against an AVC Level 
-        /// </summary>
-        /// <param name="settings">the x264Settings to test</param>
-        /// <param name="level">the level</param>
-        /// <param name="bytesInUncompressedFrame">Number of bytes in an uncompressed frame</param>
-        /// <returns>   0 if the settings are compliant with the level
-        ///             1 if (level > 3 || level = 3 AND Bframes > 0)
-        ///             2 if maxDPB violated</returns>
-        public int Verifyx264Settings(x264Settings settings, AVCLevels.Levels avcLevel, double bytesInUncompressedFrame)
-        {
-
-            if (!this.checkP4x4(avcLevel, settings))
-                return 1;
-
-            if (!this.checkMaxDPB(avcLevel, settings, bytesInUncompressedFrame))
-                return 2;
-
-            return 0;
-        }
-
-        /// <summary>
-        /// Checks a collection of x264Settings and modifies them if needed to fit within the level constraints.
-        /// </summary>
-        /// <param name="level">the level to enforce</param>
-        /// <param name="inputSettings">the collection of x264Settings to check</param>
-        /// <param name="frameSize">the size of the decoded video frame in bytes</param>
-        /// <returns>A compliant set of x264Settings</returns>
-        public x264Settings EnforceSettings(AVCLevels.Levels avcLevel, x264Settings inputSettings, double frameSize, out AVCLevelEnforcementReturn enforcement)
-        {
-            x264Settings enforcedSettings = (x264Settings) inputSettings.Clone();
-            enforcement = new AVCLevelEnforcementReturn();
-            enforcement.Altered = false;
-            enforcement.EnableP4x4mv = true;
-            enforcement.EnableVBVBufferSize = true;
-            enforcement.EnableVBVMaxRate = true;
-            enforcement.Panic = false;
-            enforcement.PanicString = "";
-
-            if (!checkP4x4(avcLevel, inputSettings))
-            {
-                enforcement.Altered = true;
-                enforcedSettings.P4x4mv = false;
-            }
-            if (checkP4x4Enabled(avcLevel, inputSettings))
-                enforcement.EnableP4x4mv = true;
-            else
-                enforcement.EnableP4x4mv = false;
-
-            // step through various options to enforce the max decoded picture buffer size
-            while (!this.checkMaxDPB(avcLevel,enforcedSettings, frameSize))
-            {
-                if (enforcedSettings.NbRefFrames > 1)
-                {
-                    enforcement.Altered = true;
-                    enforcedSettings.NbRefFrames -= 1; // try reducing the number of reference frames
-                }
-                else
-                {
-                    enforcement.Panic = true;
-                    enforcement.PanicString = "Can't force settings to conform to level (the frame size is too large)";
-                    // reset output settings to original and set level to unrestrained
-                    enforcedSettings = (x264Settings)inputSettings.Clone();
-                    enforcedSettings.AVCLevel = Levels.L_UNRESTRICTED;
-                    return enforcedSettings;
-                }   
-            }
-
-            // Disallow independent specification of MaxBitrate and MaxBufferSize unless Unrestrained
-            if (avcLevel != Levels.L_UNRESTRICTED)
-            {
-                enforcement.EnableVBVMaxRate = false;
-                enforcedSettings.VBVMaxBitrate = -1;
-                enforcement.EnableVBVBufferSize = false;
-                enforcedSettings.VBVBufferSize = -1;
-            }
-            else
-            {
-                enforcement.EnableVBVMaxRate = true;
-                enforcement.EnableVBVBufferSize = true;
-            }
-
-            return enforcedSettings;
-
-        }
-
         /// <summary>
         /// validates a source against a given AVC level taking into account the source properties and the x264 settings
         /// </summary>
@@ -556,7 +468,7 @@ namespace MeGUI
             int allowableBPS = this.getMaxMBPS(settings.AVCLevel);
             int allowableFS = this.getMaxFS(settings.AVCLevel);
             double dimensionRestriction = Math.Ceiling(Math.Sqrt((double)(allowableFS)*8));
-            double allowableDPB = this.getMaxDPB(settings.AVCLevel);
+            double allowableDPB = this.getMaxDPB(settings.AVCLevel) * 3 / 8 * 1024;
 
             if (allowableBPS >= MBPS && allowableFS >= FrameSize && allowableDPB >= bufferSize 
                 && dimensionRestriction >= hBlocks && dimensionRestriction >= vBlocks)
@@ -570,7 +482,7 @@ namespace MeGUI
                     allowableBPS = this.getMaxMBPS(settings.AVCLevel);
                     allowableFS = this.getMaxFS(settings.AVCLevel);
                     dimensionRestriction = Math.Ceiling(Math.Sqrt((double)(allowableFS)*8));
-                    allowableDPB = this.getMaxDPB(settings.AVCLevel);
+                    allowableDPB = this.getMaxDPB(settings.AVCLevel) * 3 / 8 * 1024;
                 }
                 compliantLevel = settings.AVCLevel;
                 return false;
@@ -579,50 +491,4 @@ namespace MeGUI
 
         #endregion
     }
-    #region Return structure for AVC level Enforcement
-    public class AVCLevelEnforcementReturn
-    {
-        bool enableP4x4mv, enableVBVBufferSize, enableVBVMaxRate, altered;
-        bool panic; // Panic! Something failed and the level was reset to unrestrained
-        string panicString; // Description of the error that caused the panic
-
-        public AVCLevelEnforcementReturn()
-        {
-            enableP4x4mv = true;
-            enableVBVBufferSize = true;
-            enableVBVMaxRate = true;
-            altered = false;
-        }
-        public bool EnableP4x4mv
-        {
-            get {return enableP4x4mv;}
-            set { enableP4x4mv = value; }
-        }
-        public bool EnableVBVBufferSize
-        {
-            get {return enableVBVBufferSize;}
-            set { enableVBVBufferSize = value; }
-        }
-        public bool EnableVBVMaxRate
-        {
-            get {return enableVBVMaxRate;}
-            set { enableVBVMaxRate = value; }
-        }
-        public bool Altered
-        {
-            get { return altered; }
-            set { altered = value; }
-        }
-        public bool Panic
-        {
-            get { return panic; }
-            set { panic = value; }
-        }
-        public string PanicString
-        {
-            get { return panicString; }
-            set { panicString = value; }
-        }
-    }
-    #endregion
 }

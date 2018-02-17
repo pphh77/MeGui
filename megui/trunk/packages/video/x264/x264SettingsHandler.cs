@@ -371,7 +371,7 @@ namespace MeGUI.packages.video.x264
             string strCustomValue;
             if (extractCustomCommand("colorprim", out strCustomValue))
             {
-                switch (strCustomValue.ToLower(System.Globalization.CultureInfo.InvariantCulture))
+                switch (strCustomValue.ToLowerInvariant())
                 {
                     case "bt709": _xs.ColorPrim = 1; break;
                     case "bt470m": _xs.ColorPrim = 2; break;
@@ -393,7 +393,7 @@ namespace MeGUI.packages.video.x264
             string strCustomValue;
             if (extractCustomCommand("pulldown", out strCustomValue))
             {
-                switch (strCustomValue.ToLower(System.Globalization.CultureInfo.InvariantCulture))
+                switch (strCustomValue.ToLowerInvariant())
                 {
                     case "none": _xs.X264PullDown = 0; break;
                     case "22": _xs.X264PullDown = 1; break;
@@ -416,7 +416,7 @@ namespace MeGUI.packages.video.x264
             string strCustomValue;
             if (extractCustomCommand("transfer", out strCustomValue))
             {
-                switch (strCustomValue.ToLower(System.Globalization.CultureInfo.InvariantCulture))
+                switch (strCustomValue.ToLowerInvariant())
                 {
                     case "bt709": _xs.Transfer = 1; break;
                     case "bt470m": _xs.Transfer = 2; break;
@@ -440,7 +440,7 @@ namespace MeGUI.packages.video.x264
             string strCustomValue;
             if (extractCustomCommand("colormatrix", out strCustomValue))
             {
-                switch (strCustomValue.ToLower(System.Globalization.CultureInfo.InvariantCulture))
+                switch (strCustomValue.ToLowerInvariant())
                 {
                     case "bt709": _xs.ColorMatrix = 1; break;
                     case "fcc": _xs.ColorMatrix = 2; break;
@@ -463,7 +463,7 @@ namespace MeGUI.packages.video.x264
         {
             string strCustomValue;
             extractCustomCommand("profile", out strCustomValue);
-            switch (strCustomValue.ToLower(System.Globalization.CultureInfo.InvariantCulture))
+            switch (strCustomValue.ToLowerInvariant())
             {
                 case "baseline": _xs.Profile = 0; break;
                 case "main": _xs.Profile = 1; break;
@@ -495,7 +495,7 @@ namespace MeGUI.packages.video.x264
         {
             string strCustomValue;
             extractCustomCommand("nal-hrd", out strCustomValue);
-            switch (strCustomValue.ToLower(System.Globalization.CultureInfo.InvariantCulture))
+            switch (strCustomValue.ToLowerInvariant())
             {
                 case "none": _xs.Nalhrd = 0; break;
                 case "vbr": _xs.Nalhrd = 1; break;
@@ -522,7 +522,7 @@ namespace MeGUI.packages.video.x264
         {
             string strCustomValue;
             extractCustomCommand("level", out strCustomValue);
-            switch (strCustomValue.ToLower(System.Globalization.CultureInfo.InvariantCulture).Replace(".", "").Trim())
+            switch (strCustomValue.ToLowerInvariant().Replace(".", "").Trim())
             {
                 case "1": 
                 case "10": _xs.AVCLevel = AVCLevels.Levels.L_10; break;
@@ -546,6 +546,10 @@ namespace MeGUI.packages.video.x264
                 case "50": _xs.AVCLevel = AVCLevels.Levels.L_50; break;
                 case "51": _xs.AVCLevel = AVCLevels.Levels.L_51; break;
                 case "52": _xs.AVCLevel = AVCLevels.Levels.L_52; break;
+                case "6":
+                case "60": _xs.AVCLevel = AVCLevels.Levels.L_60; break;
+                case "61": _xs.AVCLevel = AVCLevels.Levels.L_61; break;
+                case "62": _xs.AVCLevel = AVCLevels.Levels.L_62; break;
             }
 
             if (_log == null)
@@ -570,7 +574,7 @@ namespace MeGUI.packages.video.x264
         {
             string strCustomValue;
             extractCustomCommand("keyint", out strCustomValue);
-            if (strCustomValue.ToLower(System.Globalization.CultureInfo.InvariantCulture).Equals("infinite"))
+            if (strCustomValue.ToLowerInvariant().Equals("infinite"))
                 _xs.KeyframeInterval = 0;
             else
             {
@@ -765,7 +769,7 @@ namespace MeGUI.packages.video.x264
         {
             string strCustomValue;
             extractCustomCommand("b-pyramid", out strCustomValue);
-            switch (strCustomValue.ToLower(System.Globalization.CultureInfo.InvariantCulture))
+            switch (strCustomValue.ToLowerInvariant())
             {
                 case "none": _xs.x264BFramePyramid = 0; break;
                 case "normal": _xs.x264BFramePyramid = 2; break;
@@ -864,28 +868,8 @@ namespace MeGUI.packages.video.x264
             if (hRes <= 0 || vRes <= 0 || avcLevel == AVCLevels.Levels.L_UNRESTRICTED)  // Unrestricted/Autoguess
                 return -1;
 
-            int maxDPB = 0;  // the maximum picture decoded buffer for the given level
-            switch (avcLevel)
-            {
-                case AVCLevels.Levels.L_10: maxDPB = 396;    break;
-                case AVCLevels.Levels.L_1B: maxDPB = 396;    break;
-                case AVCLevels.Levels.L_11: maxDPB = 900;    break;
-                case AVCLevels.Levels.L_12: maxDPB = 2376;   break;
-                case AVCLevels.Levels.L_13: maxDPB = 2376;   break;
-                case AVCLevels.Levels.L_20: maxDPB = 2376;   break;
-                case AVCLevels.Levels.L_21: maxDPB = 4752;   break;
-                case AVCLevels.Levels.L_22: maxDPB = 8100;   break;
-                case AVCLevels.Levels.L_30: maxDPB = 8100;   break;
-                case AVCLevels.Levels.L_31: maxDPB = 18000;  break;
-                case AVCLevels.Levels.L_32: maxDPB = 20480;  break;
-                case AVCLevels.Levels.L_40: maxDPB = 32768;  break;
-                case AVCLevels.Levels.L_41: maxDPB = 32768;  break;
-                case AVCLevels.Levels.L_42: maxDPB = 34816;  break;
-                case AVCLevels.Levels.L_50: maxDPB = 110400; break;
-                case AVCLevels.Levels.L_51: maxDPB = 184320; break;
-                case AVCLevels.Levels.L_52: maxDPB = 184320; break;
-            }
-
+            AVCLevels oAVC = new AVCLevels();
+            int maxDPB = (int)oAVC.getMaxDPB(avcLevel);  // the maximum picture decoded buffer for the given level
             int frameHeightInMbs = (int)System.Math.Ceiling((double)vRes / 16);
             int frameWidthInMbs = (int)System.Math.Ceiling((double)hRes / 16);
             int maxRef = (int)System.Math.Floor((double)maxDPB / (frameHeightInMbs * frameWidthInMbs));
