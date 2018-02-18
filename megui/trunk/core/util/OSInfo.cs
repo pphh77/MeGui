@@ -927,55 +927,72 @@ namespace MeGUI
         [DllImport("kernel32", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool CloseHandle(IntPtr handle);
 
-        public static void SuspendProcess(Process oMainProcess)
+        public static bool SuspendProcess(Process oMainProcess)
         {
-            List<Process> arrProc = GetChildProcesses(oMainProcess);
-            arrProc.Insert(0, oMainProcess);
+            bool bResult = false;
 
-            foreach (Process oProc in arrProc)
+            try
             {
-                if (oProc.HasExited || oProc.ProcessName == string.Empty)
-                    continue;
+                List<Process> arrProc = GetChildProcesses(oMainProcess);
+                arrProc.Insert(0, oMainProcess);
 
-                foreach (ProcessThread pT in oProc.Threads)
+                foreach (Process oProc in arrProc)
                 {
-                    IntPtr pOpenThread = OpenThread(ThreadAccess.SUSPEND_RESUME, false, (uint)pT.Id);
-
-                    if (pOpenThread == IntPtr.Zero)
+                    if (oProc.HasExited || oProc.ProcessName == string.Empty)
                         continue;
 
-                    SuspendThread(pOpenThread);
-                    CloseHandle(pOpenThread);
+                    foreach (ProcessThread pT in oProc.Threads)
+                    {
+                        IntPtr pOpenThread = OpenThread(ThreadAccess.SUSPEND_RESUME, false, (uint)pT.Id);
+
+                        if (pOpenThread == IntPtr.Zero)
+                            continue;
+
+                        SuspendThread(pOpenThread);
+                        CloseHandle(pOpenThread);
+                        bResult = true;
+                    }
                 }
             }
+            catch (Exception) { }
+
+            return bResult;
         }
 
-        public static void ResumeProcess(Process oMainProcess)
+        public static bool ResumeProcess(Process oMainProcess)
         {
-            List<Process> arrProc = GetChildProcesses(oMainProcess);
-            arrProc.Insert(0, oMainProcess);
-
-            foreach (Process oProc in arrProc)
+            bool bResult = false;
+            try
             {
-                if (oProc.HasExited || oProc.ProcessName == string.Empty)
-                    continue;
+                List<Process> arrProc = GetChildProcesses(oMainProcess);
+                arrProc.Insert(0, oMainProcess);
 
-                foreach (ProcessThread pT in oProc.Threads)
+                foreach (Process oProc in arrProc)
                 {
-                    IntPtr pOpenThread = OpenThread(ThreadAccess.SUSPEND_RESUME, false, (uint)pT.Id);
-
-                    if (pOpenThread == IntPtr.Zero)
+                    if (oProc.HasExited || oProc.ProcessName == string.Empty)
                         continue;
 
-                    var suspendCount = 0;
-                    do
+                    foreach (ProcessThread pT in oProc.Threads)
                     {
-                        suspendCount = ResumeThread(pOpenThread);
-                    } while (suspendCount > 0);
+                        IntPtr pOpenThread = OpenThread(ThreadAccess.SUSPEND_RESUME, false, (uint)pT.Id);
 
-                    CloseHandle(pOpenThread);
+                        if (pOpenThread == IntPtr.Zero)
+                            continue;
+
+                        var suspendCount = 0;
+                        do
+                        {
+                            suspendCount = ResumeThread(pOpenThread);
+                        } while (suspendCount > 0);
+
+                        CloseHandle(pOpenThread);
+                        bResult = true;
+                    }
                 }
             }
+            catch (Exception) { }
+
+            return bResult;
         }
 
         #endregion

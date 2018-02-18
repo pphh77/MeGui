@@ -117,13 +117,13 @@ namespace MeGUI
         /// </summary>
         /// <param name="error">output for any errors that might ocurr during this method</param>
         /// <returns>true if encoding has been successfully paused, false if not</returns>
-        void pause();
+        bool pause();
         /// <summary>
         /// resumes the encoding process
         /// </summary>
         /// <param name="error">output for any errors that might ocurr during this method</param>
         /// <returns>true if encoding has been successfully started, false if not</returns>
-        void resume();
+        bool resume();
         /// <summary>
         /// changes the priority of the encoding process/thread
         /// </summary>

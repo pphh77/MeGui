@@ -57,37 +57,6 @@ namespace MeGUI
 
         #endregion
 
-        #region temp file utils
-        protected void writeTempTextFile(string filePath, string text)
-        {
-            using (Stream temp = new FileStream(filePath, System.IO.FileMode.Create))
-            {
-                using (TextWriter avswr = new StreamWriter(temp, System.Text.Encoding.Default))
-                {
-                    avswr.WriteLine(text);
-                }
-            }
-            tempFiles.Add(filePath);
-        }
-        private void deleteTempFiles()
-        {
-            foreach (string filePath in tempFiles)
-                safeDelete(filePath);
-        }
-
-        private static void safeDelete(string filePath)
-        {
-            try
-            {
-                File.Delete(filePath);
-            }
-            catch
-            {
-                // Do Nothing
-            }
-        }
-        #endregion
-
         protected virtual void checkJobIO()
         {
             Util.ensureExists(job.Input);
@@ -295,22 +264,20 @@ namespace MeGUI
             }
         }
 
-        public void pause()
+        public bool pause()
         {
-            if (!canPause)
-                throw new JobRunException("Can't pause this kind of job.");
-            OSInfo.SuspendProcess(proc);
-            if (!mre.Reset())
-                throw new JobRunException("Could not reset mutex. pause failed");
+            bool bResult = OSInfo.SuspendProcess(proc);
+            if (!mre.Reset() || !bResult)
+                return false;
+            return true;
         }
 
-        public void resume()
+        public bool resume()
         {
-            if (!canPause)
-                throw new JobRunException("Can't resume this kind of job.");
-            OSInfo.ResumeProcess(proc);
-            if (!mre.Set())
-                throw new JobRunException("Could not set mutex. pause failed");
+            bool bResult = OSInfo.ResumeProcess(proc);
+            if (!mre.Set() || !bResult)
+                return false;
+            return true;
         }
 
         public bool isRunning()
@@ -344,14 +311,8 @@ namespace MeGUI
                 }
             }
         }
-
-        public virtual bool canPause
-        {
-            get { return true; }
-        }
-
-
         #endregion
+
         #region reading process output
         protected virtual void readStream(StreamReader sr, ManualResetEvent rEvent, StreamType str)
         {

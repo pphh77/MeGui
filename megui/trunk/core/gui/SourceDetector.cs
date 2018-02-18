@@ -724,17 +724,20 @@ namespace MeGUI
         {
             runScript(0, "#no trimming");
         }
+
         public void Stop()
         {
             continueWorking = false;
         }
-        public void Pause()
+
+        public bool Pause()
         {
-            _mre.Reset();
+            return _mre.Reset();
         }
-        public void Resume()
+
+        public bool Resume()
         {
-            _mre.Set();
+            return _mre.Set();
         }
         #endregion
     }

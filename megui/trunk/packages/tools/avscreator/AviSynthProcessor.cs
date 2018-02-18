@@ -81,6 +81,7 @@ namespace MeGUI
             }
             file.Dispose();
         }
+
         /// <summary>
         /// sets up encoding
         /// </summary
@@ -123,6 +124,7 @@ namespace MeGUI
                 throw new JobRunException(e);
             }
         }
+
         /// <summary>
         /// starts the encoding process
         /// </summary>
@@ -141,6 +143,7 @@ namespace MeGUI
                 throw new JobRunException(e);
             }
         }
+
         /// <summary>
         /// stops the encoding process
         /// </summary>
@@ -150,26 +153,27 @@ namespace MeGUI
         {
             aborted = true;
         }
+
         /// <summary>
         /// pauses the encoding process
         /// </summary>
         /// <param name="error">output for any errors that might ocurr during this method</param>
         /// <returns>true if encoding has been successfully paused, false if not</returns>
-        public void pause()
+        public bool pause()
         {
-            if (!mre.Reset())
-                throw new JobRunException("Could not reset mutex");
+            return mre.Reset();
         }
+
         /// <summary>
         /// resumes the encoding process
         /// </summary>
         /// <param name="error">output for any errors that might ocurr during this method</param>
         /// <returns>true if encoding has been successfully started, false if not</returns>
-        public void resume()
+        public bool resume()
         {
-            if (!mre.Set())
-                throw new JobRunException("Could not set mutex");
+            return mre.Set();
         }
+
         /// <summary>
         /// changes the priority of the encoding process/thread
         /// </summary>
@@ -203,6 +207,7 @@ namespace MeGUI
                     throw new JobRunException("Process has exited");
             }
         }
+
         public event JobProcessingStatusUpdateCallback StatusUpdate;
         #endregion
     }

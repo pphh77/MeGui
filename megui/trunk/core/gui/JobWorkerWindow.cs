@@ -767,9 +767,11 @@ namespace MeGUI.core.gui
             Debug.Assert(currentJob.Status == JobStatus.PROCESSING);
             try
             {
-                currentProcessor.pause();
-                currentJob.Status = JobStatus.PAUSED;
-                refreshAll();
+                if (currentProcessor.pause())
+                {
+                    currentJob.Status = JobStatus.PAUSED;
+                    refreshAll();
+                }
             }
             catch (JobRunException ex)
             {
@@ -782,8 +784,8 @@ namespace MeGUI.core.gui
             Debug.Assert(currentJob.Status == JobStatus.PAUSED);
             try
             {
-                currentProcessor.resume();
-                currentJob.Status = JobStatus.PROCESSING;
+                if (currentProcessor.resume())
+                    currentJob.Status = JobStatus.PROCESSING;
             }
             catch (JobRunException ex)
             {

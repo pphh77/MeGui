@@ -325,8 +325,6 @@ namespace MeGUI.core.details
                 List<string> filesToDelete = new List<string>();
                 if (job.Job.FilesToDelete.Count > 0)
                     filesToDelete.AddRange(job.Job.FilesToDelete);
-                if (job.Job is CleanupJob && ((CleanupJob)job.Job).files.Count > 0)
-                    filesToDelete.AddRange(((CleanupJob)job.Job).files);
                 if (filesToDelete.Count > 0)
                 {
                     LogItem oLog = FileUtil.DeleteIntermediateFiles(filesToDelete, false, true);

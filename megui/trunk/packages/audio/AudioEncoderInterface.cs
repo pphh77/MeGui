@@ -2091,18 +2091,20 @@ function x_upmixC" + id + @"(clip stereo)
             }
         }
 
-        public void pause()
+        public bool pause()
         {
-            OSInfo.SuspendProcess(_encoderProcess);
-            if (!_mre.Reset())
-                throw new JobRunException("Could not reset mutex. pause failed");
+            bool bResult = OSInfo.SuspendProcess(_encoderProcess);
+            if (!_mre.Reset() || !bResult)
+                return false;
+            return true;
         }
 
-        public void resume()
+        public bool resume()
         {
-            OSInfo.ResumeProcess(_encoderProcess);
-            if (!_mre.Set())
-                throw new JobRunException("Could not set mutex. pause failed");
+            bool bResult = OSInfo.ResumeProcess(_encoderProcess);
+            if (!_mre.Set() || !bResult)
+                return false;
+            return true;
         }
 
         public void changePriority(ProcessPriority priority)

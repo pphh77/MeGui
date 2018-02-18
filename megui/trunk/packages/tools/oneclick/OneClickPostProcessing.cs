@@ -842,20 +842,24 @@ namespace MeGUI
             }
         }
 
-        public void pause()
+        public bool pause()
         {
+            bool bResult = true;
             if (_sourceDetector != null)
-                _sourceDetector.Pause();
-            if (!_mre.Reset())
-                throw new JobRunException("Could not reset mutex. pause failed");
+                bResult = _sourceDetector.Pause();
+            if (_mre.Reset() && bResult)
+                return true;
+            return false;
         }
 
-        public void resume()
+        public bool resume()
         {
+            bool bResult = true;
             if (_sourceDetector != null)
-                _sourceDetector.Resume();
-            if (!_mre.Set())
-                throw new JobRunException("Could not set mutex. pause failed");
+                bResult = _sourceDetector.Resume();
+            if (_mre.Set() && bResult)
+                return true;
+            return false;
         }
 
         public void changePriority(ProcessPriority priority)

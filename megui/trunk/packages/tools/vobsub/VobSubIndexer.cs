@@ -108,11 +108,6 @@ namespace MeGUI
             su.Status = "Demuxing subtitles...";
         }
 
-        public override bool canPause
-        {
-            get { return false; }
-        }
-
         protected override bool hideProcess
         {
             get { return true; }

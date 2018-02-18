@@ -26,7 +26,7 @@ using MeGUI.core.util;
 
 namespace MeGUI
 {
-    public class LSMASHIndexer : CommandlineJobProcessor<LSMASHIndexJob>
+    public class LSMASHIndexer : ThreadJobProcessor<LSMASHIndexJob>
     {
         public static readonly JobProcessorFactory Factory =
                     new JobProcessorFactory(new ProcessorFactory(init), "LSMASHIndexer");
@@ -34,25 +34,13 @@ namespace MeGUI
         private static IJobProcessor init(MainForm mf, Job j)
         {
             if (j is LSMASHIndexJob) 
-                return new LSMASHIndexer(mf.Settings.LSMASH.Path);
+                return new LSMASHIndexer();
             return null;
         }
 
-        private bool indexer;
-        public LSMASHIndexer(string executableName)
+        public LSMASHIndexer()
         {
             UpdateCacher.CheckPackage("lsmash");
-            executable = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "ping.exe");
-        }
-
-        protected override string Commandline
-        {
-            get
-            {
-                StringBuilder sb = new StringBuilder();
-                sb.Append("127.0.0.1 -t");
-                return sb.ToString();
-            }
         }
 
         protected override void checkJobIO()
@@ -72,50 +60,30 @@ namespace MeGUI
             su.Status = "Creating LSMASH index...";
         }
 
-        public override void ProcessLine(string line, StreamType stream, ImageType oType)
+        protected override void RunInThread()
         {
-            // make sure that this is only called once
-            if (indexer)
-                return;
-            indexer = true;
-
-            // generate the avs script
-            StringBuilder strAVSScript = new StringBuilder();
-            MediaInfoFile oInfo = null;
-            strAVSScript.Append(VideoUtil.getLSMASHVideoInputLine(job.Input, job.Input + ".lwi", 0, ref oInfo));
-            oInfo.Dispose();
-            base.log.LogValue("AviSynth script", strAVSScript.ToString(), ImageType.Information);
-
-            // check if the script has a video track, also this call will create the index file if there is one
-            string strErrorText;
-            if (!VideoUtil.AVSScriptHasVideo(strAVSScript.ToString(), out strErrorText))
-            {
-                // avs script has no video track or an error has been thrown
-                base.log.LogEvent(strErrorText, ImageType.Error);
-                su.HasError = true;
-            }
-
-            if (proc == null || proc.HasExited)
-                return;
-
             try
             {
-                bWaitForExit = true;
-                mre.Set(); // if it's paused, then unpause
-                stdoutDone.Set();
-                stderrDone.Set();
-                proc.Kill();
-                while (bWaitForExit) // wait until the process has terminated without locking the GUI
+                // generate the avs script
+                StringBuilder strAVSScript = new StringBuilder();
+                MediaInfoFile oInfo = null;
+                strAVSScript.Append(VideoUtil.getLSMASHVideoInputLine(job.Input, job.Input + ".lwi", 0, ref oInfo));
+                oInfo.Dispose();
+                base.log.LogValue("AviSynth script", strAVSScript.ToString(), ImageType.Information);
+
+                // check if the script has a video track, also this call will create the index file if there is one
+                string strErrorText;
+                if (!VideoUtil.AVSScriptHasVideo(strAVSScript.ToString(), out strErrorText))
                 {
-                    System.Windows.Forms.Application.DoEvents();
-                    System.Threading.Thread.Sleep(100);
+                    // avs script has no video track or an error has been thrown
+                    base.log.LogEvent(strErrorText, ImageType.Error);
+                    su.HasError = true;
                 }
-                proc.WaitForExit();
-                return;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                throw new JobRunException(e);
+                base.log.LogValue("Error: ", ex.Message, ImageType.Error);
+                su.HasError = true;
             }
         }
 
@@ -143,7 +111,7 @@ namespace MeGUI
                     try
                     {
                         // try to delete the destination file
-                        if (FileUtil.DeleteFile(outputIndex, stderrLog))
+                        if (FileUtil.DeleteFile(outputIndex, log))
                         {
                             // destination file is deleted / not available ==> copy source to destination
                             File.Copy(inputIndex, outputIndex, true);
@@ -212,11 +180,6 @@ namespace MeGUI
                 job.FilesToDelete.Add(job.Input + ".lwi");
 
             base.doExitConfig();
-        }
-
-        protected override bool checkExitCode
-        {
-            get { return false; }
         }
     }
 }

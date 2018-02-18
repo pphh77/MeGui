@@ -939,23 +939,19 @@ namespace MeGUI
         private void addPackages()
         {
             PackageSystem.JobProcessors.Register(AviSynthAudioEncoder.Factory);
-
             PackageSystem.JobProcessors.Register(ffmpegEncoder.Factory);
             PackageSystem.JobProcessors.Register(x264Encoder.Factory);
             PackageSystem.JobProcessors.Register(x265Encoder.Factory);
             PackageSystem.JobProcessors.Register(XviDEncoder.Factory);
-
             PackageSystem.JobProcessors.Register(MkvMergeMuxer.Factory);
             PackageSystem.JobProcessors.Register(MP4BoxMuxer.Factory);
             PackageSystem.JobProcessors.Register(AMGMuxer.Factory);
             PackageSystem.JobProcessors.Register(tsMuxeR.Factory);
             PackageSystem.JobProcessors.Register(FFmpegMuxer.Factory);
-
             PackageSystem.JobProcessors.Register(MkvExtract.Factory);
             PackageSystem.JobProcessors.Register(PgcDemux.Factory);
             PackageSystem.JobProcessors.Register(OneClickPostProcessing.Factory);
             PackageSystem.JobProcessors.Register(CleanupJobRunner.Factory);
-
             PackageSystem.JobProcessors.Register(AviSynthProcessor.Factory);
             PackageSystem.JobProcessors.Register(D2VIndexer.Factory);
             PackageSystem.JobProcessors.Register(DGMIndexer.Factory);
@@ -966,23 +962,28 @@ namespace MeGUI
             PackageSystem.JobProcessors.Register(MeGUI.packages.tools.besplitter.Joiner.Factory);
             PackageSystem.JobProcessors.Register(MeGUI.packages.tools.besplitter.Splitter.Factory);
             PackageSystem.JobProcessors.Register(HDStreamExtractorIndexer.Factory);
+            PackageSystem.JobProcessors.Register(CleanupJobRunner.Factory);
+
             PackageSystem.MuxerProviders.Register(new AVIMuxGUIMuxerProvider());
             PackageSystem.MuxerProviders.Register(new TSMuxerProvider());
             PackageSystem.MuxerProviders.Register(new FFmpegMuxerProvider());
             PackageSystem.MuxerProviders.Register(new MKVMergeMuxerProvider());
             PackageSystem.MuxerProviders.Register(new MP4BoxMuxerProvider());
+
             PackageSystem.Tools.Register(new MeGUI.packages.tools.cutter.CutterTool());
             PackageSystem.Tools.Register(new AviSynthWindowTool());
             PackageSystem.Tools.Register(new AutoEncodeTool());
             PackageSystem.Tools.Register(new CQMEditorTool());
             PackageSystem.Tools.Register(new CalculatorTool());
             PackageSystem.Tools.Register(new ChapterCreatorTool());
-            PackageSystem.Options.Register(new UpdateOptions());
             PackageSystem.Tools.Register(new MeGUI.packages.tools.besplitter.BesplitterTool());
             PackageSystem.Tools.Register(new OneClickTool());
             PackageSystem.Tools.Register(new D2VCreatorTool());
             PackageSystem.Tools.Register(new VobSubTool());
             PackageSystem.Tools.Register(new MeGUI.packages.tools.hdbdextractor.HdBdExtractorTool());
+
+            PackageSystem.Options.Register(new UpdateOptions());
+
             PackageSystem.MediaFileTypes.Register(new AvsFileFactory());        // HandleLevel 30
             PackageSystem.MediaFileTypes.Register(new dgmFileFactory());        // HandleLevel 20
             PackageSystem.MediaFileTypes.Register(new dgiFileFactory());        // HandleLevel 19
@@ -990,7 +991,9 @@ namespace MeGUI
             PackageSystem.MediaFileTypes.Register(new lsmashFileFactory());     // HandleLevel 13
             PackageSystem.MediaFileTypes.Register(new ffmsFileFactory());       // HandleLevel 12
             PackageSystem.MediaFileTypes.Register(new MediaInfoFileFactory());  // HandleLevel  5
+
             PackageSystem.JobPreProcessors.Register(BitrateCalculatorPreProcessor.CalculationProcessor);
+
             PackageSystem.JobPostProcessors.Register(d2vIndexJobPostProcessor.PostProcessor);
             PackageSystem.JobPostProcessors.Register(dgmIndexJobPostProcessor.PostProcessor);
             PackageSystem.JobPostProcessors.Register(dgiIndexJobPostProcessor.PostProcessor);
