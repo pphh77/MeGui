@@ -317,8 +317,12 @@ namespace MeGUI
                 }
                 else
                 {
-                    cType = getContainerType(info.General[0].Format, info.General[0].FormatString);
                     _strContainer = info.General[0].Format;
+                    if (_strContainer.Contains(" / "))
+                        _strContainer = _strContainer.Substring(0, _strContainer.IndexOf(" / "));
+
+                    cType = getContainerType(_strContainer, info.General[0].FormatString);
+
                     _attachments.AddRange(info.General[0].Attachments.Split(new string[] { " / " }, StringSplitOptions.RemoveEmptyEntries));
                 }
 
@@ -337,10 +341,10 @@ namespace MeGUI
                     ati.DefaultTrack = atrack.DefaultString.ToLowerInvariant().Equals("yes");
                     ati.ForcedTrack = atrack.ForcedString.ToLowerInvariant().Equals("yes");
                     // DGIndex expects audio index not ID for TS
-                    ati.ContainerType = info.General[0].Format;
+                    ati.ContainerType = _strContainer;
                     ati.TrackIndex = counter;
                     int iID = 0;
-                    if (info.General[0].Format == "CDXA/MPEG-PS")
+                    if (ati.ContainerType == "CDXA/MPEG-PS")
                         // MediaInfo doesn't give TrackID for VCD, specs indicate only MP1L2 is supported
                         ati.TrackID = (0xC0 + counter);
                     else if (atrack.ID != "0" && atrack.ID != "" &&

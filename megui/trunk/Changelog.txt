@@ -1,3 +1,4 @@
+2826 [File Indexer]         improved handling of Blu-ray playlists
 2825 [Jobs]                 improved handling of jobs which cannot be paused (e.g. L-SMASH Indexer)
 2824 [OneClick]             added a profile option to set an output file suffix
 2823 [x264]                 added support for unified 8/10 bit binaries (requires x264 2901+)

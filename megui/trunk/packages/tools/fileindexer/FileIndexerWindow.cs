@@ -259,8 +259,25 @@ namespace MeGUI
             checkIndexIO();
         }
 
+
+        private void setControlState(bool bDisableControls)
+        {
+            if (bDisableControls)
+            {
+                this.Cursor = Cursors.WaitCursor;
+                gbInput.Enabled = queueButton.Enabled = gbOutput.Enabled = gbIndexer.Enabled = gbAudio.Enabled = false;
+            }
+            else
+            {
+                this.Cursor = Cursors.Default;
+                gbInput.Enabled = queueButton.Enabled = true;
+            }
+        }
+
         private void openVideo(string fileName)
         {
+            setControlState(true);
+
             this._oLog = MainForm.Instance.FileIndexerLog;
             if (_oLog == null)
             {
@@ -331,6 +348,7 @@ namespace MeGUI
 
                     gbIndexer.Enabled = gbAudio.Enabled = gbOutput.Enabled = true;
                     changeIndexer(newType);
+                    setControlState(false);
                     return;
                 }
             }
@@ -341,6 +359,7 @@ namespace MeGUI
             btnFFMS.Checked = btnD2V.Checked = btnDGM.Checked = btnDGI.Checked = btnLSMASH.Checked = false;
             output.Text = "";
             demuxNoAudiotracks.Checked = true;
+            setControlState(false);
             MessageBox.Show("No indexer for this file found!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
