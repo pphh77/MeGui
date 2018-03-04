@@ -1,3 +1,4 @@
+2827                        fixed a startup crash when using Windows 10 Pro for Workstations
 2826 [File Indexer]         improved handling of Blu-ray playlists
 2825 [Jobs]                 improved handling of jobs which cannot be paused (e.g. L-SMASH Indexer)
 2824 [OneClick]             added a profile option to set an output file suffix

@@ -196,7 +196,11 @@ namespace MeGUI
                 { 0x00000081, "PRODUCT_ENTERPRISE_S_EVALUATION" },
                 { 0x00000082, "PRODUCT_ENTERPRISE_S_N_EVALUATION" },
                 { 0x00000083, "PRODUCT_IOTUAPCOMMERCIAL" },
-                { 0x00000085, "PRODUCT_MOBILE_ENTERPRISE" }
+                { 0x00000085, "PRODUCT_MOBILE_ENTERPRISE" },
+                { 0x000000A1, "PRODUCT_PRO_WORKSTATION" },
+                { 0x000000A2, "PRODUCT_PRO_WORKSTATION_N" },
+                { 0x000000B2, "PRODUCT_CLOUD" },
+                { 0x000000B3, "PRODUCT_CLOUDN" }
             };
 
             GetProductInfo(osVersionInfo.dwMajorVersion,
@@ -206,6 +210,8 @@ namespace MeGUI
                     out uint product);
 
             OSProduct.TryGetValue((int)product, out string strOSProduct);
+            if (String.IsNullOrEmpty(strOSProduct))
+                strOSProduct = "PRODUCT_UNKNOWN";
             return strOSProduct;
         }
 
@@ -346,7 +352,7 @@ namespace MeGUI
                                                     case "PRODUCT_STARTER": osName += "Starter"; break;
                                                     case "PRODUCT_ENTERPRISE_SERVER": osName += "Enterprise"; break;
                                                     case "PRODUCT_STANDARD_SERVER": osName += "Standard"; break;
-                                                    default: osName += "(" + strOSProduct.Substring(8) + ")"; break;
+                                                    default: osName += "(" + strOSProduct.Replace("PRODUCT_", "") + ")"; break;
                                                 }
                                                 break;
                                             }
@@ -370,7 +376,7 @@ namespace MeGUI
                                                     case "PRODUCT_STARTER": osName += "Starter"; break;
                                                     case "PRODUCT_ENTERPRISE_SERVER": osName += "Enterprise"; break;
                                                     case "PRODUCT_STANDARD_SERVER": osName += "Standard"; break;
-                                                    default: osName += "(" + strOSProduct.Substring(8) + ")"; break;
+                                                    default: osName += "(" + strOSProduct.Replace("PRODUCT_", "") + ")"; break;
                                                 }
                                                 break;
                                             }
@@ -393,7 +399,7 @@ namespace MeGUI
                                                     case "PRODUCT_PROFESSIONAL_WMC": osName += "Professional with Media Center"; break;
                                                     case "PRODUCT_ENTERPRISE_SERVER": osName += "Enterprise"; break;
                                                     case "PRODUCT_STANDARD_SERVER": osName += "Standard"; break;
-                                                    default: osName += "(" + strOSProduct.Substring(8) + ")"; break;
+                                                    default: osName += "(" + strOSProduct.Replace("PRODUCT_", "") + ")"; break;
                                                 }
                                                 break;
                                             }
@@ -414,20 +420,24 @@ namespace MeGUI
                                                 string strOSProduct = GetOSProduct(osVersionInfo);
                                                 switch (strOSProduct)
                                                 {
+                                                    case "PRODUCT_CLOUD":
+                                                    case "PRODUCT_CLOUDN": osName += "S"; break;
                                                     case "PRODUCT_CORE":
                                                     case "PRODUCT_CORE_COUNTRYSPECIFIC":
                                                     case "PRODUCT_CORE_N": osName += "Home"; break;
                                                     case "PRODUCT_ENTERPRISE":
                                                     case "PRODUCT_ENTERPRISE_N": osName += "Enterprise"; break;
+                                                    case "PRODUCT_ENTERPRISE_SERVER": osName += "Enterprise"; break;
                                                     case "PRODUCT_PROFESSIONAL":
-                                                    case "PRODUCT_PROFESSIONAL_N": osName += "Professional"; break;
+                                                    case "PRODUCT_PROFESSIONAL_N": osName += "Pro"; break;
                                                     case "PRODUCT_EDUCATION":
                                                     case "PRODUCT_EDUCATION_N": osName += "Education"; break;
                                                     case "PRODUCT_MOBILE_CORE":
                                                     case "PRODUCT_MOBILE_ENTERPRISE": osName += "Mobile"; break;
-                                                    case "PRODUCT_ENTERPRISE_SERVER": osName += "Enterprise"; break;
+                                                    case "PRODUCT_PRO_WORKSTATION":
+                                                    case "PRODUCT_PRO_WORKSTATION_N": osName += "Pro for Workstations"; break;
                                                     case "PRODUCT_STANDARD_SERVER": osName += "Standard"; break;
-                                                    default: osName += "(" + strOSProduct.Substring(8) + ")"; break;
+                                                    default: osName += "(" + strOSProduct.Replace("PRODUCT_","") + ")"; break;
                                                 }
 
                                                 // get release id if available
