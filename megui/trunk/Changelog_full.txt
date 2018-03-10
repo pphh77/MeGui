@@ -1,3 +1,20 @@
+2827                        fixed a startup crash when using Windows 10 Pro for Workstations
+2826 [File Indexer]         improved handling of Blu-ray playlists
+2825 [Jobs]                 improved handling of jobs which cannot be paused (e.g. L-SMASH Indexer)
+2824 [OneClick]             added a profile option to set an output file suffix
+2823 [x264]                 added support for unified 8/10 bit binaries (requires x264 2901+)
+2822 [AVC Levels Tool]      removed the AVC Levels Tool
+2821 [x264]                 added support for AVC level 6, 6.1 and 6.2 (requires x264 2851+)
+2820 [Worker]               removed the individual worker queue view. part II
+2819 [Worker]               removed the individual worker queue view
+2818 [Jobs]                 added option to pause/resume jobs
+2817 [HD Streams Extractor] improved deletion of log and gaps files
+2816 [Jobs]                 aborting a job also deletes the temporary files assigned to it
+2815 [MessageBoxEx]         cosmetics
+2813 [x265]                 added support for --tune grain
+2812 [OneClick]             fixed not updating the output folder path properly (regression of 2807)
+2811 [OneClick]             fixed "-" button behaviour if only one track is available (regression of 2808)
+2810                        added High DPI support
 2808 [OneClick]             added button to remove tracks. feature request #632
 2807 [OneClick]             fixed output file path is not updated properly. bug #891
                             removed "project name" and moved the video track name to the "advanced config" page
