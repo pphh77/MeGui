@@ -39,13 +39,35 @@ namespace MeGUI.packages.tools.hdbdextractor
         public HdBdStreamExtractor()
         {
             InitializeComponent();
+
+            FeatureDataGridView.RowTemplate.Height = MainForm.Instance.Settings.DPIRescale(22);
+            FeatureDataGridView.ColumnHeadersHeight = MainForm.Instance.Settings.DPIRescale(23);
+            FeatureDataGridView.Columns[0].Width = MainForm.Instance.Settings.DPIRescale(20);
+            FeatureDataGridView.Columns[1].Width = MainForm.Instance.Settings.DPIRescale(125);
+            //FeatureDataGridView.Columns[2].Width = MainForm.Instance.Settings.DPIRescale(426);
+            FeatureDataGridView.Columns[3].Width = MainForm.Instance.Settings.DPIRescale(100);
+            FeatureDataGridView.Columns[4].Width = MainForm.Instance.Settings.DPIRescale(80);
+
+            StreamDataGridView.RowTemplate.Height = MainForm.Instance.Settings.DPIRescale(22);
+            StreamDataGridView.ColumnHeadersHeight = MainForm.Instance.Settings.DPIRescale(23);
+            StreamDataGridView.Columns[0].Width = MainForm.Instance.Settings.DPIRescale(20);
+            StreamDataGridView.Columns[1].Width = MainForm.Instance.Settings.DPIRescale(49);
+            StreamDataGridView.Columns[2].Width = MainForm.Instance.Settings.DPIRescale(47);
+            //StreamDataGridView.Columns[3].Width = MainForm.Instance.Settings.DPIRescale(260);
+            StreamDataGridView.Columns[4].Width = MainForm.Instance.Settings.DPIRescale(90);
+            StreamDataGridView.Columns[5].Width = MainForm.Instance.Settings.DPIRescale(90);
+            StreamDataGridView.Columns[6].Width = MainForm.Instance.Settings.DPIRescale(90);
+            StreamDataGridView.Columns[7].Width = MainForm.Instance.Settings.DPIRescale(80);
+
             if (MainForm.Instance.Settings.Eac3toLastUsedFileMode)
                 FileSelection.Select();
 
+            StreamDataGridView.Columns["StreamAddOptionsTextBox"].Visible = MainForm.Instance.Settings.Eac3toEnableCustomOptions;
             toolStripMenuItem2.Checked = MainForm.Instance.Settings.Eac3toAutoSelectStreams;
             toolStripMenuItem3.Checked = MainForm.Instance.Settings.Eac3toDefaultToHD;
             toolStripMenuItem4.Checked = MainForm.Instance.Settings.Eac3toEnableEncoder;
             toolStripMenuItem5.Checked = MainForm.Instance.Settings.Eac3toEnableDecoder;
+            toolStripMenuItem6.Checked = MainForm.Instance.Settings.Eac3toEnableCustomOptions;
         }
 
         #region backgroundWorker
@@ -568,6 +590,11 @@ namespace MeGUI.packages.tools.hdbdextractor
         {
             MainForm.Instance.Settings.Eac3toEnableDecoder = toolStripMenuItem5.Checked;
             StreamDataGridView_DataSourceChanged(null, null);
+        }
+
+        private void toolStripMenuItem6_Click(object sender, EventArgs e)
+        {
+            StreamDataGridView.Columns["StreamAddOptionsTextBox"].Visible = toolStripMenuItem6.Checked;
         }
     }
 

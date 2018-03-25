@@ -1,3 +1,6 @@
+2829                        improved High DPI support (e.g. when chaning DPI values)
+     [HD Streams Extractor] removed the custom "+ Options" column by default and added an option to show it
+
 Changelog 2808 --> 2828
 
 Features/Changes:

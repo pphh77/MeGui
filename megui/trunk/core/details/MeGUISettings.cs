@@ -59,7 +59,7 @@ namespace MeGUI
                      bAutoLoadDG, bAutoStartQueueStartup, bAlwayUsePortableAviSynth, bVobSubberSingleFileExport,
                      bEnsureCorrectPlaybackSpeed, bExternalMuxerX264, bUseNeroAacEnc, bOSx64, bEnableDirectShowSource,
                      bVobSubberExtractForced, bVobSubberShowAll, bUsex64Tools, bShowDebugInformation, bEac3toDefaultToHD,
-                     bEac3toEnableEncoder, bEac3toEnableDecoder, bFirstUpdateCheck;
+                     bEac3toEnableEncoder, bEac3toEnableDecoder, bEac3toEnableCustomOptions, bFirstUpdateCheck;
         private decimal forceFilmThreshold, acceptableFPSError;
         private int nbPasses, autoUpdateServerSubList, minComplexity, updateFormSplitter,
                     maxComplexity, jobColumnWidth, inputColumnWidth, outputColumnWidth, codecColumnWidth,
@@ -68,7 +68,7 @@ namespace MeGUI
                     updateFormServerVersionColumnWidth, updateFormLocalDateColumnWidth, updateFormServerDateColumnWidth, 
                     updateFormLastUsedColumnWidth, updateFormStatusColumnWidth, updateFormServerArchitectureColumnWidth, 
                     ffmsThreads, chapterCreatorMinimumLength, updateCheckInterval, disablePackageInterval;
-        private double dpiScaleFactor;
+        private double dpiScaleFactor, dLastDPIScaleFactor;
         private SourceDetectorSettings sdSettings;
         private AutoEncodeDefaultsSettings aedSettings;
         private DialogSettings dialogSettings;
@@ -88,6 +88,14 @@ namespace MeGUI
         #endregion
         public MeGUISettings()
 		{
+            // get the DPI scale factor
+            using (Graphics graphics = Graphics.FromHwnd(IntPtr.Zero))
+            {
+                float dpiX = graphics.DpiX;
+                float dpiY = graphics.DpiY;
+                dpiScaleFactor = dpiX / 96.0;
+            }
+
             // OS / build detection
 #if x64
             bMeGUIx64 = true;
@@ -130,7 +138,7 @@ namespace MeGUI
             bEac3toAutoSelectStreams = true;
             strEac3toLastFolderPath = strEac3toLastFilePath = strEac3toLastDestinationPath = "";
             bEac3toLastUsedFileMode = false;
-            bEac3toDefaultToHD = bEac3toEnableEncoder = bEac3toEnableDecoder = false;
+            bEac3toDefaultToHD = bEac3toEnableEncoder = bEac3toEnableDecoder = bEac3toEnableCustomOptions = false;
             openProgressWindow = true;
             videoExtension = "";
             audioExtension = "";
@@ -149,29 +157,29 @@ namespace MeGUI
             minComplexity = 72;
             maxComplexity = 78;
             mainFormLocation = new Point(0, 0);
-            mainFormSize = new Size(713, 478);
+            mainFormSize = new Size(DPIRescale(713), DPIRescale(478));
             updateFormLocation = new Point(0, 0);
-            updateFormSize = new Size(780, 313);
-            updateFormSplitter = 180;
-            updateFormUpdateColumnWidth = 47;
-            updateFormNameColumnWidth = 105;
-            updateFormLocalVersionColumnWidth = 117; 
-            updateFormServerVersionColumnWidth = 117;
-            updateFormServerArchitectureColumnWidth = 50;
-            updateFormLocalDateColumnWidth = 70;
-            updateFormServerDateColumnWidth = 70;
-            updateFormLastUsedColumnWidth = 70;
-            updateFormStatusColumnWidth = 111;
-            jobColumnWidth = 40;
-            inputColumnWidth = 89;
-            outputColumnWidth = 89;
-            codecColumnWidth = 79;
-            modeColumnWidth = 51;
-            statusColumnWidth = 65;
-            ownerColumnWidth = 60;
-            startColumnWidth = 58;
-            endColumnWidth = 58;
-            fpsColumnWidth = 95;
+            updateFormSize = new Size(DPIRescale(780), DPIRescale(313));
+            updateFormSplitter = DPIRescale(180);
+            updateFormUpdateColumnWidth = DPIRescale(47);
+            updateFormNameColumnWidth = DPIRescale(105);
+            updateFormLocalVersionColumnWidth = DPIRescale(117); 
+            updateFormServerVersionColumnWidth = DPIRescale(117);
+            updateFormServerArchitectureColumnWidth = DPIRescale(50);
+            updateFormLocalDateColumnWidth = DPIRescale(70);
+            updateFormServerDateColumnWidth = DPIRescale(70);
+            updateFormLastUsedColumnWidth = DPIRescale(70);
+            updateFormStatusColumnWidth = DPIRescale(111);
+            jobColumnWidth = DPIRescale(40);
+            inputColumnWidth = DPIRescale(89);
+            outputColumnWidth = DPIRescale(89);
+            codecColumnWidth = DPIRescale(79);
+            modeColumnWidth = DPIRescale(51);
+            statusColumnWidth = DPIRescale(65);
+            ownerColumnWidth = DPIRescale(60);
+            startColumnWidth = DPIRescale(58);
+            endColumnWidth = DPIRescale(58);
+            fpsColumnWidth = DPIRescale(95);
             bEnsureCorrectPlaybackSpeed = bAlwayUsePortableAviSynth = false;
             ffmsThreads = 1;
             appendToForcedStreams = "";
@@ -188,15 +196,8 @@ namespace MeGUI
             chapterCreatorSortString = "duration";
             bShowDebugInformation = false;
             bEnableDirectShowSource = false;
-
-            // get the DPI scale factor
-            using (Graphics graphics = Graphics.FromHwnd(IntPtr.Zero))
-            {
-                float dpiX = graphics.DpiX;
-                float dpiY = graphics.DpiY;
-                dpiScaleFactor = dpiX / 96.0;
-            }
             bFirstUpdateCheck = true;
+            dLastDPIScaleFactor = 0;
         }
 
         #region properties
@@ -236,6 +237,12 @@ namespace MeGUI
         public double DPIScaleFactor
         {
             get { return dpiScaleFactor; }
+        }
+
+        public double LastDPIScaleFactor
+        {
+            get { return dpiScaleFactor; }
+            set { dLastDPIScaleFactor = value; }
         }
 
         public Point MainFormLocation
@@ -449,6 +456,12 @@ namespace MeGUI
         {
             get { return bEac3toAutoSelectStreams; }
             set { bEac3toAutoSelectStreams = value; }
+        }
+
+        public bool Eac3toEnableCustomOptions
+        {
+            get { return bEac3toEnableCustomOptions; }
+            set { bEac3toEnableCustomOptions = value; }
         }
 
         public bool EnableDirectShowSource
@@ -1319,6 +1332,42 @@ namespace MeGUI
         public int DPIRescale(int iOriginalValue)
         {
             return (int)Math.Round(iOriginalValue * dpiScaleFactor, 0);
+        }
+
+        public int DPIReverse(int iOriginalValue)
+        {
+            return (int)Math.Round(iOriginalValue / dLastDPIScaleFactor * dpiScaleFactor, 0);
+        }
+
+        public void DPIRescaleAll()
+        {
+            if (dpiScaleFactor == dLastDPIScaleFactor || dLastDPIScaleFactor == 0)
+                return;
+
+            mainFormLocation = new Point(0,0);
+            mainFormSize = new Size(DPIReverse(mainFormSize.Width), DPIReverse(mainFormSize.Height));
+            updateFormLocation = new Point(0,0);
+            updateFormSize = new Size(DPIReverse(updateFormSize.Width), DPIReverse(updateFormSize.Height));
+            updateFormSplitter = DPIReverse(updateFormSplitter);
+            updateFormUpdateColumnWidth = DPIReverse(updateFormUpdateColumnWidth);
+            updateFormNameColumnWidth = DPIReverse(updateFormNameColumnWidth);
+            updateFormLocalVersionColumnWidth = DPIReverse(updateFormLocalVersionColumnWidth);
+            updateFormServerVersionColumnWidth = DPIReverse(updateFormServerVersionColumnWidth);
+            updateFormServerArchitectureColumnWidth = DPIReverse(updateFormServerArchitectureColumnWidth);
+            updateFormLocalDateColumnWidth = DPIReverse(updateFormLocalDateColumnWidth);
+            updateFormServerDateColumnWidth = DPIReverse(updateFormServerDateColumnWidth);
+            updateFormLastUsedColumnWidth = DPIReverse(updateFormLastUsedColumnWidth);
+            updateFormStatusColumnWidth = DPIReverse(updateFormStatusColumnWidth);
+            jobColumnWidth = DPIReverse(jobColumnWidth);
+            inputColumnWidth = DPIReverse(inputColumnWidth);
+            outputColumnWidth = DPIReverse(outputColumnWidth);
+            codecColumnWidth = DPIReverse(codecColumnWidth);
+            modeColumnWidth = DPIReverse(modeColumnWidth);
+            statusColumnWidth = DPIReverse(statusColumnWidth);
+            ownerColumnWidth = DPIReverse(ownerColumnWidth);
+            startColumnWidth = DPIReverse(startColumnWidth);
+            endColumnWidth = DPIReverse(endColumnWidth);
+            endColumnWidth = DPIReverse(endColumnWidth);
         }
 
         public bool IsDGIIndexerAvailable()

@@ -828,6 +828,7 @@ namespace MeGUI
             this.profileManager.LoadProfiles();
             this.mediaFileFactory = new MediaFileFactory(this);
             this.loadSettings();
+            MainForm.Instance.settings.DPIRescaleAll();
             this.dialogManager = new DialogManager(this);
         }
 

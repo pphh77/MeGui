@@ -63,24 +63,7 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.FolderInputSourceButton = new System.Windows.Forms.Button();
             this.Eac3toLinkLabel = new System.Windows.Forms.LinkLabel();
             this.FeatureGroupBox = new System.Windows.Forms.GroupBox();
-            this.FeatureDataGridView = new MeGUI.packages.tools.hdbdextractor.CustomDataGridView();
-            this.FeatureNumberDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.FeatureNameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.FeatureDescriptionDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.FeatureFileDataGridViewComboBoxColumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.FeatureDurationDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.FeatureBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.StreamGroupBox = new System.Windows.Forms.GroupBox();
-            this.StreamDataGridView = new MeGUI.packages.tools.hdbdextractor.CustomDataGridView();
-            this.StreamNumberTextBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.StreamExtractCheckBox = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.StreamTypeTextBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.StreamDescriptionTextBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.StreamExtractAsComboBox = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.StreamAddOptionsTextBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.languageDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.nameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.StreamsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.OutputGroupBox = new System.Windows.Forms.GroupBox();
             this.FolderOutputSourceButton = new System.Windows.Forms.Button();
             this.FolderOutputTextBox = new System.Windows.Forms.TextBox();
@@ -93,17 +76,35 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
+            this.StreamDataGridView = new MeGUI.packages.tools.hdbdextractor.CustomDataGridView();
+            this.StreamNumberTextBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.StreamExtractCheckBox = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.StreamTypeTextBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.StreamDescriptionTextBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.StreamExtractAsComboBox = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.StreamAddOptionsTextBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.languageDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.nameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.StreamsBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.FeatureDataGridView = new MeGUI.packages.tools.hdbdextractor.CustomDataGridView();
+            this.FeatureNumberDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.FeatureNameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.FeatureDescriptionDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.FeatureFileDataGridViewComboBoxColumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.FeatureDurationDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.FeatureBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.StatusStrip.SuspendLayout();
             this.InputGroupBox.SuspendLayout();
             this.FeatureGroupBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.FeatureDataGridView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.FeatureBindingSource)).BeginInit();
             this.StreamGroupBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.StreamDataGridView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.StreamsBindingSource)).BeginInit();
             this.OutputGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.extractTypesBindingSource)).BeginInit();
             this.menuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.StreamDataGridView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.StreamsBindingSource)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.FeatureDataGridView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.FeatureBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // StatusStrip
@@ -250,89 +251,6 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.FeatureGroupBox.TabStop = false;
             this.FeatureGroupBox.Text = " Feature(s) ";
             // 
-            // FeatureDataGridView
-            // 
-            this.FeatureDataGridView.AllowUserToAddRows = false;
-            this.FeatureDataGridView.AllowUserToDeleteRows = false;
-            this.FeatureDataGridView.AllowUserToOrderColumns = true;
-            this.FeatureDataGridView.AllowUserToResizeRows = false;
-            this.FeatureDataGridView.AutoGenerateColumns = false;
-            this.FeatureDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.FeatureDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            this.FeatureDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.FeatureNumberDataGridViewTextBoxColumn1,
-            this.FeatureNameDataGridViewTextBoxColumn,
-            this.FeatureDescriptionDataGridViewTextBoxColumn,
-            this.FeatureFileDataGridViewComboBoxColumn,
-            this.FeatureDurationDataGridViewTextBoxColumn});
-            this.FeatureDataGridView.DataSource = this.FeatureBindingSource;
-            this.FeatureDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.FeatureDataGridView.Location = new System.Drawing.Point(3, 17);
-            this.FeatureDataGridView.MultiSelect = false;
-            this.FeatureDataGridView.Name = "FeatureDataGridView";
-            this.FeatureDataGridView.RowHeadersVisible = false;
-            this.FeatureDataGridView.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.FeatureDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.FeatureDataGridView.ShowEditingIcon = false;
-            this.FeatureDataGridView.Size = new System.Drawing.Size(731, 90);
-            this.FeatureDataGridView.TabIndex = 13;
-            this.FeatureDataGridView.DataSourceChanged += new System.EventHandler(this.FeatureDataGridView_DataSourceChanged);
-            this.FeatureDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.FeatureDataGridView_DataBindingComplete);
-            // 
-            // FeatureNumberDataGridViewTextBoxColumn1
-            // 
-            this.FeatureNumberDataGridViewTextBoxColumn1.DataPropertyName = "Number";
-            this.FeatureNumberDataGridViewTextBoxColumn1.HeaderText = "#";
-            this.FeatureNumberDataGridViewTextBoxColumn1.MinimumWidth = 20;
-            this.FeatureNumberDataGridViewTextBoxColumn1.Name = "FeatureNumberDataGridViewTextBoxColumn1";
-            this.FeatureNumberDataGridViewTextBoxColumn1.ReadOnly = true;
-            this.FeatureNumberDataGridViewTextBoxColumn1.ToolTipText = "Feature number";
-            this.FeatureNumberDataGridViewTextBoxColumn1.Width = 20;
-            // 
-            // FeatureNameDataGridViewTextBoxColumn
-            // 
-            this.FeatureNameDataGridViewTextBoxColumn.DataPropertyName = "Name";
-            this.FeatureNameDataGridViewTextBoxColumn.HeaderText = "Name";
-            this.FeatureNameDataGridViewTextBoxColumn.MinimumWidth = 125;
-            this.FeatureNameDataGridViewTextBoxColumn.Name = "FeatureNameDataGridViewTextBoxColumn";
-            this.FeatureNameDataGridViewTextBoxColumn.ReadOnly = true;
-            this.FeatureNameDataGridViewTextBoxColumn.ToolTipText = "Feature name";
-            this.FeatureNameDataGridViewTextBoxColumn.Width = 125;
-            // 
-            // FeatureDescriptionDataGridViewTextBoxColumn
-            // 
-            this.FeatureDescriptionDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.FeatureDescriptionDataGridViewTextBoxColumn.DataPropertyName = "Description";
-            this.FeatureDescriptionDataGridViewTextBoxColumn.HeaderText = "Description";
-            this.FeatureDescriptionDataGridViewTextBoxColumn.MinimumWidth = 244;
-            this.FeatureDescriptionDataGridViewTextBoxColumn.Name = "FeatureDescriptionDataGridViewTextBoxColumn";
-            this.FeatureDescriptionDataGridViewTextBoxColumn.ReadOnly = true;
-            this.FeatureDescriptionDataGridViewTextBoxColumn.ToolTipText = "Feature description";
-            // 
-            // FeatureFileDataGridViewComboBoxColumn
-            // 
-            this.FeatureFileDataGridViewComboBoxColumn.HeaderText = "File(s)";
-            this.FeatureFileDataGridViewComboBoxColumn.MinimumWidth = 90;
-            this.FeatureFileDataGridViewComboBoxColumn.Name = "FeatureFileDataGridViewComboBoxColumn";
-            this.FeatureFileDataGridViewComboBoxColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.FeatureFileDataGridViewComboBoxColumn.ToolTipText = "Feature File(s)";
-            this.FeatureFileDataGridViewComboBoxColumn.Width = 90;
-            // 
-            // FeatureDurationDataGridViewTextBoxColumn
-            // 
-            this.FeatureDurationDataGridViewTextBoxColumn.DataPropertyName = "Duration";
-            this.FeatureDurationDataGridViewTextBoxColumn.HeaderText = "Duration";
-            this.FeatureDurationDataGridViewTextBoxColumn.MinimumWidth = 67;
-            this.FeatureDurationDataGridViewTextBoxColumn.Name = "FeatureDurationDataGridViewTextBoxColumn";
-            this.FeatureDurationDataGridViewTextBoxColumn.ReadOnly = true;
-            this.FeatureDurationDataGridViewTextBoxColumn.ToolTipText = "Feature duration";
-            this.FeatureDurationDataGridViewTextBoxColumn.Width = 67;
-            // 
-            // FeatureBindingSource
-            // 
-            this.FeatureBindingSource.AllowNew = false;
-            this.FeatureBindingSource.DataSource = typeof(eac3to.Feature);
-            // 
             // StreamGroupBox
             // 
             this.StreamGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -345,116 +263,6 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.StreamGroupBox.TabIndex = 3;
             this.StreamGroupBox.TabStop = false;
             this.StreamGroupBox.Text = " Stream(s) ";
-            // 
-            // StreamDataGridView
-            // 
-            this.StreamDataGridView.AllowUserToAddRows = false;
-            this.StreamDataGridView.AllowUserToDeleteRows = false;
-            this.StreamDataGridView.AllowUserToOrderColumns = true;
-            this.StreamDataGridView.AllowUserToResizeRows = false;
-            this.StreamDataGridView.AutoGenerateColumns = false;
-            this.StreamDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.StreamDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            this.StreamDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.StreamNumberTextBox,
-            this.StreamExtractCheckBox,
-            this.StreamTypeTextBox,
-            this.StreamDescriptionTextBox,
-            this.StreamExtractAsComboBox,
-            this.StreamAddOptionsTextBox,
-            this.languageDataGridViewTextBoxColumn,
-            this.nameDataGridViewTextBoxColumn});
-            this.StreamDataGridView.DataSource = this.StreamsBindingSource;
-            this.StreamDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.StreamDataGridView.Location = new System.Drawing.Point(3, 17);
-            this.StreamDataGridView.MultiSelect = false;
-            this.StreamDataGridView.Name = "StreamDataGridView";
-            this.StreamDataGridView.RowHeadersVisible = false;
-            this.StreamDataGridView.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.StreamDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.StreamDataGridView.ShowEditingIcon = false;
-            this.StreamDataGridView.Size = new System.Drawing.Size(731, 156);
-            this.StreamDataGridView.TabIndex = 7;
-            this.StreamDataGridView.DataSourceChanged += new System.EventHandler(this.StreamDataGridView_DataSourceChanged);
-            // 
-            // StreamNumberTextBox
-            // 
-            this.StreamNumberTextBox.DataPropertyName = "Number";
-            this.StreamNumberTextBox.HeaderText = "#";
-            this.StreamNumberTextBox.MinimumWidth = 20;
-            this.StreamNumberTextBox.Name = "StreamNumberTextBox";
-            this.StreamNumberTextBox.ReadOnly = true;
-            this.StreamNumberTextBox.ToolTipText = "Stream number";
-            this.StreamNumberTextBox.Width = 20;
-            // 
-            // StreamExtractCheckBox
-            // 
-            this.StreamExtractCheckBox.FalseValue = "0";
-            this.StreamExtractCheckBox.HeaderText = "Extract?";
-            this.StreamExtractCheckBox.IndeterminateValue = "-1";
-            this.StreamExtractCheckBox.MinimumWidth = 49;
-            this.StreamExtractCheckBox.Name = "StreamExtractCheckBox";
-            this.StreamExtractCheckBox.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.StreamExtractCheckBox.ToolTipText = "Extract stream?";
-            this.StreamExtractCheckBox.TrueValue = "1";
-            this.StreamExtractCheckBox.Width = 49;
-            // 
-            // StreamTypeTextBox
-            // 
-            this.StreamTypeTextBox.DataPropertyName = "Type";
-            this.StreamTypeTextBox.HeaderText = "Type";
-            this.StreamTypeTextBox.MinimumWidth = 47;
-            this.StreamTypeTextBox.Name = "StreamTypeTextBox";
-            this.StreamTypeTextBox.ReadOnly = true;
-            this.StreamTypeTextBox.ToolTipText = "Stream type";
-            this.StreamTypeTextBox.Width = 47;
-            // 
-            // StreamDescriptionTextBox
-            // 
-            this.StreamDescriptionTextBox.DataPropertyName = "Description";
-            this.StreamDescriptionTextBox.HeaderText = "Description";
-            this.StreamDescriptionTextBox.MinimumWidth = 260;
-            this.StreamDescriptionTextBox.Name = "StreamDescriptionTextBox";
-            this.StreamDescriptionTextBox.ReadOnly = true;
-            this.StreamDescriptionTextBox.ToolTipText = "Stream description";
-            this.StreamDescriptionTextBox.Width = 260;
-            // 
-            // StreamExtractAsComboBox
-            // 
-            this.StreamExtractAsComboBox.HeaderText = "Extract As";
-            this.StreamExtractAsComboBox.MinimumWidth = 80;
-            this.StreamExtractAsComboBox.Name = "StreamExtractAsComboBox";
-            this.StreamExtractAsComboBox.ToolTipText = "Stream extract type";
-            this.StreamExtractAsComboBox.Width = 80;
-            // 
-            // StreamAddOptionsTextBox
-            // 
-            this.StreamAddOptionsTextBox.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.StreamAddOptionsTextBox.HeaderText = "+ Options";
-            this.StreamAddOptionsTextBox.MinimumWidth = 83;
-            this.StreamAddOptionsTextBox.Name = "StreamAddOptionsTextBox";
-            this.StreamAddOptionsTextBox.ToolTipText = "Stream extract additional options";
-            // 
-            // languageDataGridViewTextBoxColumn
-            // 
-            this.languageDataGridViewTextBoxColumn.DataPropertyName = "Language";
-            this.languageDataGridViewTextBoxColumn.HeaderText = "Language";
-            this.languageDataGridViewTextBoxColumn.MinimumWidth = 80;
-            this.languageDataGridViewTextBoxColumn.Name = "languageDataGridViewTextBoxColumn";
-            this.languageDataGridViewTextBoxColumn.ToolTipText = "Stream language";
-            this.languageDataGridViewTextBoxColumn.Width = 80;
-            // 
-            // nameDataGridViewTextBoxColumn
-            // 
-            this.nameDataGridViewTextBoxColumn.DataPropertyName = "Name";
-            this.nameDataGridViewTextBoxColumn.HeaderText = "Name";
-            this.nameDataGridViewTextBoxColumn.MinimumWidth = 100;
-            this.nameDataGridViewTextBoxColumn.Name = "nameDataGridViewTextBoxColumn";
-            this.nameDataGridViewTextBoxColumn.ToolTipText = "Stream name";
-            // 
-            // StreamsBindingSource
-            // 
-            this.StreamsBindingSource.DataSource = typeof(eac3to.Stream);
             // 
             // OutputGroupBox
             // 
@@ -528,7 +336,8 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.toolStripMenuItem2,
             this.toolStripMenuItem3,
             this.toolStripMenuItem4,
-            this.toolStripMenuItem5});
+            this.toolStripMenuItem5,
+            this.toolStripMenuItem6});
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
             this.toolStripMenuItem1.Size = new System.Drawing.Size(61, 20);
             this.toolStripMenuItem1.Text = "&Settings";
@@ -565,6 +374,207 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.toolStripMenuItem5.Text = "Extract As: show all demux options";
             this.toolStripMenuItem5.Click += new System.EventHandler(this.toolStripMenuItem5_Click);
             // 
+            // toolStripMenuItem6
+            // 
+            this.toolStripMenuItem6.CheckOnClick = true;
+            this.toolStripMenuItem6.Name = "toolStripMenuItem6";
+            this.toolStripMenuItem6.Size = new System.Drawing.Size(311, 22);
+            this.toolStripMenuItem6.Text = "Enable Custom Options";
+            this.toolStripMenuItem6.Click += new System.EventHandler(this.toolStripMenuItem6_Click);
+            // 
+            // StreamDataGridView
+            // 
+            this.StreamDataGridView.AllowUserToAddRows = false;
+            this.StreamDataGridView.AllowUserToDeleteRows = false;
+            this.StreamDataGridView.AllowUserToOrderColumns = true;
+            this.StreamDataGridView.AllowUserToResizeRows = false;
+            this.StreamDataGridView.AutoGenerateColumns = false;
+            this.StreamDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.StreamDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            this.StreamDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.StreamNumberTextBox,
+            this.StreamExtractCheckBox,
+            this.StreamTypeTextBox,
+            this.StreamDescriptionTextBox,
+            this.StreamExtractAsComboBox,
+            this.StreamAddOptionsTextBox,
+            this.languageDataGridViewTextBoxColumn,
+            this.nameDataGridViewTextBoxColumn});
+            this.StreamDataGridView.DataSource = this.StreamsBindingSource;
+            this.StreamDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.StreamDataGridView.Location = new System.Drawing.Point(3, 17);
+            this.StreamDataGridView.MultiSelect = false;
+            this.StreamDataGridView.Name = "StreamDataGridView";
+            this.StreamDataGridView.RowHeadersVisible = false;
+            this.StreamDataGridView.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.StreamDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.StreamDataGridView.ShowEditingIcon = false;
+            this.StreamDataGridView.Size = new System.Drawing.Size(731, 156);
+            this.StreamDataGridView.TabIndex = 7;
+            this.StreamDataGridView.DataSourceChanged += new System.EventHandler(this.StreamDataGridView_DataSourceChanged);
+            // 
+            // StreamNumberTextBox
+            // 
+            this.StreamNumberTextBox.DataPropertyName = "Number";
+            this.StreamNumberTextBox.HeaderText = "#";
+            this.StreamNumberTextBox.MinimumWidth = 2;
+            this.StreamNumberTextBox.Name = "StreamNumberTextBox";
+            this.StreamNumberTextBox.ReadOnly = true;
+            this.StreamNumberTextBox.ToolTipText = "Stream number";
+            this.StreamNumberTextBox.Width = 20;
+            // 
+            // StreamExtractCheckBox
+            // 
+            this.StreamExtractCheckBox.FalseValue = "0";
+            this.StreamExtractCheckBox.HeaderText = "Extract?";
+            this.StreamExtractCheckBox.IndeterminateValue = "-1";
+            this.StreamExtractCheckBox.MinimumWidth = 2;
+            this.StreamExtractCheckBox.Name = "StreamExtractCheckBox";
+            this.StreamExtractCheckBox.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.StreamExtractCheckBox.ToolTipText = "Extract stream?";
+            this.StreamExtractCheckBox.TrueValue = "1";
+            this.StreamExtractCheckBox.Width = 49;
+            // 
+            // StreamTypeTextBox
+            // 
+            this.StreamTypeTextBox.DataPropertyName = "Type";
+            this.StreamTypeTextBox.HeaderText = "Type";
+            this.StreamTypeTextBox.MinimumWidth = 2;
+            this.StreamTypeTextBox.Name = "StreamTypeTextBox";
+            this.StreamTypeTextBox.ReadOnly = true;
+            this.StreamTypeTextBox.ToolTipText = "Stream type";
+            this.StreamTypeTextBox.Width = 47;
+            // 
+            // StreamDescriptionTextBox
+            // 
+            this.StreamDescriptionTextBox.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.StreamDescriptionTextBox.DataPropertyName = "Description";
+            this.StreamDescriptionTextBox.HeaderText = "Description";
+            this.StreamDescriptionTextBox.MinimumWidth = 2;
+            this.StreamDescriptionTextBox.Name = "StreamDescriptionTextBox";
+            this.StreamDescriptionTextBox.ReadOnly = true;
+            this.StreamDescriptionTextBox.ToolTipText = "Stream description";
+            // 
+            // StreamExtractAsComboBox
+            // 
+            this.StreamExtractAsComboBox.HeaderText = "Extract As";
+            this.StreamExtractAsComboBox.MinimumWidth = 2;
+            this.StreamExtractAsComboBox.Name = "StreamExtractAsComboBox";
+            this.StreamExtractAsComboBox.ToolTipText = "Stream extract type";
+            this.StreamExtractAsComboBox.Width = 80;
+            // 
+            // StreamAddOptionsTextBox
+            // 
+            this.StreamAddOptionsTextBox.HeaderText = "+ Options";
+            this.StreamAddOptionsTextBox.MinimumWidth = 2;
+            this.StreamAddOptionsTextBox.Name = "StreamAddOptionsTextBox";
+            this.StreamAddOptionsTextBox.ToolTipText = "Stream extract additional options";
+            this.StreamAddOptionsTextBox.Width = 176;
+            // 
+            // languageDataGridViewTextBoxColumn
+            // 
+            this.languageDataGridViewTextBoxColumn.DataPropertyName = "Language";
+            this.languageDataGridViewTextBoxColumn.HeaderText = "Language";
+            this.languageDataGridViewTextBoxColumn.MinimumWidth = 2;
+            this.languageDataGridViewTextBoxColumn.Name = "languageDataGridViewTextBoxColumn";
+            this.languageDataGridViewTextBoxColumn.ToolTipText = "Stream language";
+            this.languageDataGridViewTextBoxColumn.Width = 80;
+            // 
+            // nameDataGridViewTextBoxColumn
+            // 
+            this.nameDataGridViewTextBoxColumn.DataPropertyName = "Name";
+            this.nameDataGridViewTextBoxColumn.HeaderText = "Name";
+            this.nameDataGridViewTextBoxColumn.MinimumWidth = 2;
+            this.nameDataGridViewTextBoxColumn.Name = "nameDataGridViewTextBoxColumn";
+            this.nameDataGridViewTextBoxColumn.ToolTipText = "Stream name";
+            // 
+            // StreamsBindingSource
+            // 
+            this.StreamsBindingSource.DataSource = typeof(eac3to.Stream);
+            // 
+            // FeatureDataGridView
+            // 
+            this.FeatureDataGridView.AllowUserToAddRows = false;
+            this.FeatureDataGridView.AllowUserToDeleteRows = false;
+            this.FeatureDataGridView.AllowUserToOrderColumns = true;
+            this.FeatureDataGridView.AllowUserToResizeRows = false;
+            this.FeatureDataGridView.AutoGenerateColumns = false;
+            this.FeatureDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.FeatureDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            this.FeatureDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.FeatureNumberDataGridViewTextBoxColumn1,
+            this.FeatureNameDataGridViewTextBoxColumn,
+            this.FeatureDescriptionDataGridViewTextBoxColumn,
+            this.FeatureFileDataGridViewComboBoxColumn,
+            this.FeatureDurationDataGridViewTextBoxColumn});
+            this.FeatureDataGridView.DataSource = this.FeatureBindingSource;
+            this.FeatureDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.FeatureDataGridView.Location = new System.Drawing.Point(3, 17);
+            this.FeatureDataGridView.MultiSelect = false;
+            this.FeatureDataGridView.Name = "FeatureDataGridView";
+            this.FeatureDataGridView.RowHeadersVisible = false;
+            this.FeatureDataGridView.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.FeatureDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.FeatureDataGridView.ShowEditingIcon = false;
+            this.FeatureDataGridView.Size = new System.Drawing.Size(731, 90);
+            this.FeatureDataGridView.TabIndex = 13;
+            this.FeatureDataGridView.DataSourceChanged += new System.EventHandler(this.FeatureDataGridView_DataSourceChanged);
+            this.FeatureDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.FeatureDataGridView_DataBindingComplete);
+            // 
+            // FeatureNumberDataGridViewTextBoxColumn1
+            // 
+            this.FeatureNumberDataGridViewTextBoxColumn1.DataPropertyName = "Number";
+            this.FeatureNumberDataGridViewTextBoxColumn1.HeaderText = "#";
+            this.FeatureNumberDataGridViewTextBoxColumn1.MinimumWidth = 2;
+            this.FeatureNumberDataGridViewTextBoxColumn1.Name = "FeatureNumberDataGridViewTextBoxColumn1";
+            this.FeatureNumberDataGridViewTextBoxColumn1.ReadOnly = true;
+            this.FeatureNumberDataGridViewTextBoxColumn1.ToolTipText = "Feature number";
+            this.FeatureNumberDataGridViewTextBoxColumn1.Width = 20;
+            // 
+            // FeatureNameDataGridViewTextBoxColumn
+            // 
+            this.FeatureNameDataGridViewTextBoxColumn.DataPropertyName = "Name";
+            this.FeatureNameDataGridViewTextBoxColumn.HeaderText = "Name";
+            this.FeatureNameDataGridViewTextBoxColumn.MinimumWidth = 2;
+            this.FeatureNameDataGridViewTextBoxColumn.Name = "FeatureNameDataGridViewTextBoxColumn";
+            this.FeatureNameDataGridViewTextBoxColumn.ReadOnly = true;
+            this.FeatureNameDataGridViewTextBoxColumn.ToolTipText = "Feature name";
+            this.FeatureNameDataGridViewTextBoxColumn.Width = 125;
+            // 
+            // FeatureDescriptionDataGridViewTextBoxColumn
+            // 
+            this.FeatureDescriptionDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.FeatureDescriptionDataGridViewTextBoxColumn.DataPropertyName = "Description";
+            this.FeatureDescriptionDataGridViewTextBoxColumn.HeaderText = "Description";
+            this.FeatureDescriptionDataGridViewTextBoxColumn.MinimumWidth = 2;
+            this.FeatureDescriptionDataGridViewTextBoxColumn.Name = "FeatureDescriptionDataGridViewTextBoxColumn";
+            this.FeatureDescriptionDataGridViewTextBoxColumn.ReadOnly = true;
+            this.FeatureDescriptionDataGridViewTextBoxColumn.ToolTipText = "Feature description";
+            // 
+            // FeatureFileDataGridViewComboBoxColumn
+            // 
+            this.FeatureFileDataGridViewComboBoxColumn.HeaderText = "File(s)";
+            this.FeatureFileDataGridViewComboBoxColumn.MinimumWidth = 2;
+            this.FeatureFileDataGridViewComboBoxColumn.Name = "FeatureFileDataGridViewComboBoxColumn";
+            this.FeatureFileDataGridViewComboBoxColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.FeatureFileDataGridViewComboBoxColumn.ToolTipText = "Feature File(s)";
+            this.FeatureFileDataGridViewComboBoxColumn.Width = 90;
+            // 
+            // FeatureDurationDataGridViewTextBoxColumn
+            // 
+            this.FeatureDurationDataGridViewTextBoxColumn.DataPropertyName = "Duration";
+            this.FeatureDurationDataGridViewTextBoxColumn.HeaderText = "Duration";
+            this.FeatureDurationDataGridViewTextBoxColumn.MinimumWidth = 2;
+            this.FeatureDurationDataGridViewTextBoxColumn.Name = "FeatureDurationDataGridViewTextBoxColumn";
+            this.FeatureDurationDataGridViewTextBoxColumn.ReadOnly = true;
+            this.FeatureDurationDataGridViewTextBoxColumn.ToolTipText = "Feature duration";
+            this.FeatureDurationDataGridViewTextBoxColumn.Width = 67;
+            // 
+            // FeatureBindingSource
+            // 
+            this.FeatureBindingSource.AllowNew = false;
+            this.FeatureBindingSource.DataSource = typeof(eac3to.Feature);
+            // 
             // HdBdStreamExtractor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -596,16 +606,16 @@ namespace MeGUI.packages.tools.hdbdextractor
             this.InputGroupBox.ResumeLayout(false);
             this.InputGroupBox.PerformLayout();
             this.FeatureGroupBox.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.FeatureDataGridView)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.FeatureBindingSource)).EndInit();
             this.StreamGroupBox.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.StreamDataGridView)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.StreamsBindingSource)).EndInit();
             this.OutputGroupBox.ResumeLayout(false);
             this.OutputGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.extractTypesBindingSource)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.StreamDataGridView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.StreamsBindingSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.FeatureDataGridView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.FeatureBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -637,17 +647,17 @@ namespace MeGUI.packages.tools.hdbdextractor
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.BindingSource extractTypesBindingSource;
         private System.Windows.Forms.CheckBox closeOnQueue;
-        private System.Windows.Forms.DataGridViewTextBoxColumn FeatureNumberDataGridViewTextBoxColumn1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn FeatureNameDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn FeatureDescriptionDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewComboBoxColumn FeatureFileDataGridViewComboBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn FeatureDurationDataGridViewTextBoxColumn;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem4;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
+        private System.Windows.Forms.DataGridViewTextBoxColumn FeatureNumberDataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn FeatureNameDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn FeatureDescriptionDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewComboBoxColumn FeatureFileDataGridViewComboBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn FeatureDurationDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn StreamNumberTextBox;
         private System.Windows.Forms.DataGridViewCheckBoxColumn StreamExtractCheckBox;
         private System.Windows.Forms.DataGridViewTextBoxColumn StreamTypeTextBox;
@@ -656,5 +666,6 @@ namespace MeGUI.packages.tools.hdbdextractor
         private System.Windows.Forms.DataGridViewTextBoxColumn StreamAddOptionsTextBox;
         private System.Windows.Forms.DataGridViewTextBoxColumn languageDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn nameDataGridViewTextBoxColumn;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem6;
     }
 }
