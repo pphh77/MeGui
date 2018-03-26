@@ -127,7 +127,7 @@ namespace MeGUI.packages.tools.hdbdextractor
             {
                 if (this.InvokeRequired)
                     this.BeginInvoke(new SetToolStripProgressBarValueCallback(SetToolStripProgressBarValue), value);
-                else
+                else if (this.ToolStripProgressBar != null)
                     this.ToolStripProgressBar.Value = value;
             }
         }
@@ -139,7 +139,7 @@ namespace MeGUI.packages.tools.hdbdextractor
             {
                 if (this.InvokeRequired)
                     this.BeginInvoke(new SetToolStripLabelTextCallback(SetToolStripLabelText), message);
-                else
+                else if (this.ToolStripProgressBar != null)
                     this.ToolStripStatusLabel.Text = message;
             }
         }

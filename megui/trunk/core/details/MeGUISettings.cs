@@ -157,29 +157,29 @@ namespace MeGUI
             minComplexity = 72;
             maxComplexity = 78;
             mainFormLocation = new Point(0, 0);
-            mainFormSize = new Size(DPIRescale(713), DPIRescale(478));
+            mainFormSize = new Size(713, 478);
             updateFormLocation = new Point(0, 0);
-            updateFormSize = new Size(DPIRescale(780), DPIRescale(313));
-            updateFormSplitter = DPIRescale(180);
-            updateFormUpdateColumnWidth = DPIRescale(47);
-            updateFormNameColumnWidth = DPIRescale(105);
-            updateFormLocalVersionColumnWidth = DPIRescale(117); 
-            updateFormServerVersionColumnWidth = DPIRescale(117);
-            updateFormServerArchitectureColumnWidth = DPIRescale(50);
-            updateFormLocalDateColumnWidth = DPIRescale(70);
-            updateFormServerDateColumnWidth = DPIRescale(70);
-            updateFormLastUsedColumnWidth = DPIRescale(70);
-            updateFormStatusColumnWidth = DPIRescale(111);
-            jobColumnWidth = DPIRescale(40);
-            inputColumnWidth = DPIRescale(89);
-            outputColumnWidth = DPIRescale(89);
-            codecColumnWidth = DPIRescale(79);
-            modeColumnWidth = DPIRescale(51);
-            statusColumnWidth = DPIRescale(65);
-            ownerColumnWidth = DPIRescale(60);
-            startColumnWidth = DPIRescale(58);
-            endColumnWidth = DPIRescale(58);
-            fpsColumnWidth = DPIRescale(95);
+            updateFormSize = new Size(780, 313);
+            updateFormSplitter = 180;
+            updateFormUpdateColumnWidth = 47;
+            updateFormNameColumnWidth = 105;
+            updateFormLocalVersionColumnWidth = 117; 
+            updateFormServerVersionColumnWidth = 117;
+            updateFormServerArchitectureColumnWidth = 50;
+            updateFormLocalDateColumnWidth = 70;
+            updateFormServerDateColumnWidth = 70;
+            updateFormLastUsedColumnWidth = 70;
+            updateFormStatusColumnWidth = 111;
+            jobColumnWidth = 40;
+            inputColumnWidth = 89;
+            outputColumnWidth = 89;
+            codecColumnWidth = 79;
+            modeColumnWidth = 51;
+            statusColumnWidth = 65;
+            ownerColumnWidth = 60;
+            startColumnWidth = 58;
+            endColumnWidth = 58;
+            fpsColumnWidth = 95;
             bEnsureCorrectPlaybackSpeed = bAlwayUsePortableAviSynth = false;
             ffmsThreads = 1;
             appendToForcedStreams = "";
@@ -1341,33 +1341,63 @@ namespace MeGUI
 
         public void DPIRescaleAll()
         {
-            if (dpiScaleFactor == dLastDPIScaleFactor || dLastDPIScaleFactor == 0)
+            if (dpiScaleFactor == dLastDPIScaleFactor)
                 return;
 
-            mainFormLocation = new Point(0,0);
-            mainFormSize = new Size(DPIReverse(mainFormSize.Width), DPIReverse(mainFormSize.Height));
-            updateFormLocation = new Point(0,0);
-            updateFormSize = new Size(DPIReverse(updateFormSize.Width), DPIReverse(updateFormSize.Height));
-            updateFormSplitter = DPIReverse(updateFormSplitter);
-            updateFormUpdateColumnWidth = DPIReverse(updateFormUpdateColumnWidth);
-            updateFormNameColumnWidth = DPIReverse(updateFormNameColumnWidth);
-            updateFormLocalVersionColumnWidth = DPIReverse(updateFormLocalVersionColumnWidth);
-            updateFormServerVersionColumnWidth = DPIReverse(updateFormServerVersionColumnWidth);
-            updateFormServerArchitectureColumnWidth = DPIReverse(updateFormServerArchitectureColumnWidth);
-            updateFormLocalDateColumnWidth = DPIReverse(updateFormLocalDateColumnWidth);
-            updateFormServerDateColumnWidth = DPIReverse(updateFormServerDateColumnWidth);
-            updateFormLastUsedColumnWidth = DPIReverse(updateFormLastUsedColumnWidth);
-            updateFormStatusColumnWidth = DPIReverse(updateFormStatusColumnWidth);
-            jobColumnWidth = DPIReverse(jobColumnWidth);
-            inputColumnWidth = DPIReverse(inputColumnWidth);
-            outputColumnWidth = DPIReverse(outputColumnWidth);
-            codecColumnWidth = DPIReverse(codecColumnWidth);
-            modeColumnWidth = DPIReverse(modeColumnWidth);
-            statusColumnWidth = DPIReverse(statusColumnWidth);
-            ownerColumnWidth = DPIReverse(ownerColumnWidth);
-            startColumnWidth = DPIReverse(startColumnWidth);
-            endColumnWidth = DPIReverse(endColumnWidth);
-            endColumnWidth = DPIReverse(endColumnWidth);
+            if (dLastDPIScaleFactor == 0)
+            {
+                mainFormLocation = new Point(0, 0);
+                mainFormSize = new Size(DPIRescale(713), DPIRescale(478));
+                updateFormLocation = new Point(0, 0);
+                updateFormSize = new Size(DPIRescale(780), DPIRescale(313));
+                updateFormSplitter = DPIRescale(180);
+                updateFormUpdateColumnWidth = DPIRescale(47);
+                updateFormNameColumnWidth = DPIRescale(105);
+                updateFormLocalVersionColumnWidth = DPIRescale(117);
+                updateFormServerVersionColumnWidth = DPIRescale(117);
+                updateFormServerArchitectureColumnWidth = DPIRescale(50);
+                updateFormLocalDateColumnWidth = DPIRescale(70);
+                updateFormServerDateColumnWidth = DPIRescale(70);
+                updateFormLastUsedColumnWidth = DPIRescale(70);
+                updateFormStatusColumnWidth = DPIRescale(111);
+                jobColumnWidth = DPIRescale(40);
+                inputColumnWidth = DPIRescale(89);
+                outputColumnWidth = DPIRescale(89);
+                codecColumnWidth = DPIRescale(79);
+                modeColumnWidth = DPIRescale(51);
+                statusColumnWidth = DPIRescale(65);
+                ownerColumnWidth = DPIRescale(60);
+                startColumnWidth = DPIRescale(58);
+                endColumnWidth = DPIRescale(58);
+                fpsColumnWidth = DPIRescale(95);
+            }
+            else
+            {
+                mainFormLocation = new Point(0, 0);
+                mainFormSize = new Size(DPIReverse(mainFormSize.Width), DPIReverse(mainFormSize.Height));
+                updateFormLocation = new Point(0, 0);
+                updateFormSize = new Size(DPIReverse(updateFormSize.Width), DPIReverse(updateFormSize.Height));
+                updateFormSplitter = DPIReverse(updateFormSplitter);
+                updateFormUpdateColumnWidth = DPIReverse(updateFormUpdateColumnWidth);
+                updateFormNameColumnWidth = DPIReverse(updateFormNameColumnWidth);
+                updateFormLocalVersionColumnWidth = DPIReverse(updateFormLocalVersionColumnWidth);
+                updateFormServerVersionColumnWidth = DPIReverse(updateFormServerVersionColumnWidth);
+                updateFormServerArchitectureColumnWidth = DPIReverse(updateFormServerArchitectureColumnWidth);
+                updateFormLocalDateColumnWidth = DPIReverse(updateFormLocalDateColumnWidth);
+                updateFormServerDateColumnWidth = DPIReverse(updateFormServerDateColumnWidth);
+                updateFormLastUsedColumnWidth = DPIReverse(updateFormLastUsedColumnWidth);
+                updateFormStatusColumnWidth = DPIReverse(updateFormStatusColumnWidth);
+                jobColumnWidth = DPIReverse(jobColumnWidth);
+                inputColumnWidth = DPIReverse(inputColumnWidth);
+                outputColumnWidth = DPIReverse(outputColumnWidth);
+                codecColumnWidth = DPIReverse(codecColumnWidth);
+                modeColumnWidth = DPIReverse(modeColumnWidth);
+                statusColumnWidth = DPIReverse(statusColumnWidth);
+                ownerColumnWidth = DPIReverse(ownerColumnWidth);
+                startColumnWidth = DPIReverse(startColumnWidth);
+                endColumnWidth = DPIReverse(endColumnWidth);
+                endColumnWidth = DPIReverse(endColumnWidth);
+            }
         }
 
         public bool IsDGIIndexerAvailable()

@@ -1,4 +1,5 @@
-2829                        improved High DPI support (e.g. when chaning DPI values)
+2830                        reset view settings once to properly adjust for 2829
+2829                        improved High DPI support (e.g. when changing DPI values)
      [HD Streams Extractor] removed the custom "+ Options" column by default and added an option to show it
 
 Changelog 2808 --> 2828
