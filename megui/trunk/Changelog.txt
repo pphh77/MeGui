@@ -1,3 +1,4 @@
+2831 [Audio Encoder]        x64: improved the downmix functions (only for 7.1/6.1 to 5.1)
 2830                        reset view settings once to properly adjust for 2829
 2829                        improved High DPI support (e.g. when changing DPI values)
      [HD Streams Extractor] removed the custom "+ Options" column by default and added an option to show it

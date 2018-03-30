@@ -1744,7 +1744,7 @@ function c71_c51(clip a)
      front = GetChannel(a, 1, 2, 3, 4)
      back  = GetChannel(a, 5, 6)
      side  = GetChannel(a, 7, 8)
-     mix   = MixAudio(back, side, 1.0, 1.0)#.SoftClipperFromAudX(0.0)
+     mix   = MixAudio(back, side, 0.5, 0.5)#.SoftClipperFromAudX(0.0)
      return MergeChannels(front, mix)
   }
 # 6.1 Channels L,R,C,LFE,BC,SL,SR -> standard 5.1
@@ -1754,7 +1754,7 @@ function c61_c51(clip a)
      bcent = GetChannel(a, 5).Amplify(0.7071)
      back  = MergeChannels(bcent, bcent)
      side  = GetChannel(a, 6, 7)
-     mix   = MixAudio(back, side, 1.0, 1.0)#.SoftClipperFromAudX(0.0)
+     mix   = MixAudio(back, side, 0.5, 0.5)#.SoftClipperFromAudX(0.0)
      return MergeChannels(front, mix)
   }");
                 }
