@@ -250,6 +250,7 @@ namespace MeGUI
             }
             return false;
         }
+
 		/// <summary>
 		/// disables intro and credits setting
 		/// </summary>
@@ -259,6 +260,7 @@ namespace MeGUI
 			buttonPanel.Controls.Remove(creditsStartButton);
 		}
 		#endregion
+
 		#region Form sizing
         /// <summary>
         /// Reset the video preview to the size of the input stream
@@ -273,6 +275,7 @@ namespace MeGUI
             setZoomButtons();
             resize(zoomWidth, showPAR.Checked);
         }
+
         /// <summary>
         /// Reset the video preview to fit the input stream
         /// </summary>
@@ -283,6 +286,7 @@ namespace MeGUI
             else
                 btnFitScreen_Click(null, null);
         }
+
         /// <summary>
         /// Reset the video preview to fit the input stream
         /// </summary>
@@ -297,6 +301,7 @@ namespace MeGUI
             SetMaxZoomWidth();
             resize(zoomWidth, showPAR.Checked);
         }
+
         private void setZoomButtons()
         {
             if (zoomFactor >= 100)
@@ -321,6 +326,7 @@ namespace MeGUI
             }
 
         }
+
         private void zoomInButton_Click(object sender, EventArgs e)
         {
             if (zoomFactor > 100)
@@ -340,6 +346,7 @@ namespace MeGUI
                 originalSizeButton_Click(null, null);
             }     
         }
+
         private void zoomOutButton_Click(object sender, EventArgs e)
         {
             if (zoomFactor > 100)
@@ -362,6 +369,7 @@ namespace MeGUI
                 setZoomButtons();
             }
         }
+
         /// <summary>
         /// sets the maximum zoom width so that the video fits the screen including controls
         /// </summary>
@@ -420,6 +428,7 @@ namespace MeGUI
                 else
                     originalSizeButton_Click(null, null);
         }
+
         private void doInitialAdjustment()
         {
             switch (this.viewerType)
@@ -452,6 +461,7 @@ namespace MeGUI
                     break;
             }
         }
+
 		/// <summary>
 		/// adjusts the size of the GUI to match the source video
 		/// </summary>
@@ -496,6 +506,7 @@ namespace MeGUI
             this.buttonPanel.Location = new Point(1, videoPanel.Location.Y + videoPanel.Size.Height);
             ResumeLayout();
         }
+
         private void formResized(object sender, EventArgs e)
         {
             if (!sizeLock)
@@ -544,6 +555,7 @@ namespace MeGUI
 		{
             CurrentFrame = positionSlider.Value;
 		}
+
 		/// <summary>
 		/// sets the text in the title bar in function of the position, credits and zone settings
 		/// </summary>
@@ -568,11 +580,13 @@ namespace MeGUI
                 this.Text += "   -   " + currentTime + "/" + totalTime;
 		}
 		#endregion
+
 		#region cropping
         public void crop(CropValues cropping)
         {
             crop(cropping.left, cropping.top, cropping.right, cropping.bottom);
         }
+
 		/// <summary>
 		/// sets the cropping values for this player
 		/// </summary>
@@ -606,6 +620,7 @@ namespace MeGUI
             videoPreview.CropMargin = new Padding(left, top, right, bottom);
 		}
 		#endregion
+
 		#region player
 		/// <summary>
 		/// handles the play button
@@ -648,6 +663,7 @@ namespace MeGUI
             videoPreview.OffsetPosition(25);
         }
 		#endregion
+
 		#region credits / intro
 		/// <summary>
 		/// fires an event indicating the credits start position has been set.
@@ -659,6 +675,7 @@ namespace MeGUI
 			if (IntroCreditsFrameSet != null)
                 IntroCreditsFrameSet(CurrentFrame, true);
 		}
+
 		/// <summary>
 		/// fires an event indicating that the intro end position has been set
 		/// </summary>
@@ -670,6 +687,7 @@ namespace MeGUI
                 IntroCreditsFrameSet(CurrentFrame, false);
 		}
 		#endregion
+
 		#region zones
 		private void zoneEndButton_Click(object sender, System.EventArgs e)
 		{
@@ -728,6 +746,7 @@ namespace MeGUI
 			}
 		}
 		#endregion
+
 		#region context menu
 		private void mnuIntroEnd_Click(object sender, System.EventArgs e)
 		{
@@ -750,6 +769,7 @@ namespace MeGUI
 		{
             CurrentFrame = zoneEnd;
 		}
+
 		private void contextMenu1_Popup(object sender, System.EventArgs e)
 		{
 			if (this.introEndFrame > -1)
@@ -770,6 +790,7 @@ namespace MeGUI
 				this.mnuZoneEnd.Enabled = false;
 		}
 		#endregion
+
 		#region properties
         public Dar? DAR
         {
@@ -785,6 +806,7 @@ namespace MeGUI
 		{
 			get {return this.reader;}
 		}
+
         /// <summary>
         /// returns the underlying media file
         /// </summary>
@@ -793,6 +815,7 @@ namespace MeGUI
         {
             get { return this.file; }
         }
+
 		/// <summary>
 		/// gets /sets the frame where the credits start
 		/// </summary>
@@ -805,6 +828,7 @@ namespace MeGUI
 				setTitleText();
 			}
 		}
+
 		/// <summary>
 		/// gets / sets the frame where the intro ends
 		/// </summary>
@@ -817,6 +841,7 @@ namespace MeGUI
 				setTitleText();
 			}
 		}
+
 		/// <summary>
 		/// gets / sets the frame where the current zone starts
 		/// </summary>
@@ -830,6 +855,7 @@ namespace MeGUI
                 setTitleText();
 			}
 		}
+
 		/// <summary>
 		/// gets / sets the frame where the current zone starts
 		/// </summary>
@@ -842,6 +868,7 @@ namespace MeGUI
 				setTitleText();
 			}
 		}
+
 		/// <summary>
 		/// gets the framerate of the video that is currently loaded
 		/// </summary>
@@ -849,6 +876,7 @@ namespace MeGUI
 		{
             get { return file.VideoInfo.FPS; }
 		}
+
 		/// <summary>
 		/// gets / sets the frame currently visible
 		/// </summary>
@@ -857,6 +885,7 @@ namespace MeGUI
             get { return videoPreview.Position; }
             set { videoPreview.Position = value; }
 		}
+
         public int FrameCount
         {
             get { return videoPreview.FrameCount; }
@@ -870,9 +899,8 @@ namespace MeGUI
             if (PAR) d = arChooser.Value ?? d;
 
             int height = (int)Math.Round((decimal)targetWidth / d.AR);
-
-            videoWindowWidth = MainForm.Instance.Settings.DPIRescale(targetWidth);
-            videoWindowHeight = MainForm.Instance.Settings.DPIRescale((int)height);
+            videoWindowWidth = targetWidth;
+            videoWindowHeight = height;
             sizeLock = true;
             adjustSize();
             VideoPlayer_Shown(null, null);

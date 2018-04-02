@@ -664,7 +664,6 @@ namespace MeGUI.core.util
                 oLogWrapper.LogEvent("not installed", ImageType.Error, false);
             oLog.Add(oLogWrapper);
 
-
             // remove portable avisynth files
             PortableAviSynthActions(true);
 

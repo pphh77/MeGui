@@ -473,7 +473,6 @@ namespace MeGUI
             bIsAVSPlus = false;
             bIsMT = false;
             
-
             IntPtr _avs = new IntPtr(0);
             AVSDLLVideoInfo _vi = new AVSDLLVideoInfo();
             AviSynthColorspace _colorSpace = AviSynthColorspace.Unknown;
