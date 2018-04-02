@@ -25,11 +25,13 @@ namespace MeGUI
 {
     public class DGMIndexJob : IndexJob
     {
+        bool bOneClickProcessing;
+
         public DGMIndexJob() : base()
         {
         }
 
-        public DGMIndexJob(string input, string output, int demuxType, List<AudioTrackInfo> audioTracks, bool loadSources, bool demuxVideo)
+        public DGMIndexJob(string input, string output, int demuxType, List<AudioTrackInfo> audioTracks, bool loadSources, bool demuxVideo, bool bOneClick)
         {
             Input = input;
             Output = output;
@@ -37,7 +39,16 @@ namespace MeGUI
             AudioTracks = audioTracks;
             LoadSources = loadSources;
             DemuxVideo = demuxVideo;
-            FilesToDelete.Add(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(input), System.IO.Path.GetFileNameWithoutExtension(input) + ".log"));
+            bOneClickProcessing = bOneClick;
+        }
+
+        /// <summary>
+        /// gets / sets whether the job runs in a OneClick context (then the log file must be deleted later)
+        /// </summary>
+        public bool OneClickProcessing
+        {
+            get { return bOneClickProcessing; }
+            set { bOneClickProcessing = value; }
         }
 
         public override string CodecString

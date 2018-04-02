@@ -1,4 +1,6 @@
-2831 [Audio Encoder]        x64: improved the downmix functions (only for 7.1/6.1 to 5.1)
+2832 [File Indexer]         show DGIndexIM/NV only if enabled in the settings
+     [File Indexer]         enabled "select audio tracks" for DGIndexIM/NV
+2831 [Audio Encoder]        x64: improved the downmix functions for 7.1/6.1 to 5.1
 2830                        reset view settings once to properly adjust for 2829
 2829                        improved High DPI support (e.g. when changing DPI values)
      [HD Streams Extractor] removed the custom "+ Options" column by default and added an option to show it

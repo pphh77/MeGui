@@ -22,6 +22,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+using MeGUI.core.util;
+
 namespace MeGUI
 {
     /// <summary>
@@ -151,6 +153,69 @@ namespace MeGUI
             {
                 return strChannelCount;
             }
+        }
+
+        /// <summary>
+		/// gets all demuxed audio files from a given project
+		/// starts with the first file and returns the desired number of files
+        /// </summary>
+        /// <param name="audioTracks">list of audio tracks</param>
+        /// <param name="arrDeleteFiles">files to be deleted afterwards</param>
+        /// <param name="projectName">the project name</param>
+        /// <param name="log">log item</param>
+        /// <returns></returns>
+        public static Dictionary<int, string> GetAllDemuxedAudioFromDGI(List<AudioTrackInfo> audioTracks, out List<string> arrDeleteFiles, string projectName, LogItem log)
+        {
+            Dictionary<int, string> audioFiles = new Dictionary<int, string>();         // files to be used 
+            Dictionary<int, string> audioFilesDemuxed = new Dictionary<int, string>();  // files demuxed by DGI/M
+            arrDeleteFiles = new List<string>();                                        // files to be deleted
+
+            // get the demuxed files from the log file
+            if (File.Exists(Path.ChangeExtension(projectName, ".log")))
+            {
+                string line;
+                using (StreamReader file = new StreamReader(Path.ChangeExtension(projectName, ".log")))
+                {
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        if (!FileUtil.RegExMatch(line, @"^\d+: ", false))
+                            continue;
+
+                        string strFile = line.Substring(line.IndexOf(':') + 1).Trim();
+                        if (!File.Exists(strFile))
+                            continue;
+
+                        arrDeleteFiles.Add(strFile);
+                        audioFilesDemuxed.Add(Int32.Parse(line.Substring(0, line.IndexOf(':'))), strFile);
+                    }
+                }
+            }
+
+            if (arrDeleteFiles.Count == 0)
+            {
+                // fallback to the old way how to get demuxed files as the log file either does not exist or does not contain any files
+                audioFiles = VideoUtil.getAllDemuxedAudio(audioTracks, new List<AudioTrackInfo>(), out arrDeleteFiles, projectName, null);
+                return audioFiles;
+            }
+
+            // no need to assign files if no track should be extracted
+            if (audioTracks == null || audioTracks.Count == 0)
+                return audioFiles;
+
+            for (int counter = 0; counter < audioTracks.Count; counter++)
+            {
+                if (audioFilesDemuxed.ContainsKey(audioTracks[counter].TrackID))
+                {
+                    string strFile;
+                    audioFilesDemuxed.TryGetValue(audioTracks[counter].TrackID, out strFile);
+                    audioFiles.Add(audioTracks[counter].TrackID, strFile);
+                    arrDeleteFiles.Remove(strFile);
+                }
+                else if (log != null)
+                    log.LogEvent("Audio track not found: " + audioTracks[counter].TrackID, ImageType.Error);
+            }
+
+            return audioFiles;
         }
     }
 }

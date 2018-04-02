@@ -118,6 +118,9 @@ namespace MeGUI
                     input.FilterIndex = 6;
                 else
                     input.FilterIndex = 5;
+                btnDGI.Visible = MainForm.Instance.Settings.IsDGIIndexerAvailable();
+                btnDGM.Visible = MainForm.Instance.Settings.IsDGMIndexerAvailable();
+                btnFFMS.Location = new System.Drawing.Point(262, 20);
             }
             else
             {
@@ -125,6 +128,8 @@ namespace MeGUI
                 filter += "|All files|*.*";
                 input.Filter = filter;
                 input.FilterIndex = 4;
+                btnDGM.Visible = btnDGI.Visible = false;
+                btnFFMS.Location = new System.Drawing.Point(178, 20);
             }
         }
 
@@ -135,33 +140,23 @@ namespace MeGUI
                 case IndexType.DGI:
                     {
                         this.saveProjectDialog.Filter = "DGIndexNV project files|*.dgi";
-                        if (this.demuxTracks.Checked)
-                            this.demuxAll.Checked = true;
-                        this.demuxTracks.Enabled = false;
-                        //this.gbAudio.Enabled = true;
+                        this.demuxTracks.Enabled = true;
                         this.gbAudio.Text = " Audio Demux ";
                         this.gbOutput.Enabled = true;
                         this.demuxVideo.Enabled = true;
                         IndexerUsed = IndexType.DGI;
                         btnDGI.Checked = true;
-                        if (txtContainerInformation.Text.Trim().ToUpperInvariant().Equals("MATROSKA"))
-                            generateAudioList();
                         break;
                     }
                 case IndexType.DGM:
                     {
                         this.saveProjectDialog.Filter = "DGIndexIM project files|*.dgi";
-                        if (this.demuxTracks.Checked)
-                            this.demuxAll.Checked = true;
-                        this.demuxTracks.Enabled = false;
-                        //this.gbAudio.Enabled = true;
+                        this.demuxTracks.Enabled = true;
                         this.gbAudio.Text = " Audio Demux ";
                         this.gbOutput.Enabled = true;
                         this.demuxVideo.Enabled = true;
                         IndexerUsed = IndexType.DGM;
                         btnDGM.Checked = true;
-                        if (txtContainerInformation.Text.Trim().ToUpperInvariant().Equals("MATROSKA"))
-                            generateAudioList();
                         break;
                     }
                 case IndexType.D2V:
@@ -170,7 +165,6 @@ namespace MeGUI
                         this.demuxTracks.Enabled = true;
                         //this.gbOutput.Enabled = true;
                         this.gbAudio.Text = " Audio Demux ";
-                        this.gbAudio.Enabled = true;
                         this.demuxVideo.Enabled = true;
                         IndexerUsed = IndexType.D2V;
                         btnD2V.Checked = true;
@@ -180,19 +174,13 @@ namespace MeGUI
                     {
                         this.saveProjectDialog.Filter = "FFMSIndex project files|*.ffindex";
                         //this.gbOutput.Enabled = false;
-                        this.gbAudio.Enabled = true;
-                        if (this.demuxTracks.Checked)
-                            this.demuxAll.Checked = true;
                         this.demuxTracks.Enabled = true;
                         this.demuxVideo.Checked = false;
                         this.demuxVideo.Enabled = false;
                         IndexerUsed = IndexType.FFMS;
                         btnFFMS.Checked = true;
                         if (txtContainerInformation.Text.Trim().ToUpperInvariant().Equals("MATROSKA"))
-                        {
-                            generateAudioList();
                             this.gbAudio.Text = " Audio Demux ";
-                        }
                         else
                             this.gbAudio.Text = " Audio Encoding ";
                         break;
@@ -201,19 +189,13 @@ namespace MeGUI
                     {
                         this.saveProjectDialog.Filter = "LSMASHIndex project files|*.lwi";
                         //this.gbOutput.Enabled = false;
-                        this.gbAudio.Enabled = true;
-                        if (this.demuxTracks.Checked)
-                            this.demuxAll.Checked = true;
                         this.demuxTracks.Enabled = true;
                         this.demuxVideo.Checked = false;
                         this.demuxVideo.Enabled = false;
                         IndexerUsed = IndexType.LSMASH;
                         btnLSMASH.Checked = true;
                         if (txtContainerInformation.Text.Trim().ToUpperInvariant().Equals("MATROSKA"))
-                        {
-                            generateAudioList();
                             this.gbAudio.Text = " Audio Demux ";
-                        }
                         else
                             this.gbAudio.Text = " Audio Encoding ";
                         break;
@@ -408,7 +390,6 @@ namespace MeGUI
         private void generateAudioList()
         {
             AudioTracks.Items.Clear();
-
             foreach (AudioTrackInfo atrack in audioTracks)
                 AudioTracks.Items.Add(atrack);
         }
@@ -748,7 +729,7 @@ namespace MeGUI
             foreach (AudioTrackInfo ati in AudioTracks.CheckedItems)
                 audioTracks.Add(ati);
 
-            return new DGIIndexJob(videoInput, this.output.Text, demuxType, audioTracks, loadOnComplete.Checked, demuxVideo.Checked);
+            return new DGIIndexJob(videoInput, this.output.Text, demuxType, audioTracks, loadOnComplete.Checked, demuxVideo.Checked, false);
         }
 
         private DGMIndexJob generateDGMIndexJob(string videoInput)
@@ -765,7 +746,7 @@ namespace MeGUI
             foreach (AudioTrackInfo ati in AudioTracks.CheckedItems)
                 audioTracks.Add(ati);
 
-            return new DGMIndexJob(videoInput, this.output.Text, demuxType, audioTracks, loadOnComplete.Checked, demuxVideo.Checked);
+            return new DGMIndexJob(videoInput, this.output.Text, demuxType, audioTracks, loadOnComplete.Checked, demuxVideo.Checked, false);
         }
 
         private FFMSIndexJob generateFFMSIndexJob(string videoInput)
@@ -913,12 +894,25 @@ namespace MeGUI
         public static JobPostProcessor PostProcessor = new JobPostProcessor(postprocess, "Dgi_postprocessor");
         private static LogItem postprocess(MainForm mainForm, Job ajob)
         {
-            if (!(ajob is DGIIndexJob)) return null;
+            if (!(ajob is DGIIndexJob))
+                return null;
             DGIIndexJob job = (DGIIndexJob)ajob;
 
             StringBuilder logBuilder = new StringBuilder();
-            List<string> arrFilesToDelete = new List<string>();
-            Dictionary<int, string> audioFiles = VideoUtil.getAllDemuxedAudio(job.AudioTracks, new List<AudioTrackInfo>(), out arrFilesToDelete, job.Output, null);
+            Dictionary<int, string> audioFiles = new Dictionary<int, string>();
+
+            if (job.AudioTracks.Count > 0 || job.DemuxMode > 0)
+            {
+                List<string> arrFilesToDelete = new List<string>();
+                audioFiles = AudioUtil.GetAllDemuxedAudioFromDGI(job.AudioTracks, out arrFilesToDelete, job.Output, null);
+                job.FilesToDelete.AddRange(arrFilesToDelete);
+            }
+
+            if (!job.OneClickProcessing)
+                job.FilesToDelete.Add(Path.ChangeExtension(job.Output, ".log"));
+            if (!Path.ChangeExtension(job.Output, ".log").Equals(Path.ChangeExtension(job.Input, ".log")))
+                job.FilesToDelete.Add(Path.ChangeExtension(job.Input, ".log"));
+
             if (job.LoadSources)
             {
                 if (audioFiles.Count > 0)
@@ -956,8 +950,20 @@ namespace MeGUI
             DGMIndexJob job = (DGMIndexJob)ajob;
 
             StringBuilder logBuilder = new StringBuilder();
-            List<string> arrFilesToDelete = new List<string>();
-            Dictionary<int, string> audioFiles = VideoUtil.getAllDemuxedAudio(job.AudioTracks, new List<AudioTrackInfo>(), out arrFilesToDelete, job.Output, null);
+            Dictionary<int, string> audioFiles = new Dictionary<int, string>();
+
+            if (job.AudioTracks.Count > 0 || job.DemuxMode > 0)
+            {
+                List<string> arrFilesToDelete = new List<string>();
+                audioFiles = AudioUtil.GetAllDemuxedAudioFromDGI(job.AudioTracks, out arrFilesToDelete, job.Output, null);
+                job.FilesToDelete.AddRange(arrFilesToDelete);
+            }
+
+            if (!job.OneClickProcessing)
+                job.FilesToDelete.Add(Path.ChangeExtension(job.Output, ".log"));
+            if (!Path.ChangeExtension(job.Output, ".log").Equals(Path.ChangeExtension(job.Input, ".log")))
+                job.FilesToDelete.Add(Path.ChangeExtension(job.Input, ".log"));
+
             if (job.LoadSources)
             {
                 if (audioFiles.Count > 0)

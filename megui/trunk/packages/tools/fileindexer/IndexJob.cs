@@ -51,6 +51,7 @@ namespace MeGUI
 			get {return loadSources;}
 			set {loadSources = value;}
 		}
+
         /// <summary>
         /// gets / sets whether the video stream should be extracted
         /// </summary>
@@ -59,6 +60,7 @@ namespace MeGUI
             get { return demuxVideo; }
             set { demuxVideo = value; }
         }
+
     	/// <summary>
 		/// gets / sets the demux mode
 		/// 0 = no audio demux

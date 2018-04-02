@@ -69,6 +69,9 @@ namespace MeGUI
             {
                 string strFileName = "DGIndexIM.ini";
                 bool bChanged = false;
+                bool bResponseOnAudioMismatchFound = false;
+                bool bEnable_Info_Log = false;
+                bool bFull_Path_In_Files = false;
                 string strINIFile = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexIM.Path), strFileName);
                 StringBuilder sb = new StringBuilder();
                 if (File.Exists(strINIFile))
@@ -79,11 +82,39 @@ namespace MeGUI
                     {
                         while ((line = file.ReadLine()) != null)
                         {
-                            if (line.Equals("ResponseOnAudioMismatch=0", StringComparison.InvariantCultureIgnoreCase))
+                            if (line.StartsWith("ResponseOnAudioMismatch", StringComparison.InvariantCultureIgnoreCase))
                             {
-                                sb.AppendLine("ResponseOnAudioMismatch=1");
-                                log.LogEvent("ResponseOnAudioMismatch=1 written to " + strFileName, ImageType.Information);
-                                bChanged = true;
+                                bResponseOnAudioMismatchFound = true;
+                                if (!line.Equals("ResponseOnAudioMismatch=1", StringComparison.InvariantCultureIgnoreCase))
+                                {
+                                    sb.AppendLine("ResponseOnAudioMismatch=1");
+                                    log.LogEvent("ResponseOnAudioMismatch=1 written to " + strFileName, ImageType.Information);
+                                    bChanged = true;
+                                }
+                                continue;
+                            }
+
+                            if (line.StartsWith("Enable_Info_Log", StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                bEnable_Info_Log = true;
+                                if (!line.Equals("Enable_Info_Log=1", StringComparison.InvariantCultureIgnoreCase))
+                                {
+                                    sb.AppendLine("Enable_Info_Log=1");
+                                    log.LogEvent("Enable_Info_Log=1 written to " + strFileName, ImageType.Information);
+                                    bChanged = true;
+                                }
+                                continue;
+                            }
+
+                            if (line.StartsWith("Full_Path_In_Files", StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                bFull_Path_In_Files = true;
+                                if (!line.Equals("Full_Path_In_Files=1", StringComparison.InvariantCultureIgnoreCase))
+                                {
+                                    sb.AppendLine("Full_Path_In_Files=1");
+                                    log.LogEvent("Full_Path_In_Files=1 written to " + strFileName, ImageType.Information);
+                                    bChanged = true;
+                                }
                                 continue;
                             }
 
@@ -94,8 +125,10 @@ namespace MeGUI
                         }
                     }
                 }
-                else
+
+                if (!File.Exists(strINIFile) || !bResponseOnAudioMismatchFound || !bEnable_Info_Log || !bFull_Path_In_Files)
                 {
+                    sb = new StringBuilder();
                     sb.AppendLine("Version=");
                     sb.AppendLine("Window_Position=0,0");
                     sb.AppendLine("Info_Window_Position=0,0");
@@ -110,7 +143,7 @@ namespace MeGUI
                     sb.AppendLine("MRUList[1]=");
                     sb.AppendLine("MRUList[2]=");
                     sb.AppendLine("MRUList[3]=");
-                    sb.AppendLine("Enable_Info_Log=0");
+                    sb.AppendLine("Enable_Info_Log=1");
                     sb.AppendLine("Loop_Playback=0");
                     sb.AppendLine("AVC_Extension=264");
                     sb.AppendLine("MPG_Extension=m2v");
@@ -179,7 +212,7 @@ namespace MeGUI
                     sb.Append(" -od \"" + job.Output + "\" -h");
                 else
                     sb.Append(" -o \"" + job.Output + "\" -h");
-                if (job.DemuxMode == 2)
+                if (job.DemuxMode > 0)
                     sb.Append(" -a"); // demux everything
                 if (Path.GetExtension(job.Input).ToLowerInvariant().Equals(".mpls"))
                     sb.Append(" -ang 0");

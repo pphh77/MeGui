@@ -210,7 +210,17 @@ namespace MeGUI
                 if (audioFiles.Count == 0 && !job.PostprocessingProperties.Eac3toDemux
                     && job.PostprocessingProperties.IndexType != FileIndexerWindow.IndexType.NONE
                     && job.PostprocessingProperties.IndexType != FileIndexerWindow.IndexType.AVISOURCE)
-                    audioFiles = VideoUtil.getAllDemuxedAudio(arrAudioTracks, new List<AudioTrackInfo>(), out arrAudioFilesDelete, job.IndexFile, _log);
+                {
+
+                    if ((job.PostprocessingProperties.IndexType == FileIndexerWindow.IndexType.DGI || job.PostprocessingProperties.IndexType == FileIndexerWindow.IndexType.DGM)
+                        && File.Exists(Path.ChangeExtension(job.IndexFile, ".log")))
+                    {
+                        job.PostprocessingProperties.FilesToDelete.Add(Path.ChangeExtension(job.IndexFile, ".log"));
+                        audioFiles = AudioUtil.GetAllDemuxedAudioFromDGI(arrAudioTracks, out arrAudioFilesDelete, job.IndexFile, _log);
+                    }
+                    else
+                        audioFiles = VideoUtil.getAllDemuxedAudio(arrAudioTracks, new List<AudioTrackInfo>(), out arrAudioFilesDelete, job.IndexFile, _log);
+                }
 
                 fillInAudioInformation(ref arrAudioJobs, arrMuxStreams);
 
@@ -287,8 +297,7 @@ namespace MeGUI
                 intermediateFiles.AddRange(audioFiles.Values);
                 foreach (string file in arrAudioFilesDelete)
                     intermediateFiles.Add(file);
-                if (File.Exists(Path.Combine(Path.GetDirectoryName(job.Input), Path.GetFileNameWithoutExtension(job.Input) + "._log")))
-                    intermediateFiles.Add(Path.Combine(Path.GetDirectoryName(job.Input), Path.GetFileNameWithoutExtension(job.Input) + "._log"));
+                intermediateFiles.Add(Path.ChangeExtension(job.Input, ".log"));
                 foreach (string file in job.PostprocessingProperties.FilesToDelete)
                     intermediateFiles.Add(file);
 

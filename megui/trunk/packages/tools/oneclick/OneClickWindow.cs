@@ -1428,9 +1428,9 @@ namespace MeGUI
                 if (inputContainer == ContainerType.MKV)
                 {
                     if (dpp.IndexType == FileIndexerWindow.IndexType.DGI)
-                        job = new DGIIndexJob(dpp.VideoInput, indexFile, 0, null, false, false);
+                        job = new DGIIndexJob(dpp.VideoInput, indexFile, 0, null, false, false, true);
                     else if (dpp.IndexType == FileIndexerWindow.IndexType.DGM)
-                        job = new DGMIndexJob(dpp.VideoInput, indexFile, 0, null, false, false);
+                        job = new DGMIndexJob(dpp.VideoInput, indexFile, 0, null, false, false, true);
                     else if (dpp.IndexType == FileIndexerWindow.IndexType.LSMASH)
                         job = new LSMASHIndexJob(dpp.VideoInput, indexFile, 0, null, false);
                     else
@@ -1446,9 +1446,9 @@ namespace MeGUI
                 else
                 {
                     if (dpp.IndexType == FileIndexerWindow.IndexType.DGI)
-                        job = new DGIIndexJob(dpp.VideoInput, indexFile, 2, arrAudioTrackInfo, false, false);
+                        job = new DGIIndexJob(dpp.VideoInput, indexFile, 2, arrAudioTrackInfo, false, false, true);
                     else if (dpp.IndexType == FileIndexerWindow.IndexType.DGM)
-                        job = new DGMIndexJob(dpp.VideoInput, indexFile, 2, arrAudioTrackInfo, false, false);
+                        job = new DGMIndexJob(dpp.VideoInput, indexFile, 2, arrAudioTrackInfo, false, false, true);
                     else if (dpp.IndexType == FileIndexerWindow.IndexType.LSMASH)
                         job = new LSMASHIndexJob(dpp.VideoInput, indexFile, 2, arrAudioTrackInfo, false);
                     else
