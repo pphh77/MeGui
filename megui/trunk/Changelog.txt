@@ -1,3 +1,5 @@
+2834 [OneClick]             fixed a crash when using DGIndexIM/NV with a MKV source file (regression of 2832)
+     [File Indexer]         improved High DPI support (regression of 2832)
 2833 [Video Player]         improved High DPI support
 2832 [File Indexer]         show DGIndexIM/NV only if enabled in the settings
      [File Indexer]         enabled "select audio tracks" for DGIndexIM/NV

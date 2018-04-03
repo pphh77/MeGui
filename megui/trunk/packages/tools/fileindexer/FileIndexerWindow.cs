@@ -57,7 +57,7 @@ namespace MeGUI
         {
             openVideo(input);
             if (!string.IsNullOrEmpty(projectName))
-                this.output.Text = projectName;
+                this.output.Filename = projectName;
             if (demuxType == 0)
                 demuxNoAudiotracks.Checked = true;
             else
@@ -120,7 +120,8 @@ namespace MeGUI
                     input.FilterIndex = 5;
                 btnDGI.Visible = MainForm.Instance.Settings.IsDGIIndexerAvailable();
                 btnDGM.Visible = MainForm.Instance.Settings.IsDGMIndexerAvailable();
-                btnFFMS.Location = new System.Drawing.Point(262, 20);
+                btnFFMS.Location = new System.Drawing.Point(MainForm.Instance.Settings.DPIRescale(262), MainForm.Instance.Settings.DPIRescale(20));
+                
             }
             else
             {
@@ -129,7 +130,7 @@ namespace MeGUI
                 input.Filter = filter;
                 input.FilterIndex = 4;
                 btnDGM.Visible = btnDGI.Visible = false;
-                btnFFMS.Location = new System.Drawing.Point(178, 20);
+                btnFFMS.Location = new System.Drawing.Point(MainForm.Instance.Settings.DPIRescale(171), MainForm.Instance.Settings.DPIRescale(20));
             }
         }
 
@@ -139,7 +140,7 @@ namespace MeGUI
             {
                 case IndexType.DGI:
                     {
-                        this.saveProjectDialog.Filter = "DGIndexNV project files|*.dgi";
+                        this.output.Filter = "DGIndexNV project files|*.dgi";
                         this.demuxTracks.Enabled = true;
                         this.gbAudio.Text = " Audio Demux ";
                         this.gbOutput.Enabled = true;
@@ -150,7 +151,7 @@ namespace MeGUI
                     }
                 case IndexType.DGM:
                     {
-                        this.saveProjectDialog.Filter = "DGIndexIM project files|*.dgi";
+                        this.output.Filter = "DGIndexIM project files|*.dgi";
                         this.demuxTracks.Enabled = true;
                         this.gbAudio.Text = " Audio Demux ";
                         this.gbOutput.Enabled = true;
@@ -161,7 +162,7 @@ namespace MeGUI
                     }
                 case IndexType.D2V:
                     {
-                        this.saveProjectDialog.Filter = "DGIndex project files|*.d2v";
+                        this.output.Filter = "DGIndex project files|*.d2v";
                         this.demuxTracks.Enabled = true;
                         //this.gbOutput.Enabled = true;
                         this.gbAudio.Text = " Audio Demux ";
@@ -172,7 +173,7 @@ namespace MeGUI
                     }
                 case IndexType.FFMS:
                     {
-                        this.saveProjectDialog.Filter = "FFMSIndex project files|*.ffindex";
+                        this.output.Filter = "FFMSIndex project files|*.ffindex";
                         //this.gbOutput.Enabled = false;
                         this.demuxTracks.Enabled = true;
                         this.demuxVideo.Checked = false;
@@ -187,7 +188,7 @@ namespace MeGUI
                     }
                 case IndexType.LSMASH:
                     {
-                        this.saveProjectDialog.Filter = "LSMASHIndex project files|*.lwi";
+                        this.output.Filter = "LSMASHIndex project files|*.lwi";
                         //this.gbOutput.Enabled = false;
                         this.demuxTracks.Enabled = true;
                         this.demuxVideo.Checked = false;
@@ -208,18 +209,9 @@ namespace MeGUI
         }
         #endregion
         #region buttons
-        private void pickOutputButton_Click(object sender, System.EventArgs e)
+        private void output_FileSelected(FileBar sender, FileBarEventArgs args)
         {
-            if (!String.IsNullOrEmpty(output.Text))
-            {
-                saveProjectDialog.InitialDirectory = Path.GetDirectoryName(output.Text);
-                saveProjectDialog.FileName = Path.GetFileName(output.Text);
-            }
-            if (saveProjectDialog.ShowDialog() == DialogResult.OK)
-            {
-                output.Text = saveProjectDialog.FileName;
-                checkIndexIO();
-            }
+            checkIndexIO();
         }
 
         private void input_FileSelected(FileBar sender, FileBarEventArgs args)
@@ -339,7 +331,7 @@ namespace MeGUI
             btnD2V.Enabled = btnDGM.Enabled = btnDGI.Enabled = btnFFMS.Enabled = btnLSMASH.Enabled = false;
             gbIndexer.Enabled = gbAudio.Enabled = gbOutput.Enabled = false;
             btnFFMS.Checked = btnD2V.Checked = btnDGM.Checked = btnDGI.Checked = btnLSMASH.Checked = false;
-            output.Text = "";
+            output.Filename = "";
             demuxNoAudiotracks.Checked = true;
             setControlState(false);
             MessageBox.Show("No indexer for this file found!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -432,8 +424,8 @@ namespace MeGUI
                 return;
 
             string projectPath = string.Empty;
-            if (!String.IsNullOrEmpty(output.Text))
-                projectPath = Path.GetDirectoryName(output.Text);
+            if (!String.IsNullOrEmpty(output.Filename))
+                projectPath = Path.GetDirectoryName(output.Filename);
             else
                 projectPath = FileUtil.GetOutputFolder(this.input.Filename);
 
@@ -455,20 +447,20 @@ namespace MeGUI
 
             switch (IndexerUsed)
             {
-                case IndexType.D2V: output.Text = Path.Combine(projectPath, Path.ChangeExtension(fileName, ".d2v")); break;
+                case IndexType.D2V: output.Filename = Path.Combine(projectPath, Path.ChangeExtension(fileName, ".d2v")); break;
                 case IndexType.DGM:
-                case IndexType.DGI: output.Text = Path.Combine(projectPath, Path.ChangeExtension(fileName, ".dgi")); break;
+                case IndexType.DGI: output.Filename = Path.Combine(projectPath, Path.ChangeExtension(fileName, ".dgi")); break;
                 case IndexType.FFMS:
                     if (Path.GetExtension(fileName).Equals(".mpls", StringComparison.InvariantCultureIgnoreCase))
-                        output.Text = Path.Combine(projectPath, Path.ChangeExtension(fileName, ".ffindex"));
+                        output.Filename = Path.Combine(projectPath, Path.ChangeExtension(fileName, ".ffindex"));
                     else
-                        output.Text = Path.Combine(projectPath, fileName + ".ffindex");
+                        output.Filename = Path.Combine(projectPath, fileName + ".ffindex");
                     break;
                 case IndexType.LSMASH:
                     if (Path.GetExtension(fileName).Equals(".mpls", StringComparison.InvariantCultureIgnoreCase))
-                        output.Text = Path.Combine(projectPath, Path.ChangeExtension(fileName, ".lwi"));
+                        output.Filename = Path.Combine(projectPath, Path.ChangeExtension(fileName, ".lwi"));
                     else
-                        output.Text = Path.Combine(projectPath, fileName + ".lwi");
+                        output.Filename = Path.Combine(projectPath, fileName + ".lwi");
                     break;
             }
         }
@@ -490,9 +482,9 @@ namespace MeGUI
                 return;
             }
 
-            if (!Drives.ableToWriteOnThisDrive(Path.GetPathRoot(output.Text)))
+            if (!Drives.ableToWriteOnThisDrive(Path.GetPathRoot(output.Filename)))
             {
-                MessageBox.Show("MeGUI cannot write on the disc " + Path.GetPathRoot(output.Text) + "\n" +
+                MessageBox.Show("MeGUI cannot write on the disc " + Path.GetPathRoot(output.Filename) + "\n" +
                     "Please, select another output path to save your project...", "Configuration Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -506,14 +498,14 @@ namespace MeGUI
                 if (iFile.VideoInfo.PGCCount > 1 || iFile.VideoInfo.AngleCount > 0)
                 {
                     // pgcdemux must be used as either multiple PGCs or a multi-angle disc are found
-                    string tempFile = Path.Combine(Path.GetDirectoryName(output.Text), Path.GetFileNameWithoutExtension(output.Text) + "_1.VOB");
+                    string tempFile = Path.Combine(Path.GetDirectoryName(output.Filename), Path.GetFileNameWithoutExtension(output.Filename) + "_1.VOB");
                     prepareJobs = new SequentialChain(new PgcDemuxJob(videoInput, tempFile, iFile.VideoInfo.PGCNumber, iFile.VideoInfo.AngleNumber));
                     videoInput = tempFile;
 
                     string filesToOverwrite = string.Empty;
                     for (int i = 1; i < 10; i++)
                     {
-                        string file = Path.Combine(Path.GetDirectoryName(output.Text), Path.GetFileNameWithoutExtension(output.Text) + "_" + i + ".VOB");
+                        string file = Path.Combine(Path.GetDirectoryName(output.Filename), Path.GetFileNameWithoutExtension(output.Filename) + "_" + i + ".VOB");
                         if (File.Exists(file))
                         {
                             filesToOverwrite += file + "\n";
@@ -543,7 +535,7 @@ namespace MeGUI
             {
                 // blu-ray playlist without DGI/DGM used - therefore eac3to must be used first
 
-                string strTempMKVFile = Path.Combine(Path.GetDirectoryName(output.Text), Path.GetFileNameWithoutExtension(output.Text) + ".mkv");
+                string strTempMKVFile = Path.Combine(Path.GetDirectoryName(output.Filename), Path.GetFileNameWithoutExtension(output.Filename) + ".mkv");
                 if (File.Exists(strTempMKVFile))
                 {
                     DialogResult dr = MessageBox.Show("The demux file already exist: \n" + strTempMKVFile + "\n" +
@@ -590,12 +582,12 @@ namespace MeGUI
 
                     oStreamControl.SourceFileName = strSourceFileName;
 
-                    sb.Append(string.Format("{0}:\"{1}\" ", oStreamControl.TrackID, Path.Combine(Path.GetDirectoryName(output.Text), oStreamControl.DemuxFileName)));
+                    sb.Append(string.Format("{0}:\"{1}\" ", oStreamControl.TrackID, Path.Combine(Path.GetDirectoryName(output.Filename), oStreamControl.DemuxFileName)));
                     if (bCoreOnly)
                         sb.Append("-core ");
                 }
 
-                HDStreamsExJob oJob = new HDStreamsExJob(new List<string>() { input.Filename }, Path.GetDirectoryName(output.Text), null, sb.ToString(), 2);
+                HDStreamsExJob oJob = new HDStreamsExJob(new List<string>() { input.Filename }, Path.GetDirectoryName(output.Filename), null, sb.ToString(), 2);
                 prepareJobs = new SequentialChain(oJob);
                 videoInput = strTempMKVFile;
             }
@@ -638,7 +630,7 @@ namespace MeGUI
                             job.AudioTracks = new List<AudioTrackInfo>();
                             if (txtContainerInformation.Text.Trim().ToUpperInvariant().Equals("MATROSKA"))
                             {
-                                MkvExtractJob extractJob = new MkvExtractJob(videoInput, Path.GetDirectoryName(this.output.Text), job.AudioTracksDemux);
+                                MkvExtractJob extractJob = new MkvExtractJob(videoInput, Path.GetDirectoryName(this.output.Filename), job.AudioTracksDemux);
                                 prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(extractJob));
                             }
                         }
@@ -660,7 +652,7 @@ namespace MeGUI
                             job.AudioTracks = new List<AudioTrackInfo>();
                             if (txtContainerInformation.Text.Trim().ToUpperInvariant().Equals("MATROSKA"))
                             {
-                                MkvExtractJob extractJob = new MkvExtractJob(videoInput, Path.GetDirectoryName(this.output.Text), job.AudioTracksDemux);
+                                MkvExtractJob extractJob = new MkvExtractJob(videoInput, Path.GetDirectoryName(this.output.Filename), job.AudioTracksDemux);
                                 prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(extractJob));
                             }
                         }
@@ -676,7 +668,7 @@ namespace MeGUI
         #region helper methods
         private void checkIndexIO()
         {
-            configured = (!input.Filename.Equals("") && !output.Text.Equals(""));
+            configured = (!input.Filename.Equals("") && !output.Filename.Equals(""));
             if (configured && dialogMode)
                 queueButton.DialogResult = DialogResult.OK;
             else
@@ -712,7 +704,7 @@ namespace MeGUI
             foreach (AudioTrackInfo ati in AudioTracks.CheckedItems)
                 audioTracks.Add(ati);
 
-            return new D2VIndexJob(videoInput, this.output.Text, demuxType, audioTracks, loadOnComplete.Checked, demuxVideo.Checked);
+            return new D2VIndexJob(videoInput, this.output.Filename, demuxType, audioTracks, loadOnComplete.Checked, demuxVideo.Checked);
         }
 
         private DGIIndexJob generateDGNVIndexJob(string videoInput)
@@ -729,7 +721,7 @@ namespace MeGUI
             foreach (AudioTrackInfo ati in AudioTracks.CheckedItems)
                 audioTracks.Add(ati);
 
-            return new DGIIndexJob(videoInput, this.output.Text, demuxType, audioTracks, loadOnComplete.Checked, demuxVideo.Checked, false);
+            return new DGIIndexJob(videoInput, this.output.Filename, demuxType, audioTracks, loadOnComplete.Checked, demuxVideo.Checked, false);
         }
 
         private DGMIndexJob generateDGMIndexJob(string videoInput)
@@ -746,7 +738,7 @@ namespace MeGUI
             foreach (AudioTrackInfo ati in AudioTracks.CheckedItems)
                 audioTracks.Add(ati);
 
-            return new DGMIndexJob(videoInput, this.output.Text, demuxType, audioTracks, loadOnComplete.Checked, demuxVideo.Checked, false);
+            return new DGMIndexJob(videoInput, this.output.Filename, demuxType, audioTracks, loadOnComplete.Checked, demuxVideo.Checked, false);
         }
 
         private FFMSIndexJob generateFFMSIndexJob(string videoInput)
@@ -763,7 +755,7 @@ namespace MeGUI
             foreach (AudioTrackInfo ati in AudioTracks.CheckedItems)
                 audioTracks.Add(ati);
 
-            return new FFMSIndexJob(videoInput, output.Text, demuxType, audioTracks, loadOnComplete.Checked);
+            return new FFMSIndexJob(videoInput, output.Filename, demuxType, audioTracks, loadOnComplete.Checked);
         }
 
         private LSMASHIndexJob generateLSMASHIndexJob(string videoInput)
@@ -780,7 +772,7 @@ namespace MeGUI
             foreach (AudioTrackInfo ati in AudioTracks.CheckedItems)
                 audioTracks.Add(ati);
 
-            return new LSMASHIndexJob(videoInput, output.Text, demuxType, audioTracks, loadOnComplete.Checked);
+            return new LSMASHIndexJob(videoInput, output.Filename, demuxType, audioTracks, loadOnComplete.Checked);
         }
         #endregion
 
@@ -901,7 +893,7 @@ namespace MeGUI
             StringBuilder logBuilder = new StringBuilder();
             Dictionary<int, string> audioFiles = new Dictionary<int, string>();
 
-            if (job.AudioTracks.Count > 0 || job.DemuxMode > 0)
+            if ((job.AudioTracks != null && job.AudioTracks.Count > 0) || job.DemuxMode > 0)
             {
                 List<string> arrFilesToDelete = new List<string>();
                 audioFiles = AudioUtil.GetAllDemuxedAudioFromDGI(job.AudioTracks, out arrFilesToDelete, job.Output, null);
@@ -952,7 +944,7 @@ namespace MeGUI
             StringBuilder logBuilder = new StringBuilder();
             Dictionary<int, string> audioFiles = new Dictionary<int, string>();
 
-            if (job.AudioTracks.Count > 0 || job.DemuxMode > 0)
+            if ((job.AudioTracks != null && job.AudioTracks.Count > 0) || job.DemuxMode > 0)
             {
                 List<string> arrFilesToDelete = new List<string>();
                 audioFiles = AudioUtil.GetAllDemuxedAudioFromDGI(job.AudioTracks, out arrFilesToDelete, job.Output, null);

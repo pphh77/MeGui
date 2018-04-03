@@ -1428,13 +1428,13 @@ namespace MeGUI
                 if (inputContainer == ContainerType.MKV)
                 {
                     if (dpp.IndexType == FileIndexerWindow.IndexType.DGI)
-                        job = new DGIIndexJob(dpp.VideoInput, indexFile, 0, null, false, false, true);
+                        job = new DGIIndexJob(dpp.VideoInput, indexFile, 0, new List<AudioTrackInfo>(), false, false, true);
                     else if (dpp.IndexType == FileIndexerWindow.IndexType.DGM)
-                        job = new DGMIndexJob(dpp.VideoInput, indexFile, 0, null, false, false, true);
+                        job = new DGMIndexJob(dpp.VideoInput, indexFile, 0, new List<AudioTrackInfo>(), false, false, true);
                     else if (dpp.IndexType == FileIndexerWindow.IndexType.LSMASH)
-                        job = new LSMASHIndexJob(dpp.VideoInput, indexFile, 0, null, false);
+                        job = new LSMASHIndexJob(dpp.VideoInput, indexFile, 0, new List<AudioTrackInfo>(), false);
                     else
-                        job = new FFMSIndexJob(dpp.VideoInput, indexFile, 0, null, false);
+                        job = new FFMSIndexJob(dpp.VideoInput, indexFile, 0, new List<AudioTrackInfo>(), false);
                     if (!String.IsNullOrEmpty(dpp.VideoFileToMux))
                     {
                         finalJobChain = new SequentialChain(prepareJobs, new SequentialChain(ocJob));

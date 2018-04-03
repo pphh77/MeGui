@@ -59,11 +59,9 @@ namespace MeGUI
             this.demuxNoAudiotracks = new System.Windows.Forms.RadioButton();
             this.demuxTracks = new System.Windows.Forms.RadioButton();
             this.gbOutput = new System.Windows.Forms.GroupBox();
+            this.output = new MeGUI.FileBar();
             this.demuxVideo = new System.Windows.Forms.CheckBox();
-            this.pickOutputButton = new System.Windows.Forms.Button();
-            this.output = new System.Windows.Forms.TextBox();
             this.outputLabel = new System.Windows.Forms.Label();
-            this.saveProjectDialog = new System.Windows.Forms.SaveFileDialog();
             this.closeOnQueue = new System.Windows.Forms.CheckBox();
             this.gbIndexer = new System.Windows.Forms.GroupBox();
             this.btnLSMASH = new System.Windows.Forms.RadioButton();
@@ -106,7 +104,7 @@ namespace MeGUI
             this.input.Filter = "";
             this.input.FilterIndex = 0;
             this.input.FolderMode = false;
-            this.input.Location = new System.Drawing.Point(77, 10);
+            this.input.Location = new System.Drawing.Point(77, 12);
             this.input.Name = "input";
             this.input.ReadOnly = true;
             this.input.SaveMode = false;
@@ -174,16 +172,16 @@ namespace MeGUI
             this.AudioTracks.CheckOnClick = true;
             this.AudioTracks.Enabled = false;
             this.AudioTracks.FormattingEnabled = true;
-            this.AudioTracks.Location = new System.Drawing.Point(16, 43);
+            this.AudioTracks.Location = new System.Drawing.Point(12, 43);
             this.AudioTracks.Name = "AudioTracks";
-            this.AudioTracks.Size = new System.Drawing.Size(415, 68);
+            this.AudioTracks.Size = new System.Drawing.Size(419, 68);
             this.AudioTracks.TabIndex = 14;
             // 
             // demuxNoAudiotracks
             // 
-            this.demuxNoAudiotracks.Location = new System.Drawing.Point(19, 16);
+            this.demuxNoAudiotracks.Location = new System.Drawing.Point(12, 16);
             this.demuxNoAudiotracks.Name = "demuxNoAudiotracks";
-            this.demuxNoAudiotracks.Size = new System.Drawing.Size(120, 24);
+            this.demuxNoAudiotracks.Size = new System.Drawing.Size(127, 24);
             this.demuxNoAudiotracks.TabIndex = 13;
             this.demuxNoAudiotracks.Text = "No Audio";
             this.demuxNoAudiotracks.CheckedChanged += new System.EventHandler(this.rbtracks_CheckedChanged);
@@ -191,7 +189,7 @@ namespace MeGUI
             // demuxTracks
             // 
             this.demuxTracks.Enabled = false;
-            this.demuxTracks.Location = new System.Drawing.Point(178, 16);
+            this.demuxTracks.Location = new System.Drawing.Point(171, 16);
             this.demuxTracks.Name = "demuxTracks";
             this.demuxTracks.Size = new System.Drawing.Size(120, 24);
             this.demuxTracks.TabIndex = 7;
@@ -200,9 +198,8 @@ namespace MeGUI
             // 
             // gbOutput
             // 
-            this.gbOutput.Controls.Add(this.demuxVideo);
-            this.gbOutput.Controls.Add(this.pickOutputButton);
             this.gbOutput.Controls.Add(this.output);
+            this.gbOutput.Controls.Add(this.demuxVideo);
             this.gbOutput.Controls.Add(this.outputLabel);
             this.gbOutput.Enabled = false;
             this.gbOutput.Location = new System.Drawing.Point(12, 318);
@@ -211,6 +208,24 @@ namespace MeGUI
             this.gbOutput.TabIndex = 12;
             this.gbOutput.TabStop = false;
             this.gbOutput.Text = " Output ";
+            // 
+            // output
+            // 
+            this.output.AllowDrop = true;
+            this.output.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.output.Filename = "";
+            this.output.Filter = "";
+            this.output.FilterIndex = 0;
+            this.output.FolderMode = false;
+            this.output.Location = new System.Drawing.Point(81, 11);
+            this.output.Name = "output";
+            this.output.ReadOnly = true;
+            this.output.SaveMode = false;
+            this.output.Size = new System.Drawing.Size(350, 34);
+            this.output.TabIndex = 7;
+            this.output.Title = null;
+            this.output.FileSelected += new MeGUI.FileBarEventHandler(this.output_FileSelected);
             // 
             // demuxVideo
             // 
@@ -222,23 +237,6 @@ namespace MeGUI
             this.demuxVideo.Text = "Demux Video Stream";
             this.demuxVideo.UseVisualStyleBackColor = true;
             // 
-            // pickOutputButton
-            // 
-            this.pickOutputButton.Location = new System.Drawing.Point(401, 16);
-            this.pickOutputButton.Name = "pickOutputButton";
-            this.pickOutputButton.Size = new System.Drawing.Size(30, 23);
-            this.pickOutputButton.TabIndex = 5;
-            this.pickOutputButton.Text = "...";
-            this.pickOutputButton.Click += new System.EventHandler(this.pickOutputButton_Click);
-            // 
-            // output
-            // 
-            this.output.Location = new System.Drawing.Point(81, 17);
-            this.output.Name = "output";
-            this.output.ReadOnly = true;
-            this.output.Size = new System.Drawing.Size(314, 21);
-            this.output.TabIndex = 4;
-            // 
             // outputLabel
             // 
             this.outputLabel.Location = new System.Drawing.Point(11, 21);
@@ -246,11 +244,6 @@ namespace MeGUI
             this.outputLabel.Size = new System.Drawing.Size(100, 13);
             this.outputLabel.TabIndex = 3;
             this.outputLabel.Text = "Output File";
-            // 
-            // saveProjectDialog
-            // 
-            this.saveProjectDialog.Filter = "DGIndex project files|*.d2v";
-            this.saveProjectDialog.Title = "Pick a name for your DGIndex project";
             // 
             // closeOnQueue
             // 
@@ -453,10 +446,7 @@ namespace MeGUI
         private System.Windows.Forms.GroupBox gbAudio;
         private System.Windows.Forms.GroupBox gbOutput;
         private System.Windows.Forms.Label inputLabel;
-        private System.Windows.Forms.TextBox output;
         private System.Windows.Forms.Label outputLabel;
-        private System.Windows.Forms.SaveFileDialog saveProjectDialog;
-        private System.Windows.Forms.Button pickOutputButton;
         private System.Windows.Forms.GroupBox gbInput;
         private System.Windows.Forms.RadioButton demuxTracks;
         private System.Windows.Forms.RadioButton demuxNoAudiotracks;
@@ -481,5 +471,6 @@ namespace MeGUI
         private System.Windows.Forms.TextBox txtContainerInformation;
         private System.Windows.Forms.TextBox txtScanTypeInformation;
         private System.Windows.Forms.RadioButton btnLSMASH;
+        private FileBar output;
     }
 }
