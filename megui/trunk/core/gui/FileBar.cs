@@ -19,31 +19,39 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 
 using MeGUI.core.util;
 
 namespace MeGUI
 {
-
     public delegate void FileBarEventHandler(FileBar sender, FileBarEventArgs args);
     
     public partial class FileBar : UserControl
     {
+        public event FileBarEventHandler FileSelected;
+        NotifyCounter raiseEvent = new NotifyCounter();
         private string oldName;
+
         public FileBar()
         {
             InitializeComponent();
-            DragDropUtil.RegisterSingleFileDragDrop(filename, setFilename, delegate() { return Filter; });
+            DragDropUtil.RegisterSingleFileDragDrop(filename, SetFilename, delegate() { return Filter; });
+
+            if (MainForm.Instance.Settings.DPIScaleFactor <= 1)
+                return;
+            int iMarging = MainForm.Instance.Settings.DPIRescale(2);
+            openButton.Margin = new Padding(3, iMarging, 0, iMarging);
         }
 
+        #region properties
+
         private bool saveMode = false;
+        [Category("FileBar"),
+            Description("When this property is true, the dialogue to save files/folders is used instead of the one to open these."),
+            DefaultValue(false)]
         public bool SaveMode
         {
             get { return saveMode; }
@@ -54,22 +62,28 @@ namespace MeGUI
             }
         }
 
+        [Category("FileBar"),
+            Description("When this property is true, the TextBox is set to read only."),
+            DefaultValue(true)]
         public bool ReadOnly
         {
             get { return filename.ReadOnly; }
             set { filename.ReadOnly = value; }
         }
 
-        private string title;
-
+        private string title = null;
+        [Category("FileBar"),
+            Description("The title of the open/save dialogue."),
+            DefaultValue(null)]
         public string Title
         {
             get { return title; }
             set { title = value; }
         }
 
-        NotifyCounter raiseEvent = new NotifyCounter();
-
+        [Category("FileBar"),
+            Description("The selected file or folder path."),
+            DefaultValue(null)]
         public string Filename
         {
             get { return filename.Text; }
@@ -83,31 +97,37 @@ namespace MeGUI
             }
         }
 
-        private bool folderMode;
-
+        private bool folderMode = false;
+        [Category("FileBar"),
+           Description("When this property is true, a folder instead of a file has to be choosen."),
+           DefaultValue(false)]
         public bool FolderMode
         {
             get { return folderMode; }
             set { folderMode = value; }
         }
 
-        private string filter;
-
+        private string filter = null;
+        [Category("FileBar"),
+           Description("The filter list e.g. All files (*.*)|*.*"),
+           DefaultValue(null)]
         public string Filter
         {
             get { return filter; }
             set { filter = value; }
         }
 
-        private int filterIndex;
-
+        private int filterIndex = 0;
+        [Category("FileBar"),
+           Description("The by default selected filter index position."),
+           DefaultValue(0)]
         public int FilterIndex
         {
             get { return filterIndex; }
             set { filterIndex = value; }
         }
 
-        public event FileBarEventHandler FileSelected;
+        #endregion
 
         private void openButton_Click(object sender, EventArgs e)
         {
@@ -115,7 +135,7 @@ namespace MeGUI
             {
                 FolderBrowserDialog dialog = new FolderBrowserDialog();
                 if (dialog.ShowDialog() == DialogResult.OK)
-                    setFilename(dialog.SelectedPath);
+                    SetFilename(dialog.SelectedPath);
             }
             else
             {
@@ -136,7 +156,7 @@ namespace MeGUI
                     catch { }
                 }
                 if (dialog.ShowDialog() == DialogResult.OK)
-                    setFilename(dialog.FileName);
+                    SetFilename(dialog.FileName);
             }
         }
 
@@ -145,28 +165,30 @@ namespace MeGUI
             openButton.PerformClick();
         }
 
-        private void setFilename(string filename)
+        private void SetFilename(string filename)
         {
             oldName = this.filename.Text;
             using (IDisposable a = raiseEvent.Wrap())
             {
                 this.filename.Text = filename;
             }
-            triggerEvent();
+            TriggerEvent();
         }
 
-        private void triggerEvent()
+        private void TriggerEvent()
         {
-            if (raiseEvent.Ready && FileSelected != null) FileSelected(this, new FileBarEventArgs(oldName, filename.Text));
+            if (raiseEvent.Ready && FileSelected != null)
+                FileSelected(this, new FileBarEventArgs(oldName, filename.Text));
             oldName = filename.Text;
         }
 
         private void filename_TextChanged(object sender, EventArgs e)
         {
-            setFilename(filename.Text);
-            triggerEvent();
+            SetFilename(filename.Text);
+            TriggerEvent();
         }
     }
+
     public class FileBarEventArgs : EventArgs
     {
         public readonly string OldFileName;
@@ -178,5 +200,4 @@ namespace MeGUI
             NewFileName = newName;
         }
     }
-
 }

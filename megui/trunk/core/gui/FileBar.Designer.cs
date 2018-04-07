@@ -67,11 +67,11 @@ namespace MeGUI
             // 
             // openButton
             // 
-            this.openButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.openButton.Location = new System.Drawing.Point(243, 3);
+            this.openButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.openButton.Location = new System.Drawing.Point(243, 0);
             this.openButton.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
             this.openButton.Name = "openButton";
-            this.openButton.Size = new System.Drawing.Size(26, 20);
+            this.openButton.Size = new System.Drawing.Size(26, 26);
             this.openButton.TabIndex = 1;
             this.openButton.Text = "...";
             this.openButton.Click += new System.EventHandler(this.openButton_Click);

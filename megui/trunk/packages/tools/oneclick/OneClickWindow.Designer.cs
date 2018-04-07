@@ -70,6 +70,7 @@ namespace MeGUI
             this.subtitlesTab = new System.Windows.Forms.TabControl();
             this.subPage0 = new System.Windows.Forms.TabPage();
             this.oneClickSubtitleStreamControl1 = new MeGUI.OneClickStreamControl();
+            this.tabPage7 = new System.Windows.Forms.TabPage();
             this.tabPage5 = new System.Windows.Forms.TabPage();
             this.subtitleMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.subtitleAddTrack = new System.Windows.Forms.ToolStripMenuItem();
@@ -117,7 +118,6 @@ namespace MeGUI
             this.openOnQueue = new System.Windows.Forms.CheckBox();
             this.cbGUIMode = new System.Windows.Forms.ComboBox();
             this.helpButton1 = new MeGUI.core.gui.HelpButton();
-            this.tabPage7 = new System.Windows.Forms.TabPage();
             label1 = new System.Windows.Forms.Label();
             this.tabPage1.SuspendLayout();
             this.outputTab.SuspendLayout();
@@ -192,7 +192,7 @@ namespace MeGUI
             this.oneclickProfile.Location = new System.Drawing.Point(99, 40);
             this.oneclickProfile.Name = "oneclickProfile";
             this.oneclickProfile.ProfileSet = "OneClick";
-            this.oneclickProfile.Size = new System.Drawing.Size(332, 22);
+            this.oneclickProfile.Size = new System.Drawing.Size(333, 22);
             this.oneclickProfile.TabIndex = 31;
             this.oneclickProfile.SelectedProfileChanged += new System.EventHandler(this.OneClickProfileChanged);
             // 
@@ -211,15 +211,11 @@ namespace MeGUI
             | System.Windows.Forms.AnchorStyles.Right)));
             this.output.Filename = "";
             this.output.Filter = "MP4 Files|*.mp4";
-            this.output.FilterIndex = 0;
-            this.output.FolderMode = false;
-            this.output.Location = new System.Drawing.Point(99, 8);
+            this.output.Location = new System.Drawing.Point(99, 10);
             this.output.Name = "output";
-            this.output.ReadOnly = true;
             this.output.SaveMode = true;
-            this.output.Size = new System.Drawing.Size(333, 26);
+            this.output.Size = new System.Drawing.Size(333, 23);
             this.output.TabIndex = 29;
-            this.output.Title = null;
             // 
             // outputLabel
             // 
@@ -381,6 +377,15 @@ namespace MeGUI
             this.oneClickSubtitleStreamControl1.TabIndex = 0;
             this.oneClickSubtitleStreamControl1.TrackNumber = 1;
             this.oneClickSubtitleStreamControl1.FileUpdated += new System.EventHandler(this.oneClickSubtitleStreamControl_FileUpdated);
+            // 
+            // tabPage7
+            // 
+            this.tabPage7.Location = new System.Drawing.Point(4, 22);
+            this.tabPage7.Name = "tabPage7";
+            this.tabPage7.Size = new System.Drawing.Size(444, 89);
+            this.tabPage7.TabIndex = 4;
+            this.tabPage7.Text = "    -";
+            this.tabPage7.UseVisualStyleBackColor = true;
             // 
             // tabPage5
             // 
@@ -601,7 +606,7 @@ namespace MeGUI
             // 
             this.deleteChapter.Location = new System.Drawing.Point(420, 48);
             this.deleteChapter.Name = "deleteChapter";
-            this.deleteChapter.Size = new System.Drawing.Size(26, 24);
+            this.deleteChapter.Size = new System.Drawing.Size(26, 23);
             this.deleteChapter.TabIndex = 41;
             this.deleteChapter.Text = "X";
             this.deleteChapter.UseVisualStyleBackColor = true;
@@ -609,9 +614,9 @@ namespace MeGUI
             // 
             // deleteWorking
             // 
-            this.deleteWorking.Location = new System.Drawing.Point(420, 16);
+            this.deleteWorking.Location = new System.Drawing.Point(420, 17);
             this.deleteWorking.Name = "deleteWorking";
-            this.deleteWorking.Size = new System.Drawing.Size(26, 24);
+            this.deleteWorking.Size = new System.Drawing.Size(26, 23);
             this.deleteWorking.TabIndex = 40;
             this.deleteWorking.Text = "X";
             this.deleteWorking.UseVisualStyleBackColor = true;
@@ -623,31 +628,21 @@ namespace MeGUI
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chapterFile.Filename = "";
             this.chapterFile.Filter = "Chapter files (*.txt, *.xml)|*.txt;*.xml";
-            this.chapterFile.FilterIndex = 0;
-            this.chapterFile.FolderMode = false;
-            this.chapterFile.Location = new System.Drawing.Point(120, 47);
+            this.chapterFile.Location = new System.Drawing.Point(120, 48);
             this.chapterFile.Name = "chapterFile";
-            this.chapterFile.ReadOnly = true;
-            this.chapterFile.SaveMode = false;
-            this.chapterFile.Size = new System.Drawing.Size(294, 26);
+            this.chapterFile.Size = new System.Drawing.Size(294, 23);
             this.chapterFile.TabIndex = 39;
-            this.chapterFile.Title = null;
             // 
             // workingDirectory
             // 
             this.workingDirectory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.workingDirectory.Filename = "";
-            this.workingDirectory.Filter = null;
-            this.workingDirectory.FilterIndex = 0;
             this.workingDirectory.FolderMode = true;
-            this.workingDirectory.Location = new System.Drawing.Point(120, 15);
+            this.workingDirectory.Location = new System.Drawing.Point(120, 17);
             this.workingDirectory.Name = "workingDirectory";
-            this.workingDirectory.ReadOnly = true;
-            this.workingDirectory.SaveMode = false;
-            this.workingDirectory.Size = new System.Drawing.Size(294, 26);
+            this.workingDirectory.Size = new System.Drawing.Size(294, 23);
             this.workingDirectory.TabIndex = 38;
-            this.workingDirectory.Title = null;
             this.workingDirectory.FileSelected += new MeGUI.FileBarEventHandler(this.workingDirectory_FileSelected);
             // 
             // chapterLabel
@@ -897,15 +892,6 @@ namespace MeGUI
             this.helpButton1.Name = "helpButton1";
             this.helpButton1.Size = new System.Drawing.Size(38, 23);
             this.helpButton1.TabIndex = 32;
-            // 
-            // tabPage7
-            // 
-            this.tabPage7.Location = new System.Drawing.Point(4, 22);
-            this.tabPage7.Name = "tabPage7";
-            this.tabPage7.Size = new System.Drawing.Size(444, 89);
-            this.tabPage7.TabIndex = 4;
-            this.tabPage7.Text = "    -";
-            this.tabPage7.UseVisualStyleBackColor = true;
             // 
             // OneClickWindow
             // 

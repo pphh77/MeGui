@@ -52,7 +52,7 @@ namespace MeGUI
             this.muxedInput.Name = "muxedInput";
             this.muxedInput.ReadOnly = true;
             this.muxedInput.SaveMode = false;
-            this.muxedInput.Size = new System.Drawing.Size(289, 26);
+            this.muxedInput.Size = new System.Drawing.Size(289, 23);
             this.muxedInput.TabIndex = 3;
             this.muxedInput.Title = null;
             this.muxedInput.FileSelected += new MeGUI.FileBarEventHandler(this.muxedInput_FileSelected);

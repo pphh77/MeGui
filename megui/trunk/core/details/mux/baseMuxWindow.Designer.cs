@@ -109,7 +109,7 @@ namespace MeGUI
             // 
             // muxButton
             // 
-            this.muxButton.Location = new System.Drawing.Point(376, 568);
+            this.muxButton.Location = new System.Drawing.Point(376, 565);
             this.muxButton.Margin = new System.Windows.Forms.Padding(12, 9, 12, 9);
             this.muxButton.Name = "muxButton";
             this.muxButton.Size = new System.Drawing.Size(56, 23);
@@ -136,7 +136,7 @@ namespace MeGUI
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 48.99329F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 51.00671F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 43F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 44F));
             this.tableLayoutPanel2.Controls.Add(this.videoInputLabel, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.videoName, 3, 1);
             this.tableLayoutPanel2.Controls.Add(this.fps, 1, 1);
@@ -169,7 +169,7 @@ namespace MeGUI
             this.videoName.Location = new System.Drawing.Point(245, 42);
             this.videoName.MaxLength = 100;
             this.videoName.Name = "videoName";
-            this.videoName.Size = new System.Drawing.Size(140, 21);
+            this.videoName.Size = new System.Drawing.Size(139, 21);
             this.videoName.TabIndex = 5;
             // 
             // fps
@@ -201,17 +201,11 @@ namespace MeGUI
             this.vInput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel2.SetColumnSpan(this.vInput, 4);
             this.vInput.Filename = "";
-            this.vInput.Filter = null;
-            this.vInput.FilterIndex = 0;
-            this.vInput.FolderMode = false;
-            this.vInput.Location = new System.Drawing.Point(71, 4);
+            this.vInput.Location = new System.Drawing.Point(71, 6);
             this.vInput.Margin = new System.Windows.Forms.Padding(3, 3, 6, 3);
             this.vInput.Name = "vInput";
-            this.vInput.ReadOnly = true;
-            this.vInput.SaveMode = false;
-            this.vInput.Size = new System.Drawing.Size(355, 26);
+            this.vInput.Size = new System.Drawing.Size(355, 23);
             this.vInput.TabIndex = 1;
-            this.vInput.Title = null;
             this.vInput.FileSelected += new MeGUI.FileBarEventHandler(this.vInput_FileSelected);
             // 
             // MuxFPSLabel
@@ -227,7 +221,7 @@ namespace MeGUI
             // removeVideoTrack
             // 
             this.removeVideoTrack.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.removeVideoTrack.Location = new System.Drawing.Point(398, 41);
+            this.removeVideoTrack.Location = new System.Drawing.Point(397, 41);
             this.removeVideoTrack.Name = "removeVideoTrack";
             this.removeVideoTrack.Size = new System.Drawing.Size(24, 23);
             this.removeVideoTrack.TabIndex = 39;
@@ -273,15 +267,10 @@ namespace MeGUI
             this.chapters.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.chapters.Filename = "";
             this.chapters.Filter = "";
-            this.chapters.FilterIndex = 0;
-            this.chapters.FolderMode = false;
             this.chapters.Location = new System.Drawing.Point(88, 17);
             this.chapters.Name = "chapters";
-            this.chapters.ReadOnly = true;
-            this.chapters.SaveMode = false;
-            this.chapters.Size = new System.Drawing.Size(316, 22);
+            this.chapters.Size = new System.Drawing.Size(316, 23);
             this.chapters.TabIndex = 3;
-            this.chapters.Title = null;
             this.chapters.FileSelected += new MeGUI.FileBarEventHandler(this.chapters_FileSelected);
             // 
             // outputGroupbox
@@ -292,7 +281,7 @@ namespace MeGUI
             this.outputGroupbox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.outputGroupbox.Location = new System.Drawing.Point(3, 415);
             this.outputGroupbox.Name = "outputGroupbox";
-            this.outputGroupbox.Size = new System.Drawing.Size(438, 141);
+            this.outputGroupbox.Size = new System.Drawing.Size(438, 138);
             this.outputGroupbox.TabIndex = 4;
             this.outputGroupbox.TabStop = false;
             this.outputGroupbox.Text = "Output";
@@ -320,14 +309,14 @@ namespace MeGUI
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel4.Size = new System.Drawing.Size(432, 121);
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(432, 118);
             this.tableLayoutPanel4.TabIndex = 0;
             // 
             // lbContainer
             // 
             this.lbContainer.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.lbContainer.AutoSize = true;
-            this.lbContainer.Location = new System.Drawing.Point(3, 101);
+            this.lbContainer.Location = new System.Drawing.Point(3, 98);
             this.lbContainer.Name = "lbContainer";
             this.lbContainer.Size = new System.Drawing.Size(54, 13);
             this.lbContainer.TabIndex = 11;
@@ -338,7 +327,7 @@ namespace MeGUI
             // 
             this.label1.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 74);
+            this.label1.Location = new System.Drawing.Point(3, 71);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(66, 13);
             this.label1.TabIndex = 9;
@@ -348,7 +337,7 @@ namespace MeGUI
             // 
             this.muxedOutputLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.muxedOutputLabel.AutoSize = true;
-            this.muxedOutputLabel.Location = new System.Drawing.Point(3, 9);
+            this.muxedOutputLabel.Location = new System.Drawing.Point(3, 8);
             this.muxedOutputLabel.Name = "muxedOutputLabel";
             this.muxedOutputLabel.Size = new System.Drawing.Size(76, 13);
             this.muxedOutputLabel.TabIndex = 0;
@@ -358,7 +347,7 @@ namespace MeGUI
             // 
             this.splitting.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.splitting.CustomSizes = new MeGUI.core.util.FileSize[0];
-            this.splitting.Location = new System.Drawing.Point(85, 35);
+            this.splitting.Location = new System.Drawing.Point(85, 32);
             this.splitting.MaximumSize = new System.Drawing.Size(1000, 29);
             this.splitting.MinimumSize = new System.Drawing.Size(64, 29);
             this.splitting.Name = "splitting";
@@ -372,7 +361,7 @@ namespace MeGUI
             // 
             this.splittingLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.splittingLabel.AutoSize = true;
-            this.splittingLabel.Location = new System.Drawing.Point(3, 43);
+            this.splittingLabel.Location = new System.Drawing.Point(3, 40);
             this.splittingLabel.Name = "splittingLabel";
             this.splittingLabel.Size = new System.Drawing.Size(45, 13);
             this.splittingLabel.TabIndex = 2;
@@ -382,16 +371,12 @@ namespace MeGUI
             // 
             this.output.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.output.Filename = "";
-            this.output.Filter = null;
-            this.output.FilterIndex = 0;
-            this.output.FolderMode = false;
             this.output.Location = new System.Drawing.Point(85, 3);
             this.output.Name = "output";
             this.output.ReadOnly = false;
             this.output.SaveMode = true;
-            this.output.Size = new System.Drawing.Size(344, 26);
+            this.output.Size = new System.Drawing.Size(344, 23);
             this.output.TabIndex = 1;
-            this.output.Title = null;
             this.output.Click += new System.EventHandler(this.output_Click);
             // 
             // cbType
@@ -399,7 +384,7 @@ namespace MeGUI
             this.cbType.Dock = System.Windows.Forms.DockStyle.Left;
             this.cbType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbType.FormattingEnabled = true;
-            this.cbType.Location = new System.Drawing.Point(85, 70);
+            this.cbType.Location = new System.Drawing.Point(85, 67);
             this.cbType.Name = "cbType";
             this.cbType.Size = new System.Drawing.Size(121, 21);
             this.cbType.TabIndex = 7;
@@ -409,7 +394,7 @@ namespace MeGUI
             // 
             this.cbContainer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbContainer.FormattingEnabled = true;
-            this.cbContainer.Location = new System.Drawing.Point(85, 97);
+            this.cbContainer.Location = new System.Drawing.Point(85, 94);
             this.cbContainer.Name = "cbContainer";
             this.cbContainer.Size = new System.Drawing.Size(121, 21);
             this.cbContainer.TabIndex = 10;
@@ -586,10 +571,10 @@ namespace MeGUI
             this.helpButton1.ArticleName = "Manual mux window";
             this.helpButton1.AutoSize = true;
             this.helpButton1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.helpButton1.Location = new System.Drawing.Point(12, 568);
+            this.helpButton1.Location = new System.Drawing.Point(12, 565);
             this.helpButton1.Margin = new System.Windows.Forms.Padding(12, 9, 12, 9);
             this.helpButton1.Name = "helpButton1";
-            this.helpButton1.Size = new System.Drawing.Size(37, 23);
+            this.helpButton1.Size = new System.Drawing.Size(38, 23);
             this.helpButton1.TabIndex = 8;
             // 
             // chkCloseOnQueue
@@ -599,7 +584,7 @@ namespace MeGUI
             this.chkCloseOnQueue.AutoSize = true;
             this.chkCloseOnQueue.Checked = true;
             this.chkCloseOnQueue.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkCloseOnQueue.Location = new System.Drawing.Point(281, 568);
+            this.chkCloseOnQueue.Location = new System.Drawing.Point(281, 565);
             this.chkCloseOnQueue.Margin = new System.Windows.Forms.Padding(12, 9, 12, 9);
             this.chkCloseOnQueue.Name = "chkCloseOnQueue";
             this.chkCloseOnQueue.Size = new System.Drawing.Size(71, 23);

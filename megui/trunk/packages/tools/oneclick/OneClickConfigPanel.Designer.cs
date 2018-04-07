@@ -109,6 +109,8 @@ namespace MeGUI.packages.tools.oneclick
             this.workingDirectory = new MeGUI.FileBar();
             this.workingDirectoryLabel = new System.Windows.Forms.Label();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.txtSuffixName = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.txtPrefixName = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -122,8 +124,6 @@ namespace MeGUI.packages.tools.oneclick
             this.audioMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.audioAddTrack = new System.Windows.Forms.ToolStripMenuItem();
             this.audioRemoveTrack = new System.Windows.Forms.ToolStripMenuItem();
-            this.txtSuffixName = new System.Windows.Forms.TextBox();
-            this.label4 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
             this.otherGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.horizontalResolution)).BeginInit();
@@ -764,16 +764,11 @@ namespace MeGUI.packages.tools.oneclick
             // outputDirectory
             // 
             this.outputDirectory.Filename = "";
-            this.outputDirectory.Filter = null;
-            this.outputDirectory.FilterIndex = 0;
             this.outputDirectory.FolderMode = true;
-            this.outputDirectory.Location = new System.Drawing.Point(64, 19);
+            this.outputDirectory.Location = new System.Drawing.Point(64, 20);
             this.outputDirectory.Name = "outputDirectory";
-            this.outputDirectory.ReadOnly = true;
-            this.outputDirectory.SaveMode = false;
-            this.outputDirectory.Size = new System.Drawing.Size(300, 26);
+            this.outputDirectory.Size = new System.Drawing.Size(300, 23);
             this.outputDirectory.TabIndex = 43;
-            this.outputDirectory.Title = null;
             // 
             // label8
             // 
@@ -786,16 +781,11 @@ namespace MeGUI.packages.tools.oneclick
             // workingDirectory
             // 
             this.workingDirectory.Filename = "";
-            this.workingDirectory.Filter = null;
-            this.workingDirectory.FilterIndex = 0;
             this.workingDirectory.FolderMode = true;
-            this.workingDirectory.Location = new System.Drawing.Point(64, 51);
+            this.workingDirectory.Location = new System.Drawing.Point(64, 52);
             this.workingDirectory.Name = "workingDirectory";
-            this.workingDirectory.ReadOnly = true;
-            this.workingDirectory.SaveMode = false;
-            this.workingDirectory.Size = new System.Drawing.Size(300, 26);
+            this.workingDirectory.Size = new System.Drawing.Size(300, 23);
             this.workingDirectory.TabIndex = 42;
-            this.workingDirectory.Title = null;
             // 
             // workingDirectoryLabel
             // 
@@ -821,6 +811,22 @@ namespace MeGUI.packages.tools.oneclick
             this.groupBox4.TabIndex = 43;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = " Project Name ";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(7, 57);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(33, 13);
+            this.label4.TabIndex = 7;
+            this.label4.Text = "Suffix";
+            // 
+            // txtSuffixName
+            // 
+            this.txtSuffixName.Location = new System.Drawing.Point(60, 54);
+            this.txtSuffixName.Name = "txtSuffixName";
+            this.txtSuffixName.Size = new System.Drawing.Size(121, 20);
+            this.txtSuffixName.TabIndex = 6;
             // 
             // label1
             // 
@@ -935,22 +941,6 @@ namespace MeGUI.packages.tools.oneclick
             this.audioRemoveTrack.Size = new System.Drawing.Size(148, 22);
             this.audioRemoveTrack.Text = "Remove Track";
             this.audioRemoveTrack.Click += new System.EventHandler(this.audioRemoveTrack_Click);
-            // 
-            // txtSuffixName
-            // 
-            this.txtSuffixName.Location = new System.Drawing.Point(60, 54);
-            this.txtSuffixName.Name = "txtSuffixName";
-            this.txtSuffixName.Size = new System.Drawing.Size(121, 20);
-            this.txtSuffixName.TabIndex = 6;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(7, 57);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(33, 13);
-            this.label4.TabIndex = 7;
-            this.label4.Text = "Suffix";
             // 
             // OneClickConfigPanel
             // 

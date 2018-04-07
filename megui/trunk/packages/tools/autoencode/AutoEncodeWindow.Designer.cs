@@ -284,16 +284,12 @@ namespace MeGUI
             // muxedOutput
             // 
             this.muxedOutput.Filename = "";
-            this.muxedOutput.Filter = null;
-            this.muxedOutput.FilterIndex = 0;
-            this.muxedOutput.FolderMode = false;
             this.muxedOutput.Location = new System.Drawing.Point(97, 74);
             this.muxedOutput.Name = "muxedOutput";
             this.muxedOutput.ReadOnly = false;
             this.muxedOutput.SaveMode = true;
-            this.muxedOutput.Size = new System.Drawing.Size(352, 26);
+            this.muxedOutput.Size = new System.Drawing.Size(352, 23);
             this.muxedOutput.TabIndex = 36;
-            this.muxedOutput.Title = null;
             // 
             // cancelButton
             // 

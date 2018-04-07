@@ -64,15 +64,10 @@ namespace MeGUI
             // 
             this.input.Filename = "";
             this.input.Filter = "IFO Files|*.ifo";
-            this.input.FilterIndex = 0;
-            this.input.FolderMode = false;
-            this.input.Location = new System.Drawing.Point(120, 13);
+            this.input.Location = new System.Drawing.Point(62, 16);
             this.input.Name = "input";
-            this.input.ReadOnly = true;
-            this.input.SaveMode = false;
-            this.input.Size = new System.Drawing.Size(286, 26);
+            this.input.Size = new System.Drawing.Size(344, 23);
             this.input.TabIndex = 5;
-            this.input.Title = null;
             this.input.FileSelected += new MeGUI.FileBarEventHandler(this.input_FileSelected);
             // 
             // inputLabel
@@ -98,13 +93,10 @@ namespace MeGUI
             // 
             this.output.Filename = "";
             this.output.Filter = "VobSub Files|*.idx";
-            this.output.FilterIndex = 0;
-            this.output.FolderMode = false;
-            this.output.Location = new System.Drawing.Point(120, 17);
+            this.output.Location = new System.Drawing.Point(62, 17);
             this.output.Name = "output";
-            this.output.ReadOnly = true;
             this.output.SaveMode = true;
-            this.output.Size = new System.Drawing.Size(286, 26);
+            this.output.Size = new System.Drawing.Size(344, 23);
             this.output.TabIndex = 5;
             this.output.Title = "Choose an output file";
             this.output.FileSelected += new MeGUI.FileBarEventHandler(this.output_FileSelected);

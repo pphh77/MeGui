@@ -593,7 +593,7 @@ namespace MeGUI
             this.btnClearOutputDirecoty.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.btnClearOutputDirecoty.Location = new System.Drawing.Point(257, 27);
             this.btnClearOutputDirecoty.Name = "btnClearOutputDirecoty";
-            this.btnClearOutputDirecoty.Size = new System.Drawing.Size(25, 20);
+            this.btnClearOutputDirecoty.Size = new System.Drawing.Size(25, 23);
             this.btnClearOutputDirecoty.TabIndex = 43;
             this.btnClearOutputDirecoty.Text = "x";
             this.btnClearOutputDirecoty.Click += new System.EventHandler(this.btnClearOutputDirecoty_Click);
@@ -611,16 +611,11 @@ namespace MeGUI
             // 
             this.defaultOutputDir.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.defaultOutputDir.Filename = "";
-            this.defaultOutputDir.Filter = null;
-            this.defaultOutputDir.FilterIndex = 0;
             this.defaultOutputDir.FolderMode = true;
-            this.defaultOutputDir.Location = new System.Drawing.Point(8, 24);
+            this.defaultOutputDir.Location = new System.Drawing.Point(8, 27);
             this.defaultOutputDir.Name = "defaultOutputDir";
-            this.defaultOutputDir.ReadOnly = true;
-            this.defaultOutputDir.SaveMode = false;
-            this.defaultOutputDir.Size = new System.Drawing.Size(243, 26);
+            this.defaultOutputDir.Size = new System.Drawing.Size(243, 23);
             this.defaultOutputDir.TabIndex = 40;
-            this.defaultOutputDir.Title = null;
             // 
             // tabPage3
             // 
@@ -1033,15 +1028,10 @@ namespace MeGUI
             this.fdkaacLocation.Enabled = false;
             this.fdkaacLocation.Filename = "";
             this.fdkaacLocation.Filter = "FDKAAC|fdkaac.exe";
-            this.fdkaacLocation.FilterIndex = 0;
-            this.fdkaacLocation.FolderMode = false;
-            this.fdkaacLocation.Location = new System.Drawing.Point(64, 18);
+            this.fdkaacLocation.Location = new System.Drawing.Point(64, 20);
             this.fdkaacLocation.Name = "fdkaacLocation";
-            this.fdkaacLocation.ReadOnly = true;
-            this.fdkaacLocation.SaveMode = false;
-            this.fdkaacLocation.Size = new System.Drawing.Size(399, 26);
+            this.fdkaacLocation.Size = new System.Drawing.Size(399, 23);
             this.fdkaacLocation.TabIndex = 44;
-            this.fdkaacLocation.Title = null;
             // 
             // groupBox6
             // 
@@ -1183,15 +1173,10 @@ namespace MeGUI
             this.neroaacencLocation.Enabled = false;
             this.neroaacencLocation.Filename = "";
             this.neroaacencLocation.Filter = "NeroAacEnc|neroaacenc.exe";
-            this.neroaacencLocation.FilterIndex = 0;
-            this.neroaacencLocation.FolderMode = false;
-            this.neroaacencLocation.Location = new System.Drawing.Point(64, 18);
+            this.neroaacencLocation.Location = new System.Drawing.Point(64, 20);
             this.neroaacencLocation.Name = "neroaacencLocation";
-            this.neroaacencLocation.ReadOnly = true;
-            this.neroaacencLocation.SaveMode = false;
-            this.neroaacencLocation.Size = new System.Drawing.Size(399, 26);
+            this.neroaacencLocation.Size = new System.Drawing.Size(399, 23);
             this.neroaacencLocation.TabIndex = 44;
-            this.neroaacencLocation.Title = null;
             // 
             // groupBox4
             // 
@@ -1206,9 +1191,9 @@ namespace MeGUI
             // 
             // btnClearMP4TempDirectory
             // 
-            this.btnClearMP4TempDirectory.Location = new System.Drawing.Point(433, 23);
+            this.btnClearMP4TempDirectory.Location = new System.Drawing.Point(433, 20);
             this.btnClearMP4TempDirectory.Name = "btnClearMP4TempDirectory";
-            this.btnClearMP4TempDirectory.Size = new System.Drawing.Size(25, 20);
+            this.btnClearMP4TempDirectory.Size = new System.Drawing.Size(25, 23);
             this.btnClearMP4TempDirectory.TabIndex = 42;
             this.btnClearMP4TempDirectory.Text = "x";
             this.btnClearMP4TempDirectory.Click += new System.EventHandler(this.btnClearMP4TempDirectory_Click);
@@ -1218,16 +1203,11 @@ namespace MeGUI
             this.tempDirMP4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tempDirMP4.Filename = "";
-            this.tempDirMP4.Filter = null;
-            this.tempDirMP4.FilterIndex = 0;
             this.tempDirMP4.FolderMode = true;
             this.tempDirMP4.Location = new System.Drawing.Point(12, 20);
             this.tempDirMP4.Name = "tempDirMP4";
-            this.tempDirMP4.ReadOnly = true;
-            this.tempDirMP4.SaveMode = false;
-            this.tempDirMP4.Size = new System.Drawing.Size(418, 26);
+            this.tempDirMP4.Size = new System.Drawing.Size(418, 23);
             this.tempDirMP4.TabIndex = 41;
-            this.tempDirMP4.Title = null;
             this.tempDirMP4.FileSelected += new MeGUI.FileBarEventHandler(this.tempDirMP4_FileSelected);
             // 
             // vobGroupBox

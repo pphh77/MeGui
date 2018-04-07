@@ -244,9 +244,6 @@ namespace MeGUI.core.gui
             this.audioOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.SetColumnSpan(this.audioOutput, 4);
             this.audioOutput.Filename = "";
-            this.audioOutput.Filter = null;
-            this.audioOutput.FilterIndex = 0;
-            this.audioOutput.FolderMode = false;
             this.audioOutput.Location = new System.Drawing.Point(133, 59);
             this.audioOutput.Name = "audioOutput";
             this.audioOutput.ReadOnly = false;
@@ -261,12 +258,8 @@ namespace MeGUI.core.gui
             this.tableLayoutPanel1.SetColumnSpan(this.cuts, 4);
             this.cuts.Filename = "";
             this.cuts.Filter = "MeGUI cutlist files (*.clt)|*.clt";
-            this.cuts.FilterIndex = 0;
-            this.cuts.FolderMode = false;
             this.cuts.Location = new System.Drawing.Point(133, 31);
             this.cuts.Name = "cuts";
-            this.cuts.ReadOnly = true;
-            this.cuts.SaveMode = false;
             this.cuts.Size = new System.Drawing.Size(320, 22);
             this.cuts.TabIndex = 18;
             this.cuts.Title = "Select a file with cuts";
@@ -278,12 +271,8 @@ namespace MeGUI.core.gui
             this.tableLayoutPanel1.SetColumnSpan(this.audioInput, 4);
             this.audioInput.Filename = "";
             this.audioInput.Filter = "All files (*.*)|*.*";
-            this.audioInput.FilterIndex = 0;
-            this.audioInput.FolderMode = false;
             this.audioInput.Location = new System.Drawing.Point(133, 3);
             this.audioInput.Name = "audioInput";
-            this.audioInput.ReadOnly = true;
-            this.audioInput.SaveMode = false;
             this.audioInput.Size = new System.Drawing.Size(320, 22);
             this.audioInput.TabIndex = 16;
             this.audioInput.Title = "Select your audio input";

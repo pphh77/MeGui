@@ -98,19 +98,13 @@ namespace MeGUI
             // input
             // 
             this.input.AllowDrop = true;
-            this.input.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.input.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.input.Filename = "";
             this.input.Filter = "";
-            this.input.FilterIndex = 0;
-            this.input.FolderMode = false;
-            this.input.Location = new System.Drawing.Point(77, 12);
+            this.input.Location = new System.Drawing.Point(81, 17);
             this.input.Name = "input";
-            this.input.ReadOnly = true;
-            this.input.SaveMode = false;
-            this.input.Size = new System.Drawing.Size(354, 34);
+            this.input.Size = new System.Drawing.Size(354, 23);
             this.input.TabIndex = 4;
-            this.input.Title = null;
             this.input.FileSelected += new MeGUI.FileBarEventHandler(this.input_FileSelected);
             // 
             // inputLabel
@@ -212,19 +206,14 @@ namespace MeGUI
             // output
             // 
             this.output.AllowDrop = true;
-            this.output.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.output.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.output.Filename = "";
             this.output.Filter = "";
-            this.output.FilterIndex = 0;
-            this.output.FolderMode = false;
-            this.output.Location = new System.Drawing.Point(81, 11);
+            this.output.Location = new System.Drawing.Point(81, 15);
             this.output.Name = "output";
-            this.output.ReadOnly = true;
-            this.output.SaveMode = false;
-            this.output.Size = new System.Drawing.Size(350, 34);
+            this.output.SaveMode = true;
+            this.output.Size = new System.Drawing.Size(350, 23);
             this.output.TabIndex = 7;
-            this.output.Title = null;
             this.output.FileSelected += new MeGUI.FileBarEventHandler(this.output_FileSelected);
             // 
             // demuxVideo

@@ -119,13 +119,9 @@ namespace MeGUI.core.gui
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dllBar.Filename = "";
             this.dllBar.Filter = "DLL Files (*.dll)|*.dll";
-            this.dllBar.FilterIndex = 0;
-            this.dllBar.FolderMode = false;
             this.dllBar.Location = new System.Drawing.Point(63, 350);
             this.dllBar.Name = "dllBar";
-            this.dllBar.ReadOnly = true;
-            this.dllBar.SaveMode = false;
-            this.dllBar.Size = new System.Drawing.Size(328, 26);
+            this.dllBar.Size = new System.Drawing.Size(328, 23);
             this.dllBar.TabIndex = 46;
             this.dllBar.Title = "Select AviSynth Plugin DLL to open";
             this.dllBar.FileSelected += new MeGUI.FileBarEventHandler(this.dllBar_FileSelected);

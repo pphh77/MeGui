@@ -72,15 +72,10 @@ namespace MeGUI.packages.tools.besplitter
             | System.Windows.Forms.AnchorStyles.Right)));
             this.input.Filename = "";
             this.input.Filter = "";
-            this.input.FilterIndex = 0;
-            this.input.FolderMode = false;
             this.input.Location = new System.Drawing.Point(12, 25);
             this.input.Name = "input";
-            this.input.ReadOnly = true;
-            this.input.SaveMode = false;
-            this.input.Size = new System.Drawing.Size(285, 26);
+            this.input.Size = new System.Drawing.Size(285, 23);
             this.input.TabIndex = 3;
-            this.input.Title = null;
             this.input.FileSelected += new MeGUI.FileBarEventHandler(this.input_FileSelected);
             // 
             // cuts
@@ -89,31 +84,22 @@ namespace MeGUI.packages.tools.besplitter
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cuts.Filename = "";
             this.cuts.Filter = "MeGUI cutlist files (*.clt)|*.clt";
-            this.cuts.FilterIndex = 0;
-            this.cuts.FolderMode = false;
             this.cuts.Location = new System.Drawing.Point(12, 70);
             this.cuts.Name = "cuts";
-            this.cuts.ReadOnly = true;
-            this.cuts.SaveMode = false;
-            this.cuts.Size = new System.Drawing.Size(285, 26);
+            this.cuts.Size = new System.Drawing.Size(285, 23);
             this.cuts.TabIndex = 4;
-            this.cuts.Title = null;
             // 
             // output
             // 
             this.output.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.output.Filename = "";
-            this.output.Filter = null;
-            this.output.FilterIndex = 0;
-            this.output.FolderMode = false;
             this.output.Location = new System.Drawing.Point(12, 115);
             this.output.Name = "output";
             this.output.ReadOnly = false;
             this.output.SaveMode = true;
-            this.output.Size = new System.Drawing.Size(285, 26);
+            this.output.Size = new System.Drawing.Size(285, 23);
             this.output.TabIndex = 5;
-            this.output.Title = null;
             // 
             // goButton
             // 
