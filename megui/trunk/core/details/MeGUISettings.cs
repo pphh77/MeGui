@@ -516,10 +516,7 @@ namespace MeGUI
 #if DEBUG
                 return 1; // always development update server for MeGUI debug builds
 #else
-                if (bMeGUIx64)
-                    return 1; // always development update server for MeGUI x64
-                else
-                    return autoUpdateServerSubList;
+                return autoUpdateServerSubList;
 #endif
             }
             set { autoUpdateServerSubList = value; }

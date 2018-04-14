@@ -172,6 +172,7 @@ namespace MeGUI
         }
 
 		#endregion
+
 		#region properties
 		public MeGUISettings Settings
 		{

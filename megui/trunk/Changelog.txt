@@ -1,3 +1,4 @@
+2836 [Updater]              x64: enabled stable build server
 2835 [FileIndexer]          fixed output file selection (regression of 2834)
 2834 [OneClick]             fixed a crash when using DGIndexIM/NV with a MKV source file (regression of 2832)
      [File Indexer]         improved High DPI support (regression of 2832)
