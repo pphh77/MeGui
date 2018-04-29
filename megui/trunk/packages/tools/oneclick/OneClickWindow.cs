@@ -20,7 +20,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Text;
@@ -526,7 +525,7 @@ namespace MeGUI
             {
                 for (int i = 0; i < audioTracks.Count; ++i)
                 {
-                    if (audioTracks[i].SelectedStreamIndex == 0) // "None"
+                    if (audioTracks[i].SelectedStreamIndex <= 0) // "None"
                         continue;
 
                     if (audioTracks[i].SelectedStream.EncoderSettings != null 
@@ -564,7 +563,7 @@ namespace MeGUI
             {
                 for (int i = 0; i < subtitleTracks.Count; ++i)
                 {
-                    if (subtitleTracks[i].SelectedStreamIndex == 0) // "None"
+                    if (subtitleTracks[i].SelectedStreamIndex <= 0) // "None"
                         continue;
 
                     string typeString;
@@ -1691,8 +1690,7 @@ namespace MeGUI
             updatePossibleContainers();
         }
 
-
-        // Subtitle Track Handling
+        #region subtitle track handling
         private void subtitleAddTrack_Click(object sender, EventArgs e)
         {
             SubtitleAddTrack(true);
@@ -1870,6 +1868,8 @@ namespace MeGUI
                     {
                         if (iCounter > 0)
                             SubtitleAddTrack(false);
+
+                        iSelectedSubtitleTabPage = iCounter;
                         subtitleTracks[iCounter++].SelectedStreamIndex = i + 1;
                     }
                 }
@@ -1881,9 +1881,13 @@ namespace MeGUI
                 {
                     if (iCounter > 0)
                         SubtitleAddTrack(false);
+
+                    iSelectedSubtitleTabPage = iCounter;
                     subtitleTracks[iCounter++].SelectedStreamIndex = i + 1;
                 }
             }
+
+            iSelectedSubtitleTabPage = 0;
         }
 
         private void subtitlesTab_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -1902,8 +1906,9 @@ namespace MeGUI
                     oTrack.chkDefaultStream.Checked = false;
             }
         }
+        #endregion
 
-        // Audio Track Handling
+        #region audio Track Handling
         private void audioAddTrack_Click(object sender, EventArgs e)
         {
             AudioAddTrack(true);
@@ -2114,6 +2119,8 @@ namespace MeGUI
 
                         if (iCounter > 0)
                             AudioAddTrack(false);
+
+                        iSelectedAudioTabPage = iCounter;
                         audioTracks[iCounter++].SelectedStreamIndex = i + 1;
                     }
                 }
@@ -2155,10 +2162,13 @@ namespace MeGUI
 
                     if (iCounter > 0)
                         AudioAddTrack(false);
+
+                    iSelectedAudioTabPage = iCounter;
                     audioTracks[iCounter++].SelectedStreamIndex = i + 1;
                 }
             }
 
+            iSelectedAudioTabPage = 0;
             ResetAudioSettings(settings);
         }
 
@@ -2194,6 +2204,7 @@ namespace MeGUI
         {
             AudioAddTrack(true);
         }
+        #endregion
 
         private void OneClickWindow_Shown(object sender, EventArgs e)
         {

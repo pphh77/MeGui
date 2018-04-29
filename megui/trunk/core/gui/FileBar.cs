@@ -40,7 +40,7 @@ namespace MeGUI
             InitializeComponent();
             DragDropUtil.RegisterSingleFileDragDrop(filename, SetFilename, delegate() { return Filter; });
 
-            if (MainForm.Instance.Settings.DPIScaleFactor <= 1)
+            if (MainForm.Instance == null || MainForm.Instance.Settings.DPIScaleFactor <= 1)
                 return;
             int iMarging = MainForm.Instance.Settings.DPIRescale(2);
             openButton.Margin = new Padding(3, iMarging, 0, iMarging);
