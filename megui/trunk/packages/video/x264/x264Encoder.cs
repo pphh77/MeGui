@@ -127,8 +127,6 @@ namespace MeGUI
             // bit-depth
             if (xs.X26410Bits)
                 sb.Append("--output-depth 10 ");
-            else
-                sb.Append("--output-depth 8 ");
 
             // --bluray-compat
             xs.BlurayCompat = oSettingsHandler.getBlurayCompat();

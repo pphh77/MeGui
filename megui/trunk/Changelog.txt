@@ -1,3 +1,4 @@
+2838 [x264]                 do not add "--output-depth 8" for 8 bit targets. feature request #636
 2837 [Updater]              redist files are only copied if not installed
                             added information which redist packages are installed to the log
 
