@@ -23,11 +23,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 using ICSharpCode.SharpZipLib.Zip;
+using Microsoft.Win32;
 
 namespace MeGUI.core.util
 {
@@ -469,8 +471,7 @@ namespace MeGUI.core.util
             Regex regex = new Regex(pattern);
             if (bIgnoreCase)
                 regex = new Regex(pattern, RegexOptions.IgnoreCase);
-            Match match = regex.Match(text);
-            return match.Success;
+            return regex.IsMatch(text);
         }
 
         /// <summary>
@@ -875,6 +876,188 @@ namespace MeGUI.core.util
             return true;
         }
 
+        #region redist actions
+        /// <summary>
+        /// Gets the Redist information based on the registry
+        /// </summary>
+        /// <returns></returns>
+        public static LogItem GetRedistInformation()
+        {
+            GetRedistKeys(@"SOFTWARE\Classes\Installer\Dependencies");
+            GetRedistKeys(@"SOFTWARE\Classes\Installer\Products");
+
+            LogItem oLog = new LogItem("Redistributables");
+            if (MainForm.Instance.Settings.RedistVersions.Count > 0)
+            {
+                List<string> oKeys = MainForm.Instance.Settings.RedistVersions.Keys.ToList();
+                oKeys.Sort();
+                foreach (string key in oKeys)
+                    oLog.LogValue("Microsoft Visual C++ " + key.Split('_')[0] + " " + key.Split('_')[1], MainForm.Instance.Settings.RedistVersions[key], false);
+            }
+            else
+                oLog.Info("No redistributables found");
+
+            return oLog;
+        }
+
+        /// <summary>
+        /// Gets the sub keys of a root key and the redist information in them
+        /// </summary>
+        /// <param name="strRegKey">root registry key</param>
+        private static void GetRedistKeys(string strRegKey)
+        {
+            RegistryKey BaseKey = Registry.LocalMachine.OpenSubKey(strRegKey);
+            if (BaseKey == null)
+                return;
+
+            foreach (string sub in BaseKey.GetSubKeyNames())
+            {
+                RegistryKey oLocalKey = BaseKey.OpenSubKey(sub);
+                FindRedistInformation(oLocalKey, out string year, out string architecture, out string version);
+                if (string.IsNullOrEmpty(architecture))
+                    continue;
+                if (MainForm.Instance.Settings.RedistVersions.ContainsKey(year + "_" + architecture))
+                {
+                    Version v1 = new Version(version);
+                    Version v2 = new Version(MainForm.Instance.Settings.RedistVersions[year + "_" + architecture]);
+                    if (v1 < v2)
+                        continue;
+                    MainForm.Instance.Settings.RedistVersions.Remove(year + "_" + architecture);
+                }
+                MainForm.Instance.Settings.RedistVersions.Add(year + "_" + architecture, version);
+            }
+        }
+
+        /// <summary>
+        /// Tries to find the redist information based on a given reg key
+        /// </summary>
+        /// <param name="oKey">the reg key to check</param>
+        /// <param name="year">the year of the redist package</param>
+        /// <param name="architecture">the architecture of the redist package</param>
+        /// <param name="version">the version of the redist package</param>
+        private static void FindRedistInformation(RegistryKey oKey, out string year, out string architecture, out string version)
+        {
+            year = architecture = version = string.Empty;
+
+            object oValue = oKey.GetValue("ProductName");
+            if (oValue == null)
+            {
+                oValue = oKey.GetValue("DisplayName");
+                if (oValue == null)
+                    return;
+            }
+
+            string strValue = oValue.ToString();
+            if (String.IsNullOrEmpty(strValue))
+                return;
+
+            if (!RegExMatch(strValue, @"^Microsoft Visual C\+\+.*Redistributable", true))
+                return;
+
+            Match oMatch = Regex.Match(strValue, @" \d{4} ");
+            if (!oMatch.Success)
+                return;
+            year = oMatch.Value.Trim();
+
+            oMatch = Regex.Match(strValue, @" \d+\.\d+\.\d+\z");
+            if (!oMatch.Success)
+                return;
+            version = oMatch.Value;
+
+            oMatch = Regex.Match(strValue, @"x(64|86)");
+            if (!oMatch.Success)
+                return;
+            architecture = oMatch.Value.ToLowerInvariant(); ;
+        }
+
+        /// <summary>
+        /// copies runtime/redist files
+        /// </summary>
+        public static void CopyRuntimeFiles()
+        {
+            UpdateCacher.CheckPackage("redist");
+
+            foreach (string strDirectory in Directory.GetDirectories(Path.GetDirectoryName(MainForm.Instance.Settings.Redist.Path)))
+            {
+                string strPackage = new DirectoryInfo(strDirectory).Name;
+                if (MainForm.Instance.Settings.RedistVersions.ContainsKey(strPackage))
+                    continue;
+                CopyRuntimeFiles(strDirectory);
+                MainForm.Instance.UpdateHandler.AddTextToLog("redist files copied: " + strPackage, ImageType.Information, false);
+            }
+        }
+
+        /// <summary>
+        /// copies runtime/redist files
+        /// </summary>
+        public static void CopyRuntimeFiles(string strSourcePath)
+        {
+            ArrayList targetDirectories = new ArrayList();
+            targetDirectories.Add(Path.GetDirectoryName(Application.ExecutablePath));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.FFmpeg.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.XviD.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynthPlugins.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynth.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.LSMASH.Path));
+
+            // get the redist files from the redist package
+            ArrayList sourceFiles = new ArrayList();
+            DirectoryInfo fi = new DirectoryInfo(strSourcePath);
+            FileInfo[] files = fi.GetFiles("*.dll", SearchOption.AllDirectories);
+            foreach (FileInfo f in files)
+                sourceFiles.Add(f.Name);
+
+            foreach (String dir in targetDirectories)
+            {
+                if (!Directory.Exists(dir))
+                    continue;
+
+                foreach (String file in sourceFiles)
+                {
+                    try { File.Copy(Path.Combine(strSourcePath, file), Path.Combine(dir, file), true); }
+                    catch { }
+                }
+            }
+        }
+
+        /// <summary>
+        /// removes runtime/redist files
+        /// </summary>
+        public static void RemoveRuntimeFiles()
+        {
+            ArrayList targetDirectories = new ArrayList();
+            targetDirectories.Add(Path.GetDirectoryName(Application.ExecutablePath));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.FFmpeg.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.XviD.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynthPlugins.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynth.Path));
+            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.LSMASH.Path));
+
+            // get the redist files from the redist package
+            string strRedistPath = Path.GetDirectoryName(MainForm.Instance.Settings.Redist.Path);
+            ArrayList sourceFiles = new ArrayList();
+            if (Directory.Exists(strRedistPath))
+            {
+                DirectoryInfo fi = new DirectoryInfo(strRedistPath);
+                FileInfo[] files = fi.GetFiles("*.dll", SearchOption.AllDirectories);
+                foreach (FileInfo f in files)
+                    sourceFiles.Add(f.Name);
+            }
+
+            foreach (String dir in targetDirectories)
+            {
+                if (!Directory.Exists(dir))
+                    continue;
+
+                foreach (String file in sourceFiles)
+                    DeleteFile(Path.Combine(dir, file), null);
+            }
+        }
+        #endregion
 
         /// <summary>
         /// Enables or disables the portable AviSynth build
@@ -924,55 +1107,6 @@ namespace MeGUI.core.util
                         try { File.Delete(Path.Combine(dir, file)); }
                         catch { }
                     }
-                }        
-            }
-        }
-
-        /// <summary>
-        /// copies runtime/redist files
-        /// </summary>
-        public static void CopyRuntimeFiles()
-        {
-            UpdateCacher.CheckPackage("redist");
-
-            // AVS expects the DLL files in the MeGUI root & encoder directories
-            // AVS+ expects the DLL files in the filter directories
-            // therefore copy all redist files into all of these directories
-
-            ArrayList targetDirectories = new ArrayList();
-            targetDirectories.Add(Path.GetDirectoryName(Application.ExecutablePath));
-            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.FFmpeg.Path));
-            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path));
-            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path));
-            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.XviD.Path));
-            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynthPlugins.Path));
-            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynth.Path));
-            targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.LSMASH.Path));
-
-            // get the redist files from the redist package
-            string strRedistPath = Path.GetDirectoryName(MainForm.Instance.Settings.Redist.Path);
-            ArrayList sourceFiles = new ArrayList();
-            if (Directory.Exists(strRedistPath))
-            {
-                DirectoryInfo fi = new DirectoryInfo(strRedistPath);
-                FileInfo[] files = fi.GetFiles("*.dll");
-                foreach (FileInfo f in files)
-                    sourceFiles.Add(f.Name);
-            }
-
-            foreach (String dir in targetDirectories)
-            {
-                if (!Directory.Exists(dir))
-                    continue;
-
-                foreach (String file in sourceFiles)
-                {
-                    if (File.Exists(Path.Combine(dir, file)) &&
-                        File.GetLastWriteTimeUtc(Path.Combine(dir, file)) == File.GetLastWriteTimeUtc(Path.Combine(strRedistPath, file)))
-                        continue;
-
-                    try { File.Copy(Path.Combine(strRedistPath, file), Path.Combine(dir, file), true); }
-                    catch { }
                 }
             }
         }

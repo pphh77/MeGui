@@ -19,6 +19,7 @@
 // ****************************************************************************
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -85,6 +86,7 @@ namespace MeGUI
                                 eac3to, fdkaac, ffmpeg, ffms, flac, haali, lame, lsmash, mediainfo,
                                 megui_core, megui_help, megui_libs, megui_updater, mkvmerge, mp4box, neroaacenc,
                                 oggenc, opus, pgcdemux, qaac, redist, tsmuxer, vsrip, x264, x265, xvid;
+        Dictionary<string, string> oRedistVersions;
         #endregion
         public MeGUISettings()
 		{
@@ -198,6 +200,7 @@ namespace MeGUI
             bEnableDirectShowSource = false;
             bFirstUpdateCheck = true;
             dLastDPIScaleFactor = 0;
+            oRedistVersions = new Dictionary<string, string>();
         }
 
         #region properties
@@ -1101,6 +1104,13 @@ namespace MeGUI
             set { bUseQAAC = value; }
         }
 
+        [XmlIgnore]
+        public Dictionary<string, string> RedistVersions
+        {
+            get { return oRedistVersions; }
+            set { oRedistVersions = value; }
+        }
+
         public ProgramSettings AviMuxGui
         {
             get { return avimuxgui; }
@@ -1608,7 +1618,8 @@ namespace MeGUI
             qaac.DoNotDeleteFoldersOnUpdate.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\qaac\QTfiles64"));
             if (!MainForm.Instance.Settings.UseQAAC)
                 UpdateCacher.CheckPackage("qaac", false, false);
-            redist.UpdateInformation("redist", "Runtime Files", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\redist\_readme.txt"));
+            redist.UpdateInformation("redist", "Runtime Files", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\redist\install.cmd"));
+            redist.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\redist\remove.cmd"));
             tsmuxer.UpdateInformation("tsmuxer", "tsMuxeR", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\tsmuxer\tsmuxer.exe"));
             vsrip.UpdateInformation("vsrip", "VobSub Ripper", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\vsrip\vsrip.exe"));
             x264.UpdateInformation("x264", "x264", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x264\x264.exe"));

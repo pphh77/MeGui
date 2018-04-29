@@ -1,14 +1,18 @@
-2836 [Updater]              x64: enabled stable build server
-2835 [FileIndexer]          fixed output file selection (regression of 2834)
-2834 [OneClick]             fixed a crash when using DGIndexIM/NV with a MKV source file (regression of 2832)
-     [File Indexer]         improved High DPI support (regression of 2832)
-2833 [Video Player]         improved High DPI support
-2832 [File Indexer]         show DGIndexIM/NV only if enabled in the settings
-     [File Indexer]         enabled "select audio tracks" for DGIndexIM/NV
-2831 [Audio Encoder]        x64: improved the downmix functions for 7.1/6.1 to 5.1
-2830                        reset view settings once to properly adjust for 2829
-2829                        improved High DPI support (e.g. when changing DPI values)
-     [HD Streams Extractor] removed the custom "+ Options" column by default and added an option to show it
+2837 [Updater]              redist files are only copied if not installed
+                            added information which redist packages are installed to the log
+
+
+Changelog 2828 --> 2836
+
+Features/Changes:
+[File Indexer]         enabled "select audio tracks" for DGIndexIM/NV
+[File Indexer]         show DGIndexIM/NV only if enabled in the settings
+[HD Streams Extractor] removed the custom "+ Options" column by default and added an option to show it
+
+Enhancements/Fixes:
+                       improved High DPI support
+[Audio Encoder]        x64: improved the downmix functions for 7.1/6.1 to 5.1
+
 
 Changelog 2808 --> 2828
 
@@ -24,23 +28,6 @@ Enhancements/Fixes:
 [x264]                 added support for AVC level 6, 6.1 and 6.2 (requires x264 2851+)
 [x264]                 added support for unified 8/10 bit binaries (requires x264 2901+)
 [x265]                 added support for --tune grain
-
-
-Changelog 2774 --> 2808
-
-Features/Changes:
-[AVS Script Creator]   DirectShowSource/AVISource are disabled by default and have to be enabled in the MeGUI settings
-[File Indexer]         added MPLS support
-[OneClick]             added support for MKV attachments. If the MKV source does have such attachments, it will be copied to the target MKV. feature request #617
-[Xvid]                 added a workaround to be able to use Xvid in portable AviSynth mode
-[Update]               added a first start-up question if the updater should be enabled or disabled (message will be shown also once to existing users)
-                       if disabled no downloads will be made without confirmation. therefore e.g. no information of new updates will be available.
-
-Enhancements/Fixes:
-[AVS Script Creator]   fixed DirectShowSource/AVISource not available if the portable AviSynth is used (regression of 2761). bug #896
-[AVS Script Creator]   improved the file extension filters of the "video input" file open dialogue
-[Chapter]              fixed non-ASCII handling (regression of 2753). bug #898
-[L-SMASH Indexer]      improved detection of LSMASH/LWLibav (regression of 2767). bug #899
 
 
 Known Problems:

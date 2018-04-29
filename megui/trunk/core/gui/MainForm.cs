@@ -204,23 +204,23 @@ namespace MeGUI
         {
             get { return jobControl1; }
         }
+
         public bool ProcessStatusChecked
         {
             get { return progressMenu.Checked; }
             set { progressMenu.Checked = value; }
         }
+
         public VideoEncodingComponent Video
         {
             get { return videoEncodingComponent1; }
         }
+
         public AudioEncodingComponent Audio
         {
             get { return audioEncodingComponent1; }
         }
         #endregion
-        /// <summary>
-        /// initializes all the dropdown elements in the GUI to their default values
-        /// </summary>
 
         /// <summary>
         /// handles the GUI closing event
@@ -241,6 +241,7 @@ namespace MeGUI
             }
             base.OnClosing(e);
         }
+
         #region reset
         private void resetButton_Click(object sender, System.EventArgs e)
         {
@@ -248,6 +249,7 @@ namespace MeGUI
             audioEncodingComponent1.Reset();
         }
         #endregion
+
         #region auto encoding
         private void autoEncodeButton_Click(object sender, System.EventArgs e)
         {
@@ -267,6 +269,7 @@ namespace MeGUI
             }
         }
         #endregion
+
         #region job management
         #region I/O verification
         /// <summary>
@@ -319,6 +322,7 @@ namespace MeGUI
         }
         #endregion
         #endregion
+
         #region settings
         /// <summary>
         /// saves the global GUI settings to settings.xml
@@ -368,6 +372,7 @@ namespace MeGUI
         }
 
         #endregion
+
         #region GUI updates
 
         #region helper methods
@@ -473,6 +478,7 @@ namespace MeGUI
             }
         }
         #endregion
+
         #region menu actions
         private void mnuFileOpen_Click(object sender, EventArgs e)
         {
@@ -576,6 +582,7 @@ namespace MeGUI
         {
             get { return mediaFileFactory; }
         }
+
         #region tray action
         private void trayIcon_MouseDoubleClick(object sender, MouseEventArgs e)
         {
@@ -593,6 +600,7 @@ namespace MeGUI
         }
 
         #endregion
+
         #region file opening
         private void openOtherVideoFile(string fileName)
         {
@@ -688,6 +696,7 @@ namespace MeGUI
             new ProfileImporter(this, file, false).ShowDialog();
         }
         #endregion
+
         #region Drag 'n' Drop
         private void MeGUI_DragDrop(object sender, DragEventArgs e)
         {
@@ -714,6 +723,7 @@ namespace MeGUI
             }
         }
         #endregion
+
         #region importing
         public void importProfiles(string file, bool bAuto)
         {
@@ -784,6 +794,7 @@ namespace MeGUI
             _updateHandler.SaveSettings();
             UpdateCacher.RemoveOldFiles();
             jobControl1.saveJobs();
+            FileUtil.RemoveRuntimeFiles();
             this.saveLog();
             deleteFiles();
             this.runRestarter();
@@ -805,6 +816,7 @@ namespace MeGUI
         }
 
         #region MeGUIInfo
+
         #region start and end
         public void setGUIInfo()
         {
@@ -1182,20 +1194,24 @@ namespace MeGUI
             }
         }
         #endregion
+
         #region properties
         public PackageSystem PackageSystem
         {
             get { return packageSystem; }
         }
+
         public bool Restart
         {
             get { return restart; }
             set { restart = value; }
         }
+
         public DialogManager DialogManager
         {
             get { return dialogManager; }
         }
+
         /// <summary>
         /// gets the path from where MeGUI was launched
         /// </summary>
@@ -1204,6 +1220,7 @@ namespace MeGUI
             get { return this.path; }
         }
         #endregion
+
         #endregion
 
         internal void ClosePlayer()
@@ -1338,6 +1355,8 @@ namespace MeGUI
             string version = OSInfo.GetDotNetVersion();
             if (!String.IsNullOrEmpty(version) && !version40.Equals(version))
                 s.LogValue(".NET Framework", string.Format("{0}", version), false);
+
+            s.Add(FileUtil.GetRedistInformation());
 
             // get DPI and resolution
             using (Graphics graphics = Graphics.FromHwnd(IntPtr.Zero))

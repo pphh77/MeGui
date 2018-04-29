@@ -1,3 +1,14 @@
+2836 [Updater]              x64: enabled stable build server
+2835 [FileIndexer]          fixed output file selection (regression of 2834)
+2834 [OneClick]             fixed a crash when using DGIndexIM/NV with a MKV source file (regression of 2832)
+     [File Indexer]         improved High DPI support (regression of 2832)
+2833 [Video Player]         improved High DPI support
+2832 [File Indexer]         show DGIndexIM/NV only if enabled in the settings
+     [File Indexer]         enabled "select audio tracks" for DGIndexIM/NV
+2831 [Audio Encoder]        x64: improved the downmix functions for 7.1/6.1 to 5.1
+2830                        reset view settings once to properly adjust for 2829
+2829                        improved High DPI support (e.g. when changing DPI values)
+     [HD Streams Extractor] removed the custom "+ Options" column by default and added an option to show it
 2827                        fixed a startup crash when using Windows 10 Pro for Workstations
 2826 [File Indexer]         improved handling of Blu-ray playlists
 2825 [Jobs]                 improved handling of jobs which cannot be paused (e.g. L-SMASH Indexer)
