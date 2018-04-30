@@ -87,8 +87,9 @@ namespace MeGUI.core.util
         {
             get
             {
-                if (cuts.Count == 0) throw new Exception("Must have at least one cut");
-                return cuts[cuts.Count - 1].endFrame;
+                if (cuts.Count == 0)
+                    throw new Exception("Must have at least one cut");
+                return cuts[cuts.Count - 1].endFrame + 1;
             }
         }
 
@@ -138,7 +139,7 @@ namespace MeGUI.core.util
             {
                 ulong ans = 0;
                 foreach (CutSection c in AllCuts)
-                    ans += (ulong)(c.endFrame - c.startFrame);
+                    ans += (ulong)(c.endFrame - c.startFrame) + 1;
                 return ans;
             }
         }
