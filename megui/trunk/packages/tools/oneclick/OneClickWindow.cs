@@ -1171,8 +1171,14 @@ namespace MeGUI
 
                     // audio track will be encoded
                     string strFileName = string.Empty;
-                    if (!oStreamControl.SelectedItem.IsStandard || !dpp.Eac3toDemux)
+                    if ((!oStreamControl.SelectedItem.IsStandard || !dpp.Eac3toDemux) 
+                        && (inputContainer == ContainerType.MKV || (dpp.IndexType != FileIndexerWindow.IndexType.D2V 
+                            && dpp.IndexType != FileIndexerWindow.IndexType.DGI && dpp.IndexType != FileIndexerWindow.IndexType.DGM)))
                     {
+                        // only process if
+                        // - no DG* indexer is used or DG* indexer is used for a MKV file
+                        // - no default/included stream or not demuxed with eac3to
+
                         if (oAudioTrackInfo.HasCore && oStream.EncodingMode != AudioEncodingMode.Never)
                         {
                             if (oAudioTrackInfo.AudioCodec == AudioCodec.THDAC3)
