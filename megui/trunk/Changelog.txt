@@ -1,3 +1,4 @@
+2842 [Main]                 improved logging if a profile/setting cannot be loaded. bug #910
 2841 [OneClick]             fixed audio track processing for some file types if DG* indexer is used (e.g. VOB without IFO)
 2840 [Main]                 fixed a crash if a folder is dropped onto the main window. bug #906
 2839 [OneClick]             fixed tracks 2 to n-1 not properly selecting their input track stream (regression of 2808). bug #907

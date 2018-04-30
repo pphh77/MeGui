@@ -126,7 +126,7 @@ namespace MeGUI.core.util
                     ser.Serialize(s, o);
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 try
                 {
@@ -134,7 +134,7 @@ namespace MeGUI.core.util
                 }
                 catch (Exception) { }
                 LogItem _oLog = MainForm.Instance.Log.Info("Error");
-                _oLog.LogValue("XmlSerialize: " + path, e, ImageType.Error);
+                _oLog.LogValue("The file could not be saved: '" + path + "'", ex, ImageType.Error);
                 return false;
             }
             return true;
@@ -153,10 +153,12 @@ namespace MeGUI.core.util
                         return (T)ser.Deserialize(s);
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    MessageBox.Show("File '" + path + "' could not be loaded!\n\nIt will be moved to the backup directory.", "Error loading File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("The file could not be loaded:\n'" + path + "'\n\nIt will be moved to the backup directory:\n" + Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "backup"), "Error loading File", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     FileUtil.BackupFile(path, true);
+                    LogItem _oLog = MainForm.Instance.Log.Info("Error");
+                    _oLog.LogValue("The file could not be loaded: '" + path + "'. It will be moved to the backup directory: " + Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "backup"), ex, ImageType.Error);
                     return null;
                 }
             }
@@ -185,22 +187,21 @@ namespace MeGUI.core.util
                         return (T)ser.Deserialize(s);
                     }
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
                     if (!bSilentError)
                     {
-                        MessageBox.Show("File '" + path + "' could not be loaded!\n\nIt will be moved to the backup directory.", "Error loading File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("The file could not be loaded:\n'" + path + "'\n\nIt will be moved to the backup directory:\n" + Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "backup"), "Error loading File", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         FileUtil.BackupFile(path, true);
                     }
-                    LogItem _oLog = MainForm.Instance.Log.Info("Error");
-                    _oLog.LogValue("XmlDeserialize: " + path, e, ImageType.Error);
+                    LogItem _oLog = MainForm.Instance.Log.Add(new LogItem("Error"));
+                    _oLog.LogValue("The file could not be loaded: '" + path + "'. It will be moved to the backup directory: " + Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "backup"), ex, ImageType.Error);
                     return null;
                 }
             }
             else
                 return null;
         }
-
 
         private static readonly System.Text.RegularExpressions.Regex _cleanUpStringRegex = new System.Text.RegularExpressions.Regex(@"\n[^\n]+\r", System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.CultureInvariant);
         public static string cleanUpString(string s)

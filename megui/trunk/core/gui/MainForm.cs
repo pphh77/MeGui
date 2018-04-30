@@ -78,6 +78,7 @@ namespace MeGUI
         private LogItem _eac3toLog;
         private LogItem _avisynthWrapperLog;
         private LogItem _mediaInfoWrapperLog;
+        private LogItem _oTempLog = new LogItem("Log", ImageType.NoImage);
         public LogItem OneClickLog { get { return _oneClickLog; } set { _oneClickLog = value; } }
         public LogItem AutoEncodeLog { get { return _autoEncodeLog; } set { _autoEncodeLog = value; } }
         public LogItem AVSScriptCreatorLog { get { return _aVSScriptCreatorLog; } set { _aVSScriptCreatorLog = value; } }
@@ -156,6 +157,7 @@ namespace MeGUI
             Instance = this;
             constructMeGUIInfo();
             InitializeComponent();
+            logTree1.SetLog(_oTempLog);
             System.Reflection.Assembly myAssembly = this.GetType().Assembly;
             string name = this.GetType().Namespace + ".";
 #if CSC
@@ -338,10 +340,10 @@ namespace MeGUI
                     ser = new XmlSerializer(typeof(MeGUISettings));
                     ser.Serialize(s, this.settings);
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
                     LogItem _oLog = MainForm.Instance.Log.Info("Error");
-                    _oLog.LogValue("saveSettings", e, ImageType.Error);
+                    _oLog.LogValue("saveSettings", ex, ImageType.Error);
                 }
             }
         }
@@ -448,7 +450,7 @@ namespace MeGUI
             get
             {
                 if (logTree1 == null)
-                    return new LogItem("Log", ImageType.NoImage); ;
+                    return _oTempLog;
                 return logTree1.Log;
             }
         }

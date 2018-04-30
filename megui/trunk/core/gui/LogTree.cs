@@ -21,10 +21,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 
 using MeGUI.core.util;
@@ -33,25 +30,37 @@ namespace MeGUI.core.gui
 {
     public partial class LogTree : UserControl
     {
+        private LogItem _oLog;
+
         public LogTree()
         {
             InitializeComponent();
+
+            _oLog = new LogItem("Log", ImageType.NoImage);
 
             ImageList i = new ImageList();
             i.Images.Add(System.Drawing.SystemIcons.Error);
             i.Images.Add(System.Drawing.SystemIcons.Warning);
             i.Images.Add(System.Drawing.SystemIcons.Information);
             treeView.ImageList = i;
+        }
 
-            Log.SubItemAdded += delegate(object sender, EventArgs<LogItem> args)
+        public LogItem Log
+        {
+            get { return _oLog; }
+        }
+
+        public void SetLog(LogItem log)
+        {
+            _oLog = log;
+            foreach (LogItem oItem in _oLog.SubEvents)
+                Util.ThreadSafeRun(treeView, delegate { treeView.Nodes.Add(Register(oItem)); });
+
+            _oLog.SubItemAdded += delegate (object sender, EventArgs<LogItem> args)
             {
                 Util.ThreadSafeRun(treeView, delegate { treeView.Nodes.Add(Register(args.Data)); });
             };
         }
-
-
-        public readonly LogItem Log = new LogItem("Log", ImageType.NoImage);
-
 
         private TreeNode Register(LogItem log)
         {
@@ -97,7 +106,7 @@ namespace MeGUI.core.gui
 
         private void EditLog_Click(object sender, EventArgs e)
         {
-            Show(Log, true);
+            Show(_oLog, true);
         }
 
         private LogItem SelectedLogItem
@@ -126,7 +135,7 @@ namespace MeGUI.core.gui
 
         private void SaveLog_Click(object sender, EventArgs e)
         {
-            Save(Log);
+            Save(_oLog);
         }
 
         private void SaveBranch_Click(object sender, EventArgs e)
@@ -173,7 +182,7 @@ namespace MeGUI.core.gui
 
         private void ExpandLog_Click(object sender, EventArgs e)
         {
-            ExpandAll(Log);
+            ExpandAll(_oLog);
         }
 
         private void ExpandBranch_Click(object sender, EventArgs e)
@@ -183,7 +192,7 @@ namespace MeGUI.core.gui
 
         private void CollapseLog_Click(object sender, EventArgs e)
         {
-            CollapseAll(Log);
+            CollapseAll(_oLog);
         }
 
         private void CollapseBranch_Click(object sender, EventArgs e)
