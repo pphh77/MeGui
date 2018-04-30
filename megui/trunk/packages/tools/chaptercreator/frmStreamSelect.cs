@@ -99,7 +99,7 @@ namespace MeGUI
                 ex = new BlurayExtractor();
             else if (strFileOrInputFolder.ToLowerInvariant().EndsWith(".txt") || strFileOrInputFolder.ToLowerInvariant().EndsWith(".xml"))
                 ex = new TextExtractor();
-            else
+            else if (System.IO.File.Exists(strFileOrInputFolder))
                 ex = new MediaInfoExtractor();
 
             return ex;

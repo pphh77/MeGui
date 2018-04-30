@@ -431,8 +431,8 @@ namespace MeGUI
                         {
                             case 0:
                                 OneClickWindow ocmt = new OneClickWindow();
-                                ocmt.setInput(videoInput);
                                 ocmt.Show();
+                                ocmt.setInput(videoInput);
                                 this.Close();
                                 break;
                             case 1:

@@ -1,4 +1,5 @@
-2839 [OneClick]             fixed tracks 2 to n-1 not properly selecting their input track stream (regression of 2808)
+2840 [Main]                 fixed a crash if a folder is dropped onto the main form. bug #906
+2839 [OneClick]             fixed tracks 2 to n-1 not properly selecting their input track stream (regression of 2808). bug #907
 2838 [x264]                 do not add "--output-depth 8" for 8 bit targets. feature request #636
 2837 [Updater]              redist files are only copied if not installed
                             added information which redist packages are installed to the log

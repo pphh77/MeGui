@@ -608,13 +608,14 @@ namespace MeGUI
             asw.OpenScript += new OpenScriptCallback(Video.openVideoFile);
             asw.Show();
         }
+
         private void openIndexableFile(string fileName)
         {
             if (DialogManager.useOneClick())
             {
                 OneClickWindow ocmt = new OneClickWindow();
-                ocmt.setInput(fileName);
                 ocmt.Show();
+                ocmt.setInput(fileName);
             }
             else
             {
@@ -641,8 +642,8 @@ namespace MeGUI
             if (Directory.Exists(file))
             {
                 OneClickWindow ocmt = new OneClickWindow();
+                ocmt.Show();
                 ocmt.setInput(file);
-                ocmt.ShowDialog();
                 return false;
             }
 
