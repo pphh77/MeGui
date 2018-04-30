@@ -1,3 +1,4 @@
+2844 [OneClick]             fixed cleanup job not to fail anymore if the input file does not exist (regression of 2825). bug #913
 2843 [AVS / Audio Cutter]   fixed cut length off by one frame. bug #912
 2842 [Main]                 improved logging if a profile/setting cannot be loaded. bug #910
 2841 [OneClick]             fixed audio track processing for some file types if DG* indexer is used (e.g. VOB without IFO)

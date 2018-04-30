@@ -39,7 +39,9 @@ namespace MeGUI
 
         protected virtual void checkJobIO()
         {
-            Util.ensureExists(job.Input);
+            // only check if the input file exist if it is not a cleanup job
+            if (!(this is MeGUI.core.details.CleanupJobRunner))
+                Util.ensureExists(job.Input);
         }
 
         protected virtual void doExitConfig()
