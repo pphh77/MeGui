@@ -584,8 +584,8 @@ namespace MeGUI.core.gui
             return true;
         }
 
-        private enum ExceptionType { UserSkip, Error };
-        private class JobStartException : MeGUIException
+        public enum ExceptionType { UserSkip, Error };
+        public class JobStartException : MeGUIException
         {
             public ExceptionType type;
             public JobStartException(string reason, ExceptionType type) : base(reason) { this.type = type; }

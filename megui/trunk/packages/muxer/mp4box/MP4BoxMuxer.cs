@@ -52,15 +52,15 @@ namespace MeGUI
             trackNumber = 0;
             lastLine = "";
         }
+
         #region setup/start overrides
         protected override void checkJobIO()
         {
             this.numberOfAudioTracks = job.Settings.AudioStreams.Count;
             this.numberOfSubtitleTracks = job.Settings.SubtitleStreams.Count;
-            
+
             base.checkJobIO();
         }
-
         #endregion
 
         #region line processing
@@ -191,6 +191,7 @@ namespace MeGUI
             return isEmpty;
         }
         #endregion
+
         #region additional stuff
         /// <summary>
         /// compiles mp4 overhead statistics and dumps them to the log and a logfile
@@ -285,6 +286,7 @@ namespace MeGUI
 
                     sb.Append("\"");
                 }
+
                 int trackCount = 0;
                 foreach (object o in settings.AudioStreams)
                 {
@@ -428,6 +430,10 @@ namespace MeGUI
                         settings.MuxedOutput = Path.ChangeExtension(settings.MuxedOutput, ".m4v");
                     if (string.IsNullOrEmpty(settings.VideoInput) && !string.IsNullOrEmpty(settings.AudioStreams.ToString()))
                         settings.MuxedOutput = Path.ChangeExtension(settings.MuxedOutput, ".m4a");
+
+                    if (File.Exists(settings.MuxedOutput) && !settings.MuxedOutput.Equals(job.Output) && !MainForm.Instance.DialogManager.overwriteJobOutput(settings.MuxedOutput))
+                        throw new MeGUI.core.gui.JobWorker.JobStartException("File exists and the user doesn't want to overwrite", MeGUI.core.gui.JobWorker.ExceptionType.UserSkip);
+                    job.Output = settings.MuxedOutput;
                 }
 
                 // force to create a new output file
