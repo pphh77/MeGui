@@ -1377,10 +1377,11 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             }
 
             // TimeModification
-            if (audioJob.Settings.TimeModification == TimeModificationMode.SlowDown25To23976WithCorrection ||
+            if (!MainForm.Instance.Settings.AviSynthPlus && (
+                audioJob.Settings.TimeModification == TimeModificationMode.SlowDown25To23976WithCorrection ||
                 audioJob.Settings.TimeModification == TimeModificationMode.SlowDown25To24WithCorrection ||
                 audioJob.Settings.TimeModification == TimeModificationMode.SpeedUp23976To25WithCorrection ||
-                audioJob.Settings.TimeModification == TimeModificationMode.SpeedUp24To25WithCorrection)
+                audioJob.Settings.TimeModification == TimeModificationMode.SpeedUp24To25WithCorrection))
             {
                 string strPluginPath = Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "timestretch.dll");
                 if (File.Exists(strPluginPath))
@@ -1404,16 +1405,16 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                     script.Append("SSRC(Round((AudioRate()*25.0)/24.0)).AssumeSampleRate(AudioRate())" + Environment.NewLine);
                     break;
                 case TimeModificationMode.SpeedUp23976To25WithCorrection:
-                    script.Append((MainForm.Instance.Settings.IsMeGUIx64 ? "TimeStretch" : "TimeStretchPlugin") + "(tempo=(1001.0/9.6))" + Environment.NewLine);
+                    script.Append((MainForm.Instance.Settings.AviSynthPlus ? "TimeStretch" : "TimeStretchPlugin") + "(tempo=(1001.0/9.6))" + Environment.NewLine);
                     break;
                 case TimeModificationMode.SlowDown25To23976WithCorrection:
-                    script.Append((MainForm.Instance.Settings.IsMeGUIx64 ? "TimeStretch" : "TimeStretchPlugin") + "(tempo=(96.0/1.001))" + Environment.NewLine);
+                    script.Append((MainForm.Instance.Settings.AviSynthPlus ? "TimeStretch" : "TimeStretchPlugin") + "(tempo=(96.0/1.001))" + Environment.NewLine);
                     break;
                 case TimeModificationMode.SpeedUp24To25WithCorrection:
-                    script.Append((MainForm.Instance.Settings.IsMeGUIx64 ? "TimeStretch" : "TimeStretchPlugin") + "(tempo=(2500.0/24.0))" + Environment.NewLine);
+                    script.Append((MainForm.Instance.Settings.AviSynthPlus ? "TimeStretch" : "TimeStretchPlugin") + "(tempo=(2500.0/24.0))" + Environment.NewLine);
                     break;
                 case TimeModificationMode.SlowDown25To24WithCorrection:
-                    script.Append((MainForm.Instance.Settings.IsMeGUIx64 ? "TimeStretch" : "TimeStretchPlugin") + "(tempo=(2400.0/25.0))" + Environment.NewLine);
+                    script.Append((MainForm.Instance.Settings.AviSynthPlus ? "TimeStretch" : "TimeStretchPlugin") + "(tempo=(2400.0/25.0))" + Environment.NewLine);
                     break;
             }
 

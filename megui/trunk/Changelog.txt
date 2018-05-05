@@ -1,3 +1,4 @@
+2846 [Audio Encoder]        only use TimeStretchPlugin() if AVS+ is not used
 2845 [MP4 Muxer]            fixed missing MediaInfo of output file if the extension is m4v/m4a
                             fixed missing prompt if an existing m4v/m4a file should be overwritten
 2844 [OneClick]             fixed cleanup job not to fail anymore if the input file does not exist (regression of 2825). bug #913
