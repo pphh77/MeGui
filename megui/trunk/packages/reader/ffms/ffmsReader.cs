@@ -96,7 +96,7 @@ namespace MeGUI
                     fps = oInfo.VideoInfo.FPS;
             }
 
-            reader = AvsFile.ParseScript(VideoUtil.getFFMSVideoInputLine(this.fileName, indexFile, fps));
+            reader = AvsFile.ParseScript(VideoUtil.getFFMSVideoInputLine(this.fileName, indexFile, fps), true);
             info = reader.VideoInfo.Clone();
             if (oInfo != null)
                 info.DAR = oInfo.VideoInfo.DAR;
@@ -137,7 +137,8 @@ namespace MeGUI
 
         public void Dispose()
         {
-            reader.Dispose();
+            if (reader != null)
+                reader.Dispose();
         }
 
         #endregion

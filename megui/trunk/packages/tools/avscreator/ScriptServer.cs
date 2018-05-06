@@ -185,7 +185,8 @@ namespace MeGUI
                 case PossibleSources.lsmash:
                     MediaInfoFile oInfo = null;
                     inputLine = VideoUtil.getLSMASHVideoInputLine(input, indexFile, fps, ref oInfo);
-                    oInfo.Dispose();
+                    if (oInfo != null)
+                        oInfo.Dispose();
                     break;
                 case PossibleSources.vdr:
                 case PossibleSources.avisource:

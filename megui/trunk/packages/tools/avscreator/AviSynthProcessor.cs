@@ -79,7 +79,8 @@ namespace MeGUI
                 file.Clip.ReadFrame(zero, 0, (int)position);
                 mre.WaitOne();
             }
-            file.Dispose();
+            if (file != null)
+                file.Dispose();
         }
 
         /// <summary>
@@ -96,7 +97,7 @@ namespace MeGUI
 
             try 
             {
-                file = AvsFile.OpenScriptFile(job.Input);
+                file = AvsFile.OpenScriptFile(job.Input, true);
                 reader = file.GetVideoReader();
             }
             catch (Exception ex)

@@ -100,7 +100,7 @@ namespace MeGUI
                 this.fileName = fileName;
 
             MediaInfoFile oInfo = null;
-            reader = AvsFile.ParseScript(VideoUtil.getLSMASHVideoInputLine(this.fileName, indexFile, 0, ref oInfo));
+            reader = AvsFile.ParseScript(VideoUtil.getLSMASHVideoInputLine(this.fileName, indexFile, 0, ref oInfo), true);
             info = reader.VideoInfo.Clone();
             if (oInfo != null)
                 info.DAR = oInfo.VideoInfo.DAR;
@@ -141,7 +141,8 @@ namespace MeGUI
 
         public void Dispose()
         {
-            reader.Dispose();
+            if (reader != null)
+                reader.Dispose();
         }
 
         #endregion

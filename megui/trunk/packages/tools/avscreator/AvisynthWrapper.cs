@@ -73,25 +73,14 @@ namespace MeGUI
 		{
         }
 
-        public AviSynthClip OpenScriptFile(string filePath, AviSynthColorspace forceColorspace)
+        public AviSynthClip OpenScriptFile(string filePath, bool bRequireRGB24)
         {
-            return new AviSynthClip("Import", filePath, forceColorspace);
+            return new AviSynthClip("Import", filePath, bRequireRGB24);
         }
 
-        public AviSynthClip ParseScript(string script, AviSynthColorspace forceColorspace)
+        public AviSynthClip ParseScript(string script, bool bRequireRGB24)
         {
-            return new AviSynthClip("Eval", script, forceColorspace);
-        }
-
-
-		public AviSynthClip OpenScriptFile(string filePath)
-		{
-            return OpenScriptFile(filePath, AviSynthColorspace.RGB24);
-		}
-
-		public AviSynthClip ParseScript(string script)
-		{
-            return ParseScript(script, AviSynthColorspace.RGB24);
+            return new AviSynthClip("Eval", script, bRequireRGB24);
         }		
 
 		public void Dispose()
@@ -130,6 +119,8 @@ namespace MeGUI
 
         [DllImport("AvisynthWrapper", ExactSpelling = true, SetLastError = false, CharSet = CharSet.Ansi)]
         private static extern int dimzon_avs_init_2(ref IntPtr avs, string func, string arg, ref AVSDLLVideoInfo vi, ref AviSynthColorspace originalColorspace, ref AudioSampleType originalSampleType, string cs);
+        [DllImport("AvisynthWrapper", ExactSpelling = true, SetLastError = false, CharSet = CharSet.Ansi)]
+        private static extern int dimzon_avs_init_3(ref IntPtr avs, string func, string arg, ref AVSDLLVideoInfo vi, ref AviSynthColorspace originalColorspace, ref AudioSampleType originalSampleType, string cs);
         [DllImport("AvisynthWrapper", ExactSpelling = true, SetLastError = false, CharSet = CharSet.Ansi)]
         private static extern int dimzon_avs_destroy(ref IntPtr avs);
         [DllImport("AvisynthWrapper", ExactSpelling = true, SetLastError = false, CharSet = CharSet.Ansi)]
@@ -255,7 +246,15 @@ namespace MeGUI
         {
             const int errlen = 1024;
             StringBuilder sb = new StringBuilder(errlen);
-            sb.Length = dimzon_avs_getlasterror(_avs, sb, errlen);
+            try
+            {
+                if (_avs != IntPtr.Zero)
+                    sb.Length = dimzon_avs_getlasterror(_avs, sb, errlen);
+            }
+            catch (Exception ex)
+            {
+                sb.AppendLine(ex.Message);
+            }
             return sb.ToString();
         }
 
@@ -523,13 +522,14 @@ namespace MeGUI
             return iStartResult;
         }
 
-        public AviSynthClip(string func, string arg , AviSynthColorspace forceColorspace)
+        public AviSynthClip(string func, string arg, bool bRequireRGB24)
 		{
 			_vi = new AVSDLLVideoInfo();
             _avs = IntPtr.Zero;
             _colorSpace = AviSynthColorspace.Unknown;
             _sampleType = AudioSampleType.Unknown;
             bool bOpenSuccess = false;
+            string strErrorMessage = string.Empty;
 
             lock (_locker)
             {
@@ -539,12 +539,28 @@ namespace MeGUI
                 if (MainForm.Instance.Settings.ShowDebugInformation)
                     HandleAviSynthWrapperDLL(false, arg);
 
-
                 Thread t = new Thread(new ThreadStart(delegate
                 {
                     System.Windows.Forms.Application.UseWaitCursor = true;
-                    if (0 == dimzon_avs_init_2(ref _avs, func, arg, ref _vi, ref _colorSpace, ref _sampleType, forceColorspace.ToString()))
-                        bOpenSuccess = true;
+                    try
+                    {
+                        if (MainForm.Instance.Settings.AviSynthPlus)
+                        {
+                            if (0 == dimzon_avs_init_3(ref _avs, func, arg, ref _vi, ref _colorSpace, ref _sampleType,
+                                bRequireRGB24 ? AviSynthColorspace.RGB24.ToString() : AviSynthColorspace.Unknown.ToString()))
+                                bOpenSuccess = true;
+                        }
+                        if (!bOpenSuccess)
+                        {
+                            // fallback to the old function
+                            if (0 == dimzon_avs_init_2(ref _avs, func, arg, ref _vi, ref _colorSpace, ref _sampleType, AviSynthColorspace.RGB24.ToString()))
+                                bOpenSuccess = true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        strErrorMessage = ex.Message;
+                    }
                     System.Windows.Forms.Application.UseWaitCursor = false;
                 }));
                 t.Start();
@@ -558,7 +574,11 @@ namespace MeGUI
 
             if (bOpenSuccess == false)
             {
-                string err = getLastError();
+                string err = string.Empty;
+                if (_avs != IntPtr.Zero)
+                    err = getLastError();
+                else
+                    err = strErrorMessage;
                 Dispose(false);
                 throw new AviSynthException(err);
             }

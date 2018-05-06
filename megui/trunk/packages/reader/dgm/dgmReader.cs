@@ -82,7 +82,7 @@ namespace MeGUI
             string strScript = "";
             string strPath = Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexIM.Path);
             strScript = "LoadPlugin(\"" + Path.Combine(strPath, "DGDecodeIM.dll") + "\")\r\nDGSourceIM(\"" + this.fileName + "\", silent=true)";
-            reader = AvsFile.ParseScript(strScript);
+            reader = AvsFile.ParseScript(strScript, true);
 
             this.readFileProperties();
         }
@@ -169,7 +169,8 @@ namespace MeGUI
 
         public void Dispose()
         {
-            reader.Dispose();
+            if (reader != null)
+                reader.Dispose();
         }
 
         #endregion

@@ -151,7 +151,7 @@ namespace MeGUI
         {
             try
             {
-                using (AvsFile af = AvsFile.ParseScript(scriptBlock))
+                using (AvsFile af = AvsFile.ParseScript(scriptBlock, true))
                 {
                     int i = 0;
                     int frameCount = (int)af.VideoInfo.FrameCount;

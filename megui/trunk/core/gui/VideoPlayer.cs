@@ -131,7 +131,7 @@ namespace MeGUI
             {
                 if (inlineAvs)
                 {
-                    file = AvsFile.ParseScript(path);
+                    file = AvsFile.ParseScript(path, true);
                     btnReloadVideo.Enabled = false;
                 }
                 else
@@ -203,7 +203,7 @@ namespace MeGUI
             {
                 if (bInlineAVS)
                 {
-                    file = AvsFile.ParseScript(strFileName);
+                    file = AvsFile.ParseScript(strFileName, true);
                 }
                 else
                 {

@@ -1,3 +1,5 @@
+2848                        scripts with high bit depth are converted to 8 bit when processed internally (e.g. for VideoPlayer)
+2847 [AviSynth Wrapper]     added high bit depth support
 2846 [Audio Encoder]        only use TimeStretchPlugin() if AVS+ is not used
 2845 [MP4 Muxer]            fixed missing MediaInfo of output file if the extension is m4v/m4a
                             fixed missing prompt if an existing m4v/m4a file should be overwritten
@@ -41,8 +43,9 @@ Enhancements/Fixes:
 
 
 Known Problems:
-- Windows Vista and older is not supported
+- Windows Vista and older are not supported
 - Unicode is not supported
+- high bit depth is only partially supported
 - M2TS bitrate calculator does not calculate correct values as the specifications are unknown
 
 Full changelog: 

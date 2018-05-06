@@ -87,7 +87,7 @@ namespace MeGUI
 			this.fileName = fileName;
             string strPath = Path.GetDirectoryName(MainForm.Instance.Settings.DGIndex.Path);
             string strDLL = Path.Combine(strPath, "DGDecode.dll");
-            reader = AvsFile.ParseScript("LoadPlugin(\"" + strDLL + "\")\r\nDGDecode_Mpeg2Source(\"" + this.fileName + "\")");
+            reader = AvsFile.ParseScript("LoadPlugin(\"" + strDLL + "\")\r\nDGDecode_Mpeg2Source(\"" + this.fileName + "\")", true);
             this.readFileProperties();
         }
 
@@ -180,7 +180,8 @@ namespace MeGUI
         #region IDisposable Members
         public void Dispose()
         {
-            reader.Dispose();
+            if (reader != null)
+                reader.Dispose();
         }
         #endregion
     }

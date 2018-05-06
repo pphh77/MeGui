@@ -535,12 +535,12 @@ namespace MeGUI
             else if (job.PostprocessingProperties.IndexType == FileIndexerWindow.IndexType.AVISOURCE)
             {
                 string tempAvs = "AVISource(\"" + inputFile + "\", audio=false)" + VideoUtil.getAssumeFPS(0, inputFile);
-                iMediaFile = AvsFile.ParseScript(tempAvs);
+                iMediaFile = AvsFile.ParseScript(tempAvs, true);
                 oPossibleSource = PossibleSources.avisource;
             }
             else
             {
-                iMediaFile = AvsFile.OpenScriptFile(inputFile);
+                iMediaFile = AvsFile.OpenScriptFile(inputFile, true);
                 oPossibleSource = PossibleSources.avs;
             }
             reader = iMediaFile.GetVideoReader();

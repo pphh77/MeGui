@@ -68,7 +68,8 @@ namespace MeGUI
                 StringBuilder strAVSScript = new StringBuilder();
                 MediaInfoFile oInfo = null;
                 strAVSScript.Append(VideoUtil.getLSMASHVideoInputLine(job.Input, job.Input + ".lwi", 0, ref oInfo));
-                oInfo.Dispose();
+                if (oInfo != null)
+                    oInfo.Dispose();
                 base.log.LogValue("AviSynth script", strAVSScript.ToString(), ImageType.Information);
 
                 // check if the script has a video track, also this call will create the index file if there is one

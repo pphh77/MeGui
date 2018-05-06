@@ -33,7 +33,7 @@ namespace MeGUI
 
         public IMediaFile Open(string file)
         {
-            return AvsFile.OpenScriptFile(file);
+            return AvsFile.OpenScriptFile(file, true);
         }
 
         #endregion
@@ -76,20 +76,30 @@ namespace MeGUI
 
         public static AvsFile OpenScriptFile(string fileName)
         {
-            return new AvsFile(fileName, false);
+            return new AvsFile(fileName, false, false);
         }
 
         public static AvsFile ParseScript(string scriptBody)
         {
-            return new AvsFile(scriptBody, true);
+            return new AvsFile(scriptBody, true, false);
         }
 
-        private AvsFile(string script, bool parse)
+        public static AvsFile OpenScriptFile(string fileName, bool bRequireRGB24)
+        {
+            return new AvsFile(fileName, false, bRequireRGB24);
+        }
+
+        public static AvsFile ParseScript(string scriptBody, bool bRequireRGB24)
+        {
+            return new AvsFile(scriptBody, true, bRequireRGB24);
+        }
+
+        private AvsFile(string script, bool parse, bool bRequireRGB24)
         {
             try
             {
                 this.enviroment = new AviSynthScriptEnvironment();
-                this.clip = parse ? enviroment.ParseScript(script, AviSynthColorspace.RGB24) : enviroment.OpenScriptFile(script, AviSynthColorspace.RGB24);
+                this.clip = parse ? enviroment.ParseScript(script, bRequireRGB24) : enviroment.OpenScriptFile(script, bRequireRGB24);
 
                 checked
                 {

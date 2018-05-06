@@ -88,7 +88,7 @@ namespace MeGUI
             else
                 strScript += ",fieldop=0)";
 
-            reader = AvsFile.ParseScript(strScript);
+            reader = AvsFile.ParseScript(strScript, true);
 
             this.readFileProperties();
         }
@@ -175,7 +175,8 @@ namespace MeGUI
 
         public void Dispose()
         {
-            reader.Dispose();
+            if (reader != null)
+                reader.Dispose();
         }
 
         #endregion
