@@ -53,6 +53,7 @@ typedef struct tagSafeStruct
 extern "C" {
 	__declspec(dllexport) int __stdcall dimzon_avs_init(SafeStruct** ppstr, char *func, char *arg, AVSDLLVideoInfo *vi, int* originalPixelType, int* originalSampleType, char *cs);
 	__declspec(dllexport) int __stdcall dimzon_avs_init_2(SafeStruct** ppstr, char *func, char *arg, AVSDLLVideoInfo *vi, int* originalPixelType, int* originalSampleType, char *cs);
+	__declspec(dllexport) int __stdcall dimzon_avs_init_3(SafeStruct** ppstr, char *func, char *arg, AVSDLLVideoInfo *vi, int* originalPixelType, int* originalSampleType, char *cs);
 	__declspec(dllexport) int __stdcall dimzon_avs_destroy(SafeStruct** ppstr);
 	__declspec(dllexport) int __stdcall dimzon_avs_getlasterror(SafeStruct* pstr, char *str, int len);
 	__declspec(dllexport) int __stdcall dimzon_avs_getvframe(SafeStruct* pstr, void *buf, int stride, int frm);
@@ -542,7 +543,6 @@ int __stdcall dimzon_avs_init_2(SafeStruct** ppstr, char *func, char *arg, AVSDL
 					return 5;
 				}
 			}
-
 		}
 
 		inf = pstr->clp->GetVideoInfo();
@@ -578,6 +578,117 @@ int __stdcall dimzon_avs_init_2(SafeStruct** ppstr, char *func, char *arg, AVSDL
 	catch (...)
 	{
 		strncpy_s(pstr->err, ERRMSG_LEN, "Unhandled error: dimzon_avs_init_2", _TRUNCATE);
+		return 999;
+	}
+}
+
+// same as dimzon_avs_init_2(), but with a convert to 8 bit if needed (avs+ only)
+int __stdcall dimzon_avs_init_3(SafeStruct** ppstr, char *func, char *arg, AVSDLLVideoInfo *vi, int* originalPixelType, int* originalSampleType, char *cs)
+{
+	SafeStruct* pstr = ((SafeStruct*)malloc(sizeof(SafeStruct)));
+
+	try
+	{
+		*ppstr = pstr;
+		memset(pstr, 0, sizeof(SafeStruct));
+
+		pstr->dll = LoadLibrary("avisynth.dll");
+		if (!pstr->dll)
+		{
+			strncpy_s(pstr->err, ERRMSG_LEN, "Avisynth installation cannot be found", _TRUNCATE);
+			return 1;
+		}
+
+		IScriptEnvironment* (*CreateScriptEnvironment)(int version) = (IScriptEnvironment*(*)(int)) GetProcAddress(pstr->dll, "CreateScriptEnvironment");
+		if (!CreateScriptEnvironment)
+		{
+			strncpy_s(pstr->err, ERRMSG_LEN, "Cannot load CreateScriptEnvironment", _TRUNCATE);
+			return 2;
+		}
+
+		pstr->env = CreateScriptEnvironment(AVISYNTH_INTERFACE_VERSION);
+		if (pstr->env == NULL)
+		{
+#if AVISYNTH_INTERFACE_BUILD_VERSION > 4
+			strncpy_s(pstr->err, ERRMSG_LEN, "Avisynth 2.6 required", _TRUNCATE);
+#else
+			strncpy_s(pstr->err, ERRMSG_LEN, "Avisynth 2.5 required", _TRUNCATE);
+#endif
+			return 3;
+		}
+
+#if AVISYNTH_INTERFACE_BUILD_VERSION > 4
+		AVS_linkage = pstr->env->GetAVSLinkage(); // AviSynth 2.6 only
+#endif
+
+		AVSValue arg(arg);
+		AVSValue res = pstr->env->Invoke(func, AVSValue(&arg, 1));
+		if (!res.IsClip())
+		{
+			strncpy_s(pstr->err, ERRMSG_LEN, "The script's return was not a video clip.", _TRUNCATE);
+			return 4;
+		}
+
+		pstr->clp = res.AsClip();
+		VideoInfo inf = pstr->clp->GetVideoInfo();
+		VideoInfo infh = pstr->clp->GetVideoInfo();
+
+		if (inf.HasVideo())
+		{
+			*originalPixelType = inf.pixel_type;
+
+			// convert video only if RGB24 is required
+			if (strcmp("RGB24", cs) == 0 && (!inf.IsRGB24()))
+			{
+				// make sure that the clip is 8 bit
+				AVSValue args[2] = { res.AsClip(), 8 };
+				res = pstr->env->Invoke("ConvertBits", AVSValue(args, 2));
+
+				// convert to RGB24
+				res = pstr->env->Invoke("ConvertToRGB24", res);
+				pstr->clp = res.AsClip();
+				infh = pstr->clp->GetVideoInfo();
+				if (!infh.IsRGB24())
+				{
+					strncpy_s(pstr->err, ERRMSG_LEN, "Cannot convert video to RGB24", _TRUNCATE);
+					return	5;
+				}
+			}
+		}
+
+		inf = pstr->clp->GetVideoInfo();
+		if (vi != NULL)
+		{
+			vi->width = inf.width;
+			vi->height = inf.height;
+			vi->raten = inf.fps_numerator;
+			vi->rated = inf.fps_denominator;
+			vi->aspectn = 0;
+			vi->aspectd = 1;
+			vi->interlaced_frame = 0;
+			vi->top_field_first = 0;
+			vi->num_frames = inf.num_frames;
+			vi->pixel_type = inf.pixel_type;
+
+			vi->audio_samples_per_second = inf.audio_samples_per_second;
+			vi->num_audio_samples = inf.num_audio_samples;
+			vi->sample_type = inf.sample_type;
+			vi->nchannels = inf.nchannels;
+		}
+
+		pstr->res = new AVSValue(res);
+
+		pstr->err[0] = 0;
+		return 0;
+	}
+	catch (AvisynthError err)
+	{
+		strncpy_s(pstr->err, ERRMSG_LEN, err.msg, _TRUNCATE);
+		return 999;
+	}
+	catch (...)
+	{
+		strncpy_s(pstr->err, ERRMSG_LEN, "Unhandled error: dimzon_avs_init_3", _TRUNCATE);
 		return 999;
 	}
 }
