@@ -1,3 +1,4 @@
+2849                        scripts with high bit depth are converted to 8 bit when processed internally (e.g. for VideoPlayer). part II
 2848                        scripts with high bit depth are converted to 8 bit when processed internally (e.g. for VideoPlayer)
 2847 [AviSynth Wrapper]     added high bit depth support
 2846 [Audio Encoder]        only use TimeStretchPlugin() if AVS+ is not used

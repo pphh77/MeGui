@@ -73,6 +73,16 @@ namespace MeGUI
 		{
         }
 
+        public AviSynthClip OpenScriptFile(string filePath)
+        {
+            return new AviSynthClip("Import", filePath, false);
+        }
+
+        public AviSynthClip ParseScript(string script)
+        {
+            return new AviSynthClip("Eval", script, false);
+        }
+
         public AviSynthClip OpenScriptFile(string filePath, bool bRequireRGB24)
         {
             return new AviSynthClip("Import", filePath, bRequireRGB24);
@@ -81,9 +91,9 @@ namespace MeGUI
         public AviSynthClip ParseScript(string script, bool bRequireRGB24)
         {
             return new AviSynthClip("Eval", script, bRequireRGB24);
-        }		
+        }
 
-		public void Dispose()
+        public void Dispose()
 		{
 
 		}
