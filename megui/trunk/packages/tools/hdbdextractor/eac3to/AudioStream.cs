@@ -153,6 +153,7 @@ namespace eac3to
                 case "DTS HI-RES":
                     audioStream.AudioType = AudioStreamType.DTS;
                     break;
+                case "EAC3":
                 case "E-AC3":
                 case "E-AC3 EX":
                 case "E-AC3 SURROUND":

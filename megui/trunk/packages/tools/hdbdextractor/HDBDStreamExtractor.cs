@@ -594,6 +594,7 @@ namespace MeGUI.packages.tools.hdbdextractor
 
         private void toolStripMenuItem6_Click(object sender, EventArgs e)
         {
+            MainForm.Instance.Settings.Eac3toEnableCustomOptions = toolStripMenuItem6.Checked;
             StreamDataGridView.Columns["StreamAddOptionsTextBox"].Visible = toolStripMenuItem6.Checked;
         }
     }

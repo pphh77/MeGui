@@ -1,3 +1,5 @@
+2850 [HD Streams Extractor] added support for EAC3 in files
+                            "Custom Options" setting will be saved
 2849                        scripts with high bit depth are converted to 8 bit when processed internally (e.g. for VideoPlayer). part II
 2848                        scripts with high bit depth are converted to 8 bit when processed internally (e.g. for VideoPlayer)
 2847 [AviSynth Wrapper]     added high bit depth support
