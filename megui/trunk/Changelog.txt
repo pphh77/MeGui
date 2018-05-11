@@ -1,3 +1,12 @@
+2851 [Chapter Creator]      added fps selector for the input source
+                            changing the input fps changes the time codes if the input fps is not known (e.g. as with TXT/XML)
+                            the output fps value is used during saving for all output types
+                            new chapters are sorted based on time codes
+                            double click on a chapter jumps to the positions if the preview pane is open
+                            preview button asks for an AVS file
+                            added option to use an automated counter for chapters (enabled by default)
+                            if the "Start Time" value is in a wrong format the text color is changed to red
+                            the Chapter Creator window stays on top of the video preview window 
 2850 [HD Streams Extractor] added support for EAC3 in files
                             "Custom Options" setting will be saved
 2849                        scripts with high bit depth are converted to 8 bit when processed internally (e.g. for VideoPlayer). part II

@@ -451,11 +451,11 @@ namespace MeGUI.core.util
         /// <param name="timeCode">position in the movie in milliseconds</param>
         /// <param name="framerate">framerate of the movie</param>
         /// <returns>the frame corresponding to the timecode</returns>
-        public static int convertTimecodeToFrameNumber(double timeCode, double framerate)
+        public static int ConvertTimecodeToFrameNumber(TimeSpan timeSpan, double framerate)
         {
             double millisecondsPerFrame = (double)(1000 / framerate);
-            double frameNumber = (double)timeCode / millisecondsPerFrame;
-            return (int)frameNumber;
+            double frameNumber = timeSpan.TotalMilliseconds / millisecondsPerFrame;
+            return (int)Math.Round(frameNumber, 0);
         }
 
         /// <summary>

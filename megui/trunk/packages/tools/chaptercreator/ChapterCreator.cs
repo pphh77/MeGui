@@ -35,25 +35,21 @@ namespace MeGUI
 	/// </summary>
 	public partial class ChapterCreator : Form
 	{
-
-		private Chapter[] chapters;
 		private string videoInput;
 		private VideoPlayer player;
 		private int introEndFrame = 0, creditsStartFrame = 0;
-        private MainForm mainForm;
         private ChapterInfo pgc;
         private int intIndex;
-        private bool bFPSKnown;
 
 		#region start / stop
-		public ChapterCreator(MainForm mainForm)
+		public ChapterCreator()
 		{
 			InitializeComponent();
             intIndex = 0;
-			chapters = new Chapter[0];
-            this.mainForm = mainForm;
             pgc = new ChapterInfo();
-		}
+            pgc.FramesPerSecond = 23.976;
+            chkCounter.Checked = MainForm.Instance.Settings.ChapterCreatorCounter;
+        }
 
         private void ChapterCreator_Load(object sender, EventArgs e)
         {
@@ -68,60 +64,104 @@ namespace MeGUI
             base.OnClosing(e);
         }
 		#endregion
+
 		#region helper methods
-        private void FreshChapterView()
+        /// <summary>
+        /// Recreates the chapter view
+        /// </summary>
+        private void ResetChapterView()
         {
             this.Cursor = Cursors.WaitCursor;
             try
             {
                 this.chapterListView.Items.Clear();
+                
                 //fill list
                 foreach (Chapter c in pgc.Chapters)
                 {
-                    ListViewItem item = new ListViewItem(new string[] { c.Time.ToString(), c.Name });
+                    string strTime = GetStringFromTimeSpan(c.Time);
+                    ListViewItem item = new ListViewItem(new string[] { strTime, c.Name });
                     chapterListView.Items.Add(item);
                     if (item.Index % 2 != 0)
                         item.BackColor = Color.White;
                     else
-                        item.BackColor = Color.FromArgb(255, 225, 235, 255);
+                        item.BackColor = Color.FromArgb(255, 245, 245, 245);
                 }
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
-            finally { this.Cursor = Cursors.Default; }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            this.Cursor = Cursors.Default;
         }
 
-        private void updateTimeLine()
+        /// <summary>
+        /// Gets the string of a time span
+        /// </summary>
+        /// <param name="ts">the TimeSpan to convert</param>
+        /// <returns>the result string</returns>
+        private string GetStringFromTimeSpan(TimeSpan ts)
         {
-            for (int i = 0; i < chapterListView.Items.Count; i++)
-            {
-                if (chapterListView.Items[i].SubItems[0].Text.Length == 8)
-                    chapterListView.Items[i].SubItems[0].Text = chapterListView.Items[i].SubItems[0].Text + ".000";
-                else
-                    chapterListView.Items[i].SubItems[0].Text = chapterListView.Items[i].SubItems[0].Text.Substring(0, 12);
-            }
+            string strTime = ts.ToString();
+            if (ts.Milliseconds == 0)
+                strTime = strTime + ".000";
+            else if (strTime.Length > 12)
+                strTime = strTime.Substring(0, 12);
+            return strTime;
+        }
+
+        /// <summary>
+        /// Gets the time span from a string
+        /// </summary>
+        /// <param name="strTime">the string to convert</param>
+        /// <param name="ts">the output time span</param>
+        /// <returns>true if the value can be converted</returns>
+        private bool GetTimeSpanFromString(string strTime, out TimeSpan ts)
+        {
+            if (!TimeSpan.TryParse(strTime, out ts))
+                return false;
+
+            if (ts.Days > 0)
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Gets the chapter name (with automatic counter if enabled)
+        /// </summary>
+        /// <param name="iIndex"></param>
+        /// <returns>the chapter name</returns>
+        private string GetChapterName(int iIndex)
+        {
+            string strChapterName = chapterName.Text;
+            if (chkCounter.Checked)
+                strChapterName = strChapterName + " " + (iIndex + 1).ToString("00");
+            return strChapterName;
         }
 		#endregion
+
 		#region buttons
 		private void removeZoneButton_Click(object sender, System.EventArgs e)
 		{
-            if (chapterListView.Items.Count < 1 || pgc.Chapters.Count < 1)
+            if (chapterListView.Items.Count < 1 || pgc.Chapters.Count < 1 || chapterListView.SelectedIndices.Count == 0)
                 return;
-            if (chapterListView.SelectedIndices.Count == 0)
-                return;
+
             intIndex = chapterListView.SelectedIndices[0];
             pgc.Chapters.Remove(pgc.Chapters[intIndex]);
             if (intIndex != 0)
                 intIndex--;
-            FreshChapterView();
-            updateTimeLine();
+
+            ResetChapterView();
 		}
 
 		private void clearZonesButton_Click(object sender, System.EventArgs e)
 		{
             pgc.Chapters.Clear();
-            FreshChapterView();
             intIndex = 0;
-		}
+
+            ResetChapterView();
+        }
 
 		private void chapterListView_SelectedIndexChanged(object sender, System.EventArgs e)
 		{
@@ -129,15 +169,19 @@ namespace MeGUI
                 return;
 
             chapterName.TextChanged -= new System.EventHandler(this.chapterName_TextChanged);
-            startTime.TextChanged -= new System.EventHandler(this.chapterName_TextChanged);            
-            ListView lv = (ListView)sender;
+            startTime.TextChanged -= new System.EventHandler(this.chapterName_TextChanged);
 
+            ListView lv = (ListView)sender;
             if (lv.SelectedItems.Count == 1)
                 intIndex = lv.SelectedItems[0].Index;
+
             if (pgc.HasChapters)
             {
                 this.startTime.Text = FileUtil.ToShortString(pgc.Chapters[intIndex].Time);
-                this.chapterName.Text = pgc.Chapters[intIndex].Name;
+                string strChapterName = pgc.Chapters[intIndex].Name;
+                if (chkCounter.Checked && FileUtil.RegExMatch(strChapterName, @" \d{2}$", false))
+                    strChapterName = strChapterName.Substring(0, strChapterName.Length - 3);
+                this.chapterName.Text = strChapterName;
             }
 
             chapterName.TextChanged += new System.EventHandler(this.chapterName_TextChanged);
@@ -146,31 +190,37 @@ namespace MeGUI
 
 		private void addZoneButton_Click(object sender, System.EventArgs e)
 		{
-            Chapter c;
-            if (chapterListView.Items.Count != 0)
-                intIndex = chapterListView.Items.Count;
-            else
-                intIndex = 0;
             TimeSpan ts = new TimeSpan(0);
-            try
-            {//try to get a valid time input					
-                 ts = TimeSpan.Parse(startTime.Text);
-            }
-            catch (Exception parse)
-            { //invalid time input
+            if (!GetTimeSpanFromString(startTime.Text, out ts))
+            { 
+                // invalid time input
                 startTime.Focus();
                 startTime.SelectAll();
-                MessageBox.Show("Cannot parse the timecode you have entered.\nIt must be given in the hh:mm:ss.ccc format"
-                                + Environment.NewLine + parse.Message, "Incorrect timecode", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                MessageBox.Show("Cannot parse the timecode you have entered.\nIt must be given in the hh:mm:ss.ccc format", 
+                                    "Incorrect timecode", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 return;
             }
-            //create a new chapter
-            c = new Chapter() { Time = ts, Name = chapterName.Text };
+            GetStringFromTimeSpan(ts);
+
+            intIndex = 0;
+            foreach (Chapter oChapter in pgc.Chapters)
+            {
+                if (oChapter.Time == ts)
+                    return;
+                else if (oChapter.Time > ts)
+                    break;
+                else
+                    intIndex++;
+            }
+
+            // create a new chapter
+            Chapter c = new Chapter() { Time = ts, Name = GetChapterName(intIndex) };
             pgc.Chapters.Insert(intIndex, c);
-            FreshChapterView();
-            updateTimeLine();
+
+            ResetChapterView();
 		}
 		#endregion
+
 		#region saving files
 		private void saveButton_Click(object sender, System.EventArgs e)
 		{
@@ -180,12 +230,11 @@ namespace MeGUI
                 return;
             }
 
-            if (!bFPSKnown && !rbTXT.Checked)
+            if (fpsChooserIn.Enabled && rbQPF.Checked)
             {
-                if (MessageBox.Show("The FPS value for the input file is unknown. Please make sure that the correct value is selected.\nCurrently " +
-                    fpsChooser.Value + " will be applied.\n\nDo you want to continue?", "FPS unknown", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                if (MessageBox.Show("The FPS value for the input file is unknown. Please make sure that the correct value for the input is selected.\nCurrently " +
+                    fpsChooserIn.Value + " will be applied.\n\nDo you want to continue?", "FPS unknown", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
                     return;
-                bFPSKnown = true;
             }
 
             if (!Directory.Exists(Path.GetDirectoryName(output.Text)))
@@ -195,27 +244,29 @@ namespace MeGUI
                     return;
             }
 
-            if (FileUtil.IsDirWriteable(Path.GetDirectoryName(output.Text)))
+            if (!FileUtil.IsDirWriteable(Path.GetDirectoryName(output.Text)))
             {
-                pgc.FramesPerSecond = (double)fpsChooser.Value;
-                if (rbQPF.Checked)
-                    pgc.SaveQpfile(output.Text);
-                else if (rbXML.Checked)
-                    pgc.SaveXml(output.Text);
-                else
-                    pgc.SaveText(output.Text);
-                if (this.closeOnQueue.Checked)
-                    this.Close();
-            }
-            else
                 MessageBox.Show("MeGUI cannot write to the path " + Path.GetDirectoryName(output.Text) + "\n" +
-            "Please select another output path to save your file.", "Configuration Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-		}
+                                    "Please select another output path to save your file.", "Configuration Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            double fps = pgc.FramesPerSecond;
+            pgc.ChangeFps((double)fpsChooserOut.Value);
+            if (rbQPF.Checked)
+                pgc.SaveQpfile(output.Text);
+            else if (rbXML.Checked)
+                pgc.SaveXml(output.Text);
+            else
+                pgc.SaveText(output.Text);
+            pgc.ChangeFps(fps);
+
+            if (this.closeOnQueue.Checked)
+                this.Close();
+        }
 
         private void btOutput_Click(object sender, EventArgs e)
         {
-            saveFileDialog.DefaultExt = "txt";
-            saveFileDialog.Filter = "Chapter Files (*.txt)|*.txt";
             if (rbXML.Checked)
             {
                 saveFileDialog.DefaultExt = "xml";
@@ -225,6 +276,11 @@ namespace MeGUI
             {
                 saveFileDialog.DefaultExt = "qpf";
                 saveFileDialog.Filter = "x264 qp Files (*.qpf)|*.qpf";
+            }
+            else
+            {
+                saveFileDialog.DefaultExt = "txt";
+                saveFileDialog.Filter = "Chapter Files (*.txt)|*.txt";
             }
             saveFileDialog.FilterIndex = 1;
             saveFileDialog.FileName = output.Text;
@@ -238,14 +294,13 @@ namespace MeGUI
                     output.Text = saveFileDialog.FileName;
             }
         }
-
 		#endregion
 
         private void btInput_Click(object sender, EventArgs e)
         {
             if (rbFromFile.Checked)
             {
-                openFileDialog.Filter = "IFO files (*.ifo)|*.ifo|Container files (*.mkv,*.mp4)|*.mkv;*.mp4|MPLS files (*.mpls)|*.mpls|Chapter files (*.txt,*.xml)|*.txt;*.xml|All supported files (*.ifo,*.mkv,*.mp4, *.mpls,*.txt,*.xml)|*.ifo;*.mkv;*.mp4;*.mpls;*.txt;*.xml";
+                openFileDialog.Filter = "IFO files (*.ifo)|*.ifo|Container files (*.mkv,*.mp4)|*.mkv;*.mp4|MPLS files (*.mpls)|*.mpls|Chapter files (*.txt,*.xml)|*.txt;*.xml|All supported files (*.ifo,*.mkv,*.mp4,*.mpls,*.txt,*.xml)|*.ifo;*.mkv;*.mp4;*.mpls;*.txt;*.xml";
                 openFileDialog.FilterIndex = 5;
 
                 if (this.openFileDialog.ShowDialog() != DialogResult.OK)
@@ -282,32 +337,28 @@ namespace MeGUI
                     return;
 
                 pgc = frm.SelectedSingleChapterInfo;
-                if (pgc.FramesPerSecond == 0 && File.Exists(input.Text))
-                {
-                    MediaInfoFile oInfo = new MediaInfoFile(input.Text);
-                    pgc.FramesPerSecond = oInfo.VideoInfo.FPS;
-                }
             }
 
-            FreshChapterView();
-            updateTimeLine();
+            bNoUpdates = true;
+            if (pgc.FramesPerSecond > 0)
+            {
+                fpsChooserIn.Value = fpsChooserOut.Value = (decimal)pgc.FramesPerSecond;
+                fpsChooserIn.Enabled = false;
+            }
+            else
+            {
+                fpsChooserIn.Value = fpsChooserOut.Value = (decimal)23.976;
+                pgc.FramesPerSecond = (double)23.976;
+                fpsChooserIn.Enabled = true;
+            }
+            bNoUpdates = false;
+
+            ResetChapterView();
 
             chaptersGroupbox.Text = " Chapters ";
             if (chapterListView.Items.Count != 0)
                 chapterListView.Items[0].Selected = true;
-            else
-                return;
 
-            if (pgc.FramesPerSecond > 0)
-            {
-                fpsChooser.Value = (decimal)pgc.FramesPerSecond;
-                bFPSKnown = true;
-            }
-            else
-                bFPSKnown = false;
-
-            string path = FileUtil.GetOutputFolder(input.Text);
-            string filePrefix = FileUtil.GetOutputFilePrefix(input.Text);
             string fileName = Path.GetFileNameWithoutExtension(input.Text);
             if (this.pgc.PGCNumber > 0)
             {
@@ -320,62 +371,95 @@ namespace MeGUI
                 }
             }
 
-            fileName = filePrefix + fileName + " - Chapter Information.txt";
+            fileName = FileUtil.GetOutputFilePrefix(input.Text) + fileName + " - Chapter Information.txt";
             if (rbXML.Checked)
                 fileName = Path.ChangeExtension(fileName, "xml");
             else if (rbQPF.Checked)
                 fileName = Path.ChangeExtension(fileName, "qpf");
 
-            output.Text = Path.Combine(path, fileName);
+            output.Text = Path.Combine(FileUtil.GetOutputFolder(input.Text), fileName);
         }
 
-		private void showVideoButton_Click(object sender, System.EventArgs e)
-		{
-			if (!this.videoInput.Equals(""))
-			{
-				if (player == null)
-				{
-					player = new VideoPlayer();
-					bool videoLoaded = player.loadVideo(mainForm, videoInput, PREVIEWTYPE.CHAPTERS, false);
-					if (videoLoaded)
-					{
-						player.Closed += new EventHandler(player_Closed);
-						player.ChapterSet += new ChapterSetCallback(player_ChapterSet);
-						if (introEndFrame > 0)
-							player.IntroEnd = this.introEndFrame;
-						if (creditsStartFrame > 0)
-							player.CreditsStart = this.creditsStartFrame;
-                        player.Show();
-                        player.SetScreenSize();
-                        this.TopMost = player.TopMost = true;
-                        if (!mainForm.Settings.AlwaysOnTop)
-                            this.TopMost = player.TopMost = false;
-					}
-					else
-						return;
-				}
-                if (chapterListView.SelectedItems.Count == 1 && chapterListView.SelectedItems[0].Tag != null) // a zone has been selected, show that zone
-				{
-					Chapter chap = (Chapter)chapterListView.SelectedItems[0].Tag;
-					double framerate = player.Framerate;
-                    int frameNumber = Util.convertTimecodeToFrameNumber(chap.Time.TotalMilliseconds, framerate);
-					player.CurrentFrame = frameNumber;
+        bool bNoUpdates = false;
+        private void fpsChooserIn_SelectionChanged(object sender, string val)
+        {
+            if (bNoUpdates || pgc.FramesPerSecond == (double)fpsChooserIn.Value)
+                return;
 
-				}
-				else // no chapter has been selected.. but if start time is configured, show the frame in the preview
-				{
-                    if (!startTime.Text.Equals(""))
+            if (fpsChooserIn.Enabled)
+            {
+                pgc.ChangeFps((double)fpsChooserIn.Value);
+                ResetChapterView();
+            }
+            else
+                pgc.FramesPerSecond = (double)fpsChooserIn.Value;
+            fpsChooserOut.Value = fpsChooserIn.Value;
+        }
+
+        private void showVideoButton_Click(object sender, System.EventArgs e)
+		{
+            if (String.IsNullOrEmpty(this.videoInput) || player == null)
+            {
+                using (OpenFileDialog d = new OpenFileDialog())
+                {
+                    d.Filter = "AviSynth Script|*.avs";
+                    d.Multiselect = false;
+                    if (!String.IsNullOrEmpty(this.videoInput))
+                        d.FileName = videoInput;
+                    if (d.ShowDialog() != DialogResult.OK)
                     {
-                        if (TimeSpan.TryParse(startTime.Text, new System.Globalization.CultureInfo("en-US"), out TimeSpan result))
-                        {
-                            int frameNumber = Util.convertTimecodeToFrameNumber(result.TotalMilliseconds, player.Framerate);
-                            player.CurrentFrame = frameNumber;
-                        }
-					}
-				}
-			}
+                        MessageBox.Show("Please configure video input first", "No video input found", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                        return;
+                    }
+
+                    this.videoInput = d.FileName;
+                }
+            }
+
+            if (player == null)
+				player = new VideoPlayer();
+
+			bool videoLoaded = player.loadVideo(MainForm.Instance, videoInput, PREVIEWTYPE.CHAPTERS, false);
+			if (videoLoaded)
+			{
+				player.Closed += new EventHandler(player_Closed);
+				player.ChapterSet += new ChapterSetCallback(player_ChapterSet);
+				if (introEndFrame > 0)
+					player.IntroEnd = this.introEndFrame;
+				if (creditsStartFrame > 0)
+					player.CreditsStart = this.creditsStartFrame;
+                player.Show();
+                player.SetScreenSize();
+                this.TopMost = player.TopMost = true;
+                if (!MainForm.Instance.Settings.AlwaysOnTop)
+                    player.TopMost = false;
+                
+                bNoUpdates = true;
+                pgc.FramesPerSecond = player.Framerate;
+                fpsChooserIn.Value = fpsChooserOut.Value = (decimal)player.Framerate;
+                fpsChooserIn.Enabled = false;
+                bNoUpdates = false;
+            }
 			else
-				MessageBox.Show("Please configure video input first", "No video input found", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+				return;
+
+            if (chapterListView.SelectedItems.Count == 1 && chapterListView.SelectedItems[0].Tag != null) 
+			{
+                // a zone has been selected, show that zone
+                Chapter chap = (Chapter)chapterListView.SelectedItems[0].Tag;
+				double framerate = player.Framerate;
+                int frameNumber = Util.ConvertTimecodeToFrameNumber(chap.Time, framerate);
+				player.CurrentFrame = frameNumber;
+			}
+			else if (TimeSpan.TryParse(startTime.Text, new System.Globalization.CultureInfo("en-US"), out TimeSpan result))
+            {
+                // show the first chapter if it is not 00:00:00.000
+                if (result.TotalMilliseconds != 0)
+                {
+                    int frameNumber = Util.ConvertTimecodeToFrameNumber(result, player.Framerate);
+                    player.CurrentFrame = frameNumber;
+                }
+            }
 		}
 
 		#region properties
@@ -384,89 +468,95 @@ namespace MeGUI
 		/// </summary>
 		public string VideoInput
 		{
-			set 
-			{
-				this.videoInput = value;
-				showVideoButton.Enabled = true;
-			}
+			set { this.videoInput = value; }
 		}
+
 		/// <summary>
 		/// gets / sets the start frame of the credits
 		/// </summary>
 		public int CreditsStartFrame
 		{
-			get {return this.creditsStartFrame;}
-			set {creditsStartFrame = value;}
+			get { return this.creditsStartFrame; }
+			set {creditsStartFrame = value; }
 		}
+
 		/// <summary>
 		/// gets / sets the end frame of the intro
 		/// </summary>
 		public int IntroEndFrame
 		{
-			get {return this.introEndFrame;}
-			set {introEndFrame = value;}
+			get { return this.introEndFrame; }
+			set { introEndFrame = value; }
 		}
 		#endregion
+
 		private void player_Closed(object sender, EventArgs e)
 		{
-			player = null;
+            this.TopMost = false;
+            player = null;
 		}
 
 		private void player_ChapterSet(int frameNumber)
 		{
-            string strChapter;
             startTime.Text = Util.converFrameNumberToTimecode(frameNumber, player.Framerate);
-            if (chapterListView.SelectedIndices.Count == 0)
-                strChapter = "Chapter " + (chapterListView.Items.Count + 1).ToString("00");
-            else
-                strChapter = "Chapter " + (chapterListView.SelectedIndices[0] + 1).ToString("00");            
-            if (!chapterName.Text.Equals(strChapter))
-                chapterName.Text = strChapter;
-            if (chapterListView.SelectedIndices.Count == 0)
-                addZoneButton_Click(null, null);
+            addZoneButton_Click(null, null);
 		}
 
         private void chapterName_TextChanged(object sender, EventArgs e)
         {
-            try
-            {
-                if (chapterListView.SelectedIndices.Count == 0)
-                    return;
-                intIndex = chapterListView.SelectedIndices[0];
-                pgc.Chapters[intIndex] = new Chapter()
-                {
-                    Time = TimeSpan.Parse(startTime.Text),
-                    Name = chapterName.Text
-                };
-                chapterListView.SelectedItems[0].SubItems[0].Text = startTime.Text;
-                chapterListView.SelectedItems[0].SubItems[1].Text = chapterName.Text;
-            }
-            catch (Exception parse)
-            { 
-                //invalid time input
-                startTime.Focus();
-                startTime.SelectAll();
-                MessageBox.Show("Cannot parse the timecode you have entered.\nIt must be given in the hh:mm:ss.ccc format"
-                                + Environment.NewLine + parse.Message, "Incorrect timecode", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+            if (chapterListView.SelectedIndices.Count == 0)
                 return;
-            }
+
+            TimeSpan ts = new TimeSpan(0);
+            if (!GetTimeSpanFromString(startTime.Text, out ts))
+                return;
+            string strTime = GetStringFromTimeSpan(ts);
+
+            intIndex = chapterListView.SelectedIndices[0];
+            pgc.Chapters[intIndex] = new Chapter()
+            {
+                Time = ts,
+                Name = GetChapterName(intIndex)
+            };
+
+            chapterListView.SelectedItems[0].SubItems[0].Text = strTime;
+            chapterListView.SelectedItems[0].SubItems[1].Text = GetChapterName(intIndex);
         }
 
         private void rbTXT_CheckedChanged(object sender, EventArgs e)
         {
-            fpsChooser.Visible = lblFPS.Visible = false;
             output.Text = Path.ChangeExtension(output.Text, "txt");
         }
 
         private void rbQPF_CheckedChanged(object sender, EventArgs e)
         {
-            fpsChooser.Visible = lblFPS.Visible = true;
             output.Text = Path.ChangeExtension(output.Text, "qpf");
+        }
+
+        private void startTime_TextChanged(object sender, EventArgs e)
+        {
+            TimeSpan ts = new TimeSpan(0);
+            if (!GetTimeSpanFromString(startTime.Text, out ts))
+                startTime.ForeColor = Color.Red;
+            else
+                startTime.ForeColor = Color.Black;
+        }
+
+        private void chapterListView_DoubleClick(object sender, EventArgs e)
+        {
+            if (player == null || chapterListView.SelectedIndices.Count == 0)
+                return;
+
+            player.CurrentFrame = Util.ConvertTimecodeToFrameNumber(pgc.Chapters[chapterListView.SelectedIndices[0]].Time, pgc.FramesPerSecond);
+        }
+
+        private void chkCounter_CheckedChanged(object sender, EventArgs e)
+        {
+            MainForm.Instance.Settings.ChapterCreatorCounter = chkCounter.Checked;
         }
 
         private void rbXML_CheckedChanged(object sender, EventArgs e)
         {
-            fpsChooser.Visible = lblFPS.Visible = true;
             output.Text = Path.ChangeExtension(output.Text, "xml");
         }
 	}
@@ -515,7 +605,7 @@ namespace MeGUI
 
         public void Run(MainForm info)
         {
-            ChapterCreator cc = new ChapterCreator(info);
+            ChapterCreator cc = new ChapterCreator();
             cc.VideoInput = info.Video.Info.VideoInput;
             cc.CreditsStartFrame = info.Video.Info.CreditsStartFrame;
             cc.IntroEndFrame = info.Video.Info.IntroEndFrame;

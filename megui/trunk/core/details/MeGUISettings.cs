@@ -60,7 +60,8 @@ namespace MeGUI
                      bAutoLoadDG, bAutoStartQueueStartup, bAlwayUsePortableAviSynth, bVobSubberSingleFileExport,
                      bEnsureCorrectPlaybackSpeed, bExternalMuxerX264, bUseNeroAacEnc, bOSx64, bEnableDirectShowSource,
                      bVobSubberExtractForced, bVobSubberShowAll, bUsex64Tools, bShowDebugInformation, bEac3toDefaultToHD,
-                     bEac3toEnableEncoder, bEac3toEnableDecoder, bEac3toEnableCustomOptions, bFirstUpdateCheck;
+                     bEac3toEnableEncoder, bEac3toEnableDecoder, bEac3toEnableCustomOptions, bFirstUpdateCheck,
+                     bChapterCreatorCounter;
         private decimal forceFilmThreshold, acceptableFPSError;
         private int nbPasses, autoUpdateServerSubList, minComplexity, updateFormSplitter,
                     maxComplexity, jobColumnWidth, inputColumnWidth, outputColumnWidth, codecColumnWidth,
@@ -201,6 +202,7 @@ namespace MeGUI
             bFirstUpdateCheck = true;
             dLastDPIScaleFactor = 0;
             oRedistVersions = new Dictionary<string, string>();
+            bChapterCreatorCounter = true;
         }
 
         #region properties
@@ -465,6 +467,12 @@ namespace MeGUI
         {
             get { return bEac3toEnableCustomOptions; }
             set { bEac3toEnableCustomOptions = value; }
+        }
+
+        public bool ChapterCreatorCounter
+        {
+            get { return bChapterCreatorCounter; }
+            set { bChapterCreatorCounter = value; }
         }
 
         public bool EnableDirectShowSource
