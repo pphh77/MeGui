@@ -406,7 +406,7 @@ namespace MeGUI
                 if (xs.MinQuantizer != 0)
                     sb.Append("--qpmin " + xs.MinQuantizer + " ");
             if (!xs.CustomEncoderOptions.Contains("--qpmax "))
-                if (xs.MaxQuantizer != 81)
+                if ((xs.X26410Bits && xs.MaxQuantizer != 81) || (!xs.X26410Bits && xs.MaxQuantizer < 69))
                     sb.Append("--qpmax " + xs.MaxQuantizer + " ");
             if (!xs.CustomEncoderOptions.Contains("--qpstep "))
                 if (xs.MaxQuantDelta != 4)
@@ -728,18 +728,25 @@ namespace MeGUI
                     sb.Append("--trellis " + xs.X264Trellis + " ");
             }
 
+            if (!xs.CustomEncoderOptions.Contains("--no-psy"))
+                if (xs.NoPsy && (xs.x264PsyTuning != x264Settings.x264PsyTuningModes.PSNR && xs.x264PsyTuning != x264Settings.x264PsyTuningModes.SSIM))
+                    sb.Append("--no-psy ");
+
             if (!xs.CustomEncoderOptions.Contains("--psy-rd "))
             {
                 if (xs.SubPelRefinement > 5)
                 {
                     display = false;
-                    switch (xs.x264PsyTuning)
+                    if (!xs.CustomEncoderOptions.Contains("--no-psy") && !xs.NoPsy)
                     {
-                        case x264Settings.x264PsyTuningModes.FILM:          if ((xs.PsyRDO != 1.0M) || (xs.PsyTrellis != 0.15M)) display = true; break;
-                        case x264Settings.x264PsyTuningModes.ANIMATION:     if ((xs.PsyRDO != 0.4M) || (xs.PsyTrellis != 0.0M)) display = true; break;
-                        case x264Settings.x264PsyTuningModes.GRAIN:         if ((xs.PsyRDO != 1.0M) || (xs.PsyTrellis != 0.25M)) display = true; break;
-                        case x264Settings.x264PsyTuningModes.STILLIMAGE:    if ((xs.PsyRDO != 2.0M) || (xs.PsyTrellis != 0.7M)) display = true; break;
-                        default:                                            if ((xs.PsyRDO != 1.0M) || (xs.PsyTrellis != 0.0M)) display = true; break;
+                        switch (xs.x264PsyTuning)
+                        {
+                            case x264Settings.x264PsyTuningModes.FILM: if ((xs.PsyRDO != 1.0M) || (xs.PsyTrellis != 0.15M)) display = true; break;
+                            case x264Settings.x264PsyTuningModes.ANIMATION: if ((xs.PsyRDO != 0.4M) || (xs.PsyTrellis != 0.0M)) display = true; break;
+                            case x264Settings.x264PsyTuningModes.GRAIN: if ((xs.PsyRDO != 1.0M) || (xs.PsyTrellis != 0.25M)) display = true; break;
+                            case x264Settings.x264PsyTuningModes.STILLIMAGE: if ((xs.PsyRDO != 2.0M) || (xs.PsyTrellis != 0.7M)) display = true; break;
+                            default: if ((xs.PsyRDO != 1.0M) || (xs.PsyTrellis != 0.0M)) display = true; break;
+                        }
                     }
 
                     if (display)
@@ -761,10 +768,6 @@ namespace MeGUI
                 if (xs.NoFastPSkip)
                     if (xs.x264PresetLevel != x264Settings.x264PresetLevelModes.placebo)
                         sb.Append("--no-fast-pskip ");
-
-            if (!xs.CustomEncoderOptions.Contains("--no-psy"))
-                if (xs.NoPsy && (xs.x264PsyTuning != x264Settings.x264PsyTuningModes.PSNR && xs.x264PsyTuning != x264Settings.x264PsyTuningModes.SSIM))
-                    sb.Append("--no-psy ");
 
             xs.X264Aud = oSettingsHandler.getAud();
             if (xs.X264Aud && !xs.BlurayCompat)

@@ -61,7 +61,7 @@ namespace MeGUI
                      bEnsureCorrectPlaybackSpeed, bExternalMuxerX264, bUseNeroAacEnc, bOSx64, bEnableDirectShowSource,
                      bVobSubberExtractForced, bVobSubberShowAll, bUsex64Tools, bShowDebugInformation, bEac3toDefaultToHD,
                      bEac3toEnableEncoder, bEac3toEnableDecoder, bEac3toEnableCustomOptions, bFirstUpdateCheck,
-                     bChapterCreatorCounter;
+                     bChapterCreatorCounter, bX264AdvancedSettings;
         private decimal forceFilmThreshold, acceptableFPSError;
         private int nbPasses, autoUpdateServerSubList, minComplexity, updateFormSplitter,
                     maxComplexity, jobColumnWidth, inputColumnWidth, outputColumnWidth, codecColumnWidth,
@@ -203,6 +203,7 @@ namespace MeGUI
             dLastDPIScaleFactor = 0;
             oRedistVersions = new Dictionary<string, string>();
             bChapterCreatorCounter = true;
+            bX264AdvancedSettings = false;
         }
 
         #region properties
@@ -473,6 +474,12 @@ namespace MeGUI
         {
             get { return bChapterCreatorCounter; }
             set { bChapterCreatorCounter = value; }
+        }
+
+        public bool X264AdvancedSettings
+        {
+            get { return bX264AdvancedSettings; }
+            set { bX264AdvancedSettings = value; }
         }
 
         public bool EnableDirectShowSource

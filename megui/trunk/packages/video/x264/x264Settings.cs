@@ -110,7 +110,7 @@ namespace MeGUI
 			tempComplexityBlur, tempQuanBlurCC, scdSensitivity, bframeBias, quantizerCrf, AQStrength, psyRDO, psyTrellis;
 		bool deblock, cabac, p4x4mv, p8x8mv, b8x8mv, i4x4mv, i8x8mv, weightedBPrediction, blurayCompat,
 			chromaME, adaptiveDCT, noMixedRefs, noFastPSkip, psnrCalc, noDctDecimate, ssimCalc, useQPFile,
-            FullRange, advSet, noMBTree, threadInput, noPsy, scenecut, x264Aud, x264SlowFirstpass, picStruct,
+            FullRange, noMBTree, threadInput, noPsy, scenecut, x264Aud, x264SlowFirstpass, picStruct,
             fakeInterlaced, nonDeterministic, tuneFastDecode, tuneZeroLatency, stitchable, x26410Bits;
 		string quantizerMatrix, qpfile, openGop, range;
         x264PresetLevelModes preset;
@@ -189,7 +189,6 @@ namespace MeGUI
             qpfile = "";
             FullRange = false;
             range = "auto";
-            advSet = false;
             lookahead = 40;
             noMBTree = true;
             threadInput = true;
@@ -643,11 +642,6 @@ namespace MeGUI
             }
             set { range = value; }
         }
-        public bool x264AdvancedSettings
-        {
-            get { return advSet; }
-            set { advSet = value; }
-        }
         public int Lookahead
         {
             get { return lookahead; }
@@ -824,7 +818,6 @@ namespace MeGUI
                 this.MacroBlockOptions != otherSettings.MacroBlockOptions ||
                 this.x264PresetLevel != otherSettings.x264PresetLevel ||
                 this.x264PsyTuning != otherSettings.x264PsyTuning ||
-                this.x264AdvancedSettings != otherSettings.x264AdvancedSettings ||
                 this.Lookahead != otherSettings.Lookahead ||
                 this.NoMBTree != otherSettings.NoMBTree ||
                 this.ThreadInput != otherSettings.ThreadInput ||

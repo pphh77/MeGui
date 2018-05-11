@@ -51,6 +51,7 @@ namespace MeGUI.packages.video.x264
             oTargetDevice = x264DeviceList[0];
             x264Tunes.Items.AddRange(EnumProxy.CreateArray(x264Settings.SupportedPsyTuningModes));
             x264Tunes.SelectedItem = EnumProxy.Create(x264Settings.x264PsyTuningModes.NONE);
+            advancedSettings.Checked = MainForm.Instance.Settings.X264AdvancedSettings;
         }
         #endregion
         #region adjustments
@@ -1279,7 +1280,6 @@ namespace MeGUI.packages.video.x264
                 xs.x264PsyTuning = getPsyTuning();
                 xs.TuneFastDecode = chkTuneFastDecode.Checked;
                 xs.TuneZeroLatency = chkTuneZeroLatency.Checked;
-                xs.x264AdvancedSettings = advancedSettings.Checked;
                 xs.NoMBTree = mbtree.Checked;
                 xs.Lookahead = (int)lookahead.Value;
                 xs.ThreadInput = threadin.Checked;
@@ -1411,7 +1411,6 @@ namespace MeGUI.packages.video.x264
                 x264Range.SelectedItem = xs.Range;
                 numAQStrength.Value = xs.AQstrength;
                 NoiseReduction.Text = xs.NoiseReduction.ToString();
-                advancedSettings.Checked = xs.x264AdvancedSettings;
                 lookahead.Value = xs.Lookahead;
                 mbtree.Checked = xs.NoMBTree;
                 threadin.Checked = xs.ThreadInput;
@@ -1440,11 +1439,13 @@ namespace MeGUI.packages.video.x264
         {
             genericUpdate();
         }
+
         private void textField_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsDigit(e.KeyChar) && (int)Keys.Back != (int)e.KeyChar)
                 e.Handled = true;
         }
+
         private void logfileOpenButton_Click(object sender, System.EventArgs e)
         {
             saveFileDialog.Filter = "x264 2pass stats files (*.stats)|*.stats";
@@ -1809,7 +1810,8 @@ namespace MeGUI.packages.video.x264
 
         private void advancedSettings_CheckedChanged(object sender, EventArgs e)
         {
-            if (advancedSettings.Checked)
+            MainForm.Instance.Settings.X264AdvancedSettings = advancedSettings.Checked;
+            if (MainForm.Instance.Settings.X264AdvancedSettings)
             {
                 if (!tabControl1.TabPages.Contains(FrameTypeTabPage))
                     tabControl1.TabPages.Add(FrameTypeTabPage);
@@ -2063,6 +2065,12 @@ namespace MeGUI.packages.video.x264
                 if (x264VBVMaxRate.Value <= 0 || x264VBVMaxRate.Value > al.getMaxBR(avcLevel, avcProfile.SelectedIndex == 2))
                     x264VBVMaxRate.ForeColor = System.Drawing.Color.Red;
             }
+            updateEvent(sender, e);
+        }
+
+        private void nopsy_CheckedChanged(object sender, EventArgs e)
+        {
+            PsyRD.Visible = PsyTrellis.Visible = lblPsyRD.Visible = lblPsyTrellis.Visible = !nopsy.Checked;
             updateEvent(sender, e);
         }
 

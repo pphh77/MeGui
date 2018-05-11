@@ -1,3 +1,6 @@
+2852 [x264]                 changed "show advanced settings" to be a global setting (default is disabled)
+                            when --no-psy is selected the --psy-rd options are not availble
+                            when using 8bit --qpmax with a value > 69 is used as 69 for the command line creation
 2851 [Chapter Creator]      added fps selector for the input source
                             changing the input fps changes the time codes if the input fps is not known (e.g. as with TXT/XML)
                             the output fps value is used during saving for all output types

@@ -169,9 +169,9 @@ namespace MeGUI.packages.video.x264
             this.x264MixedReferences = new System.Windows.Forms.CheckBox();
             this.x264BframePredictionMode = new System.Windows.Forms.ComboBox();
             this.x264BframePredictionModeLabel = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
+            this.lblPsyTrellis = new System.Windows.Forms.Label();
             this.PsyTrellis = new System.Windows.Forms.NumericUpDown();
-            this.label5 = new System.Windows.Forms.Label();
+            this.lblPsyRD = new System.Windows.Forms.Label();
             this.PsyRD = new System.Windows.Forms.NumericUpDown();
             this.noDCTDecimateOption = new System.Windows.Forms.CheckBox();
             this.noFastPSkip = new System.Windows.Forms.CheckBox();
@@ -1884,9 +1884,9 @@ namespace MeGUI.packages.video.x264
             this.x264QuantOptionsGroupbox.Controls.Add(this.x264MixedReferences);
             this.x264QuantOptionsGroupbox.Controls.Add(this.x264BframePredictionMode);
             this.x264QuantOptionsGroupbox.Controls.Add(this.x264BframePredictionModeLabel);
-            this.x264QuantOptionsGroupbox.Controls.Add(this.label4);
+            this.x264QuantOptionsGroupbox.Controls.Add(this.lblPsyTrellis);
             this.x264QuantOptionsGroupbox.Controls.Add(this.PsyTrellis);
-            this.x264QuantOptionsGroupbox.Controls.Add(this.label5);
+            this.x264QuantOptionsGroupbox.Controls.Add(this.lblPsyRD);
             this.x264QuantOptionsGroupbox.Controls.Add(this.PsyRD);
             this.x264QuantOptionsGroupbox.Controls.Add(this.noDCTDecimateOption);
             this.x264QuantOptionsGroupbox.Controls.Add(this.noFastPSkip);
@@ -1902,7 +1902,7 @@ namespace MeGUI.packages.video.x264
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(16, 214);
+            this.label16.Location = new System.Drawing.Point(16, 145);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(160, 13);
             this.label16.TabIndex = 21;
@@ -1929,7 +1929,7 @@ namespace MeGUI.packages.video.x264
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(16, 145);
+            this.label13.Location = new System.Drawing.Point(16, 214);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(139, 13);
             this.label13.TabIndex = 18;
@@ -1961,17 +1961,17 @@ namespace MeGUI.packages.video.x264
             // nopsy
             // 
             this.nopsy.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.nopsy.Location = new System.Drawing.Point(224, 209);
+            this.nopsy.Location = new System.Drawing.Point(224, 140);
             this.nopsy.Name = "nopsy";
             this.nopsy.Size = new System.Drawing.Size(45, 24);
             this.nopsy.TabIndex = 15;
             this.nopsy.UseVisualStyleBackColor = true;
-            this.nopsy.CheckedChanged += new System.EventHandler(this.updateEvent);
+            this.nopsy.CheckedChanged += new System.EventHandler(this.nopsy_CheckedChanged);
             // 
             // x264MixedReferences
             // 
             this.x264MixedReferences.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.x264MixedReferences.Location = new System.Drawing.Point(224, 140);
+            this.x264MixedReferences.Location = new System.Drawing.Point(223, 209);
             this.x264MixedReferences.Name = "x264MixedReferences";
             this.x264MixedReferences.Size = new System.Drawing.Size(45, 24);
             this.x264MixedReferences.TabIndex = 14;
@@ -2000,14 +2000,14 @@ namespace MeGUI.packages.video.x264
             this.x264BframePredictionModeLabel.Text = "MV Prediction mode";
             this.x264BframePredictionModeLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // label4
+            // lblPsyTrellis
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(16, 116);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(97, 13);
-            this.label4.TabIndex = 11;
-            this.label4.Text = "Psy-Trellis Strength";
+            this.lblPsyTrellis.AutoSize = true;
+            this.lblPsyTrellis.Location = new System.Drawing.Point(16, 116);
+            this.lblPsyTrellis.Name = "lblPsyTrellis";
+            this.lblPsyTrellis.Size = new System.Drawing.Size(97, 13);
+            this.lblPsyTrellis.TabIndex = 11;
+            this.lblPsyTrellis.Text = "Psy-Trellis Strength";
             // 
             // PsyTrellis
             // 
@@ -2023,13 +2023,13 @@ namespace MeGUI.packages.video.x264
             this.PsyTrellis.TabIndex = 10;
             this.PsyTrellis.ValueChanged += new System.EventHandler(this.updateEvent);
             // 
-            // label5
+            // lblPsyRD
             // 
-            this.label5.Location = new System.Drawing.Point(16, 90);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(86, 13);
-            this.label5.TabIndex = 9;
-            this.label5.Text = "Psy-RD Strength";
+            this.lblPsyRD.Location = new System.Drawing.Point(16, 90);
+            this.lblPsyRD.Name = "lblPsyRD";
+            this.lblPsyRD.Size = new System.Drawing.Size(86, 13);
+            this.lblPsyRD.TabIndex = 9;
+            this.lblPsyRD.Text = "Psy-RD Strength";
             // 
             // PsyRD
             // 
@@ -3152,9 +3152,9 @@ namespace MeGUI.packages.video.x264
         private System.Windows.Forms.GroupBox x264QuantOptionsGroupbox;
         private System.Windows.Forms.ComboBox x264BframePredictionMode;
         private System.Windows.Forms.Label x264BframePredictionModeLabel;
-        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label lblPsyTrellis;
         private System.Windows.Forms.NumericUpDown PsyTrellis;
-        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label lblPsyRD;
         private System.Windows.Forms.NumericUpDown PsyRD;
         private System.Windows.Forms.CheckBox noDCTDecimateOption;
         private System.Windows.Forms.CheckBox noFastPSkip;
