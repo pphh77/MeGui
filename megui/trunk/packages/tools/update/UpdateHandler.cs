@@ -237,7 +237,7 @@ namespace MeGUI
                 return result;
 
             // if auto update is disabled ask if a download try should be made
-            if (MainForm.Instance.Settings.AutoUpdate == false)
+            if (MainForm.Instance.Settings.AutoUpdate == false && (!bManuallyStarted || (bManuallyStarted && packageName.Equals("update definition"))))
             {
                 string strMessage = "The package " + packageName + " is not available offline.\n\nDo you want to search now online for updates?";
                 if (packageName.Equals("update definition"))
@@ -742,14 +742,15 @@ namespace MeGUI
             // show the update form
             _updateWindow.Show();
 
+            if (!bWait && !bAutoUpdate)
+                bManuallyStarted = true;
+            else
+                bManuallyStarted = false;
+
             // refresh update information
             if (!_updateRunning)
             {
-                if (!bWait && !bAutoUpdate)
-                    bManuallyStarted = true;
                 GetUpdateInformation(true);
-                if (!bWait && !bAutoUpdate)
-                    bManuallyStarted = false;
                 _updateWindow.RefreshGUI();
                 _updateWindow.EnableUpdateButton();
             }
