@@ -49,7 +49,7 @@ namespace MeGUI
             hybridThreshold = 5;
             decimationThreshold = 2.0;
             portionThreshold = 5.0;
-            analysePercent = 1;
+            analysePercent = 0;
             minAnalyseSections = 150;
             hybridFOPercent = 10;
             portionsAllowed = false;

@@ -19,11 +19,6 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -41,6 +36,7 @@ namespace MeGUI
             portionThreshold.Enabled = portionsAllowed.Checked;
             maximumPortions.Enabled = portionsAllowed.Checked;
         }
+
         public SourceDetectorSettings Settings
         {
             get

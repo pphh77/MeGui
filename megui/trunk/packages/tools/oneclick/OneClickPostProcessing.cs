@@ -787,7 +787,7 @@ namespace MeGUI
             else
             {
                 LogItem oSourceLog = _log.LogValue("Source detection", info.analysisResult);
-                if (info.sourceType == SourceType.NOT_ENOUGH_SECTIONS)
+                if (info.sourceType == SourceType.NOT_ENOUGH_SECTIONS || info.sourceType == SourceType.UNKNOWN)
                 {
                     oSourceLog.LogEvent("Source detection failed: Could not find enough useful sections to determine source type for " + job.Input, ImageType.Warning);
                     filters = new DeinterlaceFilter[] { new DeinterlaceFilter("Error", "#Not enough useful sections for source detection. Doing no processing") };

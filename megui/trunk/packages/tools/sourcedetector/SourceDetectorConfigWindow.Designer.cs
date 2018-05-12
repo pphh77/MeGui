@@ -60,35 +60,25 @@ namespace MeGUI
             this.analysisPercentLabel.AutoSize = true;
             this.analysisPercentLabel.Location = new System.Drawing.Point(12, 11);
             this.analysisPercentLabel.Name = "analysisPercentLabel";
-            this.analysisPercentLabel.Size = new System.Drawing.Size(90, 13);
+            this.analysisPercentLabel.Size = new System.Drawing.Size(133, 13);
             this.analysisPercentLabel.TabIndex = 0;
-            this.analysisPercentLabel.Text = "Analysis Percent:";
+            this.analysisPercentLabel.Text = "Minimum Analysis Percent:";
             // 
             // analysisPercent
             // 
             this.analysisPercent.Location = new System.Drawing.Point(213, 7);
-            this.analysisPercent.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
             this.analysisPercent.Name = "analysisPercent";
             this.analysisPercent.Size = new System.Drawing.Size(120, 21);
             this.analysisPercent.TabIndex = 1;
-            this.analysisPercent.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
             // 
             // minAnalyseSectionsLabel
             // 
             this.minAnalyseSectionsLabel.AutoSize = true;
             this.minAnalyseSectionsLabel.Location = new System.Drawing.Point(12, 37);
             this.minAnalyseSectionsLabel.Name = "minAnalyseSectionsLabel";
-            this.minAnalyseSectionsLabel.Size = new System.Drawing.Size(134, 13);
+            this.minAnalyseSectionsLabel.Size = new System.Drawing.Size(193, 13);
             this.minAnalyseSectionsLabel.TabIndex = 0;
-            this.minAnalyseSectionsLabel.Text = "Minimum analysis sections:";
+            this.minAnalyseSectionsLabel.Text = "Minimum Analysis Sections: (5 frames):";
             // 
             // minAnalyseSections
             // 

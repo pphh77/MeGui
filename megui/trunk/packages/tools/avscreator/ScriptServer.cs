@@ -492,6 +492,7 @@ namespace MeGUI
         }
 
 #endregion
+
 #region IVTC snippets
         public static void AddTIVTC(string d2vFile, bool anime, bool hybrid, bool mostlyFilm, bool advancedDeinterlacing,
             FieldOrder fieldOrder, List<DeinterlaceFilter> filters)
@@ -574,6 +575,7 @@ namespace MeGUI
 
 
 #endregion
+
 #region decimate snippet
         public static void AddTDecimate(int decimateM, List<DeinterlaceFilter> filters)
         {
@@ -582,32 +584,54 @@ namespace MeGUI
                 string.Format("LoadPlugin(\"{0}\"){1}TDecimate(cycleR={2})", Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "TIVTC.dll"), Environment.NewLine, decimateM)));
         }
 #endregion
+
 #region analysis scripting
         private const string DetectionScript =
-@"{0} #original script
-{1} #trimming
-{5} #LoadPlugin
+@"# original script
+{0}
+
+# trimming
+{1}
+
+# load plugin
+{2}
+
+# color format change
+{4}
+
+# detection script
 global unused_ = blankclip(pixel_type=""yv12"", length=10).TFM()
-file=""{2}""
+file=""{3}""
 global sep=""-""
 function IsMoving() {{
-  global b = (diff < 1.0) ? false : true}}
-ConvertToYV12()
+  global b = (diff < 1.0) ? false : true
+}}
 c = last
 global clip = last
 c = WriteFile(c, file, ""a"", ""sep"", ""b"")
 c = FrameEvaluate(c, ""global a = IsCombedTIVTC(clip, cthresh=9)"")
 c = FrameEvaluate(c, ""IsMoving"")
 c = FrameEvaluate(c,""global diff = 0.50*YDifferenceFromPrevious(clip) + 0.25*UDifferenceFromPrevious(clip) + 0.25*VDifferenceFromPrevious(clip)"")
+
+# crop
 crop(c,0,0,16,16)
-SelectRangeEvery({3},{4},0)";
+
+# select range
+{5}";
 
         private const string FieldOrderScript =
-@"{0} # original script
-{1} #trimming
+@"# original script
+{0}
+
+# trimming
+{1}
+
+# color format change
+{3}
+
+# detection script
 file=""{2}""
 global sep=""-""
-ConvertToYV12()
 d = last
 global abff = d.assumebff().separatefields()
 global atff = d.assumetff().separatefields()
@@ -615,16 +639,25 @@ c = d.loop(2)
 c = WriteFile(c, file, ""diffa"", ""sep"", ""diffb"")
 c = FrameEvaluate(c,""global diffa = 0.50*YDifferenceFromPrevious(abff) + 0.25*UDifferenceFromPrevious(abff) + 0.25*VDifferenceFromPrevious(abff)"")
 c = FrameEvaluate(c,""global diffb = 0.50*YDifferenceFromPrevious(atff) + 0.25*UDifferenceFromPrevious(atff) + 0.25*VDifferenceFromPrevious(atff)"")
-crop(c,0,0,16,16)
-SelectRangeEvery({3},{4},0)
-";
 
-        public static string getScript(int scriptType, string originalScript, string trimLine, string logFileName, int selectEvery, int selectLength)
+# crop
+crop(c,0,0,16,16)
+
+# select range
+{4}";
+
+        public static string GetDetectionScript(int scriptType, string originalScript, string trimLine, string logFileName, int selectEvery, int selectLength)
         {
+            string strPlugin = "LoadPlugin(\"" + Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "TIVTC.dll") + "\")";
+            string strConvertColorFormat = "ConvertToYV12()";
+            if (MainForm.Instance.Settings.AviSynthPlus)
+                strConvertColorFormat = "ConvertBits(8)\r\n" + strConvertColorFormat;
+            string strSelectRange = (selectEvery > selectLength) ? "SelectRangeEvery(" + selectEvery + "," + selectLength + ",0)" : "#process all";
+            
             if (scriptType == 0) // detection
-                return string.Format(DetectionScript, originalScript, trimLine, logFileName, selectEvery, selectLength, "LoadPlugin(\"" + Path.Combine(MainForm.Instance.Settings.AvisynthPluginsPath, "TIVTC.dll") + "\")");
+                return string.Format(DetectionScript, originalScript, trimLine, strPlugin, logFileName, strConvertColorFormat, strSelectRange);
             else if (scriptType == 1) // field order
-                return string.Format(FieldOrderScript, originalScript, trimLine, logFileName, selectEvery, selectLength);
+                return string.Format(FieldOrderScript, originalScript, trimLine, logFileName, strConvertColorFormat, strSelectRange);
             else
                 return null;
         }

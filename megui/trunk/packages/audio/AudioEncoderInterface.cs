@@ -990,7 +990,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             StringBuilder script = new StringBuilder();
 
             string id = _uniqueId;
-            string tmp = Path.Combine(Path.GetTempPath(), id);
+            string tmp = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), id);
 
             MediaInfoFile oInfo = new MediaInfoFile(audioJob.Input, ref _log);
 

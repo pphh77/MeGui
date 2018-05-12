@@ -1123,6 +1123,7 @@ namespace MeGUI
                     Invoke(new MethodInvoker(delegate
                     {
                         deintProgressBar.Enabled = false;
+                        this.deintProgressBar.Value = this.deintProgressBar.Maximum;
                         this.DeintInfo = info;
                         if (deintSourceType.SelectedIndex < 1)
                         {
@@ -1158,6 +1159,8 @@ namespace MeGUI
             {
                 Invoke(new MethodInvoker(delegate
                     {
+                        if (amountDone > this.deintProgressBar.Maximum)
+                            this.deintProgressBar.Maximum = total;
                         this.deintProgressBar.Value = amountDone;
                         this.deintProgressBar.Maximum = total;
                     }));

@@ -48,6 +48,33 @@ namespace MeGUI
         }
     }
 
+    public class SourceDetectorInfo
+    {
+        public int numTC;
+        public int numProg;
+        public int numInt;
+        public int numUseless;
+        public int sectionCount;
+        public int sectionCountBFF;
+        public int sectionCountTFF;
+        public int[] numPortions;
+        public int[] sectionsWithMovingFrames;
+        public List<int[]>[] portions;
+
+        public SourceDetectorInfo()
+        {
+            numTC = numProg = numInt = numUseless = 0;
+            sectionCount = sectionCountBFF = sectionCountTFF = 0;
+            numPortions = new int[2];
+            sectionsWithMovingFrames = new int[6];
+
+            // interlaced portions
+            portions = new List<int[]>[2];
+            portions[0] = new List<int[]>();
+            portions[1] = new List<int[]>();
+        }
+    }
+
     public enum SourceType
     {
         UNKNOWN,
@@ -68,33 +95,31 @@ namespace MeGUI
 
     public class SourceDetector
     {
-        public SourceDetector(string avsScript, string d2vFile, bool isAnime, int iFrameCount,
-            SourceDetectorSettings settings, UpdateSourceDetectionStatus updateMethod, FinishedAnalysis finishedMethod)
+        public SourceDetector(string avsScript, string d2vFile, bool bIsAnime, int iFrameCount,
+            SourceDetectorSettings oSettings, UpdateSourceDetectionStatus updateMethod, FinishedAnalysis finishedMethod)
         {
-
-            this.script = avsScript;
-            this.d2vFileName = d2vFile;
-            this.settings = settings;
-            this.isAnime = isAnime;
-            this.frameCount = iFrameCount;
-            analyseUpdate += updateMethod;
-            finishedAnalysis += finishedMethod;
-            
-            //
+            script = avsScript;
+            d2vFileName = d2vFile;
+            settings = oSettings;
+            isAnime = bIsAnime;
+            frameCount = iFrameCount;
             trimmedFilteredLine = "";
             type = SourceType.UNKNOWN;
             majorityFilm = false;
-            usingPortions = false;
             error = false;
             continueWorking = true;
+            oSourceInfo = new SourceDetectorInfo();
+
+            analyseUpdate += updateMethod;
+            finishedAnalysis += finishedMethod;
         }
 
-        #region local info
-
+        #region variables
         private bool isAnime;
-        bool error = false, continueWorking = true;
-        string errorMessage = "";
-        SourceDetectorSettings settings;
+        private bool error, continueWorking;
+        private bool majorityFilm;
+        private string errorMessage = "";
+        private SourceDetectorSettings settings;
         private event UpdateSourceDetectionStatus analyseUpdate;
         private event FinishedAnalysis finishedAnalysis;
         private string script, d2vFileName, trimmedFilteredLine;
@@ -103,13 +128,16 @@ namespace MeGUI
         private int decimateM = 1;
         private int tffCount = 0, bffCount = 0;
         private FieldOrder fieldOrder = FieldOrder.UNKNOWN;
-        public bool majorityFilm, usingPortions;
         private string analysis;
         private List<DeinterlaceFilter> filters = new List<DeinterlaceFilter>();
         private ManualResetEvent _mre = new System.Threading.ManualResetEvent(true); // lock used to pause processing
-
+        private SourceDetectorInfo oSourceInfo;
+        private const int sectionLength = 5; // number of frames in a section. do not change!
+        
         #endregion
-        #region Processing
+
+        #region processing
+
         #region helper methods
         private string findPortions(List<int[]> portions, int selectEvery, int selectLength, int numPortions,
             int sectionCount, int inputFrames, string type, out string trimLine, out int frameCount)
@@ -141,41 +169,113 @@ namespace MeGUI
             return outputText;
         }
 
-        private string getLogFileName(string logFileName)
-        {
-            return Path.Combine(Path.GetTempPath(), logFileName);
-        }
-
-        // stax
-        private void Process(string scriptBlock)
+        private void Process(string scriptBlock, string strLogFile, int scriptType)
         {
             try
             {
-                using (AvsFile af = AvsFile.ParseScript(scriptBlock, true))
+                using (AvsFile af = AvsFile.ParseScript(scriptBlock, false))
                 {
                     int i = 0;
                     int frameCount = (int)af.VideoInfo.FrameCount;
                     bool running = true;
+
+                    int iNextFrameCheck = frameCount;
+                    if (settings.AnalysePercent == 0)
+                    {
+                        if (settings.MinimumAnalyseSections > settings.MinimumUsefulSections)
+                            iNextFrameCheck = settings.MinimumAnalyseSections * sectionLength;
+                        else
+                            iNextFrameCheck = settings.MinimumUsefulSections * sectionLength;
+                    }
+
                     new Thread(new ThreadStart(delegate
                     {
-                        if (analyseUpdate != null)
+                        while (running && continueWorking)
                         {
-                            while (running && continueWorking)
+                            if (analyseUpdate != null)
                             {
-                                analyseUpdate(i, frameCount);
-                                Thread.Sleep(500);
+                                if (i >= iNextFrameCheck)
+                                    analyseUpdate(iNextFrameCheck - 1, iNextFrameCheck);
+                                else
+                                    analyseUpdate(i, iNextFrameCheck);
                             }
+                            Thread.Sleep(1000);
                         }
                     })).Start();
 
-
                     IntPtr zero = new IntPtr(0);
-                    for (i = 0; i < frameCount && continueWorking; i++)
+                    if (settings.AnalysePercent == 0)
                     {
-                        _mre.WaitOne();
-                        af.Clip.ReadFrame(zero, 0, i);
+                        for (i = 0; i < frameCount && continueWorking; i++)
+                        {
+                            if (i > iNextFrameCheck)
+                            {
+                                if (scriptType == 0)
+                                {
+                                    if (!GetSectionCounts(strLogFile))
+                                    {
+                                        // error detected
+                                        running = false;
+                                        break;
+                                    }
+
+                                    if (oSourceInfo.numInt + oSourceInfo.numProg + oSourceInfo.numTC > settings.MinimumUsefulSections
+                                        || CheckDecimate(oSourceInfo.sectionsWithMovingFrames))
+                                    {
+                                        running = false;
+                                        break;
+                                    }
+
+                                    // no sufficient information yet
+                                    // try to estimate when the next check should happen
+                                    iNextFrameCheck = (int)((2 - (decimal)(oSourceInfo.numInt + oSourceInfo.numProg + oSourceInfo.numTC) / settings.MinimumUsefulSections) * i);
+                                    if (iNextFrameCheck - i < 100)
+                                        iNextFrameCheck += 100;
+                                }
+                                else
+                                {
+                                    if (!GetSectionCountsFF(strLogFile))
+                                    {
+                                        // error detected
+                                        running = false;
+                                        break;
+                                    }
+
+                                    if (oSourceInfo.sectionCountBFF + oSourceInfo.sectionCountTFF > settings.MinimumUsefulSections)
+                                    {
+                                        running = false;
+                                        break;
+                                    }
+
+                                    // no sufficient information yet
+                                    // try to estimate when the next check should happen
+                                    iNextFrameCheck = (int)((2 - (decimal)(oSourceInfo.sectionCountBFF + oSourceInfo.sectionCountTFF) / settings.MinimumUsefulSections) * i);
+                                    if (iNextFrameCheck - i < 100)
+                                        iNextFrameCheck += 100;
+                                }
+                            }
+
+                            _mre.WaitOne();
+                            af.Clip.ReadFrame(zero, 0, i);
+                        }
                     }
-                    running = false;
+                    else
+                    {
+                        for (i = 0; i < frameCount && continueWorking; i++)
+                        {
+                            _mre.WaitOne();
+                            af.Clip.ReadFrame(zero, 0, i);
+                        }
+                    }
+
+                    if (running)
+                    {
+                        if (scriptType == 0)
+                            GetSectionCounts(strLogFile);
+                        else
+                            GetSectionCountsFF(strLogFile);
+                        running = false;
+                    }
                 }
             }
             catch (Exception ex)
@@ -186,47 +286,60 @@ namespace MeGUI
             }
         }
         #endregion
+
         #region script generation and running
         private void runScript(int scriptType, string trimLine)
         {
-            const int selectLength = 5; // This used to be variable, but I found no need to. It's useful to keep this name, though
-            int selectEvery = (int) ((100.0 * (double)selectLength) / ((double)settings.AnalysePercent));
-
-            int minAnalyseSections = settings.MinimumAnalyseSections;
-            if (scriptType == 1) // Field order script. For this, we separatefields, so we have twice as many frames anyway
-                // It saves time, and costs nothing to halve the minimum sections to analyse for this example
-                minAnalyseSections = minAnalyseSections / 2 + 1; // We add one to prevent getting 0;
-
-            // Check if we need to modify the SelectRangeEvery parameters:
-            if (((double)selectLength * (double)frameCount / (double)selectEvery) < (int)minAnalyseSections * 5) 
+            int selectEvery = sectionLength;
+            if (settings.AnalysePercent > 0)
             {
-                if (frameCount >= minAnalyseSections * 5) // If there are actually enough frames
-                    selectEvery = (int)((((double)frameCount) / ((double)minAnalyseSections * 5.0)) * (double)selectLength);
-                else
-                    // if there aren't enough frames, analyse everything -- that's got to be good enough
-                    selectEvery = selectLength;
+                int minAnalyseSections = settings.MinimumAnalyseSections;
+                if (settings.MinimumAnalyseSections < settings.MinimumUsefulSections)
+                    minAnalyseSections = settings.MinimumUsefulSections;
+                if (scriptType == 1)
+                {
+                    // Field order script. For this, we separatefields, so we have twice as many frames anyway
+                    // It saves time, and costs nothing to halve the minimum sections to analyse for this example
+                    minAnalyseSections = minAnalyseSections / 2 + 1; // We add one to prevent getting 0;
+                }
+
+                selectEvery = (int)((100.0 * (double)sectionLength) / ((double)settings.AnalysePercent));
+
+                // check if we have to modify the SelectRangeEvery parameter
+                // = if we are below the minimal to be analysed sections
+                if (((double)frameCount / (double)selectEvery) < (int)minAnalyseSections)
+                {
+                    if (frameCount >= minAnalyseSections * sectionLength)
+                    {
+                        // there are more frames available as necessary for the minimal alaysis
+                        selectEvery = (int)((double)frameCount / (double)minAnalyseSections);
+                    }
+                    else
+                    {
+                        // if there aren't enough frames, analyse everything
+                        selectEvery = sectionLength;
+                    }
+                }
             }
 
-            string logFileName = getLogFileName((scriptType == 1) ? "ff_interlace-" + Guid.NewGuid().ToString("N") + ".log" : "interlace-" + Guid.NewGuid().ToString("N") + ".log");
+            string logFileName = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), (scriptType == 1) ? "ff_interlace-" + Guid.NewGuid().ToString("N") + ".log" : "interlace-" + Guid.NewGuid().ToString("N") + ".log");
 
             if (File.Exists(logFileName))
                 File.Delete(logFileName);
 
-            string resultScript = ScriptServer.getScript(scriptType, script, trimLine, logFileName, selectEvery, selectLength);
+            string resultScript = ScriptServer.GetDetectionScript(scriptType, script, trimLine, logFileName, selectEvery, sectionLength);
 
-            // stax
             MethodInvoker mi = delegate {
                 try
                 {
-                    Process(resultScript); // stax
-                    if (error)
+                    Process(resultScript, logFileName, scriptType);
+                    if (error || !continueWorking)
                         return;
-                    if (!continueWorking)
-                        return;
-                    if (scriptType == 0) // detection
-                        analyse(logFileName, selectEvery, selectLength, frameCount);
-                    else if (scriptType == 1) // field order
-                        analyseFF(logFileName);
+
+                    if (scriptType == 0)
+                        Analyse(selectEvery, sectionLength, frameCount); // detection
+                    else
+                        AnalyseFF(); // field order
                 }
                 finally
                 {
@@ -246,15 +359,15 @@ namespace MeGUI
         }
 
         #endregion
+
         #region analysis
-        private bool checkDecimate(int[] data)
+        private bool CheckDecimate(int[] data)
         {
             int[] dataCopy = new int[6];
             Array.Copy(data, dataCopy, 6);
             Array.Sort(dataCopy);
 
-                        int numMovingFrames = -1;
-
+            int numMovingFrames = -1;
             for (int i = 0; i < data.Length; i++)
             {
                 if (dataCopy[5] == data[i])
@@ -266,14 +379,17 @@ namespace MeGUI
                 // If there are 5 moving frames, then it needs no decimation
                 // If there are 0 moving frames, then we have a problem.
             {
-                type = SourceType.DECIMATING;
                 decimateM = 5 - numMovingFrames;
                 return true;
             }
             return false;
         }
-        private void analyseFF(string filename)
+
+        private bool GetSectionCountsFF(string filename)
         {
+            oSourceInfo.sectionCountTFF = oSourceInfo.sectionCountBFF = 0;
+            tffCount = bffCount = 0;
+
             CultureInfo ci = new CultureInfo("en-us");
             StreamReader instream;
             try
@@ -286,10 +402,11 @@ namespace MeGUI
                 error = true;
                 errorMessage = "Opening the field order analysis file failed.";
                 finishProcessing();
-                return;
+                return false;
             }
+
             int countA = 0, countB = 0, countEqual = 0;
-            int localCountA = 0, localCountB = 0, sectionCountA = 0, sectionCountB = 0;
+            int localCountA = 0, localCountB = 0;
             double sumA = 0, sumB = 0;
             double valueA, valueB;
             int count = 0;
@@ -308,13 +425,9 @@ namespace MeGUI
                     catch (Exception)
                     {
                         error = true;
-                        errorMessage = "Unexpected value in file " + filename + "\r\n" +
-                            "This error should not have occurred. Please report it on \r\n" +
-                            "post it on http://sourceforge.net/projects/megui with the file named above.";
-                        errorMessage += "\r\nMore debugging info:\r\n" +
-                            "Line contents: " + line + "\r\n";
+                        errorMessage = "Unexpected value in file " + filename + "\r\nLine contents: " + line;
                         finishProcessing();
-                        return;
+                        return false;
                     }
                     if (valueA > valueB)
                     {
@@ -343,75 +456,71 @@ namespace MeGUI
                     // with film sections as well. Using this thresholding as opposed to just comparing countB to countA
                     // produces _much_ more heavily-sided results.
                     if (localCountA > localCountB && localCountB == 0)
-                        sectionCountA++;
+                        oSourceInfo.sectionCountTFF++;
                     if (localCountB > localCountA && localCountA == 0)
-                        sectionCountB++;
+                        oSourceInfo.sectionCountBFF++;
                     localCountA = 0;
                     localCountB = 0;
                 }
                 line = instream.ReadLine();
             }
             instream.Close();
-            if ((((double)sectionCountA +(double)sectionCountB) / 100.0 * (double)settings.HybridFOPercent) > sectionCountB)
+
+            tffCount = countA;
+            bffCount = countB;
+
+            return true;
+        }
+
+        private void AnalyseFF()
+        {
+            if ((((double)oSourceInfo.sectionCountTFF + (double)oSourceInfo.sectionCountBFF) / 100.0 * (double)settings.HybridFOPercent) > oSourceInfo.sectionCountBFF)
             {
-                analysis += "Source is declared tff by a margin of " + sectionCountA + " to " + sectionCountB + ".";
+                analysis += "Source is declared tff by a margin of " + oSourceInfo.sectionCountTFF + " to " + oSourceInfo.sectionCountBFF + ".";
                 fieldOrder = FieldOrder.TFF;
             }
-            else if ((((double)sectionCountA +(double)sectionCountB) / 100.0 * (double)settings.HybridFOPercent) > sectionCountA)
+            else if ((((double)oSourceInfo.sectionCountTFF + (double)oSourceInfo.sectionCountBFF) / 100.0 * (double)settings.HybridFOPercent) > oSourceInfo.sectionCountTFF)
             {
-                analysis += "Source is declared bff by a margin of " + sectionCountB + " to " + sectionCountA + ".";
+                analysis += "Source is declared bff by a margin of " + oSourceInfo.sectionCountBFF + " to " + oSourceInfo.sectionCountTFF + ".";
                 fieldOrder = FieldOrder.BFF;
             }
             else
             {
-                analysis += "Source is hybrid bff and tff at " + sectionCountB + " bff and " + sectionCountA + " tff.";
+                analysis += "Source is hybrid bff and tff at " + oSourceInfo.sectionCountBFF + " bff and " + oSourceInfo.sectionCountTFF + " tff.";
                 fieldOrder = FieldOrder.VARIABLE;
             }
 
-            tffCount = countA;
-            bffCount = countB;
             finishProcessing();
         }
-        private void analyse(string logFileName, int selectEvery, int selectLength, int inputFrames)
+
+        private bool GetSectionCounts(string logFileName)
         {
             #region variable declaration
-            bool stillWorking = false;
+            bool[,] data = new bool[5, 2];
+            int count = 0;
+            // Decimation data
+            int totalCombed = 0;
+            int[] portionLength = new int[2];
+            int[] nextPortionIndex = new int[2];
+            bool[] inPortion = new bool[2];
+            int[] portionStatus = new int[2];
+            #endregion
+
             StreamReader instream;
             try
             {
                 instream = new StreamReader(logFileName);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 error = true;
-                errorMessage = "Can't open analysis log file, \"" + logFileName + "\"\r\n" +
-                    "Make sure that TIVTC.dll is in your AviSynth plugins dir.";
+                errorMessage = "Cannot open analysis log file \"" + logFileName + "\". error: " + ex.Message;
                 finishProcessing();
-                return;
+                return false;
             }
-            bool[,] data = new bool[5, 2];
-            int count = 0;
-            int numTC = 0, numProg = 0, numInt = 0, numUseless = 0;
-            int sectionCount = 0;
 
-            // Decimation data
-            int totalCombed = 0;
-            int[] sectionsWithMovingFrames = new int[6];
-            
-            int maxPortions = settings.MaxPortions;
-            // interlaced portions
-            List<int[]>[] portions = new List<int[]>[2];
-            portions[0] = new List<int[]>();
-            portions[1] = new List<int[]>();
+            oSourceInfo = new SourceDetectorInfo();
 
-            int[] portionLength = new int[2];
-            int[] nextPortionIndex = new int[2];
-            bool[] inPortion = new bool[2];
-            int[] numPortions = new int[2];
-            int[] portionStatus = new int[2];
-
-
-            #endregion
             #region loop
             string line = instream.ReadLine();
             while (line != null)
@@ -419,9 +528,10 @@ namespace MeGUI
                 if (line.Length > 11)
                 {
                     error = true;
-                    errorMessage = "Unexpected value in file " + logFileName + "\r\n" +
-                        "Make sure you have TIVTC.dll in your AviSynth plugins directory.";
+                    errorMessage = "Unexpected value in file " + logFileName + ": " + line;
+                    break;
                 }
+
                 string[] contents = line.Split(new char[] { '-' });
                 data[count, 0] = (contents[0].Equals("true"));
                 data[count, 1] = (contents[1].Equals("true"));
@@ -430,7 +540,7 @@ namespace MeGUI
                 #region 5-ly analysis
                 if (count == 5)
                 {
-                    sectionCount++;
+                    oSourceInfo.sectionCount++;
                     int numComb = 0;
                     int numMoving = 0;
                     int combA = -1, combB = -1;
@@ -448,28 +558,28 @@ namespace MeGUI
                             numMoving++;
                     }
                     totalCombed += numComb;
-                    sectionsWithMovingFrames[numMoving]++;
+                    oSourceInfo.sectionsWithMovingFrames[numMoving]++;
                     if (numMoving < 5)
                     {
-                        numUseless++;
+                        oSourceInfo.numUseless++;
                         portionStatus[0] = 1;
                         portionStatus[1] = 1;
                     }
                     else if (numComb == 2 && ((combB - combA == 1) || (combB - combA == 4)))
                     {
-                        numTC++;
+                        oSourceInfo.numTC++;
                         portionStatus[0] = 0;
                         portionStatus[1] = 2;
                     }
                     else if (numComb > 0)
                     {
-                        numInt++;
+                        oSourceInfo.numInt++;
                         portionStatus[0] = 2;
                         portionStatus[1] = 0;
                     }
                     else
                     {
-                        numProg++;
+                        oSourceInfo.numProg++;
                         portionStatus[0] = 0;
                         portionStatus[1] = 0;
                     }
@@ -481,7 +591,7 @@ namespace MeGUI
                         {
                             if (inPortion[i])
                             {
-                                ((int[])portions[i][nextPortionIndex[i]])[1] = sectionCount;
+                                ((int[])oSourceInfo.portions[i][nextPortionIndex[i]])[1] = oSourceInfo.sectionCount;
                                 #region useless comments
                                 /*                                if (portionLength[i] == 1) // This should help reduce random fluctuations, by removing length 1 portions
  * I've now changed my mind about random fluctuations. I believe they are good, because they occur when TIVTC is on the verge of making
@@ -513,16 +623,16 @@ namespace MeGUI
                                 portionLength[i]++;
                             else
                             {
-                                int startIndex = sectionCount - portionLength[i];
+                                int startIndex = oSourceInfo.sectionCount - portionLength[i];
                                 int lastEndIndex = -2;
                                 if (nextPortionIndex[i] > 0)
-                                    lastEndIndex = ((int[])portions[i][nextPortionIndex[i]-1])[1];
+                                    lastEndIndex = ((int[])oSourceInfo.portions[i][nextPortionIndex[i] - 1])[1];
                                 if (startIndex - lastEndIndex > 1) // If the last portion ended more than 1 section ago. This culls trivial portions
                                 {
-                                    portions[i].Add(new int[2]);
-                                    ((int[])portions[i][nextPortionIndex[i]])[0] = startIndex;
+                                    oSourceInfo.portions[i].Add(new int[2]);
+                                    ((int[])oSourceInfo.portions[i][nextPortionIndex[i]])[0] = startIndex;
                                     portionLength[i]++;
-                                    numPortions[i]++;
+                                    oSourceInfo.numPortions[i]++;
                                 }
                                 else
                                 {
@@ -539,19 +649,29 @@ namespace MeGUI
                 line = instream.ReadLine();
             }
             #endregion
-            #region final counting
+
             instream.Close();
 
-            int[] array = new int[] { numInt, numProg, numTC };
+            return true;
+        }
+
+        private void Analyse(int selectEvery, int selectLength, int inputFrames)
+        {
+            bool stillWorking = false;
+ 
+            #region final counting
+
+            int[] array = new int[] { oSourceInfo.numInt, oSourceInfo.numProg, oSourceInfo.numTC };
             Array.Sort(array);
 
-            analysis = string.Format("Progressive sections: {0}\r\nInterlaced sections: {1}\r\nPartially Static Sections: {2}\r\nFilm Sections: {3}\r\n", numProg, numInt, numUseless, numTC);
+            analysis = string.Format("Progressive sections: {0}\r\nInterlaced sections: {1}\r\nPartially Static Sections: {2}\r\nFilm Sections: {3}\r\n", oSourceInfo.numProg, oSourceInfo.numInt, oSourceInfo.numUseless, oSourceInfo.numTC);
 
-            if (numInt + numProg + numTC < settings.MinimumUsefulSections)
+            if (oSourceInfo.numInt + oSourceInfo.numProg + oSourceInfo.numTC < settings.MinimumUsefulSections)
             {
-                if (checkDecimate(sectionsWithMovingFrames))
+                if (CheckDecimate(oSourceInfo.sectionsWithMovingFrames))
                 {
                     analysis += "Source is declared as repetition-upconverted. Decimation is required\r\n";
+                    type = SourceType.DECIMATING;
                     finishProcessing();
                     return;
                 }
@@ -567,13 +687,22 @@ namespace MeGUI
             #region plain
             if (array[1] < (double)(array[0]+array[1]+array[2]) /100.0 * settings.HybridPercent)
             {
-                if (array[2] == numProg)
+                if (array[2] == oSourceInfo.numProg)
                 {
-                    analysis += "Source is declared progressive.\r\n";
-                    type = SourceType.PROGRESSIVE;
-                    checkDecimate(sectionsWithMovingFrames);
+                    if (!CheckDecimate(oSourceInfo.sectionsWithMovingFrames))
+                    {
+                        analysis += "Source is declared progressive.\r\n";
+                        type = SourceType.PROGRESSIVE;
+                    }
+                    else
+                    {
+                        analysis += "Source is declared as repetition-upconverted. Decimation is required\r\n";
+                        type = SourceType.DECIMATING;
+                    }
+                    finishProcessing();
+                    return;
                 }
-                else if (array[2] == numInt)
+                else if (array[2] == oSourceInfo.numInt)
                 {
                     analysis += "Source is declared interlaced.\r\n";
                     type = SourceType.INTERLACED;
@@ -592,10 +721,10 @@ namespace MeGUI
             #region hybrid
             else
             {
-                if (array[0] == numProg) // We have a hybrid film/ntsc. This is the most common
+                if (array[0] == oSourceInfo.numProg) // We have a hybrid film/ntsc. This is the most common
                 {
                     analysis += "Source is declared hybrid film/ntsc. Majority is ";
-                    if (array[2] == numTC)
+                    if (array[2] == oSourceInfo.numTC)
                     {
                         analysis += "film.\r\n";
                         majorityFilm = true;
@@ -610,7 +739,7 @@ namespace MeGUI
                     runScript(1, "#no trimming");
 
                 }
-                else if (array[0] == numInt)
+                else if (array[0] == oSourceInfo.numInt)
                 {
                     if (array[0] > (double)(array[0]+array[1]+array[2]) / 100.0 * settings.HybridPercent) // There is also a section of interlaced
                     {
@@ -623,24 +752,24 @@ namespace MeGUI
                     else
                     {
                         analysis += "Source is declared hybrid film/progressive.\r\n";
-                        majorityFilm = (array[2] == numTC);
+                        majorityFilm = (array[2] == oSourceInfo.numTC);
                         type = SourceType.HYBRID_PROGRESSIVE_FILM;
 
                         // Although we don't actually end up using portions for this situation, 
                         // it is good to only analyse the sections which are actually film.
                         int frameCount = -1;
                         string trimLine = "#no trimming";
-                        string textLines = "The number of portions is " + numPortions[1] + ".\r\n";
-                        if (numPortions[1] <= maxPortions)
+                        string textLines = "The number of portions is " + oSourceInfo.numPortions[1] + ".\r\n";
+                        if (oSourceInfo.numPortions[1] <= settings.MaxPortions)
                         {
-                            textLines = findPortions(portions[1], selectEvery, selectLength, 
-                                numPortions[1], sectionCount, inputFrames, "telecined", out trimLine, out frameCount);
+                            textLines = findPortions(oSourceInfo.portions[1], selectEvery, selectLength,
+                                oSourceInfo.numPortions[1], oSourceInfo.sectionCount, inputFrames, "telecined", out trimLine, out frameCount);
                         }
                         stillWorking = true;
                         runScript(1, trimLine);
                     }
                 }
-                else if (array[0] == numTC)
+                else if (array[0] == oSourceInfo.numTC)
                 {
                     if (array[0] > (double)(array[0] + array[1] + array[2]) / 100.0 * settings.HybridPercent) // There is also a section of film
                     {
@@ -657,18 +786,16 @@ namespace MeGUI
                         
                         type = SourceType.HYBRID_PROGRESSIVE_INTERLACED;
 
-                        usingPortions = false;
                         int frameCount = -1;
                         string trimLine = "#no trimming";
-                        string textLines = "The number of portions is " + numPortions[0] + ".\r\n";
+                        string textLines = "The number of portions is " + oSourceInfo.numPortions[0] + ".\r\n";
 
                         if (settings.PortionsAllowed &&
-                            numPortions[0] <= maxPortions &&
+                            oSourceInfo.numPortions[0] <= settings.MaxPortions &&
                             array[2] < ((double)array[1] * settings.PortionThreshold))
                         {
-                            textLines = findPortions(portions[0], selectEvery, selectLength,
-                                numPortions[0], sectionCount, inputFrames, "interlaced", out trimLine, out frameCount);
-                            usingPortions = true;
+                            textLines = findPortions(oSourceInfo.portions[0], selectEvery, selectLength,
+                                oSourceInfo.numPortions[0], oSourceInfo.sectionCount, inputFrames, "interlaced", out trimLine, out frameCount);
                             analysis += textLines;
                         }
                         else
@@ -686,6 +813,7 @@ namespace MeGUI
                 finishProcessing();
         }
         #endregion
+
         #region finalizing
         private void finishProcessing()
         {
@@ -708,18 +836,20 @@ namespace MeGUI
 
             SourceInfo info = new SourceInfo();
             info.sourceType = type;
-            info.decimateM = decimateM;
+            if (type == SourceType.DECIMATING)
+                info.decimateM = decimateM;
             info.fieldOrder = fieldOrder;
             info.majorityFilm = majorityFilm;
             info.analysisResult = analysis;
             info.isAnime = isAnime;
 
             finishedAnalysis(info, false, null);
-
         }
         #endregion
+
         #endregion
-        #region Program interface
+
+        #region program interface
         public void Analyse()
         {
             runScript(0, "#no trimming");
