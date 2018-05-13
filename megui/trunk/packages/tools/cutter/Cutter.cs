@@ -19,11 +19,8 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 using MeGUI.core.util;
@@ -55,13 +52,14 @@ namespace MeGUI.packages.tools.cutter
         {
             player = new VideoPlayer();
             bool videoLoaded = player.loadVideo(mainForm, scriptName, PREVIEWTYPE.ZONES, false);
-            if (!videoLoaded) return;
+            if (!videoLoaded)
+                return;
 
             startFrame.Maximum = endFrame.Maximum = player.Reader.FrameCount - 1;
             cuts.Framerate = player.Framerate;
             avsScript.Text += "   (" + cuts.Framerate.ToString("##.###") + "FPS)";
 
-            player.AllowClose = false;
+            player.AllowClose = true;
             player.ZoneSet += new ZoneSetCallback(player_ZoneSet);
             player.Show();
             player.SetScreenSize();

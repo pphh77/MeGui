@@ -40,6 +40,7 @@ namespace MeGUI
 		private int introEndFrame = 0, creditsStartFrame = 0;
         private ChapterInfo pgc;
         private int intIndex;
+        private bool bFPSKnown;
 
 		#region start / stop
 		public ChapterCreator()
@@ -48,6 +49,7 @@ namespace MeGUI
             intIndex = 0;
             pgc = new ChapterInfo();
             pgc.FramesPerSecond = 23.976;
+            bFPSKnown = false;
             chkCounter.Checked = MainForm.Instance.Settings.ChapterCreatorCounter;
         }
 
@@ -230,7 +232,7 @@ namespace MeGUI
                 return;
             }
 
-            if (fpsChooserIn.Enabled && rbQPF.Checked)
+            if (!bFPSKnown && rbQPF.Checked)
             {
                 if (MessageBox.Show("The FPS value for the input file is unknown. Please make sure that the correct value for the input is selected.\nCurrently " +
                     fpsChooserIn.Value + " will be applied.\n\nDo you want to continue?", "FPS unknown", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
@@ -343,13 +345,13 @@ namespace MeGUI
             if (pgc.FramesPerSecond > 0)
             {
                 fpsChooserIn.Value = fpsChooserOut.Value = (decimal)pgc.FramesPerSecond;
-                fpsChooserIn.Enabled = false;
+                bFPSKnown = true;
             }
             else
             {
                 fpsChooserIn.Value = fpsChooserOut.Value = (decimal)23.976;
                 pgc.FramesPerSecond = (double)23.976;
-                fpsChooserIn.Enabled = true;
+                bFPSKnown = false;
             }
             bNoUpdates = false;
 
@@ -386,7 +388,7 @@ namespace MeGUI
             if (bNoUpdates || pgc.FramesPerSecond == (double)fpsChooserIn.Value)
                 return;
 
-            if (fpsChooserIn.Enabled)
+            if (bFPSKnown)
             {
                 pgc.ChangeFps((double)fpsChooserIn.Value);
                 ResetChapterView();
@@ -437,7 +439,7 @@ namespace MeGUI
                 bNoUpdates = true;
                 pgc.FramesPerSecond = player.Framerate;
                 fpsChooserIn.Value = fpsChooserOut.Value = (decimal)player.Framerate;
-                fpsChooserIn.Enabled = false;
+                bFPSKnown = true;
                 bNoUpdates = false;
             }
 			else

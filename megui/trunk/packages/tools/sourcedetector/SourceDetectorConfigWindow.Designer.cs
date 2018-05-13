@@ -76,9 +76,9 @@ namespace MeGUI
             this.minAnalyseSectionsLabel.AutoSize = true;
             this.minAnalyseSectionsLabel.Location = new System.Drawing.Point(12, 37);
             this.minAnalyseSectionsLabel.Name = "minAnalyseSectionsLabel";
-            this.minAnalyseSectionsLabel.Size = new System.Drawing.Size(193, 13);
+            this.minAnalyseSectionsLabel.Size = new System.Drawing.Size(191, 13);
             this.minAnalyseSectionsLabel.TabIndex = 0;
-            this.minAnalyseSectionsLabel.Text = "Minimum Analysis Sections: (5 frames):";
+            this.minAnalyseSectionsLabel.Text = "Minimum Analysis Sections (5 Frames):";
             // 
             // minAnalyseSections
             // 

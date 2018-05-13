@@ -1,6 +1,10 @@
+2855 [Chapter Creator]      input fps can always be selected
+                            time codes will only be changed when the input fps is changed if the input fps of the source is not known (regression of 2851)
+                            the window can be minimized
+     [AVS Cutter]           video preview can be closed
 2854 [Source Detector]      added high bit depth support
                             new "Minimum Analysis Percent" mode when set to 0 (default 0).
-                                only "Minimum Analysis Sections" has to be reached in sequential read therefore providing a quick detection method.
+                                only "Minimum Analysis Sections" has to be reached in sequential read therefore providing a quick detection method
 2853 [Update]               if automatic updates are disabled and the update window is manually opened no question will be raised anymore if packages have to be downloaded
 2852 [x264]                 changed "show advanced settings" to be a global setting (default is disabled)
                             when --no-psy is selected the --psy-rd options are not availble

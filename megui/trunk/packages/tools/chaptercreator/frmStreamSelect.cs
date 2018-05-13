@@ -88,17 +88,17 @@ namespace MeGUI
         {
             ChapterExtractor ex = null;
 
-            if (!String.IsNullOrEmpty(MeGUI.core.util.FileUtil.GetDVDPath(strFileOrInputFolder)))
+            if (strFileOrInputFolder.ToLowerInvariant().EndsWith(".mpls"))
+                ex = new MplsExtractor();
+            else if (strFileOrInputFolder.ToLowerInvariant().EndsWith(".txt") || strFileOrInputFolder.ToLowerInvariant().EndsWith(".xml"))
+                ex = new TextExtractor();
+            else if (!String.IsNullOrEmpty(MeGUI.core.util.FileUtil.GetBlurayPath(strFileOrInputFolder)))
+                ex = new BlurayExtractor();
+            else if (!String.IsNullOrEmpty(MeGUI.core.util.FileUtil.GetDVDPath(strFileOrInputFolder)))
             {
                 ex = new DvdExtractor();
                 this.Text = "Select your Title/PGC";
             }
-            else if (strFileOrInputFolder.ToLowerInvariant().EndsWith(".mpls"))
-                ex = new MplsExtractor();
-            else if (!String.IsNullOrEmpty(MeGUI.core.util.FileUtil.GetBlurayPath(strFileOrInputFolder)))
-                ex = new BlurayExtractor();
-            else if (strFileOrInputFolder.ToLowerInvariant().EndsWith(".txt") || strFileOrInputFolder.ToLowerInvariant().EndsWith(".xml"))
-                ex = new TextExtractor();
             else if (System.IO.File.Exists(strFileOrInputFolder))
                 ex = new MediaInfoExtractor();
 
