@@ -35,8 +35,9 @@ namespace MeGUI
         {
             if (j is VideoJob && (j as VideoJob).Settings is x265Settings)
             {
+                UpdateCacher.CheckPackage("ffmpeg");
                 UpdateCacher.CheckPackage("x265");
-                return new x265Encoder(mf.Settings.X265.Path);
+                return new x265Encoder("cmd.exe");
             }
             return null;
         }
@@ -44,7 +45,7 @@ namespace MeGUI
         public x265Encoder(string encoderPath) : base()
         {
             executable = encoderPath;
-            iMinimumChildProcessCount = 1;
+            iMinimumChildProcessCount = 2;
         }
 
         public override void ProcessLine(string line, StreamType stream, ImageType oType)
@@ -67,7 +68,7 @@ namespace MeGUI
             base.ProcessLine(line, stream, oType);
         }
 
-        public static string genCommandline(string input, string output, Dar? d, int hres, int vres, int fps_n, int fps_d, x265Settings _xs, Zone[] zones, LogItem log)
+        public static string genCommandline(string input, string output, Dar? d, int hres, int vres, int fps_n, int fps_d, ulong numberOfFrames, x265Settings _xs, Zone[] zones, LogItem log)
         {
             int qp;
             StringBuilder sb = new StringBuilder();
@@ -80,10 +81,12 @@ namespace MeGUI
             {
                 if (!String.IsNullOrEmpty(xs.CustomEncoderOptions))
                     log.LogEvent("custom command line: " + xs.CustomEncoderOptions);
+
+                sb.Append("/c \"\"" + MainForm.Instance.Settings.FFmpeg.Path + "\" -loglevel level+warning -i \"" + input + "\" -strict -1 -f yuv4mpegpipe - | ");
                 if (!MainForm.Instance.Settings.Usex64Tools)
-                    sb.Append("--x26x-binary \"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path), @"x86\x265.exe") + "\" ");
+                    sb.Append("\"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path), @"x86\x265.exe") + "\" ");
                 else
-                    sb.Append("--x26x-binary \"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path), @"x64\x265.exe") + "\" ");
+                    sb.Append("\"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X265.Path), @"x64\x265.exe") + "\" ");
             }
 
             #region main tab
@@ -200,10 +203,7 @@ namespace MeGUI
             else if (!String.IsNullOrEmpty(output))
                 sb.Append("--output " + "\"" + output + "\" ");
 
-            if (!String.IsNullOrEmpty(input))
-                sb.Append("\"" + input + "\"");
-
-            
+            sb.Append("--frames " + numberOfFrames + " --y4m -\"");
 
             return sb.ToString();
         }
@@ -212,7 +212,7 @@ namespace MeGUI
         {
             get 
             {
-                return genCommandline(job.Input, job.Output, job.DAR, hres, vres, fps_n, fps_d, job.Settings as x265Settings, job.Zones, base.log);
+                return genCommandline(job.Input, job.Output, job.DAR, hres, vres, fps_n, fps_d, numberOfFrames, job.Settings as x265Settings, job.Zones, base.log);
             }
         }
 

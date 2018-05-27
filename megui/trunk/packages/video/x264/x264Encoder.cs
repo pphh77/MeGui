@@ -57,8 +57,9 @@ namespace MeGUI
         public x264Encoder(string encoderPath) : base()
         {
             executable = encoderPath;
+            iMinimumChildProcessCount = 1;
             if (UseWrapper())
-                iMinimumChildProcessCount = 1;
+                iMinimumChildProcessCount = 2;
         }
 
         public override void ProcessLine(string line, StreamType stream, ImageType oType)

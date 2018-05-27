@@ -251,6 +251,17 @@ namespace MeGUI
                 bWaitForExit = true;
                 mre.Set(); // if it's paused, then unpause
                 su.WasAborted = true;
+                if (proc.StartInfo.FileName.ToLowerInvariant().Equals("cmd.exe"))
+                {
+                    foreach (Process oProc in OSInfo.GetChildProcesses(proc))
+                    {
+                        if (oProc.ProcessName.ToLowerInvariant().Equals("ffmpeg"))
+                        {
+                            OSInfo.KillProcess(oProc);
+                            break;
+                        }
+                    }
+                }
                 proc.Kill();
                 while (bWaitForExit) // wait until the process has terminated without locking the GUI
                 {

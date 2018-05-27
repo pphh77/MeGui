@@ -806,6 +806,15 @@ namespace MeGUI
         private const int THREAD_MODE_BACKGROUND_BEGIN = 0x00010000;
         private const int THREAD_MODE_BACKGROUND_END = 0x00020000;
 
+        public static void KillProcess(Process oProc)
+        {
+            try
+            {
+                oProc.Kill();
+            }
+            catch { }
+        }
+
         /// <value>
         /// Sets the process, memory and I/O priority on Windows Vista or newer operating systems
         /// </value>
