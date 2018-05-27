@@ -611,7 +611,7 @@ namespace MeGUI.packages.video.x265
         #region codec-specific overload functions
         protected override string getCommandline()
         {
-            return x265Encoder.genCommandline("input", "output", null, -1, -1, 0, 1, 1, Settings as x265Settings, null, null);
+            return x265Encoder.genCommandline(null, null, null, -1, -1, 0, 1, 1, Settings as x265Settings, null, null);
         }
         /// <summary>
         /// Does all the necessary adjustments after a GUI change has been made.

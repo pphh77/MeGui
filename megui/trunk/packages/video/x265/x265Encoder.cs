@@ -197,13 +197,16 @@ namespace MeGUI
                 case 10: sb.Append("--sar 64:45 "); break;
             }
 
-            if (xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.twopass1
-                || xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.threepass1)
-                sb.Append("--output NUL ");
-            else if (!String.IsNullOrEmpty(output))
-                sb.Append("--output " + "\"" + output + "\" ");
-
-            sb.Append("--frames " + numberOfFrames + " --y4m -\"");
+            if (log != null)
+            {
+                // input/output
+                if (xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.twopass1
+                    || xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.threepass1)
+                    sb.Append("--output NUL ");
+                else if (!String.IsNullOrEmpty(output))
+                    sb.Append("--output " + "\"" + output + "\" ");
+                sb.Append("--frames " + numberOfFrames + " --y4m -\"");
+            }
 
             return sb.ToString();
         }

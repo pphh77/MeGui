@@ -976,15 +976,18 @@ namespace MeGUI
             }
 
             //add the rest of the commandline regarding the input/output
-            if (xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.twopass1
-                || xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.threepass1)
-                sb.Append("--output NUL ");
-            else if (!String.IsNullOrEmpty(output))
-                sb.Append("--output " + "\"" + output + "\" ");
-            if (!UseWrapper() || log == null)
-                sb.Append("\"" + input + "\" ");
-            else
-                sb.Append("--frames " + numberOfFrames + " --stdin y4m -\"");
+            if (log != null)
+            {
+                if (xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.twopass1
+                    || xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.threepass1)
+                    sb.Append("--output NUL ");
+                else if (!String.IsNullOrEmpty(output))
+                    sb.Append("--output " + "\"" + output + "\" ");
+                if (!UseWrapper())
+                    sb.Append("\"" + input + "\" ");
+                else
+                    sb.Append("--frames " + numberOfFrames + " --stdin y4m -\"");
+            }
             #endregion
 
             return sb.ToString();

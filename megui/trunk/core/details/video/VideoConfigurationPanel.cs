@@ -33,7 +33,6 @@ namespace MeGUI.core.details.video
         protected int lastQuantizerEncodingValue = 32;
 
         private bool loaded;
-        protected string input = "input", output = "output", encoderPath = "program";
         #endregion
 
         #region start / stop
@@ -46,9 +45,6 @@ namespace MeGUI.core.details.video
         {
             loaded = false;
             InitializeComponent();
-
-            input = info.VideoInput;
-            output = info.VideoOutput;
         }
 
         private void VideoConfigurationPanel_Load(object sender, EventArgs e)
@@ -111,7 +107,7 @@ namespace MeGUI.core.details.video
 
             doCodecSpecificAdjustments();
 
-            this.commandline.Text = encoderPath + " " + getCommandline();
+            this.commandline.Text = getCommandline();
             updating = false;
         }
         #endregion

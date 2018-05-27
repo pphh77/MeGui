@@ -227,12 +227,14 @@ new JobProcessorFactory(new ProcessorFactory(init), "XviDEncoder");
             }
 
             #region input options
-            sb.Append("-i \"" + input + "\" ");
+            if (log != null)
+                sb.Append("-i \"" + input + "\" ");
             #endregion
 
             #region output options
-            if (xs.VideoEncodingType != VideoCodecSettings.VideoEncodingMode.twopass1) // not 2 pass vbr first pass, add output filename and output type
-                sb.Append("-o \"" + output + "\" ");
+            if (log != null)
+                if (xs.VideoEncodingType != VideoCodecSettings.VideoEncodingMode.twopass1) // not 2 pass vbr first pass, add output filename and output type
+                    sb.Append("-o \"" + output + "\" ");
             #endregion
 
             #region rate control options
