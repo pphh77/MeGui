@@ -174,11 +174,13 @@ namespace MeGUI
             TJob job = (TJob)job2;
             this.job = job;
 
-            // This enables relative paths, etc
-            if (!File.Exists(executable))
-                executable = Path.Combine(System.Windows.Forms.Application.StartupPath, executable);
-
-            Util.ensureExists(executable);
+            if (!executable.ToLowerInvariant().Equals("cmd.exe"))
+            {
+                // This enables relative paths, etc
+                if (!File.Exists(executable))
+                    executable = Path.Combine(System.Windows.Forms.Application.StartupPath, executable);
+                Util.ensureExists(executable);
+            }
 
             this.su = su;
             checkJobIO();

@@ -30,9 +30,9 @@ namespace MeGUI
 
     public abstract class CommandlineVideoEncoder : CommandlineJobProcessor<VideoJob>
     {
-        #region variables
-        private ulong numberOfFrames;
+        #region variables 
         private ulong? currentFrameNumber;
+        protected ulong numberOfFrames;
         protected int lastStatusUpdateFramePosition = 0;
         protected int hres = 0, vres = 0;
         protected int fps_n = 0, fps_d = 0;

@@ -38,14 +38,18 @@ namespace MeGUI
                 UpdateCacher.CheckPackage("x264");
 
                 string encoderPath = mf.Settings.X264.Path;
-                if (UseAvs4x26x())
-                    encoderPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.X264.Path), "avs4x26x.exe");
+                if (UseWrapper())
+                {
+                    UpdateCacher.CheckPackage("ffmpeg");
+                    encoderPath = "cmd.exe";
+                }
+                    
                 return new x264Encoder(encoderPath);
             }
             return null;
         }
 
-        private static bool UseAvs4x26x()
+        private static bool UseWrapper()
         {
             return (!MainForm.Instance.Settings.IsMeGUIx64 && MainForm.Instance.Settings.Usex64Tools);
         }
@@ -53,7 +57,7 @@ namespace MeGUI
         public x264Encoder(string encoderPath) : base()
         {
             executable = encoderPath;
-            if (UseAvs4x26x())
+            if (UseWrapper())
                 iMinimumChildProcessCount = 1;
         }
 
@@ -76,7 +80,7 @@ namespace MeGUI
             base.ProcessLine(line, stream, oType);
         }
 
-        public static string genCommandline(string input, string output, Dar? d, int hres, int vres, int fps_n, int fps_d, x264Settings _xs, Zone[] zones, LogItem log)
+        public static string genCommandline(string input, string output, Dar? d, int hres, int vres, int fps_n, int fps_d, ulong numberOfFrames, x264Settings _xs, Zone[] zones, LogItem log)
         {
             int qp;
             bool display = false;
@@ -93,10 +97,10 @@ namespace MeGUI
                 if (!String.IsNullOrEmpty(xs.CustomEncoderOptions))
                     log.LogEvent("custom command line: " + xs.CustomEncoderOptions);
 
-                if (UseAvs4x26x())
+                if (UseWrapper())
                 {
                     // add executable
-                    sb.Append("--x26x-binary \"" + MainForm.Instance.Settings.X264.Path + "\" ");
+                    sb.Append("/c \"\"" + MainForm.Instance.Settings.FFmpeg.Path  + "\" -loglevel level+warning -i \"" + input + "\" -strict -1 -f yuv4mpegpipe - | \"" + MainForm.Instance.Settings.X264.Path + "\" ");
                 }
             }
 
@@ -970,14 +974,16 @@ namespace MeGUI
                 case 10: sb.Append("--sar 64:45 "); break;
             }
 
-            //add the rest of the commandline regarding the output
+            //add the rest of the commandline regarding the input/output
             if (xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.twopass1
                 || xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.threepass1)
                 sb.Append("--output NUL ");
             else if (!String.IsNullOrEmpty(output))
                 sb.Append("--output " + "\"" + output + "\" ");
-            if (!String.IsNullOrEmpty(input))
+            if (!UseWrapper() || log == null)
                 sb.Append("\"" + input + "\" ");
+            else
+                sb.Append("--frames " + numberOfFrames + " --stdin y4m -\"");
             #endregion
 
             return sb.ToString();
@@ -987,7 +993,7 @@ namespace MeGUI
         {
             get 
             {
-                return genCommandline(job.Input, job.Output, job.DAR, hres, vres, fps_n, fps_d, job.Settings as x264Settings, job.Zones, base.log);
+                return genCommandline(job.Input, job.Output, job.DAR, hres, vres, fps_n, fps_d, numberOfFrames, job.Settings as x264Settings, job.Zones, base.log);
             }
         }
     }

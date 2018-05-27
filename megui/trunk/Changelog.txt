@@ -1,3 +1,4 @@
+2856 [x264]                 replaced avs4x26x with ffmpeg
 2855 [Chapter Creator]      input fps can always be selected
                             time codes will only be changed when the input fps is changed if the input fps of the source is not known (regression of 2851)
                             the window can be minimized
