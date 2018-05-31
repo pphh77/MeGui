@@ -74,7 +74,8 @@ namespace MeGUI
         {
             double fps;
             Dar d = Dar.A1x1;
-            JobUtil.GetAllInputProperties(job.Input, out numberOfFrames, out fps, out fps_n, out fps_d, out hres, out vres, out d);
+            AviSynthColorspace colorspace;
+            JobUtil.GetAllInputProperties(job.Input, out numberOfFrames, out fps, out fps_n, out fps_d, out hres, out vres, out d, out colorspace);
             Dar? dar = job.DAR;
             su.NbFramesTotal = numberOfFrames;
             su.ClipLength = TimeSpan.FromSeconds((double)numberOfFrames / fps);
@@ -85,6 +86,8 @@ namespace MeGUI
                 log.LogEvent("resolution: " + hres + "x" + vres);
                 log.LogEvent("frame rate: " + fps_n + "/" + fps_d);
                 log.LogEvent("frames: " + numberOfFrames);
+                log.LogEvent("length: " + string.Format("{0:00}:{1:00}:{2:00}.{3:000}", 
+                    (int)(su.ClipLength.Value.TotalHours), su.ClipLength.Value.Minutes, su.ClipLength.Value.Seconds, su.ClipLength.Value.Milliseconds));
                 if (dar.HasValue && d.AR == dar.Value.AR)
                 {
                     log.LogValue("aspect ratio", d);
@@ -95,6 +98,7 @@ namespace MeGUI
                     if (dar.HasValue)
                         log.LogValue("aspect ratio (job)", dar.Value);
                 }
+                log.LogValue("color space", colorspace.ToString());
             }
 
             if (!job.DAR.HasValue)
@@ -116,28 +120,26 @@ namespace MeGUI
         {
             try
             {
-                if (!string.IsNullOrEmpty(job.Output) && File.Exists(job.Output))
+                if (string.IsNullOrEmpty(job.Output) || !File.Exists(job.Output))
+                    return;
+
+                FileInfo fi = new FileInfo(job.Output);
+                long size = fi.Length; // size in bytes
+                long bitrate = (long)((double)(size * 8.0) / (su.ClipLength.Value.TotalSeconds * 1000.0));
+
+                LogItem stats = log.Info(string.Format("[{0:G}] {1}", DateTime.Now, "Final statistics"));
+                if (job.Settings.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.CQ) // CQ mode
+                    stats.LogValue("Constant Quantizer Mode", "Quantizer " + job.Settings.BitrateQuantizer + " computed...");
+                else if (job.Settings.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.quality)
+                    stats.LogValue("Constant Quality Mode", "Quality " + job.Settings.BitrateQuantizer + " computed...");
+                else
+                    stats.LogValue("Video Bitrate Desired", job.Settings.BitrateQuantizer + " kbit/s");
+                stats.LogValue("Video Bitrate Obtained (approximate)", bitrate + " kbit/s");
+
+                if ((this is x264Encoder || this is x265Encoder) && currentFrameNumber != su.NbFramesTotal)
                 {
-                    FileInfo fi = new FileInfo(job.Output);
-                    long size = fi.Length; // size in bytes
-
-                    ulong framecount;
-                    double framerate;
-                    JobUtil.getInputProperties(out framecount, out framerate, job.Input);
-
-                    double numberOfSeconds = (double)framecount / framerate;
-                    long bitrate = (long)((double)(size * 8.0) / (numberOfSeconds * 1000.0));
-
-                    LogItem stats = log.Info(string.Format("[{0:G}] {1}", DateTime.Now, "Final statistics"));
-
-                    if (job.Settings.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.CQ) // CQ mode
-                        stats.LogValue("Constant Quantizer Mode", "Quantizer " + job.Settings.BitrateQuantizer + " computed...");
-                    else if (job.Settings.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.quality)
-                        stats.LogValue("Constant Quality Mode", "Quality " + job.Settings.BitrateQuantizer + " computed...");
-                    else
-                        stats.LogValue("Video Bitrate Desired", job.Settings.BitrateQuantizer + " kbit/s");
-
-                    stats.LogValue("Video Bitrate Obtained (approximate)", bitrate + " kbit/s");
+                    stats.LogEvent("Number of encoded frames does not match the source: " + su.NbFramesDone + "/" + su.NbFramesTotal, ImageType.Error);
+                    su.HasError = true;
                 }
             }
             catch (Exception e)

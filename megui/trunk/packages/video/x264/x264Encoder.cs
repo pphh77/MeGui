@@ -19,8 +19,8 @@
 // ****************************************************************************
 
 using System;
-using System.IO;
 using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Text;
 
 using MeGUI.core.util;
@@ -73,7 +73,11 @@ namespace MeGUI
                         return;
             }
 
-            if (line.ToLowerInvariant().Contains("[error]:"))
+            if (FileUtil.RegExMatch(line, @"^encoded \d+ frames", true))
+                base.setFrameNumber(line.Substring(8, line.IndexOf(" frames") - 8));
+
+            if (line.ToLowerInvariant().Contains("[error]:")
+                || line.ToLowerInvariant().Contains("error:"))
                 oType = ImageType.Error;
             else if (line.ToLowerInvariant().Contains("[warning]:")
                 || line.ToLowerInvariant().Contains("warning:"))
@@ -81,7 +85,7 @@ namespace MeGUI
             base.ProcessLine(line, stream, oType);
         }
 
-        public static string genCommandline(string input, string output, Dar? d, int hres, int vres, int fps_n, int fps_d, ulong numberOfFrames, x264Settings _xs, Zone[] zones, LogItem log)
+        public static string genCommandline(string input, string output, Dar? d, int hres, int vres, int fps_n, int fps_d, ref ulong numberOfFrames, x264Settings _xs, Zone[] zones, LogItem log)
         {
             int qp;
             bool display = false;
@@ -949,6 +953,9 @@ namespace MeGUI
                 case 6: sb.Append("--pulldown euro "); break;
             }
 
+            // get number of frames to encode
+            oSettingsHandler.getFrames(ref numberOfFrames);
+
             xs.CustomEncoderOptions = oSettingsHandler.getCustomCommandLine();
             if (!String.IsNullOrEmpty(xs.CustomEncoderOptions)) // add custom encoder options
                 sb.Append(xs.CustomEncoderOptions.Trim() + " ");
@@ -975,9 +982,10 @@ namespace MeGUI
                 case 10: sb.Append("--sar 64:45 "); break;
             }
 
-            //add the rest of the commandline regarding the input/output
+            // input/output section
             if (log != null)
             {
+                sb.Append("--frames " + numberOfFrames + " ");
                 if (xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.twopass1
                     || xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.threepass1)
                     sb.Append("--output NUL ");
@@ -986,7 +994,7 @@ namespace MeGUI
                 if (!UseWrapper())
                     sb.Append("\"" + input + "\" ");
                 else
-                    sb.Append("--frames " + numberOfFrames + " --stdin y4m -\"");
+                    sb.Append("--stdin y4m -\"");
             }
             #endregion
 
@@ -997,7 +1005,9 @@ namespace MeGUI
         {
             get 
             {
-                return genCommandline(job.Input, job.Output, job.DAR, hres, vres, fps_n, fps_d, numberOfFrames, job.Settings as x264Settings, job.Zones, base.log);
+                string strCommandLine = genCommandline(job.Input, job.Output, job.DAR, hres, vres, fps_n, fps_d, ref numberOfFrames, job.Settings as x264Settings, job.Zones, base.log);
+                su.NbFramesTotal = numberOfFrames;
+                return strCommandLine;
             }
         }
     }

@@ -1,3 +1,4 @@
+2859 [x26x]                 flag a job as "error" if the number of frames of the input and output does not match
 2858 [Video Encoder]        removed input/output settings from the command line preview
 2857 [x265]                 replaced avs4x26x with ffmpeg
 2856 [x264]                 replaced avs4x26x with ffmpeg

@@ -59,6 +59,9 @@ namespace MeGUI
                         return;
             }
 
+            if (FileUtil.RegExMatch(line, @"^encoded \d+ frames", true))
+                base.setFrameNumber(line.Substring(8, line.IndexOf(" frames") - 8));
+
             if (line.ToLowerInvariant().Contains("[error]:")
                 || line.ToLowerInvariant().Contains("error:"))
                 oType = ImageType.Error;
@@ -68,7 +71,7 @@ namespace MeGUI
             base.ProcessLine(line, stream, oType);
         }
 
-        public static string genCommandline(string input, string output, Dar? d, int hres, int vres, int fps_n, int fps_d, ulong numberOfFrames, x265Settings _xs, Zone[] zones, LogItem log)
+        public static string genCommandline(string input, string output, Dar? d, int hres, int vres, int fps_n, int fps_d, ref ulong numberOfFrames, x265Settings _xs, Zone[] zones, LogItem log)
         {
             int qp;
             StringBuilder sb = new StringBuilder();
@@ -173,6 +176,9 @@ namespace MeGUI
             string CustomSarValue;
             xs.SampleAR = oSettingsHandler.getSar(d, hres, vres, out CustomSarValue, String.Empty);
 
+            // get number of frames to encode
+            oSettingsHandler.getFrames(ref numberOfFrames);
+
             xs.CustomEncoderOptions = oSettingsHandler.getCustomCommandLine();
             if (!String.IsNullOrEmpty(xs.CustomEncoderOptions)) // add custom encoder options
                 sb.Append(xs.CustomEncoderOptions + " ");
@@ -215,7 +221,9 @@ namespace MeGUI
         {
             get 
             {
-                return genCommandline(job.Input, job.Output, job.DAR, hres, vres, fps_n, fps_d, numberOfFrames, job.Settings as x265Settings, job.Zones, base.log);
+                string strCommandLine = genCommandline(job.Input, job.Output, job.DAR, hres, vres, fps_n, fps_d, ref numberOfFrames, job.Settings as x265Settings, job.Zones, base.log);
+                su.NbFramesTotal = numberOfFrames;
+                return strCommandLine;
             }
         }
 

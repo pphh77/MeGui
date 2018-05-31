@@ -87,6 +87,57 @@ namespace MeGUI.packages.video.x265
         }
 
         /// <summary>
+        /// Calculates the --frames value
+        /// </summary>
+        /// <returns>the --frames value</returns>
+        public void getFrames(ref ulong frames)
+        {
+            if (_log == null)
+                return;
+
+            string strCustomValue = "";
+            ulong seek = 0;
+            if (extractCustomCommand("seek", out strCustomValue))
+            {
+                ulong iTemp = seek;
+                if (ulong.TryParse(strCustomValue, out iTemp))
+                {
+                    seek = iTemp;
+                    if (seek >= frames)
+                    {
+                        seek = 0;
+                        _log.LogEvent("removing --seek as the seek value outreaches the frame number");
+                    }
+                    else
+                    {
+                        _xs.CustomEncoderOptions += " --seek " + seek;
+                        frames -= seek;  // reduce by the number of seek frames
+                    }
+                }
+            }
+
+            strCustomValue = string.Empty;
+            ulong framesCustom = frames;
+            if (extractCustomCommand("frames", out strCustomValue))
+            {
+                ulong iTemp = frames;
+                if (ulong.TryParse(strCustomValue, out iTemp))
+                {
+                    framesCustom = iTemp;
+                    if (framesCustom > frames)
+                    {
+                        _log.LogEvent("reducing --frames as required by the selected source");
+                        framesCustom = frames;
+                    }
+                    else
+                        frames = framesCustom;
+                }
+            }
+
+            return;
+        }
+
+        /// <summary>
         /// returns the value for the selected command in the custom command line 
         /// and removes the command from the custom command line
         /// </summary>

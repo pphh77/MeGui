@@ -1109,8 +1109,10 @@ namespace MeGUI.packages.video.x264
         #region codec-specific overload functions
         protected override string getCommandline()
         {
-            return x264Encoder.genCommandline("input", "output", null, -1, -1, 0, 1, 1, Settings as x264Settings, null, null);
+            ulong x = 1;
+            return x264Encoder.genCommandline("input", "output", null, -1, -1, 0, 1, ref x, Settings as x264Settings, null, null);
         }
+
         /// <summary>
         /// Does all the necessary adjustments after a GUI change has been made.
         /// </summary>

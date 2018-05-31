@@ -751,14 +751,19 @@ namespace MeGUI
                 return "";
             }
 
+            JobUtil.GetAllInputProperties(strOutputAVSFile, out ulong numberOfFrames, out double fps, out int fps_n, out int fps_d, out int hres, out int vres, out Dar d, out AviSynthColorspace colorspace);
+            _log.LogEvent("resolution: " + hres + "x" + vres);
+            _log.LogEvent("frame rate: " + fps_n + "/" + fps_d);
+            _log.LogEvent("frames: " + numberOfFrames);
+            TimeSpan oTime = TimeSpan.FromSeconds((double)numberOfFrames / fps);
+            _log.LogEvent("length: " + string.Format("{0:00}:{1:00}:{2:00}.{3:000}",
+                (int)(oTime.TotalHours), oTime.Minutes, oTime.Seconds, oTime.Milliseconds));
+            _log.LogValue("aspect ratio", d);
+            _log.LogValue("color space", colorspace.ToString());
+
             // create qpf file if necessary and possible 
             if (job.PostprocessingProperties.ChapterInfo.HasChapters && useChaptersMarks && settings != null && settings is x264Settings)
             {
-                JobUtil.GetAllInputProperties(strOutputAVSFile, out ulong numberOfFrames, out double fps, out int fps_n, out int fps_d, out int hres, out int vres, out Dar d);
-                _log.LogEvent("frame rate: " + fps_n + "/" + fps_d);
-                _log.LogEvent("frames: " + numberOfFrames);
-                _log.LogValue("aspect ratio", d);
-
                 fps = (double)fps_n / fps_d;
                 string strChapterFile = Path.ChangeExtension(strOutputAVSFile, ".qpf");
                 job.PostprocessingProperties.ChapterInfo.ChangeFps(fps);

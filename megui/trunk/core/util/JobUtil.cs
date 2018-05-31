@@ -445,8 +445,10 @@ namespace MeGUI
 		{
             int d1, d2, d3, d4;
             Dar d;
-            return GetAllInputProperties(video, out nbOfFrames, out framerate, out d1, out d2, out d3, out d4, out d);
+            AviSynthColorspace c;
+            return GetAllInputProperties(video, out nbOfFrames, out framerate, out d1, out d2, out d3, out d4, out d, out c);
 		}
+
         /// <summary>
         /// gets the number of frames, framerate, horizontal and vertical resolution from a video source
         /// </summary>
@@ -459,7 +461,7 @@ namespace MeGUI
         /// <param name="vRes">the vertical resolution</param>
         /// <param name="dar">the dar value</param>
         /// <returns>whether the source could be opened or not</returns>
-        public static bool GetAllInputProperties(string video, out ulong nbOfFrames, out double framerate, out int framerate_n, out int framerate_d, out int hRes, out int vRes, out Dar dar)
+        public static bool GetAllInputProperties(string video, out ulong nbOfFrames, out double framerate, out int framerate_n, out int framerate_d, out int hRes, out int vRes, out Dar dar, out AviSynthColorspace colorspace)
 		{
             try
 			{
@@ -472,6 +474,7 @@ namespace MeGUI
                     hRes = (int)avi.VideoInfo.Width;
                     vRes = (int)avi.VideoInfo.Height;
                     dar = avi.VideoInfo.DAR;
+                    colorspace = avi.Clip.OriginalColorspace;
                 }
                 return true;
 			}
@@ -494,7 +497,8 @@ namespace MeGUI
 		public static bool GetAllInputProperties(out ulong nbOfFrames, out double framerate, out int hRes, out int vRes, out Dar dar, string video)
 		{
             int fn, fd;
-            return GetAllInputProperties(video, out nbOfFrames, out framerate, out fn, out fd, out hRes, out vRes, out dar);
+            AviSynthColorspace c;
+            return GetAllInputProperties(video, out nbOfFrames, out framerate, out fn, out fd, out hRes, out vRes, out dar, out c);
 		}
 
 		/// <summary>
