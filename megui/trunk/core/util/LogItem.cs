@@ -95,9 +95,9 @@ namespace MeGUI.core.util
             this.text = name;
             this.type = type;
             if (type == ImageType.Warning)
-                MainForm.Instance.setOverlayIcon(System.Drawing.SystemIcons.Warning);
+                MainForm.Instance.setOverlayIcon(System.Drawing.SystemIcons.Warning, false);
             else if (type == ImageType.Error)
-                MainForm.Instance.setOverlayIcon(System.Drawing.SystemIcons.Error);
+                MainForm.Instance.setOverlayIcon(System.Drawing.SystemIcons.Error, false);
         }
 
         public LogItem Add(LogItem logItem)

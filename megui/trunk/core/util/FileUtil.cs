@@ -671,143 +671,166 @@ namespace MeGUI.core.util
             // copy required runtime files
             CopyRuntimeFiles();
 
-            // detect system installation
-            string syswow64path = Environment.GetFolderPath(Environment.SpecialFolder.System).ToLowerInvariant().Replace("\\system32", "\\SysWOW64");
-
-            if (!MainForm.Instance.Settings.IsMeGUIx64)
+            // detect system installation - checks if a system installed AviSynth build can be used
+            int iResult = AviSynthClip.CheckAvisynthInstallation(out string strVersion, out bool bIsAVS26, out bool bIsAVSPlus, out bool bIsMT, out string strAviSynthDLLSystem);
+            if (GetFileInformation(strAviSynthDLLSystem, out fileVersion, out fileDate, out fileProductName))
             {
-                // on a x86 MeGUI build try the SysWOW64 folder first
-                if (GetFileInformation(Path.Combine(syswow64path, "avisynth.dll"), out fileVersion, out fileDate, out fileProductName))
-                    bFoundInstalledAviSynth = true;
-                else if (!Directory.Exists(syswow64path)
-                    && GetFileInformation(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "avisynth.dll"), out fileVersion, out fileDate, out fileProductName))
-                    bFoundInstalledAviSynth = true;
-            }
-            else if (GetFileInformation(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "avisynth.dll"), out fileVersion, out fileDate, out fileProductName))
-                bFoundInstalledAviSynth = true;
-
-            if (bFoundInstalledAviSynth)
-            {
+                // file information
                 if (!String.IsNullOrEmpty(fileVersion))
                     oLogInstalled.LogValue("File Version", fileVersion, false);
                 else
                     oLogInstalled.LogValue("File Version", "n/a", false);
                 if (!String.IsNullOrEmpty(fileDate))
-                    oLogInstalled.LogValue("Date", fileDate, false);
+                    oLogInstalled.LogValue("File Date", fileDate, false);
                 else
-                    oLogInstalled.LogValue("Date", "n/a", false);
+                    oLogInstalled.LogValue("File Date", "n/a", false);
                 if (!String.IsNullOrEmpty(fileProductName))
-                    oLogInstalled.LogValue("Name", fileProductName, false);
+                    oLogInstalled.LogValue("File Name", fileProductName, false);
                 else
-                    oLogInstalled.LogValue("Name", "n/a", false);
+                    oLogInstalled.LogValue("File Name", "n/a", false);
+                oLogInstalled.LogValue("File Path", strAviSynthDLLSystem, false);
 
-                // checks if the AviSynth build can be used
-                int iResult = AviSynthClip.CheckAvisynthInstallation(out string strVersion, out bool bIsAVS26, out bool bIsAVSPlus, out bool bIsMT);
+                // avisynth information
                 if (iResult != 0)
                 {
                     // no, it cannot be used
-                    bFoundInstalledAviSynth = false;
-
                     if (iResult == 3)
-                        oLogInstalled.LogValue("Status",
-                            "Installed AviSynth build is out of date." + (MainForm.Instance.Settings.AlwaysUsePortableAviSynth ? String.Empty : " Switching to the portable build."),
+                        oLogInstalled.LogValue("AviSynth Status",
+                            "installed AviSynth build is out of date" + (MainForm.Instance.Settings.AlwaysUsePortableAviSynth ? String.Empty : ". switching to the portable build."),
                             !MainForm.Instance.Settings.AlwaysUsePortableAviSynth ? ImageType.Warning : ImageType.Information, false);
                     else
-                        oLogInstalled.LogValue("Status",
-                            "Installed AviSynth build cannot be used." + (MainForm.Instance.Settings.AlwaysUsePortableAviSynth ? String.Empty : " Switching to the portable build."),
+                        oLogInstalled.LogValue("AviSynth Status",
+                            "installed AviSynth build cannot be used: " + iResult + (MainForm.Instance.Settings.AlwaysUsePortableAviSynth ? String.Empty : ". switching to the portable build."),
                             !MainForm.Instance.Settings.AlwaysUsePortableAviSynth ? ImageType.Warning : ImageType.Information, false);
                 }
                 else
                 {
+                    // yes, it can potentially be used
                     if (!String.IsNullOrEmpty(strVersion))
                     {
-                        oLogInstalled.LogValue("Version", strVersion, false);
+                        oLogInstalled.LogValue("AviSynth Version", strVersion, false);
                         oLogInstalled.LogValue("AviSynth+", bIsAVSPlus ? "true" : "false", false);
-                        oLogInstalled.LogValue("MT", bIsMT ? "true" : "false", false);
+                        oLogInstalled.LogValue("AviSynth MT", bIsMT ? "true" : "false", false);
                     }
                     else
                     {
-                        oLogInstalled.LogValue("Version", "n/a", false);
+                        oLogInstalled.LogValue("AviSynth Version", "n/a", false);
                         oLogInstalled.LogValue("AviSynth+", "n/a", false);
-                        oLogInstalled.LogValue("MT", "n/a", false);
+                        oLogInstalled.LogValue("AviSynth MT", "n/a", false);
                     }
 
                     if (!String.IsNullOrEmpty(strVersion) && !bIsAVS26)
                     {
                         bFoundInstalledAviSynth = false;
-                        oLogInstalled.LogValue("Status",
-                            "Installed AviSynth build is out of date." + (MainForm.Instance.Settings.AlwaysUsePortableAviSynth ? String.Empty : " Switching to the portable build."),
+                        oLogInstalled.LogValue("AviSynth Status",
+                            "installed AviSynth build is out of date" + (MainForm.Instance.Settings.AlwaysUsePortableAviSynth ? String.Empty : ". switching to the portable build."),
                             !MainForm.Instance.Settings.AlwaysUsePortableAviSynth ? ImageType.Warning : ImageType.Information, false);
                     }
                     else
-                        oLogInstalled.LogValue("Status", (!MainForm.Instance.Settings.AlwaysUsePortableAviSynth && bFoundInstalledAviSynth) ? "active" : "inactive", false);
+                        bFoundInstalledAviSynth = true;
 
-                    if (bFoundInstalledAviSynth && !MainForm.Instance.Settings.AlwaysUsePortableAviSynth && bIsAVSPlus)
+                    if (bFoundInstalledAviSynth && bIsAVSPlus)
                         MainForm.Instance.Settings.AviSynthPlus = true;
                 }
             }
             else
-                oLogInstalled.LogEvent("not installed", ImageType.Information, false);
+                oLogInstalled.LogValue("AviSynth Status", "not installed", ImageType.Information, false);   
             oLog.Add(oLogInstalled);
 
-            // detects included avisynth
+            // check included avisynth
             MainForm.Instance.Settings.PortableAviSynth = false;
-            UpdateCacher.CheckPackage("avs");
-            if (GetFileInformation(MainForm.Instance.Settings.AviSynth.Path, out fileVersion, out fileDate, out fileProductName))
-            {
-                if (!String.IsNullOrEmpty(fileVersion))
-                    oLogPortable.LogValue("File Version", fileVersion, false);
-                else
-                    oLogPortable.LogValue("File Version", "n/a", false);
-                if (!String.IsNullOrEmpty(fileDate))
-                    oLogPortable.LogValue("Date", fileDate, false);
-                else
-                    oLogPortable.LogValue("Date", "n/a", false);
-                if (!String.IsNullOrEmpty(fileProductName))
-                    oLogPortable.LogValue("Name", fileProductName, false);
-                else
-                    oLogPortable.LogValue("Name", "n/a", false);
 
-                if (!bFoundInstalledAviSynth || MainForm.Instance.Settings.AlwaysUsePortableAviSynth)
+            if (!bFoundInstalledAviSynth || MainForm.Instance.Settings.AlwaysUsePortableAviSynth)
+            {
+                PortableAviSynthActions(false);
+                string strAviSynthPortable = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), Path.GetFileName(MainForm.Instance.Settings.AviSynth.Path));
+                if (GetFileInformation(strAviSynthPortable, out fileVersion, out fileDate, out fileProductName))
                 {
-                    PortableAviSynthActions(false);
+                    if (!String.IsNullOrEmpty(fileVersion))
+                        oLogPortable.LogValue("File Version", fileVersion, false);
+                    else
+                        oLogPortable.LogValue("File Version", "n/a", false);
+                    if (!String.IsNullOrEmpty(fileDate))
+                        oLogPortable.LogValue("File Date", fileDate, false);
+                    else
+                        oLogPortable.LogValue("File Date", "n/a", false);
+                    if (!String.IsNullOrEmpty(fileProductName))
+                        oLogPortable.LogValue("File Name", fileProductName, false);
+                    else
+                        oLogPortable.LogValue("File Name", "n/a", false);
+                    oLogPortable.LogValue("File Path", strAviSynthPortable.ToLowerInvariant(), false);
 
                     // checks if the AviSynth build can be used
-                    int iResult = AviSynthClip.CheckAvisynthInstallation(out string strVersion, out bool bIsAVS26, out bool bIsAVSPlus, out bool bIsMT);
-                    if (iResult != 0)
+                    iResult = AviSynthClip.CheckAvisynthInstallation(out strVersion, out bIsAVS26, out bIsAVSPlus, out bIsMT, out string strAviSynthDLLPortable);
+                    if (!strAviSynthDLLPortable.ToLower().Equals(strAviSynthPortable.ToLower()))
+                    {
+                        if (bFoundInstalledAviSynth)
+                        {
+                            // switch back to the system installed AviSynth
+                            PortableAviSynthActions(true);
+                            oLogInstalled.LogValue("AviSynth Status", "active", false);
+                        }
+                        oLogPortable.LogValue("AviSynth Status", "inactive - portable AviSynth build cannot be used. The loaded DLL is: " + strAviSynthDLLPortable, 
+                            bFoundInstalledAviSynth ? ImageType.Warning : ImageType.Error, false);
+                    }
+                    else if (iResult != 0)
                     {
                         // no, it cannot be used
                         if (iResult == 3)
-                            oLogPortable.LogValue("Status", "Installed AviSynth build is out of date.", ImageType.Error, false);
+                            oLogPortable.LogValue("AviSynth Status", (bFoundInstalledAviSynth ? "inactive" : "active") + " - portable AviSynth build is out of date", ImageType.Error, false);
                         else
-                            oLogPortable.LogValue("Status", "Installed AviSynth build cannot be used.", ImageType.Error, false);
+                            oLogPortable.LogValue("AviSynth Status", "portable AviSynth build cannot be used: " + iResult, ImageType.Error, false);
 
                         // delete avisynth.dll so that it will be reinstalled
-                        try { File.Delete(MainForm.Instance.Settings.AviSynth.Path); }
-                        catch { }
+                        FileUtil.DeleteFile(MainForm.Instance.Settings.AviSynth.Path, null);
+
+                        if (bFoundInstalledAviSynth)
+                        {
+                            // switch back to the system installed AviSynth
+                            PortableAviSynthActions(true);
+                            oLogInstalled.LogValue("AviSynth Status", "active", false);
+                        }
                     }
                     else
                     {
                         if (!String.IsNullOrEmpty(strVersion))
                         {
-                            oLogPortable.LogValue("Version", strVersion, false);
+                            oLogPortable.LogValue("AviSynth Version", strVersion, false);
                             oLogPortable.LogValue("AviSynth+", bIsAVSPlus ? "true" : "false", false);
-                            oLogPortable.LogValue("MT", bIsMT ? "true" : "false", false);
+                            oLogPortable.LogValue("AviSynth MT", bIsMT ? "true" : "false", false);
                         }
                         else
                         {
-                            oLogPortable.LogValue("Version", "n/a", false);
+                            oLogPortable.LogValue("AviSynth Version", "n/a", false);
                             oLogPortable.LogValue("AviSynth+", "n/a", false);
-                            oLogPortable.LogValue("MT", "n/a", false);
+                            oLogPortable.LogValue("AviSynth MT", "n/a", false);
                         }
 
                         if (!String.IsNullOrEmpty(strVersion) && !bIsAVS26)
                         {
-                            bFoundInstalledAviSynth = false;
-                            oLogPortable.LogValue("Status", "Installed AviSynth build is out of date.", ImageType.Error, false);
+                            oLogPortable.LogValue("AviSynth Status", (bFoundInstalledAviSynth ? "in" : string.Empty) + "active - portable AviSynth build is out of date", ImageType.Error, false);
+                            if (bFoundInstalledAviSynth)
+                            {
+                                // switch back to the system installed AviSynth
+                                PortableAviSynthActions(true);
+                                oLogInstalled.LogValue("AviSynth Status", "active", false);
+                            }
+                            else
+                            {
+                                bFoundInstalledAviSynth = true;
+                                MainForm.Instance.Settings.PortableAviSynth = true;
+                                if (bIsAVSPlus)
+                                    MainForm.Instance.Settings.AviSynthPlus = true;
+                            }
+
+                            // delete avisynth.dll so that it will be reinstalled
+                            FileUtil.DeleteFile(MainForm.Instance.Settings.AviSynth.Path, null);
                         }
                         else
                         {
+                            if (bFoundInstalledAviSynth)
+                                oLogInstalled.LogValue("AviSynth Status", "inactive", false);
+                            oLogPortable.LogValue("AviSynth Status", "active", false);
                             bFoundInstalledAviSynth = true;
                             MainForm.Instance.Settings.PortableAviSynth = true;
                             if (bIsAVSPlus)
@@ -815,11 +838,14 @@ namespace MeGUI.core.util
                         }
                     }
                 }
-                oLogPortable.LogValue("Status", MainForm.Instance.Settings.PortableAviSynth ? "active" : "inactive", false);
+                else
+                {
+                    if (bFoundInstalledAviSynth)
+                        oLogInstalled.LogValue("AviSynth Status", "active", false);
+                    oLogPortable.LogValue("AviSynth Status", "not installed", ImageType.Error, false);
+                }
+                oLog.Add(oLogPortable);
             }
-            else
-                oLogPortable.LogEvent("not installed", ImageType.Error, false);
-            oLog.Add(oLogPortable);
 
             if (!bFoundInstalledAviSynth)
                     oLog.LogValue("AviSynth", "not found", ImageType.Error, false);
@@ -1065,8 +1091,6 @@ namespace MeGUI.core.util
         /// <param name="bRemove">if true the files will be removed</param>
         public static void PortableAviSynthActions(bool bRemove)
         {
-            string avisynthPath = Path.GetDirectoryName(MainForm.Instance.Settings.AviSynth.Path);
-
             ArrayList targetDirectories = new ArrayList();
             targetDirectories.Add(Path.GetDirectoryName(Application.ExecutablePath));
             targetDirectories.Add(Path.GetDirectoryName(MainForm.Instance.Settings.FFmpeg.Path));
@@ -1085,6 +1109,9 @@ namespace MeGUI.core.util
 
                 if (!bRemove)
                 {
+                    UpdateCacher.CheckPackage("avs");
+                    string avisynthPath = Path.GetDirectoryName(MainForm.Instance.Settings.AviSynth.Path);
+
                     // copy the avisynth files
                     foreach (String file in sourceFiles)
                     {

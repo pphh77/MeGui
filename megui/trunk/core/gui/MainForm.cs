@@ -1314,7 +1314,10 @@ namespace MeGUI
             this.ClientSize = settings.MainFormSize;
 
             if (OSInfo.IsWindows7OrNewer)
+            {
                 taskbarItem = (ITaskbarList3)new ProgressTaskbar();
+                setOverlayIcon(taskbarIcon, true);
+            }
 
             if (settings.AutoStartQueueStartup)
                 jobControl1.StartAll(false);
@@ -1400,7 +1403,7 @@ namespace MeGUI
             UpdateCacher.CheckPackage("updater");
         }
 
-        public void setOverlayIcon(Icon oIcon)
+        public void setOverlayIcon(Icon oIcon, bool bForce)
         {
             if (!OSInfo.IsWindows7OrNewer)
                 return;
@@ -1408,22 +1411,21 @@ namespace MeGUI
             if (oIcon == null)
             {
                 // remove the overlay icon
-                Util.ThreadSafeRun(this, delegate { taskbarItem.SetOverlayIcon(this.Handle, IntPtr.Zero, null); });
+                if (taskbarItem != null)
+                    Util.ThreadSafeRun(this, delegate { taskbarItem.SetOverlayIcon(this.Handle, IntPtr.Zero, null); });
                 taskbarIcon = null;
                 return;
             }
 
-            if (taskbarIcon != null && oIcon.Handle == taskbarIcon.Handle)
+            if (taskbarIcon != null && oIcon.Handle == taskbarIcon.Handle && !bForce)
                 return;
 
             if (oIcon == System.Drawing.SystemIcons.Warning && taskbarIcon == System.Drawing.SystemIcons.Error)
                 return;
 
             if (taskbarItem != null)
-            {
                 Util.ThreadSafeRun(this, delegate { taskbarItem.SetOverlayIcon(this.Handle, oIcon.Handle, null); });
-                taskbarIcon = oIcon;
-            }
+            taskbarIcon = oIcon;
         }
 
         private void OneClickEncButton_Click(object sender, EventArgs e)

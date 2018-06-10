@@ -475,18 +475,28 @@ namespace MeGUI
         /// Detects if the AviSynth version can be used
         /// </summary>
         /// <returns>0 if everything is fine, 3 if the version is outdated or a different value for other errors</param>
-        public static int CheckAvisynthInstallation(out string strVersion, out bool bIsAVS26, out bool bIsAVSPlus, out bool bIsMT)
+        public static int CheckAvisynthInstallation(out string strVersion, out bool bIsAVS26, out bool bIsAVSPlus, out bool bIsMT, out string strAviSynthDLL)
         {
             strVersion = "";
             bIsAVS26 = false;
             bIsAVSPlus = false;
             bIsMT = false;
-            
+            strAviSynthDLL = string.Empty;
+
             IntPtr _avs = new IntPtr(0);
             AVSDLLVideoInfo _vi = new AVSDLLVideoInfo();
             AviSynthColorspace _colorSpace = AviSynthColorspace.Unknown;
             AudioSampleType _sampleType = AudioSampleType.Unknown;
+            if (MainForm.Instance.Settings.ShowDebugInformation)
+                LoadLibraryA("avisynthwrapper.dll");
+
             int iStartResult = dimzon_avs_init_2(ref _avs, "Eval", "Version()", ref _vi, ref _colorSpace, ref _sampleType, AviSynthColorspace.RGB24.ToString());
+
+            foreach (System.Diagnostics.ProcessModule module in System.Diagnostics.Process.GetCurrentProcess().Modules)
+            {
+                if (module.FileName.ToLowerInvariant().EndsWith("avisynth.dll"))
+                    strAviSynthDLL = module.FileName.ToLowerInvariant();
+            }
 
             if (iStartResult == 0)
             {
@@ -528,7 +538,19 @@ namespace MeGUI
             }
 
             int iCloseResult = dimzon_avs_destroy(ref _avs);
-            _avs = new IntPtr(0);
+            if (_avs != IntPtr.Zero)
+                CloseHandle(_avs);
+            _avs = IntPtr.Zero;
+            if (MainForm.Instance.Settings.ShowDebugInformation)
+            {
+                foreach (System.Diagnostics.ProcessModule mod in System.Diagnostics.Process.GetCurrentProcess().Modules)
+                {
+                    if (mod.FileName.ToLowerInvariant().EndsWith("avisynthwrapper.dll"))
+                        FreeLibrary(mod.BaseAddress);
+                    else if (mod.FileName.ToLowerInvariant().EndsWith("avisynth.dll"))
+                        FreeLibrary(mod.BaseAddress);
+                }
+            }
             return iStartResult;
         }
 
@@ -646,6 +668,8 @@ namespace MeGUI
                     {
                         if (mod.FileName.ToLowerInvariant().Equals(strFile.ToLowerInvariant()))
                             bResult = FreeLibrary(mod.BaseAddress);
+                        else if (mod.FileName.ToLowerInvariant().EndsWith("avisynth.dll"))
+                            FreeLibrary(mod.BaseAddress);
                     }
                     MainForm.Instance.AviSynthWrapperLog.LogValue("sessions open: " + _countDLL + ", id: " + _random + ", close: " + bResult, script + (bDebug ? Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.StackTrace : String.Empty));
                 }

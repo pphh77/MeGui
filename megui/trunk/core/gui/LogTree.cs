@@ -208,7 +208,7 @@ namespace MeGUI.core.gui
 
         private void ResetOverlayIcon_Click(object sender, EventArgs e)
         {
-           MainForm.Instance.setOverlayIcon(null);
+           MainForm.Instance.setOverlayIcon(null, false);
         }
 
         private void ContextMenu_Opening(object sender, CancelEventArgs e)
