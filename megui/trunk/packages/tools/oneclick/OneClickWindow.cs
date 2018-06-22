@@ -1746,6 +1746,10 @@ namespace MeGUI
             if (this.Visible)
                 a.enableDragDrop();
 
+            if (iSelectedSubtitleTabPage > subtitlesTab.TabPages.Count - 3 ||
+                iSelectedSubtitleTabPage > subtitleTracks.Count - 3)
+                iSelectedSubtitleTabPage = 0;
+
             subtitlesTab.TabPages.Insert(iSelectedSubtitleTabPage + 1, p);
             subtitleTracks.Insert(iSelectedSubtitleTabPage + 1, a);
             p.Controls.Add(a);
@@ -1861,6 +1865,8 @@ namespace MeGUI
             catch (Exception) {}
             subtitleTracks.RemoveRange(1, subtitleTracks.Count - 1);
 
+            iSelectedSubtitleTabPage = 0;
+
             foreach (string strLanguage in settings.DefaultSubtitleLanguage)
                 if (strLanguage.Equals("[none]"))
                     return;
@@ -1964,6 +1970,10 @@ namespace MeGUI
             a.SelectProfileNameOrWarn(audioTracks[0].EncoderProfile);
             if (this.Visible)
                 a.enableDragDrop();
+
+            if (iSelectedAudioTabPage > audioTab.TabPages.Count - 3 ||
+                iSelectedAudioTabPage > audioTracks.Count - 3)
+                iSelectedAudioTabPage = 0;
 
             audioTab.TabPages.Insert(iSelectedAudioTabPage + 1, p);
             audioTracks.Insert(iSelectedAudioTabPage + 1, a);
@@ -2081,6 +2091,8 @@ namespace MeGUI
             }
             catch (Exception) {}
             audioTracks.RemoveRange(1, audioTracks.Count - 1);
+
+            iSelectedAudioTabPage = 0;
 
             foreach (string strLanguage in settings.DefaultAudioLanguage)
                 if (strLanguage.Equals("[none]"))

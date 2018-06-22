@@ -168,5 +168,4 @@ namespace MeGUI.core.gui
             this.name = name;
         }
     }
-
 }
