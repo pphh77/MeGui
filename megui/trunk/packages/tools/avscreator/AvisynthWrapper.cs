@@ -487,8 +487,6 @@ namespace MeGUI
             AVSDLLVideoInfo _vi = new AVSDLLVideoInfo();
             AviSynthColorspace _colorSpace = AviSynthColorspace.Unknown;
             AudioSampleType _sampleType = AudioSampleType.Unknown;
-            if (MainForm.Instance.Settings.ShowDebugInformation)
-                LoadLibraryA("avisynthwrapper.dll");
 
             int iStartResult = dimzon_avs_init_2(ref _avs, "Eval", "Version()", ref _vi, ref _colorSpace, ref _sampleType, AviSynthColorspace.RGB24.ToString());
 
@@ -541,16 +539,14 @@ namespace MeGUI
             if (_avs != IntPtr.Zero)
                 CloseHandle(_avs);
             _avs = IntPtr.Zero;
-            if (MainForm.Instance.Settings.ShowDebugInformation)
+            foreach (System.Diagnostics.ProcessModule mod in System.Diagnostics.Process.GetCurrentProcess().Modules)
             {
-                foreach (System.Diagnostics.ProcessModule mod in System.Diagnostics.Process.GetCurrentProcess().Modules)
-                {
-                    if (mod.FileName.ToLowerInvariant().EndsWith("avisynthwrapper.dll"))
-                        FreeLibrary(mod.BaseAddress);
-                    else if (mod.FileName.ToLowerInvariant().EndsWith("avisynth.dll"))
-                        FreeLibrary(mod.BaseAddress);
-                }
+                if (mod.FileName.ToLowerInvariant().EndsWith("avisynthwrapper.dll"))
+                    FreeLibrary(mod.BaseAddress);
+                else if (mod.FileName.ToLowerInvariant().EndsWith("avisynth.dll"))
+                    FreeLibrary(mod.BaseAddress);
             }
+            LoadLibraryA("avisynthwrapper.dll");
             return iStartResult;
         }
 

@@ -183,7 +183,8 @@ namespace MeGUI
             startColumnWidth = 58;
             endColumnWidth = 58;
             fpsColumnWidth = 95;
-            bEnsureCorrectPlaybackSpeed = bAlwayUsePortableAviSynth = false;
+            bEnsureCorrectPlaybackSpeed = false;
+            bAlwayUsePortableAviSynth = true;
             ffmsThreads = 1;
             appendToForcedStreams = "";
             ocGUIMode = OCGUIMode.Default;
