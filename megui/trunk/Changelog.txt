@@ -1,3 +1,4 @@
+2862 [Xvid]                 improved workaround to be able to use Xvid in portable AviSynth mode
 2861 [OneClick]             fixed an out of bounds error. bug #919
 2860                        improved AviSynth detection
 2859 [x26x]                 flag a job as "error" if the number of frames of the input and output does not match

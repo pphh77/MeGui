@@ -167,21 +167,21 @@ new JobProcessorFactory(new ProcessorFactory(init), "XviDEncoder");
                 string strMeGUIWritten = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Classes\AVIFile\Extensions\AVS", "MeGUI", string.Empty);
                 if (!String.IsNullOrEmpty(strMeGUIWritten))
                 {
-                    Microsoft.Win32.Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\AVIFile\Extensions\AVS");
+                    Microsoft.Win32.Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\AVIFile\Extensions\AVS", false);
                     bKeyRemoved = true;
                 }
 
                 strMeGUIWritten = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Classes\AVIFile\Extensions", "MeGUI", string.Empty);
                 if (!String.IsNullOrEmpty(strMeGUIWritten))
                 {
-                    Microsoft.Win32.Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\AVIFile\Extensions");
+                    Microsoft.Win32.Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\AVIFile\Extensions", false);
                     bKeyRemoved = true;
                 }
 
                 strMeGUIWritten = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Classes\AVIFile", "MeGUI", string.Empty);
                 if (!String.IsNullOrEmpty(strMeGUIWritten))
                 {
-                    Microsoft.Win32.Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\AVIFile");
+                    Microsoft.Win32.Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\AVIFile", false);
                     bKeyRemoved = true;
                 }
 
@@ -193,14 +193,14 @@ new JobProcessorFactory(new ProcessorFactory(init), "XviDEncoder");
                 strMeGUIWritten = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Classes\" + strWOWkey + @"CLSID\" + guid + @"\InProcServer32", "MeGUI", string.Empty);
                 if (!String.IsNullOrEmpty(strMeGUIWritten))
                 {
-                    Microsoft.Win32.Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\" + strWOWkey + @"CLSID\" + guid + @"\InProcServer32");
+                    Microsoft.Win32.Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\" + strWOWkey + @"CLSID\" + guid + @"\InProcServer32", false);
                     bKeyRemoved = true;
                 }
 
                 strMeGUIWritten = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Classes\" + strWOWkey + @"CLSID\" + guid, "MeGUI", string.Empty);
                 if (!String.IsNullOrEmpty(strMeGUIWritten))
                 {
-                    Microsoft.Win32.Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\" + strWOWkey + @"CLSID\" + guid);
+                    Microsoft.Win32.Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\" + strWOWkey + @"CLSID\" + guid, false);
                     bKeyRemoved = true;
                 }
             }
