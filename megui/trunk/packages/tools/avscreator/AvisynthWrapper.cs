@@ -163,9 +163,12 @@ namespace MeGUI
         private AviSynthColorspace _colorSpace;
         private AudioSampleType _sampleType;
         private static object _locker = new object();
-        private int _random;
+        private static object _lockerAccessCounter = new object();
         private static object _lockerDLL = new object();
         private static int _countDLL = 0;
+        private int _countAccess = 0;
+        private int _random;
+
 
 #if dimzon
 
@@ -259,7 +262,11 @@ namespace MeGUI
             try
             {
                 if (_avs != IntPtr.Zero)
+                {
+                    AccessCounter(true);
                     sb.Length = dimzon_avs_getlasterror(_avs, sb, errlen);
+                    AccessCounter(false);
+                }
             }
             catch (Exception ex)
             {
@@ -421,7 +428,12 @@ namespace MeGUI
         {
             const int errlen = 1024;
             StringBuilder sb = new StringBuilder(errlen);
-            sb.Length = dimzon_avs_getstrfunction(this._avs, strFunction, sb, errlen);
+            if (_avs != IntPtr.Zero)
+            {
+                AccessCounter(true);
+                sb.Length = dimzon_avs_getstrfunction(_avs, strFunction, sb, errlen);
+                AccessCounter(false);
+            }
             return sb.ToString();
         }
 
@@ -429,7 +441,12 @@ namespace MeGUI
         {
             int v = 0;
             int res = 0;
-            res = dimzon_avs_getintvariable(this._avs, variableName, ref v);
+            if (_avs != IntPtr.Zero)
+            {
+                AccessCounter(true);
+                res = dimzon_avs_getintvariable(this._avs, variableName, ref v);
+                AccessCounter(false);
+            }
             if (res < 0)
                 throw new AviSynthException(getLastError());
             return (0 == res) ? v : defaultValue;
@@ -437,29 +454,30 @@ namespace MeGUI
 
 		public void ReadAudio(IntPtr addr, long offset, int count)
 		{
-            if (0 != dimzon_avs_getaframe(_avs, addr, offset, count))
-				throw new AviSynthException(getLastError());
-		}
-
-		public void ReadAudio(byte buffer, long offset, int count)
-		{
-			GCHandle h = GCHandle.Alloc(buffer,GCHandleType.Pinned);
-			try
-			{
-				ReadAudio(h.AddrOfPinnedObject(), offset, count);
-			}
-			finally
-			{
-				h.Free();
-			}
-		}
+            if (_avs != IntPtr.Zero)
+            {
+                AccessCounter(true);
+                if (0 != dimzon_avs_getaframe(_avs, addr, offset, count))
+                    throw new AviSynthException(getLastError());
+                AccessCounter(false);
+            }
+        }
 
         public void ReadFrame(IntPtr addr, int stride, int frame)
         {
-            if (0 != dimzon_avs_getvframe(_avs, addr, stride, frame))
-                throw new AviSynthException(getLastError());
+            if (_avs != IntPtr.Zero)
+            {
+                AccessCounter(true);
+                if (0 != dimzon_avs_getvframe(_avs, addr, stride, frame))
+                    throw new AviSynthException(getLastError());
+                AccessCounter(false);
+            }
         }
 
+        /// <summary>
+        /// Gets the AviSynth interface version of the AviSynthWrapper.dll
+        /// </summary>
+        /// <returns></returns>
         public static int GetAvisynthWrapperInterfaceVersion()
         {
             int iVersion = 0;
@@ -594,10 +612,7 @@ namespace MeGUI
                 t.Start();
 
                 while (t.ThreadState == ThreadState.Running)
-                {
-                    System.Windows.Forms.Application.DoEvents();
-                    Thread.Sleep(100);
-                }
+                    MeGUI.core.util.Util.Wait(100);
             }
 
             if (bOpenSuccess == false)
@@ -626,6 +641,9 @@ namespace MeGUI
         {
             if (_avs != IntPtr.Zero)
             {
+                // wait till the avs object is not used anymore
+                while (_countAccess > 0)
+                    MeGUI.core.util.Util.Wait(100);
                 dimzon_avs_destroy(ref _avs);
                 if (_avs != IntPtr.Zero)
                     CloseHandle(_avs);
@@ -679,6 +697,17 @@ namespace MeGUI
             }
         }
 
+        private void AccessCounter(bool bAdd)
+        {
+            lock (_lockerAccessCounter)
+            {
+                if (bAdd)
+                    _countAccess++;
+                else
+                    _countAccess--;
+            }
+        }
+
         public short BitsPerSample
 		{
 			get
@@ -724,6 +753,5 @@ namespace MeGUI
                 return (SamplesCount > 0 ? SamplesCount : 0) * ChannelsCount * BytesPerSample;
             }
         }
-
 	}
 }

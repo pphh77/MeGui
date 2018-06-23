@@ -740,10 +740,7 @@ namespace MeGUI
                 {
                     importer.Show();
                     while (importer.Visible == true)    // wait until the profiles have been imported
-                    {
-                        Application.DoEvents();
-                        System.Threading.Thread.Sleep(100);
-                    }
+                        MeGUI.core.util.Util.Wait(100);
                 }
                 else
                     importer.AutoImport();

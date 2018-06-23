@@ -72,10 +72,7 @@ namespace MeGUI
                     mkvinfo.BeginErrorReadLine();
                     mkvinfo.BeginOutputReadLine();
                     while (!mkvinfo.HasExited) // wait until the process has terminated without locking the GUI
-                    {
-                        System.Windows.Forms.Application.DoEvents();
-                        System.Threading.Thread.Sleep(100);
-                    }
+                        MeGUI.core.util.Util.Wait(100);
                     mkvinfo.WaitForExit();
 
                     _oLog.LogValue("MkvInfo", _strResult);

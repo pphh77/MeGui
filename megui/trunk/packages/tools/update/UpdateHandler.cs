@@ -170,10 +170,7 @@ namespace MeGUI
         public void GetUpdateInformation(bool bWait)
         {
             while (_updateRunning)
-            {
-                System.Threading.Thread.Sleep(100);
-                Application.DoEvents();
-            }
+                MeGUI.core.util.Util.Wait(100);
             _updateRunning = true;
 
             // refresh update data
@@ -181,10 +178,7 @@ namespace MeGUI
             updateCheck.IsBackground = true;
             updateCheck.Start();
             while (bWait && updateCheck.IsAlive)
-            {
-                System.Threading.Thread.Sleep(100);
-                Application.DoEvents();
-            }
+                MeGUI.core.util.Util.Wait(100);
         }
 
         public void RefreshUpdateData()
@@ -288,7 +282,7 @@ namespace MeGUI
                 mre.WaitOne();
                 if (_updateWindow != null)
                 {
-                    System.Threading.Thread.Sleep(1000);
+                    MeGUI.core.util.Util.Wait(1000);
                     _updateWindow.SetProgressBar(0, 10, 0, string.Empty);
                 }
             }
@@ -455,10 +449,7 @@ namespace MeGUI
         public void BeginUpdateCheck()
         {
             while (_updateRunning)
-            {
-                System.Threading.Thread.Sleep(100);
-                Application.DoEvents();
-            }
+                MeGUI.core.util.Util.Wait(100);
 
             bool bIsComponentMissing = UpdateCacher.IsComponentMissing();
             if (!bIsComponentMissing && NumUpdatableFiles() == 0)
@@ -562,10 +553,7 @@ namespace MeGUI
             List<UpdateWindow.iUpgradeable> missingFiles = new List<UpdateWindow.iUpgradeable>();
 
             while (_updateRunning)
-            {
-                System.Threading.Thread.Sleep(100);
-                Application.DoEvents();
-            }
+                MeGUI.core.util.Util.Wait(100);
             _updateRunning = true;
 
             // Count the number of files we can update before we restart
@@ -761,10 +749,7 @@ namespace MeGUI
             {
                 bool bUpdateRunning = _updateRunning;
                 while (_updateRunning)
-                {
-                    System.Threading.Thread.Sleep(100);
-                    Application.DoEvents();
-                }
+                    MeGUI.core.util.Util.Wait(100);
                 if (bUpdateRunning)
                 {
                     GetUpdateInformation(true);
@@ -778,10 +763,7 @@ namespace MeGUI
             else if (bWait)
             {
                 while (_updateWindow.Visible)
-                {
-                    System.Threading.Thread.Sleep(100);
-                    Application.DoEvents();
-                }
+                    MeGUI.core.util.Util.Wait(100);
             }
 
             if (bAutoUpdate)

@@ -858,8 +858,7 @@ namespace MeGUI
                             iCount++;
                     if (iCount >= iMinimumChildProcessCount)
                         break;
-                    System.Windows.Forms.Application.DoEvents();
-                    System.Threading.Thread.Sleep(500);
+                    MeGUI.core.util.Util.Wait(500);
                 } while (oCheckStarted.AddSeconds(60) > DateTime.Now); // wait max. 60 seconds to find all child processes
                 arrProc.Insert(0, oMainProcess);
 

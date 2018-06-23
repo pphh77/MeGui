@@ -523,8 +523,8 @@ namespace MeGUI
             }
         }
         #endregion
-        #region destructor
 
+        #region destructor
 		/// <summary>
 		/// performs additional tasks when the window is closed
 		/// ensures that if the AviReader/d2vreader is valid, access to the file is properly closed
@@ -538,9 +538,10 @@ namespace MeGUI
                 return;
             }
 
+            this.Visible = false;
             if (file != null)
                 file.Dispose();
-			base.OnClosing (e);
+			base.OnClosing(e);
 		}
 		#endregion
 		

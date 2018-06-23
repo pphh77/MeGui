@@ -125,11 +125,7 @@ namespace MeGUI.packages.tools.hdbdextractor
             bFetchAll = true;
             FetchFeatureInformation();
             while (bFetchAll)
-            {
-                System.Windows.Forms.Application.DoEvents();
-                System.Threading.Thread.Sleep(100);
-            }
-
+                MeGUI.core.util.Util.Wait(100);
         }
 
         public void FetchFeatureInformation()
@@ -217,10 +213,7 @@ namespace MeGUI.packages.tools.hdbdextractor
                         if (backgroundWorker.CancellationPending)
                             compiler.Kill();
                     while (!compiler.HasExited) // wait until the process has terminated without locking the GUI
-                    {
-                        System.Windows.Forms.Application.DoEvents();
-                        System.Threading.Thread.Sleep(100);
-                    }
+                        MeGUI.core.util.Util.Wait(100);
                     compiler.WaitForExit();
                 }
                 catch (Exception ex)

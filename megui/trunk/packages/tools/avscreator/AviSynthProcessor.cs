@@ -65,7 +65,7 @@ namespace MeGUI
                 su.NbFramesDone = position;
                 su.FillValues();
                 StatusUpdate(su);
-                Thread.Sleep(1000);
+                MeGUI.core.util.Util.Wait(1000);
             }
             su.IsComplete = true;
             StatusUpdate(su);

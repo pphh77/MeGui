@@ -140,7 +140,7 @@ namespace MeGUI
                     while (true)
                     {
                         updateTime();
-                        Thread.Sleep(1000);
+                        MeGUI.core.util.Util.Wait(1000);
                     }
                 }));
                 _processTime.Start();
@@ -816,9 +816,7 @@ namespace MeGUI
         private void waitTillAnalyseFinished()
         {
             while (!finished)
-            {
-                Thread.Sleep(500);
-            }
+                MeGUI.core.util.Util.Wait(500);
         }
 
         #endregion

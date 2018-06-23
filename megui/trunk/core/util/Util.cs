@@ -492,6 +492,23 @@ namespace MeGUI.core.util
             return retval;
         }
         #endregion
+
+        /// <summary>
+        /// Wait function
+        /// </summary>
+        /// <param name="iMilliSeconds">time span to wait in milliseconds</param>
+        public static void Wait(int iMilliSeconds)
+        {
+            while (iMilliSeconds > 0)
+            {
+                if (iMilliSeconds < 250)
+                    System.Threading.Thread.Sleep(iMilliSeconds);
+                else
+                    System.Threading.Thread.Sleep(250);
+                iMilliSeconds -= 250;
+                Application.DoEvents();
+            }
+        }
     }
 
     public delegate TOut Converter<TIn, TOut>(TIn iinput);

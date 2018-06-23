@@ -68,7 +68,7 @@ namespace MeGUI.core.util
                 catch (IOException ex)
                 {
                     strError = ex.Message;
-                    System.Threading.Thread.Sleep(1000);
+                    MeGUI.core.util.Util.Wait(1000);
                 }
                 catch (Exception ex)
                 {
@@ -133,7 +133,7 @@ namespace MeGUI.core.util
             if (string.IsNullOrEmpty(p))
                 throw new IOException("Can't create directory");
             ensureDirectoryExists(GetDirectoryName(p));
-            System.Threading.Thread.Sleep(100);
+            MeGUI.core.util.Util.Wait(100);
             return Directory.CreateDirectory(p);
         }
 
@@ -597,7 +597,7 @@ namespace MeGUI.core.util
                                 break;
                             }
                             else
-                                System.Threading.Thread.Sleep(2000);
+                                MeGUI.core.util.Util.Wait(2000);
                         }
                     }
                 }

@@ -288,10 +288,7 @@ namespace MeGUI
                 }));
                 processMediaInfo.Start();
                 while (processMediaInfo.ThreadState == ThreadState.Running || processMediaInfo.ThreadState == ThreadState.WaitSleepJoin)
-                {
-                    System.Windows.Forms.Application.DoEvents();
-                    Thread.Sleep(100);
-                }
+                    MeGUI.core.util.Util.Wait(100);
 
                 if (info == null || !info.OpenSuccess)
                 {

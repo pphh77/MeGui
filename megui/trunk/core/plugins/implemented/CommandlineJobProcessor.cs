@@ -228,7 +228,7 @@ namespace MeGUI
                 {
                     // try to hide the main window
                     while (!proc.HasExited && !WindowUtil.GetIsWindowVisible(proc.MainWindowHandle))
-                        Thread.Sleep(100);
+                        MeGUI.core.util.Util.Wait(100);
                     if (!proc.HasExited)
                         WindowUtil.HideWindow(proc.MainWindowHandle);
                 }
@@ -264,10 +264,7 @@ namespace MeGUI
                 }
                 proc.Kill();
                 while (bWaitForExit) // wait until the process has terminated without locking the GUI
-                {
-                    System.Windows.Forms.Application.DoEvents();
-                    System.Threading.Thread.Sleep(100);
-                }
+                    MeGUI.core.util.Util.Wait(100);
                 proc.WaitForExit();
                 return;
             }
@@ -406,8 +403,7 @@ namespace MeGUI
                 su.FillValues();
                 if (StatusUpdate != null && proc != null && !proc.HasExited)
                     StatusUpdate(su);
-                Thread.Sleep(1000);
-
+                MeGUI.core.util.Util.Wait(1000);
             }
         }
 

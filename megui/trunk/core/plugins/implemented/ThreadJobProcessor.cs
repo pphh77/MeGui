@@ -184,7 +184,7 @@ namespace MeGUI
                 su.FillValues();
                 if (StatusUpdate != null && IsRunning())
                     StatusUpdate(su);
-                Thread.Sleep(1000);
+                MeGUI.core.util.Util.Wait(1000);
             }
             ThreadFinished();
         }

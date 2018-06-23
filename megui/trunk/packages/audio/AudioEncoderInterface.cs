@@ -386,7 +386,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                     while (true)
                     {
                         updateTime();
-                        Thread.Sleep(1000);
+                        MeGUI.core.util.Util.Wait(1000);
                     }
                 }));
                 t.Start();
@@ -464,7 +464,6 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                                             setProgress((decimal)frameSample / (decimal)a.SamplesCount);
                                             lastUpdateSample = frameSample;
                                         }
-                                        Thread.Sleep(0);
                                     }
                                 }
                                 finally
@@ -478,10 +477,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                             }
                             raiseEvent("Finalizing encoder");
                             while (!_encoderProcess.HasExited) // wait until the process has terminated without locking the GUI
-                            {
-                                Application.DoEvents();
-                                Thread.Sleep(100);
-                            }
+                                MeGUI.core.util.Util.Wait(100);
                             _encoderProcess.WaitForExit();
                             _readFromStdErrThread.Join();
                             _readFromStdOutThread.Join();
@@ -497,10 +493,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                             {
                                 _encoderProcess.Kill();
                                 while (!_encoderProcess.HasExited) // wait until the process has terminated without locking the GUI
-                                {
-                                    Application.DoEvents();
-                                    Thread.Sleep(100);
-                                }
+                                    MeGUI.core.util.Util.Wait(100);
                                 _encoderProcess.WaitForExit();
                                 _readFromStdErrThread.Join();
                                 _readFromStdOutThread.Join();
@@ -717,10 +710,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
         {
             _encoderThread.Abort();
             while (_encoderThread.IsAlive)
-            {
-                Application.DoEvents();
-                Thread.Sleep(100);
-            }
+                MeGUI.core.util.Util.Wait(100);
             _encoderThread = null;
             if (_encoderProcess == null)
             {

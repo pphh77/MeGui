@@ -199,7 +199,7 @@ namespace MeGUI
                                 else
                                     analyseUpdate(i, iNextFrameCheck);
                             }
-                            Thread.Sleep(1000);
+                            MeGUI.core.util.Util.Wait(1000);
                         }
                     })).Start();
 
