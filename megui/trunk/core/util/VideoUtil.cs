@@ -763,7 +763,7 @@ namespace MeGUI
         {
             UpdateCacher.CheckPackage("lsmash");
 
-            bool b8Bit = true;
+            int iVideoBits = 8;
             if (File.Exists(inputFile) && oInfo == null)
                 oInfo = new MediaInfoFile(inputFile);
             if (oInfo != null)
@@ -772,43 +772,59 @@ namespace MeGUI
                 {
                     if (fps == 0 && oInfo.VideoInfo.FPS > 0)
                         fps = oInfo.VideoInfo.FPS;
-                    if (oInfo.VideoInfo.BitDepth > 8)
-                        b8Bit = false;
+                    iVideoBits = oInfo.VideoInfo.BitDepth;
                 }
             }
 
             int fpsnum, fpsden;
             getFPSFraction(fps, inputFile, out fpsnum, out fpsden);
-            return getLSMASHBasicInputLine(inputFile, indexFile, -1, 0, fpsnum, fpsden, true, b8Bit);
+            return getLSMASHBasicInputLine(inputFile, indexFile, -1, 0, fpsnum, fpsden, true, iVideoBits);
         }
 
         public static string getLSMASHAudioInputLine(string inputFile, string indexFile, int track)
         {
             UpdateCacher.CheckPackage("lsmash");
-            return getLSMASHBasicInputLine(inputFile, indexFile, track, 0, 0, 0, false, true);
+            return getLSMASHBasicInputLine(inputFile, indexFile, track, 0, 0, 0, false, 8);
         }
 
-        private static string getLSMASHBasicInputLine(string inputFile, string indexFile, int track, int rffmode, int fpsnum, int fpsden, bool video, bool b8Bit)
+        private static string getLSMASHBasicInputLine(string inputFile, string indexFile, int track, int rffmode, int fpsnum, int fpsden, bool video, int iVideoBit)
         {
             StringBuilder script = new StringBuilder();
             script.AppendFormat("LoadPlugin(\"{0}\"){1}",
                 MainForm.Instance.Settings.LSMASH.Path,
                 Environment.NewLine);
 
+            if (iVideoBit > 8 && MainForm.Instance.Settings.AviSynthPlus)
+                script.AppendFormat("LoadPlugin(\"{0}\"){1}",
+                    Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynth.Path), @"plugins\ConvertStacked.dll"),
+                    Environment.NewLine);
+
             if (inputFile.ToLowerInvariant().EndsWith(".lwi") && File.Exists(inputFile))
                 indexFile = inputFile;
-            if (!String.IsNullOrEmpty(indexFile) && 
+            if (!String.IsNullOrEmpty(indexFile) &&
                 (indexFile.ToLowerInvariant().Equals(inputFile.ToLowerInvariant() + ".lwi") || !File.Exists(indexFile)))
                 indexFile = null;
 
             bool bUseLsmash = UseLSMASHVideoSource(inputFile, video);
             if (video)
             {
-                script.AppendFormat("{0}(\"{1}\"{2}{3})",
+                script.AppendFormat("{0}(\"{1}\"{2}",
                     (bUseLsmash ? "LSMASHVideoSource" : "LWLibavVideoSource"),
                     (!String.IsNullOrEmpty(indexFile) ? indexFile : inputFile),
-                    (track > -1 ? (bUseLsmash ? ", track=" + track : ", stream_index=" + track) : String.Empty),
-                    (!b8Bit ? ", format=\"YUV420P8\"" : String.Empty));
+                    (track > -1 ? (bUseLsmash ? ", track=" + track : ", stream_index=" + track) : String.Empty));
+
+                if (iVideoBit <= 8)
+                    script.Append(")");
+                else if (!MainForm.Instance.Settings.AviSynthPlus)
+                    script.Append(", format=\"YUV420P8\")");
+                else if (iVideoBit <= 10)
+                    script.AppendFormat(", format=\"YUV420P10\"){0}ConvertFromDoubleWidth(bits=10)", Environment.NewLine);
+                else if (iVideoBit <= 12)
+                    script.AppendFormat(", format=\"YUV420P12\"){0}ConvertFromDoubleWidth(bits=12)", Environment.NewLine);
+                else if (iVideoBit <= 14)
+                    script.AppendFormat(", format=\"YUV420P14\"){0}ConvertFromDoubleWidth(bits=14)", Environment.NewLine);
+                else
+                    script.AppendFormat(", format=\"YUV420P16\"){0}ConvertFromDoubleWidth(bits=16)", Environment.NewLine);
             }
             else
             {

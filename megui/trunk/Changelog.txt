@@ -1,3 +1,4 @@
+2864 [L-SMASH Indexer]      added high bit depth support
 2863 [AviSynth]             changed default value of "always use the included AviSynth" to enabled
                             unload avisynthwrapper during startup detection to ensure that the portable build is used if required
 2862 [Xvid]                 improved workaround to be able to use Xvid in portable AviSynth mode
