@@ -1,3 +1,4 @@
+2867 [AviSynth]             only check the system installed AviSynth if the portable one is not forced
 2866 [OneClick]             fixed tracks 2 to n-1 not properly selecting their input track stream (regression of 2861). bug #907
 2865 [AviSynth]             improved error handling
 2864 [L-SMASH Indexer]      added high bit depth support
