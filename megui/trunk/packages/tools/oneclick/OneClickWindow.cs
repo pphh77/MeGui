@@ -1747,7 +1747,7 @@ namespace MeGUI
                 a.enableDragDrop();
 
             if (iSelectedSubtitleTabPage > subtitlesTab.TabPages.Count - 3 ||
-                iSelectedSubtitleTabPage > subtitleTracks.Count - 3)
+                iSelectedSubtitleTabPage > subtitleTracks.Count - 1)
                 iSelectedSubtitleTabPage = 0;
 
             subtitlesTab.TabPages.Insert(iSelectedSubtitleTabPage + 1, p);
@@ -1972,7 +1972,7 @@ namespace MeGUI
                 a.enableDragDrop();
 
             if (iSelectedAudioTabPage > audioTab.TabPages.Count - 3 ||
-                iSelectedAudioTabPage > audioTracks.Count - 3)
+                iSelectedAudioTabPage > audioTracks.Count - 1)
                 iSelectedAudioTabPage = 0;
 
             audioTab.TabPages.Insert(iSelectedAudioTabPage + 1, p);

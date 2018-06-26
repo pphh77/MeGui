@@ -1,3 +1,4 @@
+2866 [OneClick]             fixed tracks 2 to n-1 not properly selecting their input track stream (regression of 2861). bug #907
 2865 [AviSynth]             improved error handling
 2864 [L-SMASH Indexer]      added high bit depth support
 2863 [AviSynth]             changed default value of "always use the included AviSynth" to enabled
