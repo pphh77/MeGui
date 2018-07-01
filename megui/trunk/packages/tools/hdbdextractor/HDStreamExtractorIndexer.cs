@@ -103,6 +103,8 @@ namespace MeGUI
                     {
                         if (line.ToLowerInvariant().Contains("<error>"))
                             stdoutLog.LogEvent(line, ImageType.Error);
+                        else if (line.ToLowerInvariant().Contains("<warning>"))
+                            stdoutLog.LogEvent(line, ImageType.Warning);
                         if (line.Contains("Getting \"Haali Matroska Muxer\" instance failed"))
                         {
                             // haali media plitter is missing ==> try to (re)install it
@@ -165,7 +167,8 @@ namespace MeGUI
             }
             else if (su.PercentageDoneExact > 0 && su.PercentageDoneExact < 100
                 && !line.ToLowerInvariant().Contains("creating file ") 
-                && !line.ToLowerInvariant().Contains("(seamless branching)..."))
+                && !line.ToLowerInvariant().Contains("(seamless branching)...")
+                && !FileUtil.RegExMatch(line, @"\w\d{2} extracting \w+ track number \d+", true))
             {
                 base.ProcessLine(line, stream, ImageType.Warning);
             }

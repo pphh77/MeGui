@@ -61,7 +61,7 @@ namespace MeGUI
                      bEnsureCorrectPlaybackSpeed, bExternalMuxerX264, bUseNeroAacEnc, bOSx64, bEnableDirectShowSource,
                      bVobSubberExtractForced, bVobSubberShowAll, bUsex64Tools, bShowDebugInformation, bEac3toDefaultToHD,
                      bEac3toEnableEncoder, bEac3toEnableDecoder, bEac3toEnableCustomOptions, bFirstUpdateCheck,
-                     bChapterCreatorCounter, bX264AdvancedSettings;
+                     bChapterCreatorCounter, bX264AdvancedSettings, bEac3toAddPrefix;
         private decimal forceFilmThreshold, acceptableFPSError;
         private int nbPasses, autoUpdateServerSubList, minComplexity, updateFormSplitter,
                     maxComplexity, jobColumnWidth, inputColumnWidth, outputColumnWidth, codecColumnWidth,
@@ -142,6 +142,7 @@ namespace MeGUI
             strEac3toLastFolderPath = strEac3toLastFilePath = strEac3toLastDestinationPath = "";
             bEac3toLastUsedFileMode = false;
             bEac3toDefaultToHD = bEac3toEnableEncoder = bEac3toEnableDecoder = bEac3toEnableCustomOptions = false;
+            bEac3toAddPrefix = true;
             openProgressWindow = true;
             videoExtension = "";
             audioExtension = "";
@@ -463,6 +464,12 @@ namespace MeGUI
         {
             get { return bEac3toAutoSelectStreams; }
             set { bEac3toAutoSelectStreams = value; }
+        }
+
+        public bool Eac3toAddPrefix
+        {
+            get { return bEac3toAddPrefix; }
+            set { bEac3toAddPrefix = value; }
         }
 
         public bool Eac3toEnableCustomOptions

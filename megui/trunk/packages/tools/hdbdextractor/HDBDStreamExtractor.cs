@@ -68,6 +68,7 @@ namespace MeGUI.packages.tools.hdbdextractor
             toolStripMenuItem4.Checked = MainForm.Instance.Settings.Eac3toEnableEncoder;
             toolStripMenuItem5.Checked = MainForm.Instance.Settings.Eac3toEnableDecoder;
             toolStripMenuItem6.Checked = MainForm.Instance.Settings.Eac3toEnableCustomOptions;
+            addPrefixBasedOnInputToolStripMenuItem.Checked = MainForm.Instance.Settings.Eac3toAddPrefix;
         }
 
         #region backgroundWorker
@@ -345,10 +346,13 @@ namespace MeGUI.packages.tools.hdbdextractor
         private string GenerateArguments()
         {
             string filePrefix = string.Empty;
-            if (FolderSelection.Checked)
-                filePrefix = MeGUI.core.util.FileUtil.GetOutputFilePrefix(dummyInput);
-            else
-                filePrefix = MeGUI.core.util.FileUtil.GetOutputFilePrefix(input[0]);
+            if (MainForm.Instance.Settings.Eac3toAddPrefix)
+            {
+                if (FolderSelection.Checked)
+                    filePrefix = MeGUI.core.util.FileUtil.GetOutputFilePrefix(dummyInput);
+                else
+                    filePrefix = System.IO.Path.GetFileNameWithoutExtension(input[0]) + "_";
+            }
 
             StringBuilder sb = new StringBuilder();
             foreach (DataGridViewRow row in StreamDataGridView.Rows)
@@ -596,6 +600,11 @@ namespace MeGUI.packages.tools.hdbdextractor
         {
             MainForm.Instance.Settings.Eac3toEnableCustomOptions = toolStripMenuItem6.Checked;
             StreamDataGridView.Columns["StreamAddOptionsTextBox"].Visible = toolStripMenuItem6.Checked;
+        }
+
+        private void addPrefixBasedOnInputToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MainForm.Instance.Settings.Eac3toAddPrefix = addPrefixBasedOnInputToolStripMenuItem.Checked;
         }
     }
 

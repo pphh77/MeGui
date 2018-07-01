@@ -134,10 +134,11 @@ namespace MeGUI
                 stderrDone.WaitOne(); // wait for stderr to finish processing
             }
 
+            getErrorLine();
+
             // check the exitcode
             if (checkExitCode && !arrSuccessCodes.Contains(proc.ExitCode))
             {
-                getErrorLine();
                 string strError = WindowUtil.GetErrorText(proc.ExitCode);
                 if (!su.WasAborted)
                 {
