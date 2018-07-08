@@ -210,32 +210,37 @@ namespace MediaInfoWrapper
 #if DEBUG
                 bDebug = true;
 #endif
-
+                MeGUI.core.util.LogItem _oLog = new MeGUI.core.util.LogItem("X");
                 if (bUnload)
                 {
                     _countDLL--;
                     if (_countDLL > 0)
                     {
-                        MainForm.Instance.MediaInfoWrapperLog.LogValue("sessions open: " + _countDLL + ", id: " + _random, "File: " + _FileName + (bDebug ? Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.StackTrace : String.Empty));
-                        return;
+                        _oLog = new MeGUI.core.util.LogItem("sessions open: " + _countDLL + ", id: " + _random + ", close");
                     }
-
-                    bool bResult = false;
-                    string strFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), "mediainfo.dll");
-                    foreach (System.Diagnostics.ProcessModule mod in System.Diagnostics.Process.GetCurrentProcess().Modules)
+                    else
                     {
-                        if (mod.FileName.ToLowerInvariant().Equals(strFile.ToLowerInvariant()))
-                            bResult = FreeLibrary(mod.BaseAddress);
+                        bool bResult = false;
+                        string strFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), "mediainfo.dll");
+                        foreach (System.Diagnostics.ProcessModule mod in System.Diagnostics.Process.GetCurrentProcess().Modules)
+                        {
+                            if (mod.FileName.ToLowerInvariant().Equals(strFile.ToLowerInvariant()))
+                                bResult = FreeLibrary(mod.BaseAddress);
+                        }
+                        _oLog = new MeGUI.core.util.LogItem("sessions open: " + _countDLL + ", id: " + _random + ", close: " + bResult);
                     }
-                    MainForm.Instance.MediaInfoWrapperLog.LogValue("sessions open: " + _countDLL + ", id: " + _random + ", close: " + bResult, "File: " + _FileName + (bDebug ? Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.StackTrace : String.Empty));
                 }
                 else
                 {
                     if (_countDLL == 0)
                         LoadLibraryA("mediainfo.dll");
                     _countDLL++;
-                    MainForm.Instance.MediaInfoWrapperLog.LogValue("sessions open: " + _countDLL + ", id: " + _random, "File: " + "File: " + _FileName + (bDebug ? Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.StackTrace : String.Empty));
+                    _oLog = new MeGUI.core.util.LogItem("sessions open: " + _countDLL + ", id: " + _random);
                 }
+                _oLog.LogValue("File", _FileName);
+                if (bDebug)
+                    _oLog.LogValue("StackTrace", Environment.StackTrace);
+                MainForm.Instance.MediaInfoWrapperLog.Add(_oLog);
             }
         }
 

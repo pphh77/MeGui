@@ -680,7 +680,7 @@ namespace MeGUI.core.util
             // detect system installation - checks if a system installed AviSynth build can be used (only if portable build is not forced)
             if (!MainForm.Instance.Settings.AlwaysUsePortableAviSynth)
             {
-                iResult = AviSynthClip.CheckAvisynthInstallation(out strVersion, out bIsAVS26, out bIsAVSPlus, out bIsMT, out string strAviSynthDLLSystem);
+                iResult = AviSynthClip.CheckAvisynthInstallation(out strVersion, out bIsAVS26, out bIsAVSPlus, out bIsMT, out string strAviSynthDLLSystem, ref oLogInstalled);
                 if (GetFileInformation(strAviSynthDLLSystem, out fileVersion, out fileDate, out fileProductName))
                 {
                     // file information
@@ -772,7 +772,7 @@ namespace MeGUI.core.util
                     oLogPortable.LogValue("File Path", strAviSynthPortable.ToLowerInvariant(), false);
 
                     // checks if the AviSynth build can be used
-                    iResult = AviSynthClip.CheckAvisynthInstallation(out strVersion, out bIsAVS26, out bIsAVSPlus, out bIsMT, out string strAviSynthDLLPortable);
+                    iResult = AviSynthClip.CheckAvisynthInstallation(out strVersion, out bIsAVS26, out bIsAVSPlus, out bIsMT, out string strAviSynthDLLPortable, ref oLogPortable);
                     if (!strAviSynthDLLPortable.ToLower().Equals(strAviSynthPortable.ToLower()))
                     {
                         if (bFoundInstalledAviSynth)
