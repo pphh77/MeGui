@@ -1369,7 +1369,8 @@ namespace MeGUI.packages.video.x264
             this.cbAQMode.Items.AddRange(new object[] {
             "Disabled",
             "Variance AQ (complexity mask)",
-            "Auto-variance AQ (experimental)"});
+            "Auto-variance AQ",
+            "Auto-variance AQ with bias to dark scenes"});
             this.cbAQMode.Location = new System.Drawing.Point(52, 19);
             this.cbAQMode.Name = "cbAQMode";
             this.cbAQMode.Size = new System.Drawing.Size(135, 21);

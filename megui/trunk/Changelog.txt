@@ -1,3 +1,6 @@
+2870 [x264]                 added --aq-mode 3. feature request #639
+2869 [AviSynth]             improved error handling
+                            fixed a potential crash (regression of 2863)
 2868 [HD Streams Extractor] added an option to select if the output prefix should be added (default: enabled)
                             add the output prefix also if the "file mode" is used
 2867 [AviSynth]             only check the system installed AviSynth if the portable one is not forced
