@@ -472,18 +472,7 @@ namespace MeGUI
             // close video player so that the AviSynth script is also closed
             info.ClosePlayer();
 
-            ulong frameCount;
-            double frameRate;
-            error = VideoUtil.CheckAVS(info.Video.VideoInput, out frameCount, out frameRate);
-            if (error != null)
-            {
-                bool bContinue = MainForm.Instance.DialogManager.createJobs(error);
-                if (!bContinue)
-                {
-                    MessageBox.Show("Job creation aborted due to invalid AviSynth script");
-                    return;
-                }
-            }
+            JobUtil.GetInputProperties(info.Video.VideoInput, out ulong frameCount, out double frameRate);
 
             VideoCodecSettings vSettings = info.Video.CurrentSettings.Clone();
             Zone[] zones = info.Video.Info.Zones; // We can't simply modify the zones in place because that would reveal the final zones config to the user, including the credits/start zones

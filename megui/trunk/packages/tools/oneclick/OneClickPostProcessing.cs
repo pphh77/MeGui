@@ -248,22 +248,7 @@ namespace MeGUI
                     _mre.WaitOne();
 
                     // check AVS file 
-                    ulong frameCount;
-                    double frameRate;
-                    string error = VideoUtil.CheckAVS(avsFile, out frameCount, out frameRate);
-                    if (error != null)
-                    {
-                        bool bContinue = MainForm.Instance.DialogManager.createJobs(error);
-                        if (!bContinue)
-                        {
-                            _log.Error("Job creation aborted due to invalid AviSynth script");
-                            _processTime.Abort();
-                            su.WasAborted = true;
-                            su.IsComplete = true;
-                            raiseEvent();
-                            return;
-                        }
-                    }
+                    JobUtil.GetInputProperties(avsFile, out ulong frameCount, out double frameRate);
 
                     myVideo.Input = avsFile;
                     myVideo.Output = Path.Combine(job.PostprocessingProperties.WorkingDirectory, Path.GetFileNameWithoutExtension(job.Input) + "_Video");

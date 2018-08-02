@@ -1,3 +1,4 @@
+2871 [Video Encoder]        added high bit depth support to the AVS pre-check
 2870 [x264]                 added --aq-mode 3. feature request #639
 2869 [AviSynth]             improved error handling
                             fixed a potential crash (regression of 2863)

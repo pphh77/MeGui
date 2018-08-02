@@ -70,11 +70,11 @@ namespace MeGUI
             set { continueDespiteError = value; }
         }
 
-        private bool askAboutYV12;
-        public bool AskAboutYV12
+        private bool askAboutColorConersion;
+        public bool AskAboutColorConversion
         {
-            get { return askAboutYV12; }
-            set { askAboutYV12 = value; }
+            get { return askAboutColorConersion; }
+            set { askAboutColorConersion = value; }
         }
 
         private bool askAboutUpdates;
@@ -84,11 +84,11 @@ namespace MeGUI
             set { askAboutUpdates = value; }
         }
 
-        private bool addConvertToYV12;
-        public bool AddConvertToYV12
+        private bool addConvertTo;
+        public bool AddConvertTo
         {
-            get { return addConvertToYV12; }
-            set { addConvertToYV12 = value; }
+            get { return addConvertTo; }
+            set { addConvertTo = value; }
         }
 
         private bool askAboutVOBs;
@@ -124,8 +124,8 @@ namespace MeGUI
             askAboutVOBs = true;
             useOneClick = true;
             askAboutError = true;
-            askAboutYV12 = true;
-            addConvertToYV12 = true;
+            askAboutColorConersion = true;
+            addConvertTo = true;
             continueDespiteError = true;
             askAboutDuplicates = true;
             dupResponse = true;

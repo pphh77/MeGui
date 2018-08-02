@@ -290,112 +290,6 @@ namespace MeGUI
 		}
         #endregion
 
-        #region source checking
-        public static string CheckAVS(string avsFile, out ulong frameCount, out double frameRate)
-        {
-            return checkAVS(avsFile, true, out frameCount, out frameRate);
-        }
-        
-        private static string checkAVS(string avsFile, bool tryToFix, out ulong frameCount, out double frameRate)
-        {
-            frameCount = 0;
-            frameRate = 0;
-
-            try
-            {
-                using (AvsFile avi = AvsFile.OpenScriptFile(avsFile))
-                {
-                    checked { frameCount = (ulong)avi.VideoInfo.FrameCount; }
-                    frameRate = avi.VideoInfo.FPS;
-
-                    if (avi.Clip.OriginalColorspace != AviSynthColorspace.YV12 && avi.Clip.OriginalColorspace != AviSynthColorspace.I420)
-                    {
-                        if (tryToFix && !isConvertedToYV12(avsFile))
-                        {
-                            bool convert = MainForm.Instance.DialogManager.addConvertToYV12(avi.Clip.OriginalColorspace.ToString());
-                            if (convert)
-                            {
-                                if (appendConvertToYV12(avsFile))
-                                {
-                                    string sResult = checkAVS(avsFile, false, out frameCount, out frameRate); // Check everything again, to see if it is all fixed now
-                                    if (sResult == null)
-                                        return null;
-                                    else
-                                        return sResult;
-                                }
-                            }
-                            return "You didn't want me to append ConvertToYV12(). You'll have to fix the colorspace problem yourself.";
-                        }
-                        return string.Format("AviSynth clip is in {0} not in YV12, even though ConvertToYV12() has been appended.", avi.Clip.OriginalColorspace.ToString());
-                    }
-
-                    VideoCodecSettings settings = GetCurrentVideoSettings();
-                    if (settings != null && !settings.SettingsID.Equals("x264") && !settings.SettingsID.Equals("x265")) // mod4 restriction
-                    {
-                        if (avi.Clip.VideoHeight % 4 != 0 ||
-                            avi.Clip.VideoWidth % 4 != 0)
-                            return string.Format("AviSynth clip doesn't have mod4 dimensions:\r\nWidth: {0}\r\nHeight:{1}\r\n" +
-                                "This could cause problems with some encoders,\r\n" +
-                                "and will also result in a loss of compressibility.", avi.Clip.VideoWidth, avi.Clip.VideoHeight);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                return "Error in AviSynth script:\r\n" + e.Message;
-            }
-            return null;
-        }
-
-        private static bool appendConvertToYV12(string file)
-        {
-            try
-            {
-                StreamWriter avsOut = new StreamWriter(file, true);
-                avsOut.Write("\r\nConvertToYV12()");
-                avsOut.Close();
-            }
-            catch (Exception)
-            {
-                return false; 
-            }
-            return true;
-        }
-
-        private static bool isConvertedToYV12(string file)
-        {
-            try
-            {
-                String strLastLine = "", line = "";
-                using (StreamReader reader = new StreamReader(file))
-                {
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        if (!String.IsNullOrEmpty(line))
-                            strLastLine = line;
-                    }
-                }
-                if (strLastLine.ToLowerInvariant().Equals("converttoyv12()"))
-                    return true;
-                else
-                    return false;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        delegate VideoCodecSettings CurrentSettingsDelegate();
-        private static VideoCodecSettings GetCurrentVideoSettings()
-        {
-            if (MainForm.Instance.InvokeRequired)
-                return (VideoCodecSettings)MainForm.Instance.Invoke(new CurrentSettingsDelegate(GetCurrentVideoSettings));
-            else
-                return MainForm.Instance.Video.CurrentSettings;
-        }
-        #endregion
-
         #region new stuff
         public static JobChain GenerateJobSeries(VideoStream video, string muxedOutput, AudioJob[] audioStreams,
             MuxStream[] subtitles, List<string> attachments, ChapterInfo chapterInfo, FileSize? desiredSize, FileSize? splitSize, 
@@ -989,6 +883,7 @@ namespace MeGUI
             }
         }
     }
+
 	#region helper structs
 	/// <summary>
 	/// helper structure for cropping

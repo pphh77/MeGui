@@ -186,18 +186,7 @@ namespace MeGUI
                     videoOutput = Path.ChangeExtension(videoOutput, "m4v");
             }
 
-            ulong frameCount;
-            double frameRate;
-            string error = VideoUtil.CheckAVS(info.VideoInput, out frameCount, out frameRate);
-            if (error != null)
-            {
-                bool bContinue = MainForm.Instance.DialogManager.createJobs(error);
-                if (!bContinue)
-                {
-                    MessageBox.Show("Job creation aborted due to invalid AviSynth script");
-                    return;
-                }
-            }
+            JobUtil.GetInputProperties(info.VideoInput, out ulong frameCount, out double frameRate);
 
             JobChain prepareJobs = JobUtil.AddVideoJobs(info.VideoInput, videoOutput, this.CurrentSettings.Clone(),
                 info.IntroEndFrame, info.CreditsStartFrame, info.DAR, PrerenderJob, info.Zones, (int)frameCount);

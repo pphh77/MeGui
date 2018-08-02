@@ -80,7 +80,7 @@ namespace MeGUI
         {
             ulong a;
             double b;
-            getInputProperties(out a, out b, p);
+            GetInputProperties(p, out a, out b);
         }
         /// <summary>
         /// sets the number of encoder threads in function of the number of processors found on the system
@@ -432,16 +432,16 @@ namespace MeGUI
 		{
 			job.Settings.BitrateQuantizer = bitrate;
 		}
-		#endregion
-		#region input properties
-		/// <summary>
-		/// gets the number of frames and framerate from an avisynth script
-		/// </summary>
-		/// <param name="nbOfFrames">number of frames of the source</param>
-		/// <param name="framerate">framerate of the source</param>
-		/// <param name="video">path of the source</param>
-		/// <returns>true if the input file could be opened, false if not</returns>
-		public static bool getInputProperties(out ulong nbOfFrames, out double framerate, string video)
+        #endregion
+        #region input properties
+        /// <summary>
+        /// gets the number of frames and framerate from an avisynth script
+        /// </summary>
+        /// <param name="video">path of the source</param>
+        /// <param name="nbOfFrames">number of frames of the source</param>
+        /// <param name="framerate">framerate of the source</param>
+        /// <returns>true if the input file could be opened, false if not</returns>
+        public static bool GetInputProperties(string video, out ulong nbOfFrames, out double framerate)
 		{
             int d1, d2, d3, d4;
             Dar d;
@@ -510,7 +510,7 @@ namespace MeGUI
 		{
 			ulong retval = 0;
 			double framerate = 0.0;
-			bool succ = getInputProperties(out retval, out framerate, path);
+			bool succ = GetInputProperties(path, out retval, out framerate);
 			return retval;
 		}
 
@@ -523,7 +523,7 @@ namespace MeGUI
 		{
 			ulong retval = 0;
 			double framerate = 0.0;
-			bool succ = getInputProperties(out retval, out framerate, path);
+			bool succ = GetInputProperties(path, out retval, out framerate);
 			return framerate;
 		}
 		#endregion

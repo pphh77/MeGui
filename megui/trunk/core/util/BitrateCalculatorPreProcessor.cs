@@ -20,8 +20,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using System.Xml.Serialization;
 
 using MeGUI.core.details;
@@ -60,7 +58,7 @@ namespace MeGUI.core.util
 
             double framerate;
             ulong framecount;
-            JobUtil.getInputProperties(out framecount, out framerate, job.Input);
+            JobUtil.GetInputProperties(job.Input, out framecount, out framerate);
 
             CalcData data = new CalcData((long)framecount, (decimal)framerate, b.Container, job.Settings.Codec, 
                 job.Settings.NbBframes > 0, audioStreams.ToArray());

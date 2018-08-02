@@ -18,6 +18,8 @@
 // 
 // ****************************************************************************
 
+using System;
+
 namespace MeGUI
 {
     public class MediaFileFactory
@@ -51,7 +53,7 @@ namespace MeGUI
                         }
                     }
                 }
-                catch {}
+                catch (Exception ex) { string test = ex.Message; }
             }
             return bestMediaFile;
         }

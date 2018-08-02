@@ -285,20 +285,20 @@ namespace MeGUI
             return mainForm.Settings.DialogSettings.ContinueDespiteError;
         }
 
-        public bool addConvertToYV12(string colorspace)
+        public bool AddConvertTo(string colorspace_original, string colorspace_target)
         {
-            if (mainForm.Settings.DialogSettings.AskAboutYV12)
+            if (mainForm.Settings.DialogSettings.AskAboutColorConversion)
             {
                 bool askAgain;
-                bool bResult = askAbout("The colorspace of your clip is not in YV12...\r\n" +
-                                        "Do you want me to add ConvertToYV12() to the end of your script?",
+                bool bResult = askAbout("The colorspace " + colorspace_original + " of your clip is not in " + colorspace_target + ".\r\n" +
+                                        "Do you want to add the necessary ConvertTo function(s) to the end of the script?",
                                         "Incorrect Colorspace", MessageBoxIcon.Warning, out askAgain);
 
-                mainForm.Settings.DialogSettings.AskAboutYV12 = askAgain;
-                mainForm.Settings.DialogSettings.AddConvertToYV12 = bResult;
+                mainForm.Settings.DialogSettings.AskAboutColorConversion = askAgain;
+                mainForm.Settings.DialogSettings.AddConvertTo = bResult;
                 return bResult;
             }
-            return mainForm.Settings.DialogSettings.AddConvertToYV12;
+            return mainForm.Settings.DialogSettings.AddConvertTo;
         }
 
         public bool AskAboutUpdates()

@@ -19,6 +19,7 @@
 // ****************************************************************************
 
 using System;
+using System.Collections;
 using System.IO;
 using System.Text;
 
@@ -47,20 +48,25 @@ namespace MeGUI
         protected override void checkJobIO()
         {
             base.checkJobIO();
-            if (File.Exists(job.Input) && Path.GetExtension(job.Input).ToLowerInvariant().Equals(".avs"))
-            {
-                string strAVSFile = String.Empty;
-                try
-                {
-                    StreamReader sr = new StreamReader(job.Input, Encoding.Default);
-                    strAVSFile = sr.ReadToEnd();
-                    sr.Close();
-                }
-                catch (Exception) {}
-                log.LogValue("AviSynth input script", strAVSFile);
-            }
             su.Status = "Encoding video...";
             getInputProperties(job);
+        }
+
+        private string GetAVSFileContent()
+        {
+            if (!File.Exists(job.Input) || !Path.GetExtension(job.Input).ToLowerInvariant().Equals(".avs"))
+                return string.Empty;
+
+            string strAVSFile = String.Empty;
+            try
+            {
+                StreamReader sr = new StreamReader(job.Input, Encoding.Default);
+                strAVSFile = sr.ReadToEnd();
+                sr.Close();
+            }
+            catch (Exception) { }
+
+            return strAVSFile;
         }
 
         /// <summary>
@@ -72,37 +78,69 @@ namespace MeGUI
         /// <returns>true if the file could be opened, false if not</returns>
         protected void getInputProperties(VideoJob job)
         {
+            log.LogValue("AviSynth input script", GetAVSFileContent());
+
             double fps;
             Dar d = Dar.A1x1;
-            AviSynthColorspace colorspace;
-            JobUtil.GetAllInputProperties(job.Input, out numberOfFrames, out fps, out fps_n, out fps_d, out hres, out vres, out d, out colorspace);
+            AviSynthColorspace colorspace_original;
+            JobUtil.GetAllInputProperties(job.Input, out numberOfFrames, out fps, out fps_n, out fps_d, out hres, out vres, out d, out colorspace_original);
+
             Dar? dar = job.DAR;
             su.NbFramesTotal = numberOfFrames;
             su.ClipLength = TimeSpan.FromSeconds((double)numberOfFrames / fps);
 
-            // log
-            if (log != null)
-            {
-                log.LogEvent("resolution: " + hres + "x" + vres);
-                log.LogEvent("frame rate: " + fps_n + "/" + fps_d);
-                log.LogEvent("frames: " + numberOfFrames);
-                log.LogEvent("length: " + string.Format("{0:00}:{1:00}:{2:00}.{3:000}", 
-                    (int)(su.ClipLength.Value.TotalHours), su.ClipLength.Value.Minutes, su.ClipLength.Value.Seconds, su.ClipLength.Value.Milliseconds));
-                if (dar.HasValue && d.AR == dar.Value.AR)
-                {
-                    log.LogValue("aspect ratio", d);
-                }
-                else
-                {
-                    log.LogValue("aspect ratio (avs)", d);
-                    if (dar.HasValue)
-                        log.LogValue("aspect ratio (job)", dar.Value);
-                }
-                log.LogValue("color space", colorspace.ToString());
-            }
-
             if (!job.DAR.HasValue)
                 job.DAR = d;
+
+            // log
+            if (log == null)
+                return;
+
+            log.LogEvent("resolution: " + hres + "x" + vres);
+            log.LogEvent("frame rate: " + fps_n + "/" + fps_d);
+            log.LogEvent("frames: " + numberOfFrames);
+            log.LogEvent("length: " + string.Format("{0:00}:{1:00}:{2:00}.{3:000}", 
+                (int)(su.ClipLength.Value.TotalHours), su.ClipLength.Value.Minutes, su.ClipLength.Value.Seconds, su.ClipLength.Value.Milliseconds));
+            if (dar.HasValue && d.AR == dar.Value.AR)
+            {
+                log.LogValue("aspect ratio", d);
+            }
+            else
+            {
+                log.LogValue("aspect ratio (avs)", d);
+                if (dar.HasValue)
+                    log.LogValue("aspect ratio (job)", dar.Value);
+            }
+                
+            if (Int32.TryParse(colorspace_original.ToString(), out int result))
+                log.LogValue("color space", colorspace_original.ToString(), ImageType.Warning);
+            else
+                log.LogValue("color space", colorspace_original.ToString());
+
+            string strEncoder = "x26x";
+            if (this is XviDEncoder)
+                strEncoder = "xvid";
+
+            AviSynthColorspace colorspace_target = AviSynthColorspaceHelper.GetConvertedColorspace(strEncoder, colorspace_original);
+            if (colorspace_original != colorspace_target 
+                && !AviSynthColorspaceHelper.IsConvertedToColorspace(job.Input, colorspace_target.ToString()))
+            {
+                if (MainForm.Instance.DialogManager.AddConvertTo(colorspace_original.ToString(), colorspace_target.ToString()))
+                {
+                    AviSynthColorspaceHelper.AppendConvertTo(job.Input, colorspace_target, colorspace_original);
+                    log.LogValue("AviSynth input script (appended)", GetAVSFileContent());
+
+                    // Check everything again, to see if it is all fixed now
+                    AviSynthColorspace colorspace_converted;
+                    JobUtil.GetAllInputProperties(job.Input, out numberOfFrames, out fps, out fps_n, out fps_d, out hres, out vres, out d, out colorspace_converted);
+                    if (colorspace_original != colorspace_converted)
+                        log.LogValue("color space converted", colorspace_converted.ToString());
+                    else
+                        log.LogEvent("color space not supported, conversion failed", ImageType.Error);
+                }
+                else
+                    log.LogEvent("color space not supported", ImageType.Error);
+            }
         }
 
         protected override void doExitConfig()
