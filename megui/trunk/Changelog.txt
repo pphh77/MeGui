@@ -1,3 +1,4 @@
+2872 [x26x]                 changed the log level for ffmpeg from warning to error
 2871 [Video Encoder]        added high bit depth support to the AVS pre-check
 2870 [x264]                 added --aq-mode 3. feature request #639
 2869 [AviSynth]             improved error handling
