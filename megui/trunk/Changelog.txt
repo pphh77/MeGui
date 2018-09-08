@@ -1,3 +1,4 @@
+2875 [Video Encoder]        do not create a mux job if a manual 1st pass is created
 2874 [Video Encoder]        improved AVS pre-check (regression of 2871)
 2873 [MediaInfo]            added support for MediaInfo 18.08
      [HD Streams Extractor] improved language detection support

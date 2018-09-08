@@ -1408,7 +1408,6 @@ namespace MeGUI
         static MediaInfoFile()
         {
             knownVideoDescriptions = new Dictionary<string, VideoCodec>();
-
             knownVideoDescriptions.Add("divx 5", VideoCodec.ASP);
             knownVideoDescriptions.Add("divx 4", VideoCodec.ASP);
             knownVideoDescriptions.Add("divx 6", VideoCodec.ASP);
@@ -1416,12 +1415,13 @@ namespace MeGUI
             knownVideoDescriptions.Add("xvid", VideoCodec.ASP);
             knownVideoDescriptions.Add("asp", VideoCodec.ASP);
             knownVideoDescriptions.Add("mpeg-4 adv simple", VideoCodec.ASP);
+            knownVideoDescriptions.Add("mpeg-4 visual", VideoCodec.ASP);
+            knownVideoDescriptions.Add("mpeg-4v", VideoCodec.ASP);
             knownVideoDescriptions.Add("avc", VideoCodec.AVC);
             knownVideoDescriptions.Add("h264", VideoCodec.AVC);
             knownVideoDescriptions.Add("h.264", VideoCodec.AVC);
             knownVideoDescriptions.Add("huffman", VideoCodec.HFYU);
             knownVideoDescriptions.Add("ffvh", VideoCodec.HFYU);
-            knownVideoDescriptions.Add("mpeg-4v", VideoCodec.ASP);
             knownVideoDescriptions.Add("vc-1", VideoCodec.VC1);
             knownVideoDescriptions.Add("mpeg-1v", VideoCodec.MPEG1);
             knownVideoDescriptions.Add("V_MPEG1", VideoCodec.MPEG1);

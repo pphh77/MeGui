@@ -191,7 +191,8 @@ namespace MeGUI
             JobChain prepareJobs = JobUtil.AddVideoJobs(info.VideoInput, videoOutput, this.CurrentSettings.Clone(),
                 info.IntroEndFrame, info.CreditsStartFrame, info.DAR, PrerenderJob, info.Zones, (int)frameCount);
 
-            if (!fileType.Text.StartsWith("RAW") 
+            if (!fileType.Text.StartsWith("RAW") && 
+                vSettings.VideoEncodingType != MeGUI.VideoCodecSettings.VideoEncodingMode.twopass1 && vSettings.VideoEncodingType != MeGUI.VideoCodecSettings.VideoEncodingMode.threepass1
                 && (!vSettings.SettingsID.Equals("x264") || !fileType.Text.Equals("MKV") || MainForm.Instance.Settings.UseExternalMuxerX264))
             {
                 // create mux job
@@ -460,6 +461,8 @@ namespace MeGUI
         VideoEncoderType lastCodec = null;
         private void videoProfile_SelectedProfileChanged(object sender, EventArgs e)
         {
+            updateIOConfig();
+
             if (CurrentSettings.EncoderType == lastCodec)
                 return;
 
