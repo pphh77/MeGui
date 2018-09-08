@@ -34,9 +34,9 @@ namespace MediaInfoWrapper
         private string _ID;
         private string _UniqueID;
         private string _Title;
-        private string _Codec;
-        private string _CodecString;
-        private string _CodecUrl;
+        private string _CodecID;
+        private string _CodecIDString;
+        private string _CodecIDInfo;
         private string _Delay;
         private string _Video0Delay;
         private string _PlayTime;
@@ -188,47 +188,47 @@ namespace MediaInfoWrapper
         }
 
         ///<summary> Codec used </summary>
-        public string Codec
+        public string CodecID
         {
             get
             {
-                if (String.IsNullOrEmpty(this._Codec))
-                    this._Codec="";
-                return _Codec;
+                if (String.IsNullOrEmpty(this._CodecID))
+                    this._CodecID="";
+                return _CodecID;
             }
             set
             {
-                this._Codec=value;
+                this._CodecID=value;
             }
         }
 
         ///<summary> Codec used (test) </summary>
-        public string CodecString
+        public string CodecIDString
         {
             get
             {
-                if (String.IsNullOrEmpty(this._CodecString))
-                    this._CodecString="";
-                return _CodecString;
+                if (String.IsNullOrEmpty(this._CodecIDString))
+                    this._CodecIDString = "";
+                return _CodecIDString;
             }
             set
             {
-                this._CodecString=value;
+                this._CodecIDString = value;
             }
         }
 
-        ///<summary> Codec used (test) </summary>
-        public string CodecUrl
+        ///<summary> Codec used (info) </summary>
+        public string CodecIDInfo
         {
             get
             {
-                if (String.IsNullOrEmpty(this._CodecUrl))
-                    this._CodecUrl="";
-                return _CodecUrl;
+                if (String.IsNullOrEmpty(this._CodecIDInfo))
+                    this._CodecIDInfo = "";
+                return _CodecIDInfo;
             }
             set
             {
-                this._CodecUrl=value;
+                this._CodecIDInfo = value;
             }
         }
 

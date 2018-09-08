@@ -56,6 +56,7 @@ namespace MediaInfoWrapper
         private string _FormatSettingsITU;
         private string _MuxingMode;
         private string _CodecID;
+        private string _CodecIDString;
         private string _CodecIDInfo;
         private string _CodecIDHint;
         private string _CodecIDUrl;
@@ -594,6 +595,21 @@ namespace MediaInfoWrapper
             set
             {
                 this._CodecID = value;
+            }
+        }
+
+        ///<summary> the ID of the Codec, found in the container </summary>
+        public string CodecIDString
+        {
+            get
+            {
+                if (String.IsNullOrEmpty(this._CodecIDString))
+                    this._CodecIDString = "";
+                return _CodecIDString;
+            }
+            set
+            {
+                this._CodecIDString = value;
             }
         }
 

@@ -34,11 +34,8 @@ namespace MediaInfoWrapper
         private string _ID;
         private string _UniqueID;
         private string _Title;
-        private string _Codec;
-        private string _CodecString;
-        private string _CodecInfo;
-        private string _CodecUrl;
         private string _CodecID;
+        private string _CodecIDString;
         private string _CodecIDInfo;
         private string _BitRate;
         private string _BitRateString;
@@ -231,66 +228,6 @@ namespace MediaInfoWrapper
             }
         }
 
-        ///<summary> Codec used </summary>
-        public string Codec
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(this._Codec))
-                    this._Codec = "";
-                return _Codec;
-            }
-            set
-            {
-                this._Codec = value;
-            }
-        }
-        
-        ///<summary> Codec used (text) </summary>
-        public string CodecString
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(this._CodecString))
-                    this._CodecString = "";
-                return _CodecString;
-            }
-            set
-            {
-                this._CodecString = value;
-            }
-        }
-
-        ///<summary> Info about codec </summary>
-        public string CodecInfo
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(this._CodecInfo))
-                    this._CodecInfo = "";
-                return _CodecInfo;
-            }
-            set
-            {
-                this._CodecInfo = value;
-            }
-        }
-
-        ///<summary> Link </summary>
-        public string CodecUrl
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(this._CodecUrl))
-                    this._CodecUrl = "";
-                return _CodecUrl;
-            }
-            set
-            {
-                this._CodecUrl = value;
-            }
-        }
-
         ///<summary> Codec ID used </summary>
         public string CodecID
         {
@@ -303,6 +240,21 @@ namespace MediaInfoWrapper
             set
             {
                 this._CodecID = value;
+            }
+        }
+
+        ///<summary> Codec ID String used </summary>
+        public string CodecIDString
+        {
+            get
+            {
+                if (String.IsNullOrEmpty(this._CodecIDString))
+                    this._CodecIDString = "";
+                return _CodecIDString;
+            }
+            set
+            {
+                this._CodecIDString = value;
             }
         }
 

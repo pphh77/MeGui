@@ -683,11 +683,8 @@ namespace MediaInfoWrapper
                         _tracktemp_.ID = GetSpecificMediaInfo(StreamKind.Video,num2,"ID");
                         _tracktemp_.UniqueID = GetSpecificMediaInfo(StreamKind.Video,num2,"UniqueID");
                         _tracktemp_.Title = GetSpecificMediaInfo(StreamKind.Video,num2,"Title");
-                        _tracktemp_.Codec = GetSpecificMediaInfo(StreamKind.Video,num2,"Codec");
-                        _tracktemp_.CodecString = GetSpecificMediaInfo(StreamKind.Video,num2,"Codec/String");
-                        _tracktemp_.CodecInfo = GetSpecificMediaInfo(StreamKind.Video,num2,"Codec/Info");
-                        _tracktemp_.CodecUrl = GetSpecificMediaInfo(StreamKind.Video,num2,"Codec/Url");
                         _tracktemp_.CodecID = GetSpecificMediaInfo(StreamKind.Video, num2, "CodecID");
+                        _tracktemp_.CodecIDString = GetSpecificMediaInfo(StreamKind.Video, num2, "CodecID/String");
                         _tracktemp_.CodecIDInfo = GetSpecificMediaInfo(StreamKind.Video, num2, "CodecID/Info");
                         _tracktemp_.BitRate = GetSpecificMediaInfo(StreamKind.Video,num2,"BitRate");
                         _tracktemp_.BitRateString = GetSpecificMediaInfo(StreamKind.Video,num2,"BitRate/String");
@@ -806,6 +803,7 @@ namespace MediaInfoWrapper
                         _tracktemp_.FormatSettingsITU = GetSpecificMediaInfo(StreamKind.Audio, num2, "Format_Settings_ITU");
                         _tracktemp_.MuxingMode = GetSpecificMediaInfo(StreamKind.Audio, num2, "MuxingMode");
                         _tracktemp_.CodecID = GetSpecificMediaInfo(StreamKind.Audio, num2, "CodecID");
+                        _tracktemp_.CodecIDString = GetSpecificMediaInfo(StreamKind.Audio, num2, "CodecID/String");
                         _tracktemp_.CodecIDInfo = GetSpecificMediaInfo(StreamKind.Audio, num2, "CodecID/Info");
                         _tracktemp_.CodecIDUrl = GetSpecificMediaInfo(StreamKind.Audio, num2, "CodecID/Url");
                         _tracktemp_.CodecIDHint = GetSpecificMediaInfo(StreamKind.Audio, num2, "CodecID/Hint");
@@ -921,9 +919,9 @@ namespace MediaInfoWrapper
                         _tracktemp_.ID= GetSpecificMediaInfo(StreamKind.Text,num2,"ID");
                         _tracktemp_.UniqueID= GetSpecificMediaInfo(StreamKind.Text,num2,"UniqueID");
                         _tracktemp_.Title= GetSpecificMediaInfo(StreamKind.Text,num2,"Title");
-                        _tracktemp_.Codec= GetSpecificMediaInfo(StreamKind.Text,num2,"Codec");
-                        _tracktemp_.CodecString= GetSpecificMediaInfo(StreamKind.Text,num2,"Codec/String");
-                        _tracktemp_.CodecUrl= GetSpecificMediaInfo(StreamKind.Text,num2,"Codec/Url");
+                        _tracktemp_.CodecID= GetSpecificMediaInfo(StreamKind.Text,num2,"CodecID");
+                        _tracktemp_.CodecIDString = GetSpecificMediaInfo(StreamKind.Text, num2, "CodecID/String");
+                        _tracktemp_.CodecIDInfo = GetSpecificMediaInfo(StreamKind.Text, num2, "CodecID/Info");
                         _tracktemp_.Delay= GetSpecificMediaInfo(StreamKind.Text,num2,"Delay");
                         _tracktemp_.Video0Delay= GetSpecificMediaInfo(StreamKind.Text,num2,"Video0_Delay");
                         _tracktemp_.PlayTime= GetSpecificMediaInfo(StreamKind.Text,num2,"PlayTime");

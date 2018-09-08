@@ -31,6 +31,7 @@ namespace eac3to
         virtual public StreamType Type { get; set; }
         virtual public string Description { get; set; }
         virtual public string Language { get; set; }
+        virtual public string LanguageOriginal { get; set; }
         abstract public object[] ExtractTypes { get; }
 
         protected Stream() { }
@@ -44,19 +45,19 @@ namespace eac3to
             Description = s.Substring(s.IndexOf(":") + 1);
             Number = int.Parse(s.Substring(0, s.IndexOf(":")));
 
+            Name = "";
             if (s.Contains("Joined EVO"))
                 Name = "Joined EVO";
             else if (s.Contains("Joined VOB"))
                 Name = "Joined VOB";
             else if (type == StreamType.Subtitle && s.IndexOf("\"") > 0)
                 Name = s.Substring(s.IndexOf("\"") + 1, s.LastIndexOf("\"") - s.IndexOf("\"") - 1);
-            else
-                Name = "";
+
+            Language = string.Empty;
+            LanguageOriginal = string.Empty;
 
             if (type == StreamType.Audio || type == StreamType.Subtitle || type == StreamType.Video)
                 setLanguage(s, _log);
-            else
-                Language = string.Empty;
         }
 
         private void setLanguage(string s, LogItem _log)
@@ -85,11 +86,13 @@ namespace eac3to
             if (MeGUI.LanguageSelectionContainer.IsLanguageAvailable(language))
             {
                 this.Language = language;
+                this.LanguageOriginal = this.Language;
                 return;
             }
 
             // check if the language is a 2/3 ISO code
             this.Language = MeGUI.LanguageSelectionContainer.LookupISOCode(language);
+            this.LanguageOriginal = this.Language;
             if (!String.IsNullOrEmpty(this.Language))
                 return;
 
@@ -99,6 +102,7 @@ namespace eac3to
                 if (!string.IsNullOrEmpty(language))
                     _log.LogEvent("The language information \"" + language + "\" is unknown and has been skipped.", ImageType.Warning);
                 this.Language = string.Empty;
+                this.LanguageOriginal = language;
             }
             else
             {
@@ -107,6 +111,7 @@ namespace eac3to
                 else
                     _log.LogEvent("The language information \"" + language + "\" is unknown. The default MeGUI language has been selected instead.", ImageType.Warning);
                 this.Language = MeGUI.MainForm.Instance.Settings.DefaultLanguage1;
+                this.LanguageOriginal = language;
             }
         }
 
