@@ -238,7 +238,7 @@ namespace MeGUI
             if (colorspace_old.ToLower().Contains("a"))
                 strConvertTo = "RemoveAlphaPlane().ConvertTo" + strConvertTo + "()";
             else
-                strConvertTo += "ConvertTo" + strConvertTo + "()";
+                strConvertTo = "ConvertTo" + strConvertTo + "()";
             return strConvertTo;
         }
 
