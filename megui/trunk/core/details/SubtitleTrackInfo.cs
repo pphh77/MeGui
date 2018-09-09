@@ -34,6 +34,14 @@ namespace MeGUI
             base.TrackID = -1;
             base.MMGTrackID = mmgTrackID;
             base.Name = name;
+            this._subtitleCodec = SubtitleCodec.UNKNOWN;
+        }
+
+        private SubtitleCodec _subtitleCodec;
+        public SubtitleCodec SubtitleCodec
+        {
+            get { return _subtitleCodec; }
+            set { _subtitleCodec = value; }
         }
 
         public override string ToString()

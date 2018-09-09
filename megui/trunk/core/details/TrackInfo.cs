@@ -220,7 +220,7 @@ namespace MeGUI
                 {
                     string[] arrCodec = new string[] { };
                     arrCodec = _codec.Split('/');
-                    if (arrCodec[0].Substring(1, 1).Equals("_"))
+                    if (!String.IsNullOrEmpty(arrCodec[0]) && arrCodec[0].Substring(1, 1).Equals("_"))
                         arrCodec[0] = arrCodec[0].Substring(2);
                     strCodec = arrCodec[0].ToUpperInvariant();
                 }
@@ -252,14 +252,13 @@ namespace MeGUI
                     case "AVS": strExtension = "avs"; break;
 
                     // subtitle
-                    case "VOBSUB": strExtension = "idx"; break;
                     case "ASS": strExtension = "ass"; break;
-                    case "UTF-8": strExtension = "srt"; break;
-                    case "SSA": strExtension = "ssa"; break;
-                    case "USF": strExtension = "usf"; break;
-                    case "HDMV": strExtension = "sup"; break;
                     case "PGS": strExtension = "sup"; break;
-                    
+                    case "SRT": strExtension = "srt"; break;
+                    case "SSA": strExtension = "ssa"; break;
+                    case "TTXT": strExtension = "ttxt"; break;
+                    case "VOBSUB": strExtension = "idx"; break;
+
                     // video
                     case "ASP": strExtension = "avi"; break;
                     case "AVC": strExtension = "264"; break;

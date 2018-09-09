@@ -25,19 +25,19 @@ namespace MeGUI
     {
         private string _codecMediaInfo;
 
-        public VideoTrackInfo() : this(0, 0, null, null, null, null)
+        public VideoTrackInfo() : this(0, 0, null, null, null)
         {
         }
 
-        public VideoTrackInfo(int trackID, int mmgTrackID, string language, string name, string codecString, string codec)
+        public VideoTrackInfo(int trackID, int mmgTrackID, string language, string name, string codec)
         {
             base.TrackType = TrackType.Video;
             base.Language = language;
             base.Name = name;
             base.TrackID = trackID;
             base.MMGTrackID = mmgTrackID;
-            base.Codec = codecString;
-            _codecMediaInfo = codec + "/" + codecString;
+            base.Codec = codec;
+            this._codecMediaInfo = codec;
         }
 
         /// <summary>

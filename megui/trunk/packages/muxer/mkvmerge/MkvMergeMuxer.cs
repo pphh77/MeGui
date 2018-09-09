@@ -146,7 +146,7 @@ namespace MeGUI
                         sb.Append(" --engage keep_bitstream_ar_info"); // assuming that SAR info is already in the stream...
                     if (!string.IsNullOrEmpty(settings.VideoName))
                         sb.Append(" --track-name \"" + trackID + ":" + settings.VideoName.Replace("\"", "\\\"") + "\"");
-                    if (oVideoInfo.VideoInfo.Codec == null || oVideoInfo.VideoInfo.Codec != VideoCodec.AVC || oVideoInfo.VideoInfo.ScanType.ToLowerInvariant().Equals("progressive"))
+                    if (oVideoInfo.VideoInfo.Codec == VideoCodec.UNKNOWN || oVideoInfo.VideoInfo.Codec != VideoCodec.AVC || oVideoInfo.VideoInfo.ScanType.ToLowerInvariant().Equals("progressive"))
                     {
                         string fpsString = String.Format("{0:##.###}", oVideoInfo.VideoInfo.FPS);
                         if (settings.Framerate.HasValue)

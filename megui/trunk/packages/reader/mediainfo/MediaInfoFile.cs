@@ -74,8 +74,6 @@ namespace MeGUI
     {
         #region variables
         private static readonly CultureInfo culture = new CultureInfo("en-us");
-        private static Dictionary<string, VideoCodec> knownVideoDescriptions;
-        private static Dictionary<string, ContainerType> knownContainerTypes;
         private IMediaFile videoSourceFile = null;
         private IVideoReader videoReader = null; 
         private ContainerType cType;
@@ -318,7 +316,9 @@ namespace MeGUI
                     if (_strContainer.Contains(" / "))
                         _strContainer = _strContainer.Substring(0, _strContainer.IndexOf(" / "));
 
-                    cType = getContainerType(_strContainer, info.General[0].FormatString);
+                    cType = GetContainerType(_strContainer);
+                    if (cType == null)
+                        cType = GetContainerType(info.General[0].FormatString);
 
                     _attachments.AddRange(info.General[0].Attachments.Split(new string[] { " / " }, StringSplitOptions.RemoveEmptyEntries));
                 }
@@ -335,8 +335,8 @@ namespace MeGUI
                     AudioTrackInfo ati = new AudioTrackInfo();
                     ati.SourceFileName = _file;
                     ati.Name = atrack.Title;
-                    ati.DefaultTrack = atrack.DefaultString.ToLowerInvariant().Equals("yes");
-                    ati.ForcedTrack = atrack.ForcedString.ToLowerInvariant().Equals("yes");
+                    ati.DefaultTrack = atrack.Default.ToLowerInvariant().Equals("yes");
+                    ati.ForcedTrack = atrack.Forced.ToLowerInvariant().Equals("yes");
                     // DGIndex expects audio index not ID for TS
                     ati.ContainerType = _strContainer;
                     ati.TrackIndex = counter;
@@ -377,9 +377,9 @@ namespace MeGUI
                     else
                         ati.Codec = atrack.Format;
 
-                    ati.AudioCodec = getAudioCodec(ati.Codec);
+                    ati.AudioCodec = GetAudioCodec(ati.Codec);
                     if (ati.AudioCodec != null)
-                        ati.AudioType = getAudioType(ati.AudioCodec, cType, file);
+                        ati.AudioType = GetAudioType(ati.AudioCodec, cType, file);
 
                     if ((atrack.Format.Equals("E-AC-3") && atrack.MuxingMode.Equals("Stream extension"))
                         || (atrack.Format.Equals("DTS") && atrack.FormatProfile.Contains("/"))
@@ -432,9 +432,8 @@ namespace MeGUI
                     if (!Int32.TryParse(oTextTrack.StreamOrder, out mmgTrackID) && oTextTrack.StreamOrder.Contains("-"))
                         Int32.TryParse(oTextTrack.StreamOrder.Split('-')[1], out mmgTrackID);
                     SubtitleTrackInfo oTrack = new SubtitleTrackInfo(mmgTrackID, getLanguage(oTextTrack.Language, oTextTrack.LanguageString, ref infoLog, infoLog == null, false), oTextTrack.Title);
-                    oTrack.Codec = oTextTrack.CodecID;
-                    oTrack.DefaultTrack = oTextTrack.DefaultString.ToLowerInvariant().Equals("yes");
-                    oTrack.ForcedTrack = oTextTrack.ForcedString.ToLowerInvariant().Equals("yes");
+                    oTrack.DefaultTrack = oTextTrack.Default.ToLowerInvariant().Equals("yes");
+                    oTrack.ForcedTrack = oTextTrack.Forced.ToLowerInvariant().Equals("yes");
                     oTrack.SourceFileName = file;
                     oTrack.ContainerType = _strContainer;
                     oTrack.TrackIndex = i++;
@@ -442,30 +441,27 @@ namespace MeGUI
                     Int32.TryParse(oTextTrack.Delay, out delay);
                     oTrack.Delay = delay;
 
-                    // only add supported subtitle tracks
-                    string strCodec = oTrack.Codec.ToUpperInvariant();
-                    if (cType == ContainerType.MKV)
+                    // detects the subtitle codec
+                    oTrack.Codec = oTextTrack.Format;
+                    oTrack.SubtitleCodec = GetSubtitleCodec(oTextTrack.Format);
+                    if (oTrack.SubtitleCodec == SubtitleCodec.UNKNOWN)
+                        oTrack.SubtitleCodec = GetSubtitleCodec(oTextTrack.CodecID);
+
+                    if (MainForm.Instance.Settings.ShowDebugInformation && oTrack.SubtitleCodec == SubtitleCodec.UNKNOWN)
                     {
-                        string[] arrCodec = new string[] { };
-                        arrCodec = strCodec.Split('/');
-                        if (arrCodec[0].Length > 0 && arrCodec[0].Substring(1, 1).Equals("_"))
-                            arrCodec[0] = arrCodec[0].Substring(2);
-                        strCodec = arrCodec[0];
-                    }
-                    switch (strCodec)
-                    {
-                        case "VOBSUB": 
-                        case "ASS": 
-                        case "UTF-8": 
-                        case "SSA": 
-                        case "USF": 
-                        case "HDMV":
-                        case "PGS": break;
-                        default: strCodec = "unknown"; break;
+                        if (_Log == null)
+                            _Log = MainForm.Instance.Log.Info("MediaInfo");
+                        _Log.LogEvent("Unknown subtitle codec found: " + 
+                            oTextTrack.FormatCommercial + " / " + oTextTrack.Format + " / " + 
+                            oTextTrack.FormatVersion + " / " + oTextTrack.CodecID, ImageType.Warning);
                     }
 
-                    if (!strCodec.Equals("unknown"))
+                    // only add supported subtitle tracks
+                    if (oTrack.SubtitleCodec != SubtitleCodec.UNKNOWN)
+                    {
+                        oTrack.Codec = oTrack.SubtitleCodec.ID;
                         _SubtitleInfo.Tracks.Add(oTrack);
+                    }
                 }
 
                 // video detection
@@ -475,31 +471,42 @@ namespace MeGUI
                     MediaInfoWrapper.VideoTrack track = info.Video[0];
                     checked
                     {
+                        // detect the codec type
+                        _VideoInfo.Codec = GetVideoCodec(track.FormatCommercial);
+                        if (_VideoInfo.Codec == VideoCodec.UNKNOWN)
+                            _VideoInfo.Codec = GetVideoCodec(track.Format);
+                        if (_VideoInfo.Codec == VideoCodec.UNKNOWN)
+                            _VideoInfo.Codec = GetVideoCodec(track.Format + " " + track.FormatVersion);
+                        if (_VideoInfo.Codec == VideoCodec.UNKNOWN)
+                            _VideoInfo.Codec = GetVideoCodec(track.CodecID);
+
+                        if (MainForm.Instance.Settings.ShowDebugInformation && _VideoInfo.Codec == VideoCodec.UNKNOWN && !track.Format.Equals("AVS"))
+                        {
+                            if (_Log == null)
+                                _Log = MainForm.Instance.Log.Info("MediaInfo");
+                            _Log.LogEvent("Unknown video codec found: " + 
+                                track.FormatCommercial + " / " + track.Format + " / " + track.FormatVersion + " / " + track.CodecID, ImageType.Warning);
+                        }
+
                         int _trackID = 0;
                         Int32.TryParse(track.ID, out _trackID);
                         int _mmgTrackID = 0;
                         Int32.TryParse(track.StreamOrder, out _mmgTrackID);
 
-                        VideoTrackInfo videoInfo = new VideoTrackInfo(_trackID, _mmgTrackID, getLanguage(track.Language, track.LanguageString, ref infoLog, infoLog == null, true), track.Title, track.CodecIDString, track.CodecID);
+                        VideoTrackInfo videoInfo = new VideoTrackInfo(_trackID, _mmgTrackID, getLanguage(track.Language, track.LanguageString, ref infoLog, infoLog == null, true), track.Title, track.Format);
                         videoInfo.ContainerType = _strContainer;
-                        _VideoInfo.Track = videoInfo;
+                        if (_VideoInfo.Codec != VideoCodec.UNKNOWN)
+                            videoInfo.Codec = _VideoInfo.Codec.ID;
 
+                        _VideoInfo.Track = videoInfo;
                         _VideoInfo.Width = (ulong)easyParseInt(track.Width).Value;
                         _VideoInfo.Height = (ulong)easyParseInt(track.Height).Value;
                         _VideoInfo.FrameCount = (ulong)(easyParseInt(track.FrameCount) ?? 0);
                         _VideoInfo.ScanType = track.ScanTypeString;
-                        _VideoInfo.Codec = getVideoCodec(track.CodecID);
-                        if (_VideoInfo.Codec == null)
-                            _VideoInfo.Codec = getVideoCodec(track.Format); // sometimes codec info is not available, check the format then...
-                        if (MainForm.Instance.Settings.ShowDebugInformation && _VideoInfo.Codec == null && !track.Format.Equals("AVS"))
-                        {
-                            if (_Log == null)
-                                _Log = MainForm.Instance.Log.Info("MediaInfo");
-                            _Log.LogEvent("Unknown video codec found: " + track.CodecID + " / " + track.Format, ImageType.Warning);
-                        }
-                        _VideoInfo.Type = getVideoType(_VideoInfo.Codec, cType, file);
+                        _VideoInfo.Type = GetVideoType(_VideoInfo.Codec, cType, file);
                         _VideoInfo.DAR = Resolution.GetDAR((int)_VideoInfo.Width, (int)_VideoInfo.Height, track.AspectRatio, easyParseDecimal(track.PixelAspectRatio), track.AspectRatioString);
 
+                        // get the FPS
                         double? fps = easyParseDouble(track.FrameRate) ?? easyParseDouble(track.FrameRateOriginal);
                         if (fps == null)
                         {
@@ -633,9 +640,11 @@ namespace MeGUI
                 foreach (MediaInfoWrapper.GeneralTrack t in oInfo.General)
                 {
                     LogItem oTrack = new LogItem("General");
-                      
-                    oTrack.Info("Format: " + t.Format);
-                    oTrack.Info("FormatString: " + t.FormatString);
+
+                    if (!String.IsNullOrEmpty(t.Format))
+                        oTrack.Info("Format: " + t.Format);
+                    if (!String.IsNullOrEmpty(t.FormatString) && !t.Format.Equals(t.FormatString))
+                        oTrack.Info("FormatString: " + t.FormatString);
                     oTrack.Info("FileSize: " + t.FileSize);
                     oTrack.Info("PlayTime: " + t.PlayTimeString3);
                     if (_VideoInfo.PGCCount > 0)
@@ -661,28 +670,62 @@ namespace MeGUI
 
                     oTrack.Info("ID: " + t.ID);
                     oTrack.Info("StreamOrder: " + t.StreamOrder);
-                    oTrack.Info("CodecID: " + t.CodecID);
-                    oTrack.Info("CodecIDString: " + t.CodecIDString);
-                    oTrack.Info("CodecIDInfo: " + t.CodecIDInfo);
-                    oTrack.Info("Width: " + t.Width);
-                    oTrack.Info("Height: " + t.Height);
-                    oTrack.Info("FrameCount: " + t.FrameCount);
-                    oTrack.Info("FrameRate: " + t.FrameRate);
-                    oTrack.Info("FrameRateOriginal: " + t.FrameRateOriginal);
-                    oTrack.Info("FrameRateMode: " + t.FrameRateMode);
-                    oTrack.Info("ScanType: " + t.ScanTypeString);
-                    oTrack.Info("Bits Depth: " + t.BitDepth);
-                    oTrack.Info("Format: " + t.Format);
-                    oTrack.Info("AspectRatio: " + t.AspectRatio);
-                    oTrack.Info("AspectRatioString: " + t.AspectRatioString);
-                    oTrack.Info("Delay: " + t.Delay);
-                    oTrack.Info("Title: " + t.Title);
-                    oTrack.Info("Language: " + t.Language);
-                    oTrack.Info("LanguageString: " + t.LanguageString);
-                    oTrack.Info("Default: " + t.Default);
-                    oTrack.Info("DefaultString: " + t.DefaultString);
-                    oTrack.Info("Forced: " + t.Forced);
-                    oTrack.Info("ForcedString: " + t.ForcedString);
+                    if (!String.IsNullOrEmpty(t.CodecID))
+                        oTrack.Info("CodecID: " + t.CodecID);
+                    if (!String.IsNullOrEmpty(t.CodecIDString) && !t.CodecID.Equals(t.CodecIDString))
+                        oTrack.Info("CodecIDString: " + t.CodecIDString);
+                    if (!String.IsNullOrEmpty(t.CodecIDInfo))
+                        oTrack.Info("CodecIDInfo: " + t.CodecIDInfo);
+                    if (!String.IsNullOrEmpty(t.Format))
+                        oTrack.Info("Format: " + t.Format);
+                    if (!String.IsNullOrEmpty(t.FormatString) && !t.Format.Equals(t.FormatString))
+                        oTrack.Info("FormatString: " + t.FormatString);
+                    if (!String.IsNullOrEmpty(t.FormatVersion))
+                        oTrack.Info("FormatVersion: " + t.FormatVersion);
+                    if (!String.IsNullOrEmpty(t.FormatInfo))
+                        oTrack.Info("FormatInfo: " + t.FormatInfo);
+                    if (!String.IsNullOrEmpty(t.FormatCommercial))
+                        oTrack.Info("FormatCommercial: " + t.FormatCommercial);
+                    if (!String.IsNullOrEmpty(t.Width))
+                        oTrack.Info("Width: " + t.Width);
+                    if (!String.IsNullOrEmpty(t.Height))
+                        oTrack.Info("Height: " + t.Height);
+                    if (!String.IsNullOrEmpty(t.FrameCount))
+                        oTrack.Info("FrameCount: " + t.FrameCount);
+                    if (!String.IsNullOrEmpty(t.FrameRate))
+                        oTrack.Info("FrameRate: " + t.FrameRate);
+                    if (!String.IsNullOrEmpty(t.FrameRateOriginal))
+                        oTrack.Info("FrameRateOriginal: " + t.FrameRateOriginal);
+                    if (!String.IsNullOrEmpty(t.FrameRateMode))
+                        oTrack.Info("FrameRateMode: " + t.FrameRateMode);
+                    if (!String.IsNullOrEmpty(t.FrameRateModeString))
+                        oTrack.Info("FrameRateModeString: " + t.FrameRateModeString);
+                    if (!String.IsNullOrEmpty(t.DurationString3))
+                        oTrack.Info("Duration: " + t.DurationString3);
+                    if (!String.IsNullOrEmpty(t.ScanTypeString))
+                        oTrack.Info("ScanType: " + t.ScanTypeString);
+                    if (!String.IsNullOrEmpty(t.BitDepth))
+                        oTrack.Info("Bits Depth: " + t.BitDepth);
+                    if (!String.IsNullOrEmpty(t.AspectRatio))
+                        oTrack.Info("AspectRatio: " + t.AspectRatio);
+                    if (!String.IsNullOrEmpty(t.AspectRatioString))
+                        oTrack.Info("AspectRatioString: " + t.AspectRatioString);
+                    if (!String.IsNullOrEmpty(t.PixelAspectRatio))
+                        oTrack.Info("PixelAspectRatio: " + t.PixelAspectRatio);
+                    if (!String.IsNullOrEmpty(t.Delay))
+                        oTrack.Info("Delay: " + t.Delay);
+                    if (!String.IsNullOrEmpty(t.Title))
+                        oTrack.Info("Title: " + t.Title);
+                    if (!String.IsNullOrEmpty(t.Title))
+                        oTrack.Info("Language: " + t.Title);
+                    if (!String.IsNullOrEmpty(t.LanguageString))
+                        oTrack.Info("LanguageString: " + t.LanguageString);
+                    if (!String.IsNullOrEmpty(t.Default))
+                        oTrack.Info("Default: " + t.Default);
+                    if (!String.IsNullOrEmpty(t.Forced))
+                        oTrack.Info("Forced: " + t.Forced);
+                    if (!String.IsNullOrEmpty(t.Source))
+                        oTrack.Info("Source: " + t.Source);
                     t.LanguageString = getLanguage(t.Language, t.LanguageString, ref oTrack, true, true);
 
                     infoLog.Add(oTrack);
@@ -695,28 +738,56 @@ namespace MeGUI
 
                     oTrack.Info("ID: " + t.ID);
                     oTrack.Info("StreamOrder: " + t.StreamOrder);
-                    oTrack.Info("CodecID: " + t.CodecID);
-                    oTrack.Info("CodecIDString: " + t.CodecIDString);
-                    oTrack.Info("CodecIDInfo: " + t.CodecIDInfo);
-                    oTrack.Info("Format: " + t.Format);
-                    oTrack.Info("FormatProfile: " + t.FormatProfile);
-                    oTrack.Info("FormatSettingsSBR: " + t.FormatSettingsSBR);
-                    oTrack.Info("FormatSettingsPS: " + t.FormatSettingsPS);
-                    oTrack.Info("Muxing Mode: " + t.MuxingMode);
-                    oTrack.Info("SamplingRate: " + t.SamplingRate);
-                    oTrack.Info("SamplingRateString: " + t.SamplingRateString);
-                    oTrack.Info("Channels: " + t.Channels);
-                    oTrack.Info("ChannelsString: " + t.ChannelsString);
-                    oTrack.Info("ChannelPositionsString2: " + t.ChannelPositionsString2);
-                    oTrack.Info("BitRateMode: " + t.BitRateMode);
-                    oTrack.Info("Delay: " + t.Delay);
-                    oTrack.Info("Title: " + t.Title);
-                    oTrack.Info("Language: " + t.Language);
-                    oTrack.Info("LanguageString: " + t.LanguageString);
-                    oTrack.Info("Default: " + t.Default);
-                    oTrack.Info("DefaultString: " + t.DefaultString);
-                    oTrack.Info("Forced: " + t.Forced);
-                    oTrack.Info("ForcedString: " + t.ForcedString);
+                    if (!String.IsNullOrEmpty(t.CodecID))
+                        oTrack.Info("CodecID: " + t.CodecID);
+                    if (!String.IsNullOrEmpty(t.CodecIDString) && !t.CodecID.Equals(t.CodecIDString))
+                        oTrack.Info("CodecIDString: " + t.CodecIDString);
+                    if (!String.IsNullOrEmpty(t.CodecIDInfo))
+                        oTrack.Info("CodecIDInfo: " + t.CodecIDInfo);
+                    if (!String.IsNullOrEmpty(t.Format))
+                        oTrack.Info("Format: " + t.Format);
+                    if (!String.IsNullOrEmpty(t.FormatString) && !t.Format.Equals(t.FormatString))
+                        oTrack.Info("FormatString: " + t.FormatString);
+                    if (!String.IsNullOrEmpty(t.FormatVersion))
+                        oTrack.Info("FormatVersion: " + t.FormatVersion);
+                    if (!String.IsNullOrEmpty(t.FormatInfo))
+                        oTrack.Info("FormatInfo: " + t.FormatInfo);
+                    if (!String.IsNullOrEmpty(t.FormatCommercial))
+                        oTrack.Info("FormatCommercial: " + t.FormatCommercial);
+                    if (!String.IsNullOrEmpty(t.FormatProfile))
+                        oTrack.Info("FormatProfile: " + t.FormatProfile);
+                    if (!String.IsNullOrEmpty(t.FormatSettingsSBR))
+                        oTrack.Info("FormatSettingsSBR: " + t.FormatSettingsSBR);
+                    if (!String.IsNullOrEmpty(t.FormatSettingsPS))
+                        oTrack.Info("FormatSettingsPS: " + t.FormatSettingsPS);
+                    if (!String.IsNullOrEmpty(t.MuxingMode))
+                        oTrack.Info("Muxing Mode: " + t.MuxingMode);
+                    if (!String.IsNullOrEmpty(t.SamplingRate))
+                        oTrack.Info("SamplingRate: " + t.SamplingRate);
+                    if (!String.IsNullOrEmpty(t.SamplingRateString))
+                        oTrack.Info("SamplingRateString: " + t.SamplingRateString);
+                    if (!String.IsNullOrEmpty(t.Channels))
+                        oTrack.Info("Channels: " + t.Channels);
+                    if (!String.IsNullOrEmpty(t.ChannelsString))
+                        oTrack.Info("ChannelsString: " + t.ChannelsString);
+                    if (!String.IsNullOrEmpty(t.ChannelPositionsString2))
+                        oTrack.Info("ChannelPositionsString2: " + t.ChannelPositionsString2);
+                    if (!String.IsNullOrEmpty(t.BitRateMode))
+                        oTrack.Info("BitRateMode: " + t.BitRateMode);
+                    if (!String.IsNullOrEmpty(t.Delay))
+                        oTrack.Info("Delay: " + t.Delay);
+                    if (!String.IsNullOrEmpty(t.Title))
+                        oTrack.Info("Title: " + t.Title);
+                    if (!String.IsNullOrEmpty(t.Language))
+                        oTrack.Info("Language: " + t.Language);
+                    if (!String.IsNullOrEmpty(t.LanguageString))
+                        oTrack.Info("LanguageString: " + t.LanguageString);
+                    if (!String.IsNullOrEmpty(t.Default))
+                        oTrack.Info("Default: " + t.Default);
+                    if (!String.IsNullOrEmpty(t.Forced))
+                        oTrack.Info("Forced: " + t.Forced);
+                    if (!String.IsNullOrEmpty(t.Source))
+                        oTrack.Info("Source: " + t.Source);
                     t.LanguageString = getLanguage(t.Language, t.LanguageString, ref oTrack, true, false);
 
                     infoLog.Add(oTrack);
@@ -729,17 +800,36 @@ namespace MeGUI
 
                     oTrack.Info("ID: " + t.ID);
                     oTrack.Info("StreamOrder: " + t.StreamOrder);
-                    oTrack.Info("CodecID: " + t.CodecID);
-                    oTrack.Info("CodecIDString: " + t.CodecIDString);
-                    oTrack.Info("CodecIDInfo: " + t.CodecIDInfo);
-                    oTrack.Info("Delay: " + t.Delay);
-                    oTrack.Info("Title: " + t.Title);
-                    oTrack.Info("Language: " + t.Language);
-                    oTrack.Info("LanguageString: " + t.LanguageString);
-                    oTrack.Info("Default: " + t.Default);
-                    oTrack.Info("DefaultString: " + t.DefaultString);
-                    oTrack.Info("Forced: " + t.Forced);
-                    oTrack.Info("ForcedString: " + t.ForcedString);
+                    if (!String.IsNullOrEmpty(t.CodecID))
+                        oTrack.Info("CodecID: " + t.CodecID);
+                    if (!String.IsNullOrEmpty(t.CodecIDString) && !t.CodecID.Equals(t.CodecIDString))
+                        oTrack.Info("CodecIDString: " + t.CodecIDString);
+                    if (!String.IsNullOrEmpty(t.CodecIDInfo))
+                        oTrack.Info("CodecIDInfo: " + t.CodecIDInfo);
+                    if (!String.IsNullOrEmpty(t.Format))
+                        oTrack.Info("Format: " + t.Format);
+                    if (!String.IsNullOrEmpty(t.FormatString) && !t.Format.Equals(t.FormatString))
+                        oTrack.Info("FormatString: " + t.FormatString);
+                    if (!String.IsNullOrEmpty(t.FormatVersion))
+                        oTrack.Info("FormatVersion: " + t.FormatVersion);
+                    if (!String.IsNullOrEmpty(t.FormatInfo))
+                        oTrack.Info("FormatInfo: " + t.FormatInfo);
+                    if (!String.IsNullOrEmpty(t.FormatCommercial))
+                        oTrack.Info("FormatCommercial: " + t.FormatCommercial);
+                    if (!String.IsNullOrEmpty(t.Delay))
+                        oTrack.Info("Delay: " + t.Delay);
+                    if (!String.IsNullOrEmpty(t.Title))
+                        oTrack.Info("Title: " + t.Title);
+                    if (!String.IsNullOrEmpty(t.Language))
+                        oTrack.Info("Language: " + t.Language);
+                    if (!String.IsNullOrEmpty(t.LanguageString))
+                        oTrack.Info("LanguageString: " + t.LanguageString);
+                    if (!String.IsNullOrEmpty(t.Default))
+                        oTrack.Info("Default: " + t.Default);
+                    if (!String.IsNullOrEmpty(t.Forced))
+                        oTrack.Info("Forced: " + t.Forced);
+                    if (!String.IsNullOrEmpty(t.Source))
+                        oTrack.Info("Source: " + t.Source);
                     t.LanguageString = getLanguage(t.Language, t.LanguageString, ref oTrack, true, false);
 
                     infoLog.Add(oTrack);
@@ -804,7 +894,7 @@ namespace MeGUI
                             oTextTrack.Title = strSubtitle;
 
                         if (strSubtitle.ToLowerInvariant().Contains("forced"))
-                            oTextTrack.ForcedString = "yes";
+                            oTextTrack.Forced = "yes";
                         oTextTrack.CodecID = SubtitleType.VOBSUB.ToString();
                         oInfo.Text.Add(oTextTrack);
                     }
@@ -982,9 +1072,9 @@ namespace MeGUI
                 return false;
 
             // only AVC, VC1 and MPEG2 are supported
-            if (!_VideoInfo.Track.Codec.ToUpperInvariant().Equals("AVC") &&
-                !_VideoInfo.Track.Codec.ToUpperInvariant().Equals("VC-1") &&
-                !_VideoInfo.Track.Codec.ToUpperInvariant().Equals("MPEG-2 VIDEO"))
+            if (_VideoInfo.Codec != VideoCodec.AVC &&
+                _VideoInfo.Codec != VideoCodec.VC1 &&
+                _VideoInfo.Codec != VideoCodec.MPEG2)
                 return false;
 
             // only the following container formats are supported
@@ -1012,8 +1102,8 @@ namespace MeGUI
                 return false;
 
             // only MPEG1 and MPEG2 are supported
-            if (!_VideoInfo.Track.Codec.ToUpperInvariant().Equals("MPEG-1 VIDEO") &&
-                !_VideoInfo.Track.Codec.ToUpperInvariant().Equals("MPEG-2 VIDEO"))
+            if (_VideoInfo.Codec != VideoCodec.MPEG1 &&
+                _VideoInfo.Codec != VideoCodec.MPEG2)
                 return false;
 
             // only the following container formats are supported
@@ -1040,9 +1130,9 @@ namespace MeGUI
                 return false;
 
             // only AVC, VC1 and MPEG2 are supported
-            if (!_VideoInfo.Track.Codec.ToUpperInvariant().Equals("AVC") &&
-                !_VideoInfo.Track.Codec.ToUpperInvariant().Equals("VC-1") &&
-                !_VideoInfo.Track.Codec.ToUpperInvariant().Equals("MPEG-2 VIDEO"))
+            if (_VideoInfo.Codec != VideoCodec.AVC &&
+                _VideoInfo.Codec != VideoCodec.VC1 &&
+                _VideoInfo.Codec != VideoCodec.MPEG2)
                 return false;
 
             // only the following container formats are supported
@@ -1070,7 +1160,7 @@ namespace MeGUI
                 return false;
 
             // interlaced VC-1 is not supported
-            if (_VideoInfo.Track.Codec.ToUpperInvariant().Equals("VC-1") &&
+            if (_VideoInfo.Codec == VideoCodec.VC1 &&
                 !_VideoInfo.ScanType.ToUpperInvariant().Equals("PROGRESSIVE"))
                 return false;
 
@@ -1111,7 +1201,7 @@ namespace MeGUI
 
             // some codecs are not supported by LSMASH
             // VC-1: https://github.com/VFR-maniac/L-SMASH-Works/issues/58
-            if (_VideoInfo.Track.Codec.ToUpperInvariant().Equals("VC-1"))
+            if (_VideoInfo.Codec == VideoCodec.VC1)
                 return false;
 
             // only the following container formats are supported
@@ -1354,14 +1444,23 @@ namespace MeGUI
             }
         }
 
-        private static ContainerType getContainerType(string codec, string description)
+        private static ContainerType GetContainerType(string description)
         {
-            if (knownContainerTypes.ContainsKey(codec))
-                return knownContainerTypes[codec];
+            if (String.IsNullOrEmpty(description))
+                return null;
+
+            foreach (ContainerType _type in ContainerManager.ContainerTypes.Values)
+            {
+                if (string.IsNullOrEmpty(_type.MediaInfoRegex))
+                    continue;
+
+                if (System.Text.RegularExpressions.Regex.IsMatch(description, _type.MediaInfoRegex, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                    return _type;
+            }
             return null;
         }
 
-        private static AudioCodec getAudioCodec(string description)
+        private static AudioCodec GetAudioCodec(string description)
         {
             foreach (AudioCodec _codec in CodecManager.AudioCodecs.Values)
             {
@@ -1374,16 +1473,34 @@ namespace MeGUI
             return null;
         }
 
-        private static VideoCodec getVideoCodec(string description)
+        private static AudioType GetAudioType(AudioCodec codec, ContainerType cft, string filename)
         {
-            description = description.ToLowerInvariant();
-            foreach (string knownDescription in knownVideoDescriptions.Keys)
-                if (description.Contains(knownDescription.ToLowerInvariant()))
-                    return knownVideoDescriptions[knownDescription];
+            string extension = Path.GetExtension(filename).ToLowerInvariant();
+            foreach (AudioType t in ContainerManager.AudioTypes.Values)
+            {
+                if (t.ContainerType == cft && Array.IndexOf<AudioCodec>(t.SupportedCodecs, codec) >= 0 && "." + t.Extension == extension)
+                    return t;
+            }
             return null;
         }
 
-        private static VideoType getVideoType(VideoCodec codec, ContainerType cft, string filename)
+        private static VideoCodec GetVideoCodec(string description)
+        {
+            if (String.IsNullOrEmpty(description))
+                return VideoCodec.UNKNOWN;
+
+            foreach (VideoCodec _codec in CodecManager.VideoCodecs.Values)
+            {
+                if (string.IsNullOrEmpty(_codec.MediaInfoRegex))
+                    continue;
+
+                if (System.Text.RegularExpressions.Regex.IsMatch(description, _codec.MediaInfoRegex, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                    return _codec;
+            }
+            return VideoCodec.UNKNOWN;
+        }
+
+        private static VideoType GetVideoType(VideoCodec codec, ContainerType cft, string filename)
         {
             string extension = Path.GetExtension(filename).ToLowerInvariant();
             foreach (VideoType t in ContainerManager.VideoTypes.Values)
@@ -1394,49 +1511,23 @@ namespace MeGUI
             return null;
         }
 
-        private static AudioType getAudioType(AudioCodec codec, ContainerType cft, string filename)
+        private static SubtitleCodec GetSubtitleCodec(string description)
         {
-            string extension = Path.GetExtension(filename).ToLowerInvariant();
-            foreach (AudioType t in ContainerManager.AudioTypes.Values)
-            {
-                if (t.ContainerType == cft && Array.IndexOf<AudioCodec>(t.SupportedCodecs, codec) >= 0 && "." + t.Extension == extension)
-                    return t;
-            }
-            return null;
-        }
-        #endregion
-        static MediaInfoFile()
-        {
-            knownVideoDescriptions = new Dictionary<string, VideoCodec>();
-            knownVideoDescriptions.Add("divx 5", VideoCodec.ASP);
-            knownVideoDescriptions.Add("divx 4", VideoCodec.ASP);
-            knownVideoDescriptions.Add("divx 6", VideoCodec.ASP);
-            knownVideoDescriptions.Add("3ivx", VideoCodec.ASP);
-            knownVideoDescriptions.Add("xvid", VideoCodec.ASP);
-            knownVideoDescriptions.Add("asp", VideoCodec.ASP);
-            knownVideoDescriptions.Add("mpeg-4 adv simple", VideoCodec.ASP);
-            knownVideoDescriptions.Add("mpeg-4 visual", VideoCodec.ASP);
-            knownVideoDescriptions.Add("mpeg-4v", VideoCodec.ASP);
-            knownVideoDescriptions.Add("avc", VideoCodec.AVC);
-            knownVideoDescriptions.Add("h264", VideoCodec.AVC);
-            knownVideoDescriptions.Add("h.264", VideoCodec.AVC);
-            knownVideoDescriptions.Add("huffman", VideoCodec.HFYU);
-            knownVideoDescriptions.Add("ffvh", VideoCodec.HFYU);
-            knownVideoDescriptions.Add("vc-1", VideoCodec.VC1);
-            knownVideoDescriptions.Add("mpeg-1v", VideoCodec.MPEG1);
-            knownVideoDescriptions.Add("V_MPEG1", VideoCodec.MPEG1);
-            knownVideoDescriptions.Add("mpeg-2v", VideoCodec.MPEG2);
-            knownVideoDescriptions.Add("V_MPEG2", VideoCodec.MPEG2);
-            knownVideoDescriptions.Add("hevc", VideoCodec.HEVC);
+            if (String.IsNullOrEmpty(description))
+                return SubtitleCodec.UNKNOWN;
 
-            knownContainerTypes = new Dictionary<string, ContainerType>();
-            knownContainerTypes.Add("AVI", ContainerType.AVI);
-            knownContainerTypes.Add("Matroska", ContainerType.MKV);
-            knownContainerTypes.Add("MPEG-4", ContainerType.MP4);
-            knownContainerTypes.Add("3GPP", ContainerType.MP4);
-            knownContainerTypes.Add("BDAV", ContainerType.M2TS);
-            knownContainerTypes.Add("MPEG-TS", ContainerType.M2TS);
+            foreach (SubtitleCodec _codec in CodecManager.SubtitleCodecs.Values)
+            {
+                if (string.IsNullOrEmpty(_codec.MediaInfoRegex))
+                    continue;
+
+                if (System.Text.RegularExpressions.Regex.IsMatch(description, _codec.MediaInfoRegex, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                    return _codec;
+            }
+            return SubtitleCodec.UNKNOWN;
         }
+
+        #endregion
 
         #region IMediaFile Members
 

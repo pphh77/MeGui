@@ -25,92 +25,23 @@ namespace MediaInfoWrapper
     ///<summary>Contains properties for a TextTrack </summary>
     public class TextTrack
     {
-        private string _Count;
-        private string _StreamCount;
-        private string _StreamKind;
-        private string _StreamKindID;
         private string _StreamOrder;
-        private string _Inform;
         private string _ID;
-        private string _UniqueID;
-        private string _Title;
         private string _CodecID;
         private string _CodecIDString;
         private string _CodecIDInfo;
+        private string _Format;
+        private string _FormatInfo;
+        private string _FormatString;
+        private string _FormatCommercial;
+        private string _FormatVersion;
         private string _Delay;
-        private string _Video0Delay;
-        private string _PlayTime;
-        private string _PlayTimeString;
-        private string _PlayTimeString1;
-        private string _PlayTimeString2;
-        private string _PlayTimeString3;
         private string _Language;
         private string _LanguageString;
-        private string _LanguageMore;
         private string _Default;
-        private string _DefaultString;
         private string _Forced;
-        private string _ForcedString;
-
-        ///<summary> Count of objects available in this stream </summary>
-        public string Count
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(this._Count))
-                    this._Count="";
-                return _Count;
-            }
-            set
-            {
-                this._Count=value;
-            }
-        }
-
-        ///<summary> Count of streams of that kind available </summary>
-        public string StreamCount
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(this._StreamCount))
-                    this._StreamCount="";
-                return _StreamCount;
-            }
-            set
-            {
-                this._StreamCount=value;
-            }
-        }
-
-        ///<summary> Stream name </summary>
-        public string StreamKind
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(this._StreamKind))
-                    this._StreamKind="";
-                return _StreamKind;
-            }
-            set
-            {
-                this._StreamKind=value;
-            }
-        }
-
-        ///<summary> When multiple streams, number of the stream </summary>
-        public string StreamKindID
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(this._StreamKindID))
-                    this._StreamKindID="";
-                return _StreamKindID;
-            }
-            set
-            {
-                this._StreamKindID=value;
-            }
-        }
+        private string _Title;
+        private string _Source;
 
         ///<summary>Stream order in the file, whatever is the kind of stream (base=0)</summary>
         public string StreamOrder
@@ -127,21 +58,6 @@ namespace MediaInfoWrapper
             }
         }
 
-        ///<summary> Last   Inform   call </summary>
-        public string Inform
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(this._Inform))
-                    this._Inform="";
-                return _Inform;
-            }
-            set
-            {
-                this._Inform=value;
-            }
-        }
-
         ///<summary> A ID for this stream in this file </summary>
         public string ID
         {
@@ -154,21 +70,6 @@ namespace MediaInfoWrapper
             set
             {
                 this._ID=value;
-            }
-        }
-
-        ///<summary> A unique ID for this stream, should be copied with stream copy </summary>
-        public string UniqueID
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(this._UniqueID))
-                    this._UniqueID="";
-                return _UniqueID;
-            }
-            set
-            {
-                this._UniqueID=value;
             }
         }
 
@@ -232,6 +133,81 @@ namespace MediaInfoWrapper
             }
         }
 
+        ///<summary> Format used </summary>
+        public string Format
+        {
+            get
+            {
+                if (String.IsNullOrEmpty(this._Format))
+                    this._Format = "";
+                return _Format;
+            }
+            set
+            {
+                this._Format = value;
+            }
+        }
+
+        ///<summary> Format used + additional features </summary>
+        public string FormatString
+        {
+            get
+            {
+                if (String.IsNullOrEmpty(this._FormatString))
+                    this._FormatString = "";
+                return _FormatString;
+            }
+            set
+            {
+                this._FormatString = value;
+            }
+        }
+
+        ///<summary> Info about Format </summary>
+        public string FormatInfo
+        {
+            get
+            {
+                if (String.IsNullOrEmpty(this._FormatInfo))
+                    this._FormatInfo = "";
+                return _FormatInfo;
+            }
+            set
+            {
+                this._FormatInfo = value;
+            }
+        }
+
+        ///<summary>Commercial name used by vendor for theses setings or Format field if there is no difference</summary>
+        public string FormatCommercial
+        {
+            get
+            {
+                if (String.IsNullOrEmpty(this._FormatCommercial))
+                    this._FormatCommercial = "";
+                return _FormatCommercial;
+            }
+            set
+            {
+                this._FormatCommercial = value;
+            }
+        }
+
+        ///<summary>Version of this format</summary>
+        public string FormatVersion
+        {
+            get
+            {
+                if (String.IsNullOrEmpty(this._FormatVersion))
+                    this._FormatVersion = "";
+                return _FormatVersion;
+            }
+            set
+            {
+                this._FormatVersion = value;
+            }
+        }
+
         ///<summary> Delay fixed in the stream (relative) </summary>
         public string Delay
         {
@@ -244,96 +220,6 @@ namespace MediaInfoWrapper
             set
             {
                 this._Delay=value;
-            }
-        }
-
-        ///<summary> Delay fixed in the stream (absolute _ video0) </summary>
-        public string Video0Delay
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(this._Video0Delay))
-                    this._Video0Delay="";
-                return _Video0Delay;
-            }
-            set
-            {
-                this._Video0Delay=value;
-            }
-        }
-
-        ///<summary> Play time of the stream </summary>
-        public string PlayTime
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(this._PlayTime))
-                    this._PlayTime="";
-                return _PlayTime;
-            }
-            set
-            {
-                this._PlayTime=value;
-            }
-        }
-
-        ///<summary> Play time (formated) </summary>
-        public string PlayTimeString
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(this._PlayTimeString))
-                this._PlayTimeString="";
-                return _PlayTimeString;
-            }
-            set
-            {
-                this._PlayTimeString=value;
-            }
-        }
-
-        ///<summary> Play time in format : HHh MMmn SSs MMMms, XX omited if zero </summary>
-        public string PlayTimeString1
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(this._PlayTimeString1))
-                    this._PlayTimeString1="";
-                return _PlayTimeString1;
-            }
-            set
-            {
-                this._PlayTimeString1=value;
-            }
-        }
-
-        ///<summary> Play time in format : XXx YYy only, YYy omited if zero </summary>
-        public string PlayTimeString2
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(this._PlayTimeString2))
-                    this._PlayTimeString2="";
-                return _PlayTimeString2;
-            }
-            set
-            {
-                this._PlayTimeString2=value;
-            }
-        }
-
-        ///<summary> Play time in format : HH:MM:SS.MMM </summary>
-        public string PlayTimeString3
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(this._PlayTimeString3))
-                    this._PlayTimeString3="";
-                return _PlayTimeString3;
-            }
-            set
-            {
-                this._PlayTimeString3=value;
             }
         }
 
@@ -367,21 +253,6 @@ namespace MediaInfoWrapper
             }
         }
 
-        ///<summary> More info about Language (director s comment...) </summary>
-        public string LanguageMore
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(this._LanguageMore))
-                    this._LanguageMore="";
-                return _LanguageMore;
-            }
-            set
-            {
-                this._LanguageMore=value;
-            }
-        }
-
         ///<summary> Default Info </summary>
         public string Default
         {
@@ -394,21 +265,6 @@ namespace MediaInfoWrapper
             set
             {
                 this._Default = value;
-            }
-        }
-
-        ///<summary> Default Info (string format)</summary>
-        public string DefaultString
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(this._DefaultString))
-                    this._DefaultString = "";
-                return _DefaultString;
-            }
-            set
-            {
-                this._DefaultString = value;
             }
         }
 
@@ -427,18 +283,18 @@ namespace MediaInfoWrapper
             }
         }
 
-        ///<summary> Forced Info (string format)</summary>
-        public string ForcedString
+        ///<summary>Source</summary>
+        public string Source
         {
             get
             {
-                if (String.IsNullOrEmpty(this._ForcedString))
-                    this._ForcedString = "";
-                return _ForcedString;
+                if (String.IsNullOrEmpty(this._Source))
+                    this._Source = "";
+                return _Source;
             }
             set
             {
-                this._ForcedString = value;
+                this._Source = value;
             }
         }
     }

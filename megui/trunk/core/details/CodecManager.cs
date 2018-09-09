@@ -31,22 +31,33 @@ namespace MeGUI
     
     public class VideoCodec : ICodec, IIDable
     {
+        public VideoCodec(string id, string mediaInfoRegex)
+        {
+            this.id = id;
+            this.mediaInfoRegex = mediaInfoRegex;
+        }
+
         private string id;
         public string ID
         {
             get { return id; }
         }
-        public VideoCodec(string id)
+
+        private string mediaInfoRegex;
+        public string MediaInfoRegex
         {
-            this.id = id;
+            get { return mediaInfoRegex; }
+            set { mediaInfoRegex = value; }
         }
-        public static readonly VideoCodec ASP   = new VideoCodec("ASP");
-        public static readonly VideoCodec AVC   = new VideoCodec("AVC");
-        public static readonly VideoCodec HEVC  = new VideoCodec("HEVC");
-        public static readonly VideoCodec HFYU  = new VideoCodec("HFYU");
-        public static readonly VideoCodec MPEG1 = new VideoCodec("MPEG1");
-        public static readonly VideoCodec MPEG2 = new VideoCodec("MPEG2");
-        public static readonly VideoCodec VC1   = new VideoCodec("VC1");
+
+        public static readonly VideoCodec ASP     = new VideoCodec("ASP", "mpeg-4 visual");
+        public static readonly VideoCodec AVC     = new VideoCodec("AVC", "avc");
+        public static readonly VideoCodec HEVC    = new VideoCodec("HEVC", "hevc");
+        public static readonly VideoCodec HFYU    = new VideoCodec("HFYU", "ffvh");
+        public static readonly VideoCodec MPEG1   = new VideoCodec("MPEG1", "(mpeg-1 video)|(mpeg video version 1)");
+        public static readonly VideoCodec MPEG2   = new VideoCodec("MPEG2", "(mpeg-2 video)|(mpeg video version 2)");
+        public static readonly VideoCodec VC1     = new VideoCodec("VC1", "vc-1");
+        public static readonly VideoCodec UNKNOWN = new VideoCodec("UNKNOWN", ".*");
     }
 
     public class AudioCodec : ICodec, IIDable
@@ -92,17 +103,35 @@ namespace MeGUI
 
     public class SubtitleCodec : ICodec, IIDable
     {
+        // needed for serilaization only
+        public SubtitleCodec() : this("", "") { }
+
+        public SubtitleCodec(string id, string mediaInfoRegex)
+        {
+            this.id = id;
+            this.mediaInfoRegex = mediaInfoRegex;
+        }
+
         private string id;
         public string ID
         {
             get { return id; }
         }
-        public SubtitleCodec(string id)
+
+        private string mediaInfoRegex;
+        public string MediaInfoRegex
         {
-            this.id = id;
+            get { return mediaInfoRegex; }
+            set { mediaInfoRegex = value; }
         }
-        public static readonly SubtitleCodec TEXT  = new SubtitleCodec("TEXT");
-        public static readonly SubtitleCodec IMAGE = new SubtitleCodec("IMAGE");
+        
+        public static readonly SubtitleCodec ASS        = new SubtitleCodec("ASS", "ass");
+        public static readonly SubtitleCodec PGS        = new SubtitleCodec("PGS", "pgs");
+        public static readonly SubtitleCodec SRT        = new SubtitleCodec("SRT", "(text)|(utf-8)");
+        public static readonly SubtitleCodec SSA        = new SubtitleCodec("SSA", "ssa");
+        public static readonly SubtitleCodec TTXT       = new SubtitleCodec("TTXT", "ttxt");
+        public static readonly SubtitleCodec VOBSUB     = new SubtitleCodec("VOBSUB", "(vobsub)|(rle)");
+        public static readonly SubtitleCodec UNKNOWN    = new SubtitleCodec("UNKNOWN", ".*");
     }
     #endregion
     #region video and audio encoder types
@@ -186,19 +215,22 @@ namespace MeGUI
     {
         public static GenericRegisterer<VideoCodec> VideoCodecs = new GenericRegisterer<VideoCodec>();
         public static GenericRegisterer<AudioCodec> AudioCodecs = new GenericRegisterer<AudioCodec>();
+        public static GenericRegisterer<SubtitleCodec> SubtitleCodecs = new GenericRegisterer<SubtitleCodec>();
         public static GenericRegisterer<VideoEncoderType> VideoEncoderTypes = new GenericRegisterer<VideoEncoderType>();
         public static GenericRegisterer<AudioEncoderType> AudioEncoderTypes = new GenericRegisterer<AudioEncoderType>();
         
         static CodecManager()
         {
             if (!(
-                VideoCodecs.Register(VideoCodec.ASP)  &&
-                VideoCodecs.Register(VideoCodec.AVC)  &&
-                VideoCodecs.Register(VideoCodec.HEVC) &&
-                VideoCodecs.Register(VideoCodec.HFYU) &&
-                VideoCodecs.Register(VideoCodec.MPEG1) &&
-                VideoCodecs.Register(VideoCodec.MPEG2) &&
-                VideoCodecs.Register(VideoCodec.VC1)))
+                VideoCodecs.Register(VideoCodec.ASP)    &&
+                VideoCodecs.Register(VideoCodec.AVC)    &&
+                VideoCodecs.Register(VideoCodec.HEVC)   &&
+                VideoCodecs.Register(VideoCodec.HFYU)   &&
+                VideoCodecs.Register(VideoCodec.MPEG1)  &&
+                VideoCodecs.Register(VideoCodec.MPEG2)  &&
+                VideoCodecs.Register(VideoCodec.VC1)    &&
+                VideoCodecs.Register(VideoCodec.UNKNOWN) // must be the last line to serve as catch-all
+                ))
                 throw new Exception("Failed to register a standard video codec");
             if (!(
                 AudioCodecs.Register(AudioCodec.AAC)    &&
@@ -214,9 +246,19 @@ namespace MeGUI
                 AudioCodecs.Register(AudioCodec.THD)    &&
                 AudioCodecs.Register(AudioCodec.THDAC3) &&
                 AudioCodecs.Register(AudioCodec.VORBIS) &&
-                AudioCodecs.Register(AudioCodec.UNKNOWN)
+                AudioCodecs.Register(AudioCodec.UNKNOWN) // must be the last line to serve as catch-all
                 ))
                 throw new Exception("Failed to register a standard audio codec");
+            if (!(
+                SubtitleCodecs.Register(SubtitleCodec.ASS) &&
+                SubtitleCodecs.Register(SubtitleCodec.PGS) &&
+                SubtitleCodecs.Register(SubtitleCodec.SRT) &&
+                SubtitleCodecs.Register(SubtitleCodec.SSA) &&
+                SubtitleCodecs.Register(SubtitleCodec.TTXT) &&
+                SubtitleCodecs.Register(SubtitleCodec.VOBSUB) &&
+                SubtitleCodecs.Register(SubtitleCodec.UNKNOWN) // must be the last line to serve as catch-all
+                ))
+                throw new Exception("Failed to register a standard video codec");
             if (!(
                 VideoEncoderTypes.Register(VideoEncoderType.HFYU) &&
                 VideoEncoderTypes.Register(VideoEncoderType.X264) &&
@@ -270,13 +312,6 @@ namespace MeGUI
 
     public class AudioType : OutputType
     {
-        private AudioCodec[] supportedCodecs;
-        public AudioCodec[] SupportedCodecs
-        {
-            get { return supportedCodecs; }
-            set { supportedCodecs = value; }
-        }
-
         // needed only for serialization
         public AudioType() : base("", "", "", null) { }
 
@@ -287,6 +322,14 @@ namespace MeGUI
             : base(name, filterName, extension, containerType) {
                 this.supportedCodecs = supportedCodecs;
         }
+
+        private AudioCodec[] supportedCodecs;
+        public AudioCodec[] SupportedCodecs
+        {
+            get { return supportedCodecs; }
+            set { supportedCodecs = value; }
+        }
+
         public static readonly AudioType MP4AAC = new AudioType("MP4-AAC", "MP4 AAC Files", "mp4", ContainerType.MP4, AudioCodec.AAC);
         public static readonly AudioType M4A    = new AudioType("M4A", "MP4 Audio Files", "m4a", ContainerType.MP4, AudioCodec.AAC);
         public static readonly AudioType RAWAAC = new AudioType("Raw-AAC", "RAW AAC Files", "aac", null, AudioCodec.AAC);
@@ -346,13 +389,23 @@ namespace MeGUI
         // needed for the serialization only
         public ContainerType() : base("", "", "") { }
 
-        public ContainerType(string name, string filterName, string extension)
-            : base(name, filterName, extension) { }
+        public ContainerType(string name, string filterName, string extension, string mediaInfoRegEx)
+            : base(name, filterName, extension)
+        {
+            this.mediaInfoRegex = mediaInfoRegEx;
+        }
 
-        public static readonly ContainerType MP4  = new ContainerType("MP4", "MP4 Files", "mp4");
-        public static readonly ContainerType MKV  = new ContainerType("MKV", "Matroska Files", "mkv");
-        public static readonly ContainerType AVI  = new ContainerType("AVI", "AVI Files", "avi");
-        public static readonly ContainerType M2TS = new ContainerType("M2TS", "M2TS Files", "m2ts");
+        private string mediaInfoRegex;
+        public string MediaInfoRegex
+        {
+            get { return mediaInfoRegex; }
+            set { mediaInfoRegex = value; }
+        }
+
+        public static readonly ContainerType MP4        = new ContainerType("MP4", "MP4 Files", "mp4", "(mpeg-4)|(3gpp)");
+        public static readonly ContainerType MKV        = new ContainerType("MKV", "Matroska Files", "mkv", "matroska");
+        public static readonly ContainerType AVI        = new ContainerType("AVI", "AVI Files", "avi", "avi");
+        public static readonly ContainerType M2TS       = new ContainerType("M2TS", "M2TS Files", "m2ts", "(bdav)|(mpeg-ts)");
         public static readonly ContainerType[] Containers = new ContainerType[] { MP4, MKV, AVI, M2TS };
 
         public static ContainerType ByName(string id)

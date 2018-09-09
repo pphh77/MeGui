@@ -1358,7 +1358,7 @@ namespace MeGUI
                 && (!String.IsNullOrEmpty(dpp.IntermediateMKVFile) || !String.IsNullOrEmpty(dpp.VideoFileToMux)))
             {
                 VideoTrackInfo vInfo = _videoInputInfo.VideoInfo.Track;
-                if (_videoInputInfo.VideoInfo.Codec != null)
+                if (_videoInputInfo.VideoInfo.Codec != VideoCodec.UNKNOWN)
                     vInfo.Codec = _videoInputInfo.VideoInfo.Codec.ID;
                 if (!String.IsNullOrEmpty(dpp.IntermediateMKVFile))
                 {
