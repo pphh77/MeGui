@@ -41,7 +41,7 @@ namespace MeGUI.core.details
 
         public override string CodecString
         {
-            get { return ""; }
+            get { return "cleanup"; }
         }
 
         public override string EncodingMode

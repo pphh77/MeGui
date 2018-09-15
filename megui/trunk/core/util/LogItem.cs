@@ -87,12 +87,13 @@ namespace MeGUI.core.util
             get { return subEvents; }
         }
 
-        public LogItem(string name)
-            : this(name, ImageType.Information) { }
+        public LogItem(string name) : this(name, ImageType.Information, false) { }
 
-        public LogItem(string name, ImageType type)
+        public LogItem(string name, ImageType type) : this(name, type, false) { }
+
+        public LogItem(string name, ImageType type, bool bIncludeTime)
         {
-            this.text = name;
+            this.text = bIncludeTime ? string.Format("[{0:G}] {1}", DateTime.Now, name) : name;
             this.type = type;
             if (type == ImageType.Warning)
                 MainForm.Instance.setOverlayIcon(System.Drawing.SystemIcons.Warning, false);
@@ -142,6 +143,11 @@ namespace MeGUI.core.util
         public LogItem LogEvent(string eventName, ImageType image)
         {
             return LogEvent(eventName, image, true);
+        }
+
+        public LogItem LogEvent(string eventName, bool bIncludeTime)
+        {
+            return LogEvent(eventName, ImageType.Information, bIncludeTime);
         }
 
         public LogItem LogEvent(string eventName, ImageType image, bool bIncludeTime)

@@ -53,7 +53,7 @@ namespace MeGUI
 
         public override string CodecString
         {
-            get { return ""; }
+            get { return "dgiindex"; }
         }
 
         public override string EncodingMode

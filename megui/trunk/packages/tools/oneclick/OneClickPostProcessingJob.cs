@@ -42,7 +42,7 @@ namespace MeGUI
 
         public override string CodecString
         {
-            get { return ""; }
+            get { return "oneclick"; }
         }
 
         public override string EncodingMode

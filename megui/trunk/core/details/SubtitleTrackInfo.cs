@@ -51,7 +51,7 @@ namespace MeGUI
             {
                 string[] arrCodec = new string[] { };
                 arrCodec = this.Codec.Split('/');
-                if (arrCodec[0].Substring(1, 1).Equals("_"))
+                if (!String.IsNullOrEmpty(arrCodec[0]) && arrCodec[0].Substring(1, 1).Equals("_"))
                     arrCodec[0] = arrCodec[0].Substring(2);
                 strCodec = arrCodec[0].ToUpperInvariant();
             }

@@ -41,7 +41,7 @@ namespace MeGUI
         private VideoCodecSettings videoSettings;
         private AviSynthSettings avsSettings;
 		private double customAR;
-        private string finalOutput, aviSynthScript, deviceType, inputFile,
+        private string finalOutput, aviSynthScript, deviceType, inputFile, _timeStampFile,
             workingDirectory, _videoFileToMux, ifoFile, _intermediateMKVFile;
         private List<string> filesToDelete;
         private List<OneClickAudioTrack> _audioTracks;
@@ -357,6 +357,15 @@ namespace MeGUI
         {
             get { return _oAttachments; }
             set { _oAttachments = value; }
+        }
+
+        /// <summary>
+        /// gets / sets timestamp file which need to be processed
+        /// </summary>
+        public string TimeStampFile
+        {
+            get { return _timeStampFile; }
+            set { _timeStampFile = value; }
         }
 
         /// <summary>

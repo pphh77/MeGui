@@ -87,7 +87,7 @@ namespace MeGUI
 
         public override string CodecString
         {
-            get { return ""; }
+            get { return "index"; }
         }
 
         public override string EncodingMode

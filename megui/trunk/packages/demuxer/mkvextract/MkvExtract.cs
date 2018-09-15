@@ -158,6 +158,9 @@ namespace MeGUI
                         sb.Append(" " + i++ + ":\"" + strFileName + "\"");
                 }
 
+                if (!String.IsNullOrEmpty(job.TimeStampFile))
+                    sb.Append(" timestamps_v2 " + oFile.VideoInfo.Track.MMGTrackID + ":\"" + job.TimeStampFile + "\"");
+
                 sb.Append(" --ui-language en");
 
                 return sb.ToString();

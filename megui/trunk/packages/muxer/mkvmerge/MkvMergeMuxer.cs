@@ -154,6 +154,9 @@ namespace MeGUI
                         if (!String.IsNullOrEmpty(fpsString))
                             sb.Append(" --default-duration " + trackID + ":" + PrettyFormatting.ReplaceFPSValue(fpsString) + "fps");
                     }
+                    string timeStampFile = inputFile + ".timestamps.txt";
+                    if (!String.IsNullOrEmpty(settings.TimeStampFile) || File.Exists(timeStampFile))
+                        sb.Append(" --timestamps " + trackID + ":\"" + (File.Exists(timeStampFile) ? timeStampFile : settings.TimeStampFile) + "\"");
                     sb.Append(" --video-tracks " + trackID + " --no-audio --no-subtitles --no-chapters");
                     if (settings.Attachments.Count > 0)
                         sb.Append(" --no-attachments");

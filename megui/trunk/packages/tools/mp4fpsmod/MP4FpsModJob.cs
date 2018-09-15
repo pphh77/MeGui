@@ -19,48 +19,34 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
 
 namespace MeGUI
 {
-    public class FFMSIndexJob : IndexJob
+    public class MP4FpsModJob : Job
     {
-        public FFMSIndexJob()
-            : base()
-        {
-        }
+        public MP4FpsModJob() : base() { }
 
-        public FFMSIndexJob(string input, string indexFile, int demuxType, List<AudioTrackInfo> audioTracks, bool loadSources) : base()
+        public MP4FpsModJob(string input, string timeStampFile)
         {
             Input = input;
-            LoadSources = loadSources;
-            if (String.IsNullOrEmpty(indexFile))
-                Output = input + ".ffindex";
-            else
-                Output = indexFile;
-
-            if (audioTracks == null || audioTracks.Count == 0)
-            {
-                AudioTracks = new List<AudioTrackInfo>();
-                DemuxMode = 0;
-            }
-            else
-            {
-                DemuxMode = demuxType;
-                AudioTracks = audioTracks;
-            }
-
-            DemuxVideo = false;
+            TimeStampFile = timeStampFile;
         }
-       
+
+        private string _timeStampFile;
+        public string TimeStampFile
+        {
+            get { return _timeStampFile; }
+            set { _timeStampFile = value; }
+        }
+
         public override string CodecString
         {
-            get { return "ffmsindex"; }
+            get { return "mp4fpsmod"; }
         }
 
         public override string EncodingMode
         {
-            get { return "idx"; }
+            get { return "mux"; }
         }
     }
 }

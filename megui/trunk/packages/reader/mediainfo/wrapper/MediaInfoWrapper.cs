@@ -737,9 +737,9 @@ namespace MediaInfoWrapper
                         AudioTrack _tracktemp_ = new AudioTrack();
                         _tracktemp_.StreamOrder = GetSpecificMediaInfo(StreamKind.Audio, num2, "StreamOrder");
                         _tracktemp_.ID= GetSpecificMediaInfo(StreamKind.Audio,num2,"ID");
-                        _tracktemp_.CodecID = GetSpecificMediaInfo(StreamKind.Text, num2, "CodecID");
-                        _tracktemp_.CodecIDString = GetSpecificMediaInfo(StreamKind.Text, num2, "CodecID/String");
-                        _tracktemp_.CodecIDInfo = GetSpecificMediaInfo(StreamKind.Text, num2, "CodecID/Info");
+                        _tracktemp_.CodecID = GetSpecificMediaInfo(StreamKind.Audio, num2, "CodecID");
+                        _tracktemp_.CodecIDString = GetSpecificMediaInfo(StreamKind.Audio, num2, "CodecID/String");
+                        _tracktemp_.CodecIDInfo = GetSpecificMediaInfo(StreamKind.Audio, num2, "CodecID/Info");
                         _tracktemp_.Format = GetSpecificMediaInfo(StreamKind.Audio, num2, "Format");
                         _tracktemp_.FormatInfo = GetSpecificMediaInfo(StreamKind.Audio, num2, "Format/Info");
                         _tracktemp_.FormatString = GetSpecificMediaInfo(StreamKind.Audio, num2, "Format/String");

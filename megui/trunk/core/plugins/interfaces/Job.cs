@@ -85,8 +85,8 @@ namespace MeGUI
     /// have any extraneous information about its storage in the queue. That information is held
     /// in the TaggedJob class.
 	/// </summary>
-	[XmlInclude(typeof(VideoJob)), XmlInclude(typeof(AudioJob)), XmlInclude(typeof(MuxJob)), 
-	XmlInclude (typeof(MuxStream)), XmlInclude(typeof(D2VIndexJob)), XmlInclude(typeof(AviSynthJob)), 
+	[XmlInclude(typeof(VideoJob)), XmlInclude(typeof(AudioJob)), XmlInclude(typeof(MuxJob)), XmlInclude(typeof(MP4FpsModJob)),
+    XmlInclude (typeof(MuxStream)), XmlInclude(typeof(D2VIndexJob)), XmlInclude(typeof(AviSynthJob)), 
     XmlInclude(typeof(SubtitleIndexJob)), XmlInclude(typeof(AudioSplitJob)), XmlInclude(typeof(AudioJoinJob)),
     XmlInclude(typeof(CleanupJob)), XmlInclude(typeof(DGMIndexJob)), XmlInclude(typeof(FFMSIndexJob)),
     XmlInclude(typeof(DGIIndexJob)), XmlInclude(typeof(HDStreamsExJob)), XmlInclude(typeof(PgcDemuxJob)),

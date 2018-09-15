@@ -169,7 +169,7 @@ namespace MeGUI
                 if (oLog != null)
                 {
                     infoLog = oLog.LogValue("MediaInfo", String.Empty);
-                    infoLog.LogEvent("File: " + _file);
+                    infoLog.LogEvent("File: " + _file, false);
                 }
 
                 if (!File.Exists(file))
@@ -505,10 +505,12 @@ namespace MeGUI
                         _VideoInfo.ScanType = track.ScanTypeString;
                         _VideoInfo.Type = GetVideoType(_VideoInfo.Codec, cType, file);
                         _VideoInfo.DAR = Resolution.GetDAR((int)_VideoInfo.Width, (int)_VideoInfo.Height, track.AspectRatio, easyParseDecimal(track.PixelAspectRatio), track.AspectRatioString);
+                        if (track.FrameRateMode.ToLower().Equals("vfr"))
+                            _VideoInfo.VariableFrameRateMode = true;
 
                         // get the FPS
                         double? fps = easyParseDouble(track.FrameRate) ?? easyParseDouble(track.FrameRateOriginal);
-                        if (fps == null)
+                        if (fps == null && !_VideoInfo.VariableFrameRateMode)
                         {
                             fps = 23.976;
                             if (infoLog == null)
@@ -521,7 +523,8 @@ namespace MeGUI
                             }
                             infoLog.LogEvent("fps cannot be determined. 23.976 will be used as default.", ImageType.Warning);
                         }
-                        _VideoInfo.FPS = (double)fps;
+                        if (fps != null)
+                            _VideoInfo.FPS = (double)fps;
 
                         Int32.TryParse(track.BitDepth, out _VideoInfo.BitDepth);
                     }
@@ -668,8 +671,10 @@ namespace MeGUI
                 {
                     LogItem oTrack = new LogItem("Video");
 
-                    oTrack.Info("ID: " + t.ID);
-                    oTrack.Info("StreamOrder: " + t.StreamOrder);
+                    if (!String.IsNullOrEmpty(t.ID))
+                        oTrack.Info("ID: " + t.ID);
+                    if (!String.IsNullOrEmpty(t.StreamOrder))
+                        oTrack.Info("StreamOrder: " + t.StreamOrder);
                     if (!String.IsNullOrEmpty(t.CodecID))
                         oTrack.Info("CodecID: " + t.CodecID);
                     if (!String.IsNullOrEmpty(t.CodecIDString) && !t.CodecID.Equals(t.CodecIDString))
@@ -736,8 +741,10 @@ namespace MeGUI
                 {
                     LogItem oTrack = new LogItem("Audio");
 
-                    oTrack.Info("ID: " + t.ID);
-                    oTrack.Info("StreamOrder: " + t.StreamOrder);
+                    if (!String.IsNullOrEmpty(t.ID))
+                        oTrack.Info("ID: " + t.ID);
+                    if (!String.IsNullOrEmpty(t.StreamOrder))
+                        oTrack.Info("StreamOrder: " + t.StreamOrder);
                     if (!String.IsNullOrEmpty(t.CodecID))
                         oTrack.Info("CodecID: " + t.CodecID);
                     if (!String.IsNullOrEmpty(t.CodecIDString) && !t.CodecID.Equals(t.CodecIDString))
@@ -798,8 +805,10 @@ namespace MeGUI
                 {
                     LogItem oTrack = new LogItem("Text");
 
-                    oTrack.Info("ID: " + t.ID);
-                    oTrack.Info("StreamOrder: " + t.StreamOrder);
+                    if (!String.IsNullOrEmpty(t.ID))
+                        oTrack.Info("ID: " + t.ID);
+                    if (!String.IsNullOrEmpty(t.StreamOrder))
+                        oTrack.Info("StreamOrder: " + t.StreamOrder);
                     if (!String.IsNullOrEmpty(t.CodecID))
                         oTrack.Info("CodecID: " + t.CodecID);
                     if (!String.IsNullOrEmpty(t.CodecIDString) && !t.CodecID.Equals(t.CodecIDString))
@@ -1619,6 +1628,7 @@ namespace MeGUI
         public int BitDepth;
         public int AngleNumber;
         public int AngleCount; // if 0 then not a multi-angle disc, > 0 multi-angles may be available
+        public bool VariableFrameRateMode;
 
         private string _strVideoScanType;
         private VideoCodec _vCodec;
@@ -1644,6 +1654,7 @@ namespace MeGUI
             BitDepth = 8;
             AngleCount = 0;
             AngleNumber = 0;
+            VariableFrameRateMode = false;
         }
 
         public VideoTrackInfo Track

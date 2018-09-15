@@ -30,7 +30,7 @@ namespace MeGUI
     public class MkvExtractJob : Job
     {
         private List<TrackInfo> _oTracks;
-        private string _strOutputPath;
+        private string _strOutputPath, _strTimeStampFile;
         private List<string> _oAttachments;
 
         public MkvExtractJob() 
@@ -81,6 +81,12 @@ namespace MeGUI
         {
             get { return _oAttachments; }
             set { _oAttachments = value; }
+        }
+
+        public string TimeStampFile
+        {
+            get { return _strTimeStampFile; }
+            set { _strTimeStampFile = value; }
         }
     }
 }

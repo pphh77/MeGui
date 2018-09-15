@@ -20,6 +20,7 @@
 
 using System;
 using System.Globalization;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Text;
 
@@ -985,6 +986,10 @@ namespace MeGUI
             // input/output section
             if (log != null)
             {
+                if (!xs.CustomEncoderOptions.Contains("--tcfile-in "))
+                    if (!String.IsNullOrEmpty(xs.TCFile) && File.Exists(xs.TCFile))
+                        sb.Append("--tcfile-in \"" + xs.TCFile + "\" ");
+
                 sb.Append("--frames " + numberOfFrames + " ");
                 if (xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.twopass1
                     || xs.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.threepass1)
@@ -1001,10 +1006,52 @@ namespace MeGUI
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Checks if the timecode file does have the correct header
+        /// </summary>
+        private void CheckTCFile()
+        {
+            x264Settings xs = (x264Settings)job.Settings;
+            if (String.IsNullOrEmpty(xs.TCFile) || !File.Exists(xs.TCFile))
+                return;
+
+            if (File.Exists(xs.TCFile + ".x264"))
+                FileUtil.DeleteFile(xs.TCFile + ".x264", log);
+
+            su.Status = "Checking TC File...";
+            try
+            {
+                using (StreamReader sr = new StreamReader(xs.TCFile))
+                {
+                    bool bFound = false;
+                    using (StreamWriter sw = new StreamWriter(xs.TCFile + ".x264"))
+                    {
+                        string line = sr.ReadLine();
+                        if (line.Trim().StartsWith("# timestamp format v2"))
+                        {
+                            bFound = true;
+                            sw.WriteLine("# timecode format v2");
+                            sw.WriteLine(sr.ReadToEnd());
+                            job.FilesToDelete.Add(xs.TCFile + ".x264");
+                            xs.TCFile = xs.TCFile + ".x264";
+                        }
+                    }
+                    if (!bFound)
+                        FileUtil.DeleteFile(xs.TCFile + ".x264", log);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.LogValue("Error parsing " + xs.TCFile, ex.Message, ImageType.Error, true);
+            }
+            su.Status = "Encoding video...";
+        }
+
         protected override string Commandline
         {
             get 
             {
+                CheckTCFile();
                 string strCommandLine = genCommandline(job.Input, job.Output, job.DAR, hres, vres, fps_n, fps_d, ref numberOfFrames, job.Settings as x264Settings, job.Zones, base.log);
                 su.NbFramesTotal = numberOfFrames;
                 return strCommandLine;

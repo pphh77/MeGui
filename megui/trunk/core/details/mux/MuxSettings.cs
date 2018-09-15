@@ -33,7 +33,7 @@ namespace MeGUI
 	{
 		private List<MuxStream> audioStreams, subtitleStreams;
 		private decimal? framerate;
-		private string videoName;
+		private string videoName, timeStampFile;
         private string muxedInput, videoInput, muxedOutput, deviceType;
         private bool muxAll;
         private Dar? dar;
@@ -55,6 +55,7 @@ namespace MeGUI
             deviceType = "";
 			splitSize = null;
             muxAll = false;
+            timeStampFile = String.Empty;
 		}
 
         public string MuxedInput
@@ -158,5 +159,14 @@ namespace MeGUI
             get { return muxAll; }
             set { muxAll = value; }
         }
-	}
+
+        /// <summary>
+        /// gets / sets the timestamp file
+        /// </summary>
+        public string TimeStampFile
+        {
+            get { return timeStampFile; }
+            set { timeStampFile = value; }
+        }
+    }
 }

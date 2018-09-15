@@ -1,3 +1,66 @@
+2876 [MediaInfo]            switched to recent MediaInfo API
+                            improved logging
+2875 [Video Encoder]        do not create a mux job if a manual 1st pass is created
+2874 [Video Encoder]        improved AVS pre-check (regression of 2871)
+2873 [MediaInfo]            added support for MediaInfo 18.08
+     [HD Streams Extractor] improved language detection support
+2872 [x26x]                 changed the log level for ffmpeg from warning to error
+2871 [Video Encoder]        added high bit depth support to the AVS pre-check
+2870 [x264]                 added --aq-mode 3. feature request #639
+2869 [AviSynth]             improved error handling
+                            fixed a potential crash (regression of 2863)
+2868 [HD Streams Extractor] added an option to select if the output prefix should be added (default: enabled)
+                            add the output prefix also if the "file mode" is used
+2867 [AviSynth]             only check the system installed AviSynth if the portable one is not forced
+2866 [OneClick]             fixed tracks 2 to n-1 not properly selecting their input track stream (regression of 2861). bug #907
+2865 [AviSynth]             improved error handling
+2864 [L-SMASH Indexer]      added high bit depth support
+2863 [AviSynth]             changed default value of "always use the included AviSynth" to enabled
+                            unload avisynthwrapper during startup detection to ensure that the portable build is used if required
+2862 [Xvid]                 improved workaround to be able to use Xvid in portable AviSynth mode
+2861 [OneClick]             fixed an out of bounds error. bug #919
+2860 [AviSynth]             improved AviSynth detection
+2859 [x26x]                 flag a job as "error" if the number of frames of the input and output does not match
+2858 [Video Encoder]        removed input/output settings from the command line preview
+2857 [x265]                 replaced avs4x26x with ffmpeg
+2856 [x264]                 replaced avs4x26x with ffmpeg
+2855 [Chapter Creator]      input fps can always be selected
+                            time codes will only be changed when the input fps is changed if the input fps of the source is not known (regression of 2851)
+                            the window can be minimized
+     [AVS Cutter]           video preview can be closed
+2854 [Source Detector]      added high bit depth support
+                            new "Minimum Analysis Percent" mode when set to 0 (default 0).
+                                only "Minimum Analysis Sections" has to be reached in sequential read therefore providing a quick detection method
+2853 [Update]               if automatic updates are disabled and the update window is manually opened no question will be raised anymore if packages have to be downloaded
+2852 [x264]                 changed "show advanced settings" to be a global setting (default is disabled)
+                            when --no-psy is selected the --psy-rd options are not availble
+                            when using 8bit --qpmax with a value > 69 is used as 69 for the command line creation
+2851 [Chapter Creator]      added fps selector for the input source
+                            changing the input fps changes the time codes if the input fps is not known (e.g. as with TXT/XML)
+                            the output fps value is used during saving for all output types
+                            new chapters are sorted based on time codes
+                            double click on a chapter jumps to the positions if the preview pane is open
+                            preview button asks for an AVS file
+                            added option to use an automated counter for chapters (enabled by default)
+                            if the "Start Time" value is in a wrong format the text color is changed to red
+                            the Chapter Creator window stays on top of the video preview window 
+2850 [HD Streams Extractor] added support for EAC3 in files
+                            "Custom Options" setting will be saved
+2849                        scripts with high bit depth are converted to 8 bit when processed internally (e.g. for VideoPlayer). part II
+2848                        scripts with high bit depth are converted to 8 bit when processed internally (e.g. for VideoPlayer)
+2847 [AviSynth Wrapper]     added high bit depth support
+2846 [Audio Encoder]        only use TimeStretchPlugin() if AVS+ is not used
+2845 [MP4 Muxer]            fixed missing MediaInfo of output file if the extension is m4v/m4a
+                            fixed missing prompt if an existing m4v/m4a file should be overwritten
+2844 [OneClick]             fixed cleanup job not to fail anymore if the input file does not exist (regression of 2825). bug #913
+2843 [AVS / Audio Cutter]   fixed cut length off by one frame. bug #912
+2842 [Main]                 improved logging if a profile/setting cannot be loaded. bug #910
+2841 [OneClick]             fixed audio track processing for some file types if DG* indexer is used (e.g. VOB without IFO)
+2840 [Main]                 fixed a crash if a folder is dropped onto the main window. bug #906
+2839 [OneClick]             fixed tracks 2 to n-1 not properly selecting their input track stream (regression of 2808). bug #907
+2838 [x264]                 do not add "--output-depth 8" for 8 bit targets. feature request #636
+2837 [Updater]              redist files are only copied if not installed
+                            added information which redist packages are installed to the log
 2836 [Updater]              x64: enabled stable build server
 2835 [FileIndexer]          fixed output file selection (regression of 2834)
 2834 [OneClick]             fixed a crash when using DGIndexIM/NV with a MKV source file (regression of 2832)

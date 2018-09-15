@@ -955,7 +955,7 @@ namespace MeGUI.packages.video.x264
                 if (!Double.TryParse(strCustomValue, System.Globalization.NumberStyles.AllowDecimalPoint, culture, out fps))
                     return;
 
-                if (!VideoUtil.getFPSFraction(fps, null, out fpsnum, out fpsden))
+                if (!VideoUtil.GetFPSDetails(fps, null, out fpsnum, out fpsden))
                     return;
             }
 

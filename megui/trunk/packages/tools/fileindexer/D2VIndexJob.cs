@@ -49,7 +49,7 @@ namespace MeGUI
 
         public override string CodecString
         {
-            get { return ""; }
+            get { return "d2vindex"; }
         }
 
         public override string EncodingMode

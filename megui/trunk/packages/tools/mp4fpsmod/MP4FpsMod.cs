@@ -19,48 +19,39 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
+using System.IO;
+using System.Text;
+
+using MeGUI.core.util;
 
 namespace MeGUI
 {
-    public class FFMSIndexJob : IndexJob
+    public class MP4FpsMod : CommandlineJobProcessor<MP4FpsModJob>
     {
-        public FFMSIndexJob()
-            : base()
+        public static readonly JobProcessorFactory Factory = new JobProcessorFactory(new ProcessorFactory(init), "MP4FpsMod");
+
+        private static IJobProcessor init(MainForm mf, Job j)
         {
+            if (j is MP4FpsModJob)
+                return new MP4FpsMod();
+            return null;
         }
 
-        public FFMSIndexJob(string input, string indexFile, int demuxType, List<AudioTrackInfo> audioTracks, bool loadSources) : base()
+        public MP4FpsMod()
         {
-            Input = input;
-            LoadSources = loadSources;
-            if (String.IsNullOrEmpty(indexFile))
-                Output = input + ".ffindex";
-            else
-                Output = indexFile;
+            UpdateCacher.CheckPackage("mp4box");
+            executable = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.Mp4Box.Path), @"mp4fpsmod\mp4fpsmod.exe");
+        }
 
-            if (audioTracks == null || audioTracks.Count == 0)
+        #region IJobProcessor Members
+        protected override string Commandline
+        {
+            get
             {
-                AudioTracks = new List<AudioTrackInfo>();
-                DemuxMode = 0;
+                su.Status = "Applying timecodes...";
+                return "-i -t \"" + job.TimeStampFile + "\" -x \"" + job.Input + "\"";
             }
-            else
-            {
-                DemuxMode = demuxType;
-                AudioTracks = audioTracks;
-            }
-
-            DemuxVideo = false;
         }
-       
-        public override string CodecString
-        {
-            get { return "ffmsindex"; }
-        }
-
-        public override string EncodingMode
-        {
-            get { return "idx"; }
-        }
+        #endregion
     }
 }

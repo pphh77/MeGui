@@ -112,7 +112,7 @@ namespace MeGUI
 			chromaME, adaptiveDCT, noMixedRefs, noFastPSkip, psnrCalc, noDctDecimate, ssimCalc, useQPFile,
             FullRange, noMBTree, threadInput, noPsy, scenecut, x264Aud, x264SlowFirstpass, picStruct,
             fakeInterlaced, nonDeterministic, tuneFastDecode, tuneZeroLatency, stitchable, x26410Bits;
-		string quantizerMatrix, qpfile, openGop, range;
+		string quantizerMatrix, qpfile, openGop, range, tcfile;
         x264PresetLevelModes preset;
         x264InterlacedModes interlacedMode;
         x264Device targetDevice;
@@ -219,6 +219,7 @@ namespace MeGUI
             tuneFastDecode = tuneZeroLatency = false;
             stitchable = false;
             x26410Bits = false;
+            tcfile = String.Empty;
 		}
 		#endregion
 		#region properties
@@ -299,7 +300,6 @@ namespace MeGUI
             get { return noDctDecimate; }
             set { noDctDecimate = value; }
         }
-
         public bool PSNRCalculation
         {
             get { return psnrCalc; }
@@ -460,7 +460,7 @@ namespace MeGUI
             get { return useQPFile; }
             set { useQPFile = value; }
         }
-		public bool WeightedBPrediction
+        public bool WeightedBPrediction
 		{
 			get { return weightedBPrediction; }
 			set { weightedBPrediction = value; }
@@ -630,6 +630,11 @@ namespace MeGUI
         {
             get { return qpfile; }
             set { qpfile = value; }
+        }
+        public string TCFile
+        {
+            get { return tcfile; }
+            set { tcfile = value; }
         }
         public string Range
         {

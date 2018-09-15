@@ -34,7 +34,7 @@ namespace MeGUI
 
         public override string CodecString
         {
-            get { return ""; }
+            get { return "avisynth"; }
         }
 
         public override string EncodingMode

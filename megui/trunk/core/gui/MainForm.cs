@@ -972,6 +972,7 @@ namespace MeGUI
             PackageSystem.JobProcessors.Register(FFMSIndexer.Factory);
             PackageSystem.JobProcessors.Register(LSMASHIndexer.Factory);
             PackageSystem.JobProcessors.Register(VobSubIndexer.Factory);
+            PackageSystem.JobProcessors.Register(MP4FpsMod.Factory);
             PackageSystem.JobProcessors.Register(MeGUI.packages.tools.besplitter.Joiner.Factory);
             PackageSystem.JobProcessors.Register(MeGUI.packages.tools.besplitter.Splitter.Factory);
             PackageSystem.JobProcessors.Register(HDStreamExtractorIndexer.Factory);

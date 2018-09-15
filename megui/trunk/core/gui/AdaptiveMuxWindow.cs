@@ -250,7 +250,7 @@ namespace MeGUI
 
                 return JobUtil.GenerateMuxJobs(myVideo, fps.Value, audioStreams, audioTypes, subtitleStreams,
                     subtitleTypes, new List<string>(), chapterInfo, chapterInputType, (cbContainer.SelectedItem as ContainerType), 
-                    output.Filename, splitSize, new List<string>(), this.cbType.Text, deviceOutputType, false);
+                    output.Filename, String.Empty, splitSize, new List<string>(), this.cbType.Text, deviceOutputType, false);
             }
         }
         /// <summary>

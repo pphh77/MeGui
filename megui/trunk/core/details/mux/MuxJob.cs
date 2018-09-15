@@ -58,7 +58,7 @@ namespace MeGUI
 
         public override string CodecString
         {
-            get { return type.ToString().ToLower(System.Globalization.CultureInfo.InvariantCulture); }
+            get { return type.ToString().ToLowerInvariant(); }
         }
 
         public override string EncodingMode

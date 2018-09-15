@@ -910,6 +910,10 @@ namespace MeGUI
                 if (muxVideo)
                     bRemuxInputToMKV = true;
 
+                // remux needed to support timecodes
+                if (_videoInputInfo.VideoInfo.VariableFrameRateMode)
+                    bRemuxInputToMKV = true;
+
                 if (!bRemuxInputToMKV && 
                     (dpp.IndexType == FileIndexerWindow.IndexType.FFMS ||
                     dpp.IndexType == FileIndexerWindow.IndexType.AVISOURCE ||
@@ -1388,12 +1392,21 @@ namespace MeGUI
                 }
             }
 
+            // check if vfr mode is used and timecodes can be extracted
+            if (_videoInputInfo.VideoInfo.VariableFrameRateMode && (inputContainer == ContainerType.MKV || !String.IsNullOrEmpty(dpp.IntermediateMKVFile)))
+            {
+                dpp.TimeStampFile = Path.Combine(dpp.WorkingDirectory, 
+                    (string.IsNullOrEmpty(dpp.IntermediateMKVFile) ? Path.GetFileName(dpp.VideoInput) : Path.GetFileName(dpp.IntermediateMKVFile)) + ".timestamps.txt");
+                dpp.FilesToDelete.Add(dpp.TimeStampFile);
+            }
+
             // create MKV extract job if required
             // either because a track has to be extracted or that attachments MKV --> MKV are to be extracted & included
-            if (oExtractMKVTrack.Count > 0 || dpp.Attachments.Count > 0)
+            if (oExtractMKVTrack.Count > 0 || dpp.Attachments.Count > 0 || !String.IsNullOrEmpty(dpp.TimeStampFile))
             {
-                MkvExtractJob extractJob = new MkvExtractJob(dpp.VideoInput, dpp.WorkingDirectory, oExtractMKVTrack);
+                MkvExtractJob extractJob = new MkvExtractJob(String.IsNullOrEmpty(dpp.IntermediateMKVFile) ? dpp.VideoInput : dpp.IntermediateMKVFile, dpp.WorkingDirectory, oExtractMKVTrack);
                 extractJob.Attachments = dpp.Attachments;
+                extractJob.TimeStampFile = dpp.TimeStampFile;
                 prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(extractJob));
                 if (dpp.ApplyDelayCorrection)
                     _oLog.LogEvent("Audio delay will be detected later as an intermediate MKV file is beeing used");

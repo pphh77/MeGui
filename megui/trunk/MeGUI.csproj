@@ -466,6 +466,8 @@
     <Compile Include="core\gui\SimpleProfilesControl.Designer.cs">
       <DependentUpon>SimpleProfilesControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="packages\tools\mp4fpsmod\MP4FpsMod.cs" />
+    <Compile Include="packages\tools\mp4fpsmod\MP4FpsModJob.cs" />
     <Compile Include="packages\tools\sourcedetector\SourceDetector.cs" />
     <Compile Include="packages\tools\sourcedetector\SourceDetectorConfigWindow.cs">
       <SubType>Form</SubType>

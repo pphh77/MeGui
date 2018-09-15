@@ -233,7 +233,7 @@ namespace MeGUI
 		/// <returns>the info to be added to the log</returns>
 		public static LogItem eliminatedDuplicateFilenames(ref string videoOutput, ref string muxedOutput, AudioJob[] aStreams)
 		{
-            LogItem log = new LogItem("Eliminating duplicate filenames");
+            LogItem log = new LogItem("Eliminating duplicate filenames", ImageType.Information, true);
             if (!String.IsNullOrEmpty(videoOutput))
                 videoOutput = Path.GetFullPath(videoOutput);
             muxedOutput = Path.GetFullPath(muxedOutput);
@@ -292,7 +292,7 @@ namespace MeGUI
 
         #region new stuff
         public static JobChain GenerateJobSeries(VideoStream video, string muxedOutput, AudioJob[] audioStreams,
-            MuxStream[] subtitles, List<string> attachments, ChapterInfo chapterInfo, FileSize? desiredSize, FileSize? splitSize, 
+            MuxStream[] subtitles, List<string> attachments, string timeStampFile, ChapterInfo chapterInfo, FileSize? desiredSize, FileSize? splitSize, 
             ContainerType container, bool prerender, MuxStream[] muxOnlyAudio, LogItem log, string deviceType, 
             Zone[] zones, string videoFileToMux, OneClickAudioTrack[] audioTracks, bool alwaysMuxOutput)
         {
@@ -391,8 +391,8 @@ namespace MeGUI
             inputsToDelete.AddRange(Array.ConvertAll<AudioJob, string>(audioStreams, delegate(AudioJob a) { return a.Output; }));
 
             JobChain muxJobs = JobUtil.GenerateMuxJobs(video, null, allAudioToMux.ToArray(), allInputAudioTypes.ToArray(),
-                subtitles, allInputSubtitleTypes.ToArray(), attachments, chapterInfo, chapterInputType, container, muxedOutput, splitSize, inputsToDelete, 
-                deviceType, deviceOutputType, alwaysMuxOutput);
+                subtitles, allInputSubtitleTypes.ToArray(), attachments, chapterInfo, chapterInputType, container, muxedOutput, timeStampFile,
+                splitSize, inputsToDelete, deviceType, deviceOutputType, alwaysMuxOutput);
 
             if (desiredSize.HasValue && String.IsNullOrEmpty(videoFileToMux))
             {
@@ -597,15 +597,14 @@ namespace MeGUI
         public static string getFFMSVideoInputLine(string inputFile, string indexFile, double fps)
         {
             UpdateCacher.CheckPackage("ffms");
-            int fpsnum, fpsden;
-            getFPSFraction(fps, inputFile, out fpsnum, out fpsden);
-            return getFFMSBasicInputLine(!isFFMSDefaultPluginRequired(), inputFile, indexFile, -1, 0, fpsnum, fpsden, true);
+            GetFPSDetails(fps, inputFile, out int fpsnum, out int fpsden, true, out bool variableFrameRate);
+            return GetFFMSBasicInputLine(!isFFMSDefaultPluginRequired(), inputFile, indexFile, -1, 0, fpsnum, fpsden, true, variableFrameRate);
         }
 
         public static string getFFMSAudioInputLine(string inputFile, string indexFile, int track)
         {
             UpdateCacher.CheckPackage("ffms");
-            return getFFMSBasicInputLine(!isFFMSDefaultPluginRequired(), inputFile, indexFile, track, 0, 0, 0, false);
+            return GetFFMSBasicInputLine(!isFFMSDefaultPluginRequired(), inputFile, indexFile, track, 0, 0, 0, false, false);
         }
 
         private static bool isFFMSDefaultPluginRequired()
@@ -617,7 +616,7 @@ namespace MeGUI
             return AVSScriptHasVideo(script.ToString(), out errorText);
         }
 
-        private static string getFFMSBasicInputLine(bool loadCPlugin, string inputFile, string indexFile, int track, int rffmode, int fpsnum, int fpsden, bool video)
+        private static string GetFFMSBasicInputLine(bool loadCPlugin, string inputFile, string indexFile, int track, int rffmode, int fpsnum, int fpsden, bool video, bool variableFrameRate)
         {
             StringBuilder script = new StringBuilder();
             script.AppendFormat("Load{0}Plugin(\"{1}\"){2}",
@@ -637,7 +636,7 @@ namespace MeGUI
                     inputFile,
                     (track > -1 ? ", track=" + track : String.Empty),
                     (!String.IsNullOrEmpty(indexFile) ? ", cachefile=\"" + indexFile + "\"" : String.Empty),
-                    ((fpsnum > 0 && fpsden > 0) ? ", fpsnum=" + fpsnum + ", fpsden=" + fpsden : String.Empty),
+                    ((fpsnum > 0 && fpsden > 0 && !variableFrameRate) ? ", fpsnum=" + fpsnum + ", fpsden=" + fpsden : String.Empty),
                     (MainForm.Instance.Settings.FFMSThreads > 0 ? ", threads=" + MainForm.Instance.Settings.FFMSThreads : String.Empty),
                     (rffmode > 0 ? ", rffmode=" + rffmode : String.Empty));
             }
@@ -670,8 +669,7 @@ namespace MeGUI
                 }
             }
 
-            int fpsnum, fpsden;
-            getFPSFraction(fps, inputFile, out fpsnum, out fpsden);
+            GetFPSDetails(fps, inputFile, out int fpsnum, out int fpsden);
             return getLSMASHBasicInputLine(inputFile, indexFile, -1, 0, fpsnum, fpsden, true, iVideoBits);
         }
 
@@ -760,23 +758,30 @@ namespace MeGUI
 
         public static string getAssumeFPS(double fps, string strInput)
         {
-            int fpsnum;
-            int fpsden;
-
-            if (!getFPSFraction(fps, strInput, out fpsnum, out fpsden))
+            if (!GetFPSDetails(fps, strInput, out int fpsnum, out int fpsden, true, out bool variableFrameRate))
                 return String.Empty;
 
-            return ".AssumeFPS(" + fpsnum + "," + fpsden + ")";
+            if (!variableFrameRate)
+                return ".AssumeFPS(" + fpsnum + "," + fpsden + ")";
+            else
+                return String.Empty;
         }
 
-        public static bool getFPSFraction(double fps, string strInput, out int fpsnum, out int fpsden)
+        public static bool GetFPSDetails(double fps, string strInput, out int fpsnum, out int fpsden)
+        {
+            return GetFPSDetails(fps, strInput, out fpsnum, out fpsden, false, out bool variableFrameRate);
+        }
+
+        public static bool GetFPSDetails(double fps, string strInput, out int fpsnum, out int fpsden, bool detectVFR, out bool variableFrameRate)
         {
             fpsnum = fpsden = 0;
+            variableFrameRate = false;
 
             if (fps <= 0)
             {
                 if (!File.Exists(strInput))
                     return false;
+
                 if (strInput.ToLowerInvariant().EndsWith(".ffindex"))
                     strInput = strInput.Substring(0, strInput.Length - 8);
                 if (Path.GetExtension(strInput).ToLowerInvariant().Equals(".avs"))
@@ -784,15 +789,35 @@ namespace MeGUI
                     fps = GetFPSFromAVSFile(strInput);
                     if (fps <= 0)
                         return false;
+
+                    if (detectVFR)
+                    {
+                        MediaInfoFile oInfo = new MediaInfoFile(strInput);
+                        if (oInfo.VideoInfo.HasVideo)
+                            variableFrameRate = oInfo.VideoInfo.VariableFrameRateMode;
+                        else
+                            return false;
+                    }
                 }
                 else
                 {
                     MediaInfoFile oInfo = new MediaInfoFile(strInput);
                     if (oInfo.VideoInfo.HasVideo && oInfo.VideoInfo.FPS > 0)
+                    {
                         fps = oInfo.VideoInfo.FPS;
+                        variableFrameRate = oInfo.VideoInfo.VariableFrameRateMode;
+                    }
                     else
                         return false;
                 }
+            }
+            else if (detectVFR)
+            {
+                MediaInfoFile oInfo = new MediaInfoFile(strInput);
+                if (oInfo.VideoInfo.HasVideo)
+                    variableFrameRate = oInfo.VideoInfo.VariableFrameRateMode;
+                else
+                    return false;
             }
 
             double dFPS = Math.Round(fps, 3);

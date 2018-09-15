@@ -55,7 +55,7 @@ namespace MeGUI
        
         public override string CodecString
         {
-            get { return ""; }
+            get { return "lsmashindex"; }
         }
 
         public override string EncodingMode
