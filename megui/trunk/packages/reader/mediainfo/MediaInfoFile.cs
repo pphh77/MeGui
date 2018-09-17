@@ -434,7 +434,7 @@ namespace MeGUI
                     SubtitleTrackInfo oTrack = new SubtitleTrackInfo(mmgTrackID, getLanguage(oTextTrack.Language, oTextTrack.LanguageString, ref infoLog, infoLog == null, false), oTextTrack.Title);
                     oTrack.DefaultTrack = oTextTrack.Default.ToLowerInvariant().Equals("yes");
                     oTrack.ForcedTrack = oTextTrack.Forced.ToLowerInvariant().Equals("yes");
-                    oTrack.SourceFileName = file;
+                    oTrack.SourceFileName = _file;
                     oTrack.ContainerType = _strContainer;
                     oTrack.TrackIndex = i++;
                     int delay = 0;
@@ -921,6 +921,7 @@ namespace MeGUI
                     int iTextCount = 0; int iTextEac3toCount = 0;
                     bool bVideoFound = false;
                     int iCount = 0;
+                    string mediaInfoSource = string.Empty;
                     foreach (eac3to.Stream oTrack in _Eac3toInfo.Features[0].Streams)
                     {
                         if (oTrack.Number < iCount)
@@ -932,6 +933,11 @@ namespace MeGUI
                         {
                             iTextEac3toCount++;
                             if (iTextCount >= oInfo.Text.Count)
+                                continue;
+
+                            if (string.IsNullOrEmpty(mediaInfoSource))
+                                mediaInfoSource = oInfo.Text[iTextCount].Source;
+                            else if (!string.IsNullOrEmpty(oInfo.Text[iTextCount].Source) && !mediaInfoSource.Equals(oInfo.Text[iTextCount].Source))
                                 continue;
 
                             string strLanguageEac3To = oTrack.LanguageOriginal;
@@ -957,6 +963,11 @@ namespace MeGUI
                             if (iAudioCount >= oInfo.Audio.Count)
                                 continue;
 
+                            if (string.IsNullOrEmpty(mediaInfoSource))
+                                mediaInfoSource = oInfo.Audio[iAudioCount].Source;
+                            else if (!string.IsNullOrEmpty(oInfo.Audio[iAudioCount].Source) && !mediaInfoSource.Equals(oInfo.Audio[iAudioCount].Source))
+                                continue;
+
                             string strLanguageEac3To = oTrack.LanguageOriginal;
                             string strLanguageMediaInfo = getLanguage(oInfo.Audio[iAudioCount].Language, oInfo.Audio[iAudioCount].LanguageString, ref infoLog, true, false);
                             if (String.IsNullOrEmpty(strLanguageEac3To) && !String.IsNullOrEmpty(strLanguageMediaInfo))
@@ -979,6 +990,7 @@ namespace MeGUI
                         }
                         else if (oTrack.Type == eac3to.StreamType.Video && !bVideoFound && !oTrack.Description.Contains("(right eye)"))
                         {
+                            mediaInfoSource = oInfo.Video[0].Source;
                             oInfo.Video[0].ID = oTrack.Number.ToString();
                             bVideoFound = true;
                         }
@@ -986,11 +998,11 @@ namespace MeGUI
 
                     oInfo.Audio.RemoveRange(iAudioCount, oInfo.Audio.Count - iAudioCount);
                     if (iAudioEac3toCount != oInfo.Audio.Count)
-                        infoLog.LogEvent((iAudioEac3toCount - oInfo.Audio.Count) + " eac3to audio tracks not found!", ImageType.Warning);
+                        infoLog.LogEvent((iAudioEac3toCount - oInfo.Audio.Count) + " eac3to audio tracks do not correlate to MediaInfo tracks. Therefore these tracks will be ignored.", ImageType.Warning);
 
                     oInfo.Text.RemoveRange(iTextCount, oInfo.Text.Count - iTextCount);
                     if (iTextEac3toCount != oInfo.Text.Count)
-                        infoLog.LogEvent((iTextEac3toCount - oInfo.Text.Count) + " eac3to subtitle tracks not found!", ImageType.Warning);
+                        infoLog.LogEvent((iTextEac3toCount - oInfo.Text.Count) + " eac3to subtitle tracks do not correlate to MediaInfo tracks. Therefore these tracks will be ignored.", ImageType.Warning);
                 }
                 else if (oInfo.Audio.Count == 0 && oInfo.Video.Count == 0 && Path.GetExtension(strFile).ToLowerInvariant().Equals(".avs"))
                 {

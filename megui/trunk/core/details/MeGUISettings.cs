@@ -1630,6 +1630,7 @@ namespace MeGUI
             mkvmerge.UpdateInformation("mkvmerge", "mkvmerge", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\mkvmerge\mkvmerge.exe"));
             mkvmerge.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\mkvmerge\mkvextract.exe"));
             mp4box.UpdateInformation("mp4box", "MP4Box", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\mp4box\mp4box.exe"));
+            mp4box.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\mp4box\mp4fpsmod\mp4fpsmod.exe"));
             neroaacenc.UpdateInformation("neroaacenc", "NeroAACEnc", NeroAacEncPath);
             if (!MainForm.Instance.Settings.UseNeroAacEnc)
                 UpdateCacher.CheckPackage("neroaacenc", false, false);

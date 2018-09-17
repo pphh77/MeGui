@@ -1,3 +1,4 @@
+2878 [MediaInfo]            improved track detection of Blu-ray playlists
 2877 [OneClick]             added support for VFR input files (requires mkv/mp4 output)
      [FFMS Indexer]         added support for VFR input files
      [MKV Muxer]            added detection of timestamp files (must be in the format "videoinputfilename".timestamp.txt)
