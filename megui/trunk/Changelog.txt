@@ -1,3 +1,4 @@
+2880 [AVS Script Creator]   fixed initial MediaInfo warning (regression of 2877)
 2879 [Queue]                improved power save mode supression (requires at least Windows 7)
 2878 [MediaInfo]            improved track detection of Blu-ray playlists
 2877 [OneClick]             added support for VFR input files (requires mkv/mp4 output)

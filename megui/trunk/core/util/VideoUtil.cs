@@ -777,48 +777,51 @@ namespace MeGUI
             fpsnum = fpsden = 0;
             variableFrameRate = false;
 
-            if (fps <= 0)
+            if (File.Exists(strInput))
             {
-                if (!File.Exists(strInput))
-                    return false;
-
-                if (strInput.ToLowerInvariant().EndsWith(".ffindex"))
-                    strInput = strInput.Substring(0, strInput.Length - 8);
-                if (Path.GetExtension(strInput).ToLowerInvariant().Equals(".avs"))
+                if (fps <= 0)
                 {
-                    fps = GetFPSFromAVSFile(strInput);
-                    if (fps <= 0)
-                        return false;
+                    if (strInput.ToLowerInvariant().EndsWith(".ffindex"))
+                        strInput = strInput.Substring(0, strInput.Length - 8);
+                    if (Path.GetExtension(strInput).ToLowerInvariant().Equals(".avs"))
+                    {
+                        fps = GetFPSFromAVSFile(strInput);
+                        if (fps <= 0)
+                            return false;
 
-                    if (detectVFR)
+                        if (detectVFR)
+                        {
+                            MediaInfoFile oInfo = new MediaInfoFile(strInput);
+                            if (oInfo.VideoInfo.HasVideo)
+                                variableFrameRate = oInfo.VideoInfo.VariableFrameRateMode;
+                            else
+                                return false;
+                        }
+                    }
+                    else
                     {
                         MediaInfoFile oInfo = new MediaInfoFile(strInput);
-                        if (oInfo.VideoInfo.HasVideo)
+                        if (oInfo.VideoInfo.HasVideo && oInfo.VideoInfo.FPS > 0)
+                        {
+                            fps = oInfo.VideoInfo.FPS;
                             variableFrameRate = oInfo.VideoInfo.VariableFrameRateMode;
+                        }
                         else
                             return false;
                     }
                 }
-                else
+                else if (detectVFR)
                 {
                     MediaInfoFile oInfo = new MediaInfoFile(strInput);
-                    if (oInfo.VideoInfo.HasVideo && oInfo.VideoInfo.FPS > 0)
-                    {
-                        fps = oInfo.VideoInfo.FPS;
+                    if (oInfo.VideoInfo.HasVideo)
                         variableFrameRate = oInfo.VideoInfo.VariableFrameRateMode;
-                    }
                     else
                         return false;
                 }
             }
-            else if (detectVFR)
-            {
-                MediaInfoFile oInfo = new MediaInfoFile(strInput);
-                if (oInfo.VideoInfo.HasVideo)
-                    variableFrameRate = oInfo.VideoInfo.VariableFrameRateMode;
-                else
-                    return false;
-            }
+
+            if (fps <= 0)
+                return false;
 
             double dFPS = Math.Round(fps, 3);
             if (dFPS == 23.976)
