@@ -59,28 +59,77 @@ namespace MeGUI.core.util
             return IsWindowVisible(hWnd); // Hide the window
         }
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        static extern EXECUTION_STATE SetThreadExecutionState(EXECUTION_STATE esFlags);
+        private const int POWER_REQUEST_CONTEXT_VERSION = 0;
+        private const int POWER_REQUEST_CONTEXT_SIMPLE_STRING = 0x1;
 
-        [FlagsAttribute]
-        private enum EXECUTION_STATE : uint
+        [DllImport("kernel32.dll", SetLastError = true)]
+        internal static extern IntPtr PowerCreateRequest(ref POWER_REQUEST_CONTEXT Context);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        internal static extern bool PowerSetRequest(IntPtr PowerRequestHandle, PowerRequestType RequestType);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        internal static extern bool PowerClearRequest(IntPtr PowerRequestHandle, PowerRequestType RequestType);
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        internal struct POWER_REQUEST_CONTEXT
         {
-            ES_SYSTEM_REQUIRED = 0x00000001,
-            ES_DISPLAY_REQUIRED = 0x00000002,
-            // Legacy flag, should not be used.
-            // ES_USER_PRESENT   = 0x00000004,
-            ES_CONTINUOUS = 0x80000000,
+            public UInt32 Version;
+            public UInt32 Flags;
+            [MarshalAs(UnmanagedType.LPWStr)]
+            public string SimpleReasonString;
         }
 
+        internal enum PowerRequestType
+        {
+            PowerRequestDisplayRequired = 0, // Not to be used by drivers
+            PowerRequestSystemRequired,
+            PowerRequestAwayModeRequired, // Not to be used by drivers
+            PowerRequestExecutionRequired // Not to be used by drivers
+        }
+
+        private static IntPtr currentPowerRequest;
         public static void PreventSystemPowerdown()
         {
-            SetThreadExecutionState(EXECUTION_STATE.ES_SYSTEM_REQUIRED |
-                                EXECUTION_STATE.ES_CONTINUOUS);
+            if (!OSInfo.IsWindows7OrNewer)
+                return;
+
+            // check if there is any power request already set
+            if (currentPowerRequest != IntPtr.Zero)
+                return;
+
+            // Create new power request.
+            POWER_REQUEST_CONTEXT pContext;
+            pContext.Flags = POWER_REQUEST_CONTEXT_SIMPLE_STRING;
+            pContext.Version = POWER_REQUEST_CONTEXT_VERSION;
+            pContext.SimpleReasonString = "standby suppressed as jobs are running";
+
+            currentPowerRequest = PowerCreateRequest(ref pContext);
+
+            if (currentPowerRequest == IntPtr.Zero)
+            {
+                // Failed to create power request
+                return;
+            }
+
+            if (!PowerSetRequest(currentPowerRequest, PowerRequestType.PowerRequestSystemRequired))
+            {
+                // Failed to set power request
+                currentPowerRequest = IntPtr.Zero;
+            }
         }
 
         public static void AllowSystemPowerdown()
         {
-            SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS);
+            if (!OSInfo.IsWindows7OrNewer)
+                return;
+
+            // Only try to clear power request if any power request is set.
+            if (currentPowerRequest == IntPtr.Zero)
+                return;
+
+            if (PowerClearRequest(currentPowerRequest, PowerRequestType.PowerRequestSystemRequired))
+                currentPowerRequest = IntPtr.Zero;
         }
 
         public static string GetErrorText(int iErrorValue)

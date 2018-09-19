@@ -1,3 +1,4 @@
+2879 [Queue]                improved power save mode supression (requires at least Windows 7)
 2878 [MediaInfo]            improved track detection of Blu-ray playlists
 2877 [OneClick]             added support for VFR input files (requires mkv/mp4 output)
      [FFMS Indexer]         added support for VFR input files
@@ -8,6 +9,7 @@
 
 
 Changelog 2836 --> 2876
+
 
 Features/Changes:
                        added high bit depth support (requires AVS+)
