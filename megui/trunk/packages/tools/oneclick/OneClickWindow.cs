@@ -1763,6 +1763,7 @@ namespace MeGUI
                 iSelectedSubtitleTabPage > subtitleTracks.Count - 1)
                 iSelectedSubtitleTabPage = 0;
 
+            IntPtr h = subtitlesTab.Handle;  // fix for TabPages.Insert not working if handle has not been created yet (issue in batch mode)
             subtitlesTab.TabPages.Insert(iSelectedSubtitleTabPage + 1, p);
             subtitleTracks.Insert(iSelectedSubtitleTabPage + 1, a);
             p.Controls.Add(a);
@@ -1988,6 +1989,7 @@ namespace MeGUI
                 iSelectedAudioTabPage > audioTracks.Count - 1)
                 iSelectedAudioTabPage = 0;
 
+            IntPtr h = audioTab.Handle;  // fix for TabPages.Insert not working if handle has not been created yet (issue in batch mode)
             audioTab.TabPages.Insert(iSelectedAudioTabPage + 1, p);
             audioTracks.Insert(iSelectedAudioTabPage + 1, a);
             p.Controls.Add(a);

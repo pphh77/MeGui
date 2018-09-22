@@ -1,3 +1,4 @@
+2882 [OneClick]             fixed only using at maximum 2 audio/subtible tracks in batch mode (regression of 2861). bug #927
 2881 [HD Streams Extractor] force "-keepDialnorm" if required for a E-AC3 tracks
 2880 [AVS Script Creator]   fixed initial MediaInfo warning (regression of 2877)
 2879 [Queue]                improved power save mode supression (requires at least Windows 7)

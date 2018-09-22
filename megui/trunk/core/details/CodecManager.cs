@@ -127,7 +127,7 @@ namespace MeGUI
         
         public static readonly SubtitleCodec ASS        = new SubtitleCodec("ASS", "ass");
         public static readonly SubtitleCodec PGS        = new SubtitleCodec("PGS", "pgs");
-        public static readonly SubtitleCodec SRT        = new SubtitleCodec("SRT", "(text)|(utf-8)");
+        public static readonly SubtitleCodec SRT        = new SubtitleCodec("SRT", "(text)|(utf-8)|(subrip)");
         public static readonly SubtitleCodec SSA        = new SubtitleCodec("SSA", "ssa");
         public static readonly SubtitleCodec TTXT       = new SubtitleCodec("TTXT", "ttxt");
         public static readonly SubtitleCodec VOBSUB     = new SubtitleCodec("VOBSUB", "(vobsub)|(rle)");

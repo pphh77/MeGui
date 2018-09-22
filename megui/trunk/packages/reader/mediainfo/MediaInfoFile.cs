@@ -648,8 +648,10 @@ namespace MeGUI
                         oTrack.Info("Format: " + t.Format);
                     if (!String.IsNullOrEmpty(t.FormatString) && !t.Format.Equals(t.FormatString))
                         oTrack.Info("FormatString: " + t.FormatString);
-                    oTrack.Info("FileSize: " + t.FileSize);
-                    oTrack.Info("PlayTime: " + t.PlayTimeString3);
+                    if (!String.IsNullOrEmpty(t.FileSize))
+                        oTrack.Info("FileSize: " + t.FileSize);
+                    if (!String.IsNullOrEmpty(t.PlayTimeString3))
+                        oTrack.Info("PlayTime: " + t.PlayTimeString3);
                     if (_VideoInfo.PGCCount > 0)
                     {
                         oTrack.Info("PGCCount: " + _VideoInfo.PGCCount);
