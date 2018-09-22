@@ -1,3 +1,4 @@
+2881 [HD Streams Extractor] force "-keepDialnorm" if required for a E-AC3 tracks
 2880 [AVS Script Creator]   fixed initial MediaInfo warning (regression of 2877)
 2879 [Queue]                improved power save mode supression (requires at least Windows 7)
 2878 [MediaInfo]            improved track detection of Blu-ray playlists

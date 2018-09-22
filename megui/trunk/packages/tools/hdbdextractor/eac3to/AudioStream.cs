@@ -33,6 +33,7 @@ namespace eac3to
         public AudioStreamType AudioType { get; set; }
         public override string Language { get; set; }
         public string TypeCore;
+        public bool HasDialNorm;
         public bool ParsingFailed;
 
         public override object[] ExtractTypes
@@ -127,6 +128,7 @@ namespace eac3to
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
             TypeCore = string.Empty;
             ParsingFailed = false;
+            HasDialNorm = System.Text.RegularExpressions.Regex.IsMatch(s, ", dialnorm: ", System.Text.RegularExpressions.RegexOptions.Compiled);
         }
 
         new public static Stream Parse(string s, LogItem _log)
@@ -137,8 +139,9 @@ namespace eac3to
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException("s", "The string 's' cannot be null or empty.");
 
-            string type = s.Substring(s.IndexOf(":") + 1, s.IndexOf(',') - s.IndexOf(":") - 1).Trim();
             AudioStream audioStream = new AudioStream(s, _log);
+
+            string type = s.Substring(s.IndexOf(":") + 1, s.IndexOf(',') - s.IndexOf(":") - 1).Trim();
             switch (type.ToUpperInvariant())
             {
                 case "AC3":

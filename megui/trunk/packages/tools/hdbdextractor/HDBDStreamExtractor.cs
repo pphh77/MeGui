@@ -382,8 +382,13 @@ namespace MeGUI.packages.tools.hdbdextractor
                         Extensions.GetStringValue(stream.Type), row.Cells["languageDataGridViewTextBoxColumn"].Value, strExtension)),
                         row.Cells["StreamAddOptionsTextBox"].Value).Trim());
 
-                if (stream.Type == eac3to.StreamType.Audio && ((string)row.Cells["StreamExtractAsComboBox"].Value).EndsWith("_CORE"))
-                    sb.Append(" -core");
+                if (stream.Type == eac3to.StreamType.Audio)
+                {
+                    if (((string)row.Cells["StreamExtractAsComboBox"].Value).EndsWith("_CORE"))
+                        sb.Append(" -core");
+                    else if (((AudioStream)stream).HasDialNorm)
+                        sb.Append(" -keepDialnorm");
+                }
 
                 sb.Append(" ");
             }

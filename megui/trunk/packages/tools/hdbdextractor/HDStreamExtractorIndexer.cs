@@ -103,11 +103,13 @@ namespace MeGUI
                     {
                         if (line.ToLowerInvariant().Contains("<error>"))
                             stdoutLog.LogEvent(line, ImageType.Error);
-                        else if (line.ToLowerInvariant().Contains("<warning>"))
+                        else if (line.ToLowerInvariant().Contains("<warning>")
+                            && !FileUtil.RegExMatch(line, @"\[\w\d{2}\] audio overlaps for ", true)
+                            && !FileUtil.RegExMatch(line, @"\[\w\d{2}\] the video framerate is correct, but rather unusual", true))
                             stdoutLog.LogEvent(line, ImageType.Warning);
                         if (line.Contains("Getting \"Haali Matroska Muxer\" instance failed"))
                         {
-                            // haali media plitter is missing ==> try to (re)install it
+                            // haali media splitter is missing ==> try to (re)install it
                             if (!su.WasAborted && FileUtil.InstallHaali(ref log))
                                 base.bSecondPassNeeded = true;
                         }
