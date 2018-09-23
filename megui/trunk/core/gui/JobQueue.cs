@@ -108,28 +108,28 @@ namespace MeGUI.core.gui
                     jobs[job.Name] = job;
                 }
                 queueListView.EndUpdate();
-                refreshQueue();
+                RefreshQueue();
             }
         }
 
-        internal void queueJob(TaggedJob j)
+        internal void QueueJob(TaggedJob j)
         {
             if (InvokeRequired)
             {
-                Invoke(new MethodInvoker(delegate { queueJob(j); }));
+                Invoke(new MethodInvoker(delegate { QueueJob(j); }));
                 return;
             }
 
             queueListView.Items.Add(new ListViewItem(new string[] { j.Name, "", "", "", "", "", "", "", "", "" }));
             jobs[j.Name] = j;
-            refreshQueue();
+            RefreshQueue();
         }
 
-        internal void removeJobFromQueue(TaggedJob job)
+        internal void RemoveJobFromQueue(TaggedJob job)
         {
             if (InvokeRequired)
             {
-                Invoke(new MethodInvoker(delegate { removeJobFromQueue(job); }));
+                Invoke(new MethodInvoker(delegate { RemoveJobFromQueue(job); }));
                 return;
             }
 
@@ -142,11 +142,11 @@ namespace MeGUI.core.gui
         #region adding GUI elements
         
 
-        private void addItem(ToolStripMenuItem item, string parent)
+        private void AddItem(ToolStripMenuItem item, string parent)
         {
             if (InvokeRequired)
             {
-                Invoke(new MethodInvoker(delegate { addItem(item, parent); }));
+                Invoke(new MethodInvoker(delegate { AddItem(item, parent); }));
                 return;
             }
 
@@ -165,12 +165,12 @@ namespace MeGUI.core.gui
         {
             ToolStripMenuItem item = new ToolStripMenuItem(name);
             menuGenerators.Add(new Pair<ToolStripMenuItem, MultiJobMenuGenerator>(item, gen));
-            addItem(item, parent);
+            AddItem(item, parent);
         }
 
         public void AddMenuItem(string name, string parent)
         {
-            addItem(new ToolStripMenuItem(name), parent);
+            AddItem(new ToolStripMenuItem(name), parent);
         }
 
         internal void AddMenuItem(string name, string parent, SingleJobHandler handler)
@@ -183,7 +183,7 @@ namespace MeGUI.core.gui
                 handler(j);
             };
             singleJobHandlers.Add(item);
-            addItem(item, parent);
+            AddItem(item, parent);
         }
 
         internal void AddMenuItem(string name, string parent, MultiJobHandler handler)
@@ -197,7 +197,7 @@ namespace MeGUI.core.gui
                     list.Add(jobs[i.Text]);
                 handler(list);
             };
-            addItem(item, parent);
+            AddItem(item, parent);
             multiJobHandlers.Add(item);
         }
 
@@ -262,32 +262,32 @@ namespace MeGUI.core.gui
         public event EventHandler StartClicked;
         public event EventHandler StopClicked;
 
-        private List<TaggedJob> removeAllDependantJobsFromQueue(TaggedJob job)
+        private List<TaggedJob> RemoveAllDependantJobsFromQueue(TaggedJob job)
         {
-            removeJobFromQueue(job);
+            RemoveJobFromQueue(job);
             List<TaggedJob> list = new List<TaggedJob>();
             foreach (TaggedJob j in job.EnabledJobs)
             {
                 if (jobs.ContainsKey(j.Name))
-                    list.AddRange(removeAllDependantJobsFromQueue(j));
+                    list.AddRange(RemoveAllDependantJobsFromQueue(j));
                 else
                     list.Add(j);
             }
             return list;
         }
 
-        private void deleteJobButton_Click(object sender, EventArgs e)
+        private void DeleteJobButton_Click(object sender, EventArgs e)
         {
             if (queueListView.SelectedItems.Count <= 0) 
                 return;
 
             foreach (ListViewItem item in this.queueListView.SelectedItems)
             {
-                processUserRequestToDelete(item.Text);
+                ProcessUserRequestToDelete(item.Text);
             }
         }
 
-        private void processUserRequestToDelete(string name)
+        private void ProcessUserRequestToDelete(string name)
         {
             if (!jobs.ContainsKey(name)) // Check if it has already been deleted
                 return;
@@ -300,12 +300,12 @@ namespace MeGUI.core.gui
 
         #region list movement
         enum Direction { Up, Down }
-        private void downButton_Click(object sender, EventArgs e)
+        private void DownButton_Click(object sender, EventArgs e)
         {
             MoveListViewItem(Direction.Down);
         }
 
-        private void upButton_Click(object sender, EventArgs e)
+        private void UpButton_Click(object sender, EventArgs e)
         {
             MoveListViewItem(Direction.Up);
         }
@@ -319,7 +319,7 @@ namespace MeGUI.core.gui
         private void MoveListViewItem(Direction d)
         {
             // We can trust that the button will be disabled unless this condition is met
-            Debug.Assert(isSelectionMovable(d));
+            Debug.Assert(IsSelectionMovable(d));
 
             ListView lv = queueListView;
             ListView.ListViewItemCollection items = lv.Items;
@@ -337,7 +337,7 @@ namespace MeGUI.core.gui
                 items[min - 1].Selected = true;
 
                 for (int i = min; i <= max; i++)
-                    swapContents(items[i], items[i - 1]);
+                    SwapContents(items[i], items[i - 1]);
             }
             else if (d == Direction.Down)
             {
@@ -345,7 +345,7 @@ namespace MeGUI.core.gui
                 items[max + 1].Selected = true;
 
                 for (int i = max; i >= min; i--)
-                    swapContents(items[i], items[i + 1]);
+                    SwapContents(items[i], items[i + 1]);
             }
             lv.EndUpdate();
             lv.Refresh();
@@ -357,7 +357,7 @@ namespace MeGUI.core.gui
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
-        private void swapContents(ListViewItem a, ListViewItem b)
+        private void SwapContents(ListViewItem a, ListViewItem b)
         {
             for (int i = 0; i < a.SubItems.Count; i++)
             {
@@ -376,7 +376,7 @@ namespace MeGUI.core.gui
         /// </summary>
         /// <param name="d"></param>
         /// <returns></returns>
-        private bool isSelectionMovable(Direction d)
+        private bool IsSelectionMovable(Direction d)
         {
             ListView lv = queueListView;
             int[] indices = new int[lv.SelectedIndices.Count];
@@ -390,7 +390,7 @@ namespace MeGUI.core.gui
             if (d == Direction.Down &&
                 indices[indices.Length - 1] == queueListView.Items.Count - 1)
                 return false;
-            if (!consecutiveIndices(indices))
+            if (!ConsecutiveIndices(indices))
                 return false;
 
             return true;
@@ -403,7 +403,7 @@ namespace MeGUI.core.gui
         ///     whether the selected job is waiting or postponed
         /// </summary>
         /// <returns></returns>
-        private bool isSelectionEditable()
+        private bool IsSelectionEditable()
         {
             if (queueListView.SelectedItems.Count != 1)
                 return false;
@@ -422,7 +422,7 @@ namespace MeGUI.core.gui
         /// <param name="indices"></param>
         /// <param name="min"></param>
         /// <param name="max"></param>
-        private bool consecutiveIndices(int[] indices)
+        private bool ConsecutiveIndices(int[] indices)
         {
             Debug.Assert(indices.Length > 0);
 
@@ -441,12 +441,12 @@ namespace MeGUI.core.gui
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void queueListView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        private void QueueListView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
-            upButton.Enabled = isSelectionMovable(Direction.Up);
-            downButton.Enabled = isSelectionMovable(Direction.Down);
-            editJobButton.Enabled = isSelectionEditable();
-            markDependentJobs();
+            upButton.Enabled = IsSelectionMovable(Direction.Up);
+            downButton.Enabled = IsSelectionMovable(Direction.Down);
+            editJobButton.Enabled = IsSelectionEditable();
+            MarkDependentJobs();
         }
 
         #endregion
@@ -524,7 +524,7 @@ namespace MeGUI.core.gui
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void queueListView_DoubleClick(object sender, EventArgs e)
+        private void QueueListView_DoubleClick(object sender, EventArgs e)
         {
             if (this.queueListView.SelectedItems.Count > 0) // otherwise 
             {
@@ -545,7 +545,7 @@ namespace MeGUI.core.gui
         /// </summary>
         /// <param name="sender">This parameter is ignored</param>
         /// <param name="e">This parameter is ignored</param>
-        private void postponeMenuItem_Click(object sender, EventArgs e)
+        private void PostponeMenuItem_Click(object sender, EventArgs e)
         {
             foreach (ListViewItem item in this.queueListView.SelectedItems)
             {
@@ -565,7 +565,7 @@ namespace MeGUI.core.gui
         /// </summary>
         /// <param name="sender">This parameter is ignored</param>
         /// <param name="e">This parameter is ignored</param>
-        private void waitingMenuItem_Click(object sender, EventArgs e)
+        private void WaitingMenuItem_Click(object sender, EventArgs e)
         {
             foreach (ListViewItem item in this.queueListView.SelectedItems)
             {
@@ -580,7 +580,7 @@ namespace MeGUI.core.gui
         }
 
 
-        private void queueContextMenu_Opened(object sender, EventArgs e)
+        private void QueueContextMenu_Opened(object sender, EventArgs e)
         {
             int count = queueListView.SelectedItems.Count;
             foreach (ToolStripItem i in multiJobHandlers)
@@ -613,7 +613,7 @@ namespace MeGUI.core.gui
             AbortMenuItem.Enabled = AllJobsHaveStatus(JobStatus.PROCESSING) || AllJobsHaveStatus(JobStatus.PAUSED) || AllJobsHaveStatus(JobStatus.ABORTED);
             AbortMenuItem.Checked = AllJobsHaveStatus(JobStatus.ABORTED);
 
-            EditMenuItem.Enabled = isSelectionEditable();
+            EditMenuItem.Enabled = IsSelectionEditable();
             EditMenuItem.Checked = false;
 
             bool canModifySelectedJobs = !AnyJobsHaveStatus(JobStatus.PROCESSING) && !AnyJobsHaveStatus(JobStatus.PAUSED) && !AnyJobsHaveStatus(JobStatus.ABORTING) && this.queueListView.SelectedItems.Count > 0;
@@ -644,12 +644,12 @@ namespace MeGUI.core.gui
         #endregion
 
         #region start / stop / abort / pause
-        private void abortButton_Click(object sender, EventArgs e)
+        private void AbortButton_Click(object sender, EventArgs e)
         {
             AbortClicked(this, e);
         }
 
-        private void startStopButton_Click(object sender, EventArgs e)
+        private void StartStopButton_Click(object sender, EventArgs e)
         {
             switch (startStopMode)
             {
@@ -666,14 +666,14 @@ namespace MeGUI.core.gui
 
         #region redrawing
 
-        public void refreshQueue()
+        public void RefreshQueue()
         {
             if (!Visible) 
                 return;
 
             if (queueListView.InvokeRequired)
             {
-                queueListView.Invoke(new MethodInvoker(delegate { refreshQueue(); }));
+                queueListView.Invoke(new MethodInvoker(delegate { RefreshQueue(); }));
                 return;
             }
 
@@ -686,29 +686,28 @@ namespace MeGUI.core.gui
                 item.SubItems[3].Text = job.Job.CodecString;
                 item.SubItems[4].Text = job.Job.EncodingMode;
                 item.SubItems[5].Text = job.StatusString;
-                item.SubItems[6].Text = job.OwningWorker ?? "";
                 
                 if (job.Status == JobStatus.DONE)
                 {
-                    item.SubItems[8].Text = job.End.ToLongTimeString();
-                    item.SubItems[9].Text = job.EncodingSpeed;
+                    item.SubItems[7].Text = job.End.ToLongTimeString();
+                    item.SubItems[8].Text = job.EncodingSpeed;
                 }
                 else
                 {
+                    item.SubItems[7].Text = "";
                     item.SubItems[8].Text = "";
-                    item.SubItems[9].Text = "";
                 }
                 if (job.Status == JobStatus.DONE || job.Status == JobStatus.PROCESSING || job.Status == JobStatus.PAUSED || job.Status == JobStatus.ABORTING)
-                    item.SubItems[7].Text = job.Start.ToLongTimeString();
+                    item.SubItems[6].Text = job.Start.ToLongTimeString();
                 else
-                    item.SubItems[7].Text = "";
+                    item.SubItems[6].Text = "";
             }
             queueListView.EndUpdate();
             queueListView.Refresh();
         }
         #endregion
 
-        private void stopButton_Click(object sender, EventArgs e)
+        private void StopButton_Click(object sender, EventArgs e)
         {
             StopClicked(this, e);
         }
@@ -718,9 +717,9 @@ namespace MeGUI.core.gui
             return jobs.ContainsKey(job.Name);
         }
 
-        private void queueListView_VisibleChanged(object sender, EventArgs e)
+        private void QueueListView_VisibleChanged(object sender, EventArgs e)
         {
-            refreshQueue();
+            RefreshQueue();
         }
 
         private void AbortMenuItem_Click(object sender, EventArgs e)
@@ -731,13 +730,13 @@ namespace MeGUI.core.gui
                 {
                     jobs[item.Text].Status = JobStatus.WAITING;
                 }
-                refreshQueue();
+                RefreshQueue();
             }
             else if (!AbortMenuItem.Checked)
                 AbortClicked(this, e);
         }
 
-        private void queueListView_KeyDown(object sender, KeyEventArgs e)
+        private void QueueListView_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Control && e.KeyCode.Equals(Keys.A))
             {
@@ -748,11 +747,11 @@ namespace MeGUI.core.gui
 
             switch (e.KeyCode)
             {
-                case Keys.Delete: deleteJobButton_Click(sender, e); break;
-                case Keys.Up: if (upButton.Enabled && e.Shift) upButton_Click(sender, e); break;
-                case Keys.Down: if (downButton.Enabled && e.Shift) downButton_Click(sender, e); break;
+                case Keys.Delete: DeleteJobButton_Click(sender, e); break;
+                case Keys.Up: if (upButton.Enabled && e.Shift) UpButton_Click(sender, e); break;
+                case Keys.Down: if (downButton.Enabled && e.Shift) DownButton_Click(sender, e); break;
                 case Keys.Escape:
-                case Keys.Enter: startStopButton_Click(sender, e); break;
+                case Keys.Enter: StartStopButton_Click(sender, e); break;
             }
         }
 
@@ -769,7 +768,6 @@ namespace MeGUI.core.gui
             codecHeader.Width = MainForm.Instance.Settings.CodecColumnWidth;
             modeHeader.Width = MainForm.Instance.Settings.ModeColumnWidth;
             statusColumn.Width = MainForm.Instance.Settings.StatusColumnWidth;
-            ownerHeader.Width = MainForm.Instance.Settings.OwnerColumnWidth;
             startColumn.Width = MainForm.Instance.Settings.StartColumnWidth;
             endColumn.Width = MainForm.Instance.Settings.EndColumnWidth;
             fpsColumn.Width = MainForm.Instance.Settings.FPSColumnWidth;
@@ -786,7 +784,6 @@ namespace MeGUI.core.gui
             MainForm.Instance.Settings.CodecColumnWidth = codecHeader.Width;
             MainForm.Instance.Settings.ModeColumnWidth = modeHeader.Width;
             MainForm.Instance.Settings.StatusColumnWidth = statusColumn.Width;
-            MainForm.Instance.Settings.OwnerColumnWidth = ownerHeader.Width;
             MainForm.Instance.Settings.StartColumnWidth = startColumn.Width;
             MainForm.Instance.Settings.EndColumnWidth = endColumn.Width;
             MainForm.Instance.Settings.FPSColumnWidth = fpsColumn.Width;
@@ -801,12 +798,12 @@ namespace MeGUI.core.gui
                 OSInfo.SetWindowTheme(queueListView.Handle, "explorer", null);
         }
 
-        private void queueListView_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
+        private void QueueListView_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
         {
             this.SaveComponentSettings();
         }
 
-        private void markDependentJobs()
+        private void MarkDependentJobs()
         {
             List<string> oList = new List<string>();
             foreach (ListViewItem oItem in queueListView.SelectedItems)
@@ -816,7 +813,7 @@ namespace MeGUI.core.gui
                 TaggedJob job = jobs[oItem.Text];
                 if (job == null)
                     continue;
-                getAllDependantJobs(job, ref oList);
+                GetAllDependantJobs(job, ref oList);
             }
 
             queueListView.SuspendLayout();
@@ -830,20 +827,20 @@ namespace MeGUI.core.gui
             queueListView.ResumeLayout();
         }
 
-        private void getAllDependantJobs(TaggedJob job, ref List<string> oList)
+        private void GetAllDependantJobs(TaggedJob job, ref List<string> oList)
         {
             if (oList.Contains(job.Name))
                 return;
 
             oList.Add(job.Name);
             foreach (TaggedJob j in job.EnabledJobs)
-                getAllDependantJobs(j, ref oList);
+                GetAllDependantJobs(j, ref oList);
 
             foreach (TaggedJob j in job.RequiredJobs)
-                getAllDependantJobs(j, ref oList);
+                GetAllDependantJobs(j, ref oList);
         }
 
-        private void outputFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        private void OutputFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
             foreach (ListViewItem item in this.queueListView.SelectedItems)
             {
@@ -861,7 +858,7 @@ namespace MeGUI.core.gui
             }
         }
 
-        private void outputFileToolStripMenuItem_Click(object sender, EventArgs e)
+        private void OutputFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             foreach (ListViewItem item in this.queueListView.SelectedItems)
             {
@@ -879,7 +876,7 @@ namespace MeGUI.core.gui
             }
         }
 
-        private void inputFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        private void InputFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
             foreach (ListViewItem item in this.queueListView.SelectedItems)
             {
@@ -897,7 +894,7 @@ namespace MeGUI.core.gui
             }
         }
 
-        private void inputFileToolStripMenuItem_Click(object sender, EventArgs e)
+        private void InputFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             foreach (ListViewItem item in this.queueListView.SelectedItems)
             {

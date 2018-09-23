@@ -335,7 +335,7 @@ namespace MeGUI
                         MessageBox.Show("No mux job created as input and output are the same", "Nothing to mux", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                         return;
                     }
-                    mainForm.Jobs.addJobsWithDependencies(oJobs, true);
+                    mainForm.Jobs.AddJobsWithDependencies(oJobs, true);
                     if (chkCloseOnQueue.Checked)
                         this.Close();
                     else

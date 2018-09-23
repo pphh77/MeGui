@@ -49,7 +49,7 @@ namespace MeGUI
 
                 audioEncodingTab1.QueueJob = delegate(AudioJob a)
                 {
-                    MainForm.Instance.Jobs.addJobsToQueue(a);
+                    MainForm.Instance.Jobs.AddJobsToQueue(a);
                 };
 
                 audioEncodingTab1.AudioContainer = MainForm.Instance.Settings.MainAudioFormat;
@@ -65,7 +65,7 @@ namespace MeGUI
             a.Dock = System.Windows.Forms.DockStyle.Fill;
             a.QueueJob = delegate(AudioJob aJob)
             {
-                MainForm.Instance.Jobs.addJobsToQueue(aJob);
+                MainForm.Instance.Jobs.AddJobsToQueue(aJob);
             };
 
             TabPage p = new TabPage("Track " + tabs.Count);

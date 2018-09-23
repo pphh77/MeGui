@@ -1,3 +1,9 @@
+2884 [Worker]               changed worker handling
+                            - in "workers\settings" worker rule sets can be specified
+                              based on those rules it is determined how many jobs of which type are allowed to run in parallel
+                              also on that page the maximum number of workers can be set (default: 2)
+                            - temporary workers ignore all restrictions
+                            - removed several obsolete worker windows and options
 2883 [IFOParser]            improved subtitle detection. bug #925
 2882 [OneClick]             fixed only using at maximum 2 audio/subtible tracks in batch mode (regression of 2861). bug #927
 2881 [HD Streams Extractor] force "-keepDialnorm" if required for a E-AC3 tracks

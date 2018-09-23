@@ -34,10 +34,7 @@ namespace MeGUI.core.gui
             this.individualWorkerSummary3 = new MeGUI.core.gui.IndividualWorkerSummary();
             this.individualWorkerSummary2 = new MeGUI.core.gui.IndividualWorkerSummary();
             this.individualWorkerSummary1 = new MeGUI.core.gui.IndividualWorkerSummary();
-            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.newWorkerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
-            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -85,37 +82,22 @@ namespace MeGUI.core.gui
             this.individualWorkerSummary1.Size = new System.Drawing.Size(342, 47);
             this.individualWorkerSummary1.TabIndex = 0;
             // 
-            // contextMenuStrip1
-            // 
-            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.newWorkerToolStripMenuItem});
-            this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(138, 26);
-            // 
-            // newWorkerToolStripMenuItem
-            // 
-            this.newWorkerToolStripMenuItem.Name = "newWorkerToolStripMenuItem";
-            this.newWorkerToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
-            this.newWorkerToolStripMenuItem.Text = "New worker";
-            this.newWorkerToolStripMenuItem.Click += new System.EventHandler(this.newWorkerToolStripMenuItem_Click);
-            // 
             // WorkerSummary
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(352, 155);
-            this.ContextMenuStrip = this.contextMenuStrip1;
+            this.ClientSize = new System.Drawing.Size(352, 151);
             this.Controls.Add(this.panel1);
             this.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MinimumSize = new System.Drawing.Size(368, 190);
             this.Name = "WorkerSummary";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "WorkerSummary";
+            this.Text = "Worker Overview";
             this.VisibleChanged += new System.EventHandler(this.WorkerSummary_VisibleChanged);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -127,8 +109,6 @@ namespace MeGUI.core.gui
         private IndividualWorkerSummary individualWorkerSummary3;
         private IndividualWorkerSummary individualWorkerSummary2;
         private IndividualWorkerSummary individualWorkerSummary1;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem newWorkerToolStripMenuItem;
 
 
     }

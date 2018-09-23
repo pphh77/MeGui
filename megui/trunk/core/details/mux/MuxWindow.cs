@@ -135,7 +135,7 @@ namespace MeGUI
                 else
                 {
                     MuxJob job = this.Job;
-                    mainForm.Jobs.addJobsToQueue(job);
+                    mainForm.Jobs.AddJobsToQueue(job);
                     if (chkCloseOnQueue.Checked)
                         this.Close();
                     else

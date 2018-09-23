@@ -22,6 +22,8 @@ using System;
 using System.ComponentModel;
 using System.Windows.Forms;
 
+using MeGUI.core.util;
+
 namespace MeGUI.core.gui
 {
     public partial class IndividualWorkerSummary : UserControl
@@ -44,23 +46,18 @@ namespace MeGUI.core.gui
             progressBar1.Value = (int)w.Progress;
         }
 
-        private void startEncodingToolStripMenuItem_Click(object sender, EventArgs e)
+        private void StartEncodingToolStripMenuItem_Click(object sender, EventArgs e)
         {
             w.StartEncoding(true);
             RefreshInfo();
         }
 
-        private void abortToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AbortToolStripMenuItem_Click(object sender, EventArgs e)
         {
             w.UserRequestedAbort();
         }
 
-        private void renameToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            w.UserRequestedRename();
-        }
-
-        private void stopToolStripMenuItem_Click(object sender, EventArgs e)
+        private void StopToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (stopToolStripMenuItem.Checked)
                 w.SetRunning();
@@ -68,17 +65,7 @@ namespace MeGUI.core.gui
                 w.SetStopping();
         }
 
-        private void shutDownToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            w.UserRequestShutDown();
-        }
-
-        private void shutDownLaterToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            w.ShutDownWhenFinished();
-        }
-
-        private void showProgressWindowToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ShowProgressWindowToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (showProgressWindowToolStripMenuItem.Checked)
                 w.HideProcessWindow();
@@ -86,25 +73,22 @@ namespace MeGUI.core.gui
                 w.ShowProcessWindow();
         }
 
-        private void pauseResumeToolStripMenuItem_Click(object sender, EventArgs e)
+        private void PauseResumeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            w.pw_Suspend();
+            w.Pw_Suspend();
         }
 
-        private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
+        private void ContextMenuStrip1_Opening(object sender, CancelEventArgs e)
         {
-            startEncodingToolStripMenuItem.Enabled = !w.IsEncoding;
+            startEncodingToolStripMenuItem.Enabled = !w.IsRunning;
 
-            pauseResumeToolStripMenuItem.Enabled = w.IsEncoding;
+            pauseResumeToolStripMenuItem.Enabled = w.IsRunning;
             pauseResumeToolStripMenuItem.Checked = w.JobStatus == JobStatus.PAUSED;
 
-            abortToolStripMenuItem.Enabled = w.IsEncoding;
+            abortToolStripMenuItem.Enabled = w.IsRunning;
             
-            stopToolStripMenuItem.Enabled = w.IsEncoding;
+            stopToolStripMenuItem.Enabled = w.IsRunning;
             stopToolStripMenuItem.Checked = w.Status == JobWorkerStatus.Stopping;
-
-            shutDownLaterToolStripMenuItem.Enabled = (w.LocalJobCount > 0 || w.Status != JobWorkerStatus.Idle);
-            shutDownLaterToolStripMenuItem.Checked = w.Mode == JobWorkerMode.CloseOnLocalListCompleted;
 
             showProgressWindowToolStripMenuItem.Enabled = w.IsProgressWindowAvailable;
             showProgressWindowToolStripMenuItem.Checked = w.IsProgressWindowVisible;

@@ -31,7 +31,9 @@ namespace MeGUI.core.gui
 {
     public partial class WorkerSummary : Form
     {
-        public WorkerSummary(JobControl jobs)
+        Dictionary<string, IndividualWorkerSummary> displays = new Dictionary<string, IndividualWorkerSummary>();
+
+        public WorkerSummary()
         {
             InitializeComponent();
             panel1.Controls.Clear(); // they're just there for the designer
@@ -42,17 +44,6 @@ namespace MeGUI.core.gui
             panel1.Width = width;
             panel1.Location = new Point(0, 0);
             panel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            this.jobs = jobs;
-        }
-
-        JobControl jobs;
-        Dictionary<string, IndividualWorkerSummary> displays = new Dictionary<string,IndividualWorkerSummary>();
-
-        public void Rename(string workerName, string newName)
-        {
-            IndividualWorkerSummary i = displays[workerName];
-            displays.Remove(workerName);
-            displays[newName] = i;
         }
 
         public void RefreshInfo()
@@ -107,11 +98,5 @@ namespace MeGUI.core.gui
             e.Cancel = true;
             Hide();
         }
-
-        private void newWorkerToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            jobs.RequestNewWorker();
-        }
-
     }
 }

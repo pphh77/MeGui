@@ -1500,7 +1500,7 @@ namespace MeGUI
             }
 
             // add jobs to queue
-            MainForm.Instance.Jobs.addJobsWithDependencies(finalJobChain, !bBatchProcessing);
+            MainForm.Instance.Jobs.AddJobsWithDependencies(finalJobChain, !bBatchProcessing);
 
             if (!this.openOnQueue.Checked && this.Visible)
             {

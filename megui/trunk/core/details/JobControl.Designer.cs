@@ -29,7 +29,6 @@ namespace MeGUI.core.details
         private void InitializeComponent()
         {
             this.lblAfterEncoding = new System.Windows.Forms.Label();
-            this.newWorkerButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.cbAfterEncoding = new System.Windows.Forms.ComboBox();
             this.helpButton1 = new MeGUI.core.gui.HelpButton();
@@ -48,19 +47,6 @@ namespace MeGUI.core.details
             this.lblAfterEncoding.Text = "After encoding:";
             this.lblAfterEncoding.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // newWorkerButton
-            // 
-            this.newWorkerButton.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.newWorkerButton.AutoSize = true;
-            this.newWorkerButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.newWorkerButton.Location = new System.Drawing.Point(431, 3);
-            this.newWorkerButton.Name = "newWorkerButton";
-            this.newWorkerButton.Size = new System.Drawing.Size(74, 23);
-            this.newWorkerButton.TabIndex = 2;
-            this.newWorkerButton.Text = "New worker";
-            this.newWorkerButton.UseVisualStyleBackColor = true;
-            this.newWorkerButton.Click += new System.EventHandler(this.newWorkerButton_Click);
-            // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.AutoSize = true;
@@ -72,7 +58,6 @@ namespace MeGUI.core.details
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel1.Controls.Add(this.lblAfterEncoding, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.cbAfterEncoding, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.newWorkerButton, 2, 0);
             this.tableLayoutPanel1.Controls.Add(this.helpButton1, 3, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 521);
@@ -94,9 +79,9 @@ namespace MeGUI.core.details
             "Close MeGUI"});
             this.cbAfterEncoding.Location = new System.Drawing.Point(88, 4);
             this.cbAfterEncoding.Name = "cbAfterEncoding";
-            this.cbAfterEncoding.Size = new System.Drawing.Size(337, 21);
+            this.cbAfterEncoding.Size = new System.Drawing.Size(417, 21);
             this.cbAfterEncoding.TabIndex = 5;
-            this.cbAfterEncoding.SelectedIndexChanged += new System.EventHandler(this.cbAfterEncoding_SelectedIndexChanged);
+            this.cbAfterEncoding.SelectedIndexChanged += new System.EventHandler(this.CbAfterEncoding_SelectedIndexChanged);
             // 
             // helpButton1
             // 
@@ -117,9 +102,9 @@ namespace MeGUI.core.details
             this.jobQueue.Size = new System.Drawing.Size(553, 521);
             this.jobQueue.StartStopMode = MeGUI.core.gui.StartStopMode.Start;
             this.jobQueue.TabIndex = 0;
-            this.jobQueue.AbortClicked += new System.EventHandler(this.jobQueue_AbortClicked);
-            this.jobQueue.StartClicked += new System.EventHandler(this.jobQueue_StartClicked);
-            this.jobQueue.StopClicked += new System.EventHandler(this.jobQueue_StopClicked);
+            this.jobQueue.AbortClicked += new System.EventHandler(this.JobQueue_AbortClicked);
+            this.jobQueue.StartClicked += new System.EventHandler(this.JobQueue_StartClicked);
+            this.jobQueue.StopClicked += new System.EventHandler(this.JobQueue_StopClicked);
             // 
             // JobControl
             // 
@@ -141,7 +126,6 @@ namespace MeGUI.core.details
         private System.Windows.Forms.Label lblAfterEncoding;
         private MeGUI.core.gui.HelpButton helpButton1;
         private MeGUI.core.gui.JobQueue jobQueue;
-        private System.Windows.Forms.Button newWorkerButton;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.ComboBox cbAfterEncoding;
     }

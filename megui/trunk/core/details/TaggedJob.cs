@@ -55,7 +55,8 @@ namespace MeGUI.core.details
             get { return job; }
             set { job = value; }
         }
-        
+
+        [XmlIgnore]
         public string OwningWorker
         {
             get { return owningWorker; }

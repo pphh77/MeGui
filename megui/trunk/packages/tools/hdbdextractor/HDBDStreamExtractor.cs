@@ -338,7 +338,7 @@ namespace MeGUI.packages.tools.hdbdextractor
             else
                 job = new HDStreamsExJob(new List<string>(input), this.FolderOutputTextBox.Text, null, args.args, inputType);
 
-            MainForm.Instance.Jobs.addJobsToQueue(job);
+            MainForm.Instance.Jobs.AddJobsToQueue(job);
             if (this.closeOnQueue.Checked)
                 this.Close();
         }

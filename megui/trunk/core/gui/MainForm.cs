@@ -89,9 +89,9 @@ namespace MeGUI
 
         #endregion
 
-        public void RegisterForm(Form f)
-        {
-        }
+        //public void RegisterForm(Form f)
+        //{
+        //}
 
         public void DeleteOnClosing(string file)
         {
@@ -175,7 +175,7 @@ namespace MeGUI
             else if (MainForm.Instance.Settings.AutoUpdateServerSubList == 1)
                 this.TitleText += " DEVELOPMENT UPDATE SERVER";
             setGUIInfo();
-            Jobs.showAfterEncodingStatus(Settings);
+            Jobs.ShowAfterEncodingStatus(Settings);
             this.videoEncodingComponent1.FileType = MainForm.Instance.Settings.MainFileFormat;
 
             this.ClientSize = settings.MainFormSize;
@@ -231,7 +231,7 @@ namespace MeGUI
         /// <param name="e"></param>
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
-            if (jobControl1.IsAnyWorkerEncoding)
+            if (jobControl1.IsAnyWorkerRunning)
             {
                 e.Cancel = true; // abort closing
                 MessageBox.Show("Please close running jobs before you close MeGUI.", "Job in progress", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
@@ -511,7 +511,7 @@ namespace MeGUI
                 {
                     this.settings = sform.Settings;
                     this.saveSettings();
-                    Jobs.showAfterEncodingStatus(settings);
+                    Jobs.ShowAfterEncodingStatus(settings);
                 }
             }
         }
@@ -775,10 +775,10 @@ namespace MeGUI
             amw.Show();
         }
 
-        private void MeGUI_Load(object sender, EventArgs e)
-        {
-            RegisterForm(this);
-        }
+        //private void MeGUI_Load(object sender, EventArgs e)
+        //{
+        //    RegisterForm(this);
+        //}
 
         internal bool CloseSilent()
         {
@@ -793,7 +793,7 @@ namespace MeGUI
             this.saveSettings();
             _updateHandler.SaveSettings();
             UpdateCacher.RemoveOldFiles();
-            jobControl1.saveJobs();
+            jobControl1.SaveJobs();
             FileUtil.RemoveRuntimeFiles();
             this.saveLog();
             deleteFiles();
@@ -821,8 +821,8 @@ namespace MeGUI
         public void setGUIInfo()
         {
             fillMenus();
-            jobControl1.MainForm = this;
-            jobControl1.loadJobs();
+            //jobControl1.MainForm = this;
+            jobControl1.LoadJobs();
         }
 
         /// <summary>
@@ -1241,21 +1241,7 @@ namespace MeGUI
 
         private void viewSummary_Click(object sender, EventArgs e)
         {
-            if (viewSummary.Checked)
-            {
-                viewSummary.Checked = false;
-                Jobs.HideSummary();
-            }
-            else
-            {
-                viewSummary.Checked = true;
-                Jobs.ShowSummary();
-            }
-        }
-
-        private void createNewWorker_Click(object sender, EventArgs e)
-        {
-            Jobs.RequestNewWorker();
+            Jobs.ShowSummary();
         }
 
         private void showAllProgressWindows_Click(object sender, EventArgs e)
@@ -1302,7 +1288,7 @@ namespace MeGUI
                 {
                     this.settings = sform.Settings;
                     this.saveSettings();
-                    Jobs.showAfterEncodingStatus(settings);
+                    Jobs.ShowAfterEncodingStatus(settings);
                 }
             }
         }
@@ -1452,6 +1438,15 @@ namespace MeGUI
         {
             if (this.WindowState != FormWindowState.Minimized && this.Visible == true)
                 settings.MainFormSize = this.ClientSize;
+        }
+
+        private WorkerSettingsWindow oWorkerWindow;
+        private void workerSettings_Click(object sender, EventArgs e)
+        {
+            if (oWorkerWindow == null)
+                oWorkerWindow = new WorkerSettingsWindow();
+            oWorkerWindow.Show();
+            oWorkerWindow.BringToFront();
         }
     }
 }

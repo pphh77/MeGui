@@ -370,7 +370,7 @@ namespace MeGUI
                     }
 
                     c = CleanupJob.AddAfter(c, intermediateFiles, job.PostprocessingProperties.FinalOutput);
-                    MainForm.Instance.Jobs.addJobsWithDependencies(c, false);
+                    MainForm.Instance.Jobs.AddJobsWithDependencies(c, false);
 
                     // batch processing other input files if necessary
                     if (job.PostprocessingProperties.FilesToProcess.Count > 0)

@@ -92,7 +92,7 @@ namespace MeGUI.core.util
         {
             get
             {
-                return MainForm.Instance.Jobs.toStringList(VideoJobs).ToArray();
+                return MainForm.Instance.Jobs.ToStringList(VideoJobs).ToArray();
             }
             set {
                 _videoJobNames = value;
@@ -107,7 +107,7 @@ namespace MeGUI.core.util
             get
             {
                 if (videoJobs == null && _videoJobNames != null)
-                    videoJobs = MainForm.Instance.Jobs.toJobList(_videoJobNames);
+                    videoJobs = MainForm.Instance.Jobs.ToJobList(_videoJobNames);
                 return videoJobs;
             }
             set

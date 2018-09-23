@@ -27,11 +27,11 @@ using MeGUI.core.util;
 
 namespace MeGUI
 {
-    public delegate void WindowClosedCallback(bool hideOnly); // delegate for WindowClosed event
-    public delegate void AbortCallback(); // delegate for Abort event
+	public delegate void WindowClosedCallback(bool hideOnly); // delegate for WindowClosed event
+	public delegate void AbortCallback(); // delegate for Abort event
     public delegate void SuspendCallback(); // delegate for Suspend event
     public delegate void UpdateStatusCallback(StatusUpdate su); // delegate for UpdateStatus event
-    public delegate void PriorityChangedCallback(ProcessPriority priority); // delegate for PriorityChanged event
+	public delegate void PriorityChangedCallback(ProcessPriority priority); // delegate for PriorityChanged event
 
     /// <summary>
     /// ProgressWindow is a window that is being shown during encoding and shows the current encoding status
@@ -39,7 +39,6 @@ namespace MeGUI
     /// </summary>
     public partial class ProgressWindow : Form
     {
-        private bool isUserClosing;
         private bool bIsSuspended;
 
         #region start / stop & show / hide
@@ -54,25 +53,57 @@ namespace MeGUI
 
             if (OSInfo.IsWindows7OrNewer)
                 taskbarProgress = (ITaskbarList3)new ProgressTaskbar();
-        }
+		}
 
-        /// <summary>
-        /// handles the onclosing event
-        /// ensures that if the user closed the window, it will only be hidden
-        /// whereas if the system closed it, it is allowed to close
-        /// </summary>
-        /// <param name="e"></param>
+		/// <summary>
+		/// handles the onclosing event
+		/// ensures that if the user closed the window, it will only be hidden
+		/// whereas if the system closed it, it is allowed to close
+		/// </summary>
+		/// <param name="e"></param>
         protected override void OnClosing(CancelEventArgs e)
         {
+            this.Hide();
+
+            // possible to abort job
+            abortButton.Enabled = false;
+
+            // Current position
+            positionInClip.Text = "--- / ---";
+
+            // Current frame
+            currentVideoFrame.Text = "--- / ---";
+
+            // Data
+            videoData.Text = "--- / ---";
+
+            // Processing speed
+            fps.Text = "---";
+
+            TimeSpan oTimeSpan = new TimeSpan(0);
+
+            // Time elapsed 
+            // Now we use TotalHours to avoid 24h+ resets...
+            timeElapsed.Text = string.Format("{0:00}:{1:00}:{2:00}", (int)oTimeSpan.Hours, oTimeSpan.Minutes, oTimeSpan.Seconds);
+
+            // Estimated time
+            // go back to the old function ;-)
+            totalTime.Text = getTimeString(oTimeSpan, 0M);
+
+            this.Text = "Status: " + 0M.ToString("0.00") + " %";
+            statusLabel.Text = string.Empty;
+
+            jobNameLabel.Text = string.Empty;
+
+            progress.Value = 0;
+
+            btnSuspend.Text = "Suspend";
+            bIsSuspended = false;
+
             if (this.IsUserAbort)
-            {
                 e.Cancel = true;
-                this.Hide();
-            }
             else
-            {
                 base.OnClosing(e);
-            }
         }
 
         public void SetVisible(bool bShow)
@@ -146,6 +177,7 @@ namespace MeGUI
             catch (Exception) { }
         }
         #endregion
+
         #region helper methods
 
         /// <summary>
@@ -249,17 +281,6 @@ namespace MeGUI
             }
             else return true;
         }
-        #endregion
-        #region properties
-        /// <summary>
-        /// gets / sets whether the user closed this window or if the system is closing it
-        /// </summary>
-        public bool IsUserAbort
-        {
-            get { return isUserClosing; }
-            set { isUserClosing = value; }
-        }
-        #endregion
 
         private void ProgressWindow_VisibleChanged(object sender, EventArgs e)
         {
@@ -303,5 +324,18 @@ namespace MeGUI
             if (OSInfo.IsWindows7OrNewer)
                 taskbarProgress.SetProgressValue(this.Handle, 0, 100);
         }
+        #endregion
+
+        #region properties
+        /// <summary>
+        /// gets / sets whether the user closed this window or if the system is closing it
+        /// </summary>
+        private bool isUserClosing;
+        public bool IsUserAbort
+        {
+            get { return isUserClosing; }
+            set { isUserClosing = value; }
+        }
+        #endregion
     }
 }

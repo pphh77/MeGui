@@ -80,8 +80,8 @@ namespace MeGUI
             this.menuItem7 = new System.Windows.Forms.MenuItem();
             this.mnuViewMinimizeToTray = new System.Windows.Forms.MenuItem();
             this.menuItem1 = new System.Windows.Forms.MenuItem();
-            this.createNewWorker = new System.Windows.Forms.MenuItem();
             this.viewSummary = new System.Windows.Forms.MenuItem();
+            this.workerSettings = new System.Windows.Forms.MenuItem();
             this.mnuTools = new System.Windows.Forms.MenuItem();
             this.mnutoolsD2VCreator = new System.Windows.Forms.MenuItem();
             this.mnuOptions = new System.Windows.Forms.MenuItem();
@@ -431,21 +431,22 @@ namespace MeGUI
             // 
             this.menuItem1.Index = 2;
             this.menuItem1.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.createNewWorker,
-            this.viewSummary});
+            this.viewSummary,
+            this.workerSettings});
             this.menuItem1.Text = "Workers";
-            // 
-            // createNewWorker
-            // 
-            this.createNewWorker.Index = 0;
-            this.createNewWorker.Text = "Create new worker";
-            this.createNewWorker.Click += new System.EventHandler(this.createNewWorker_Click);
             // 
             // viewSummary
             // 
-            this.viewSummary.Index = 1;
-            this.viewSummary.Text = "Worker summary";
+            this.viewSummary.Index = 0;
+            this.viewSummary.RadioCheck = true;
+            this.viewSummary.Text = "Overview";
             this.viewSummary.Click += new System.EventHandler(this.viewSummary_Click);
+            // 
+            // workerSettings
+            // 
+            this.workerSettings.Index = 1;
+            this.workerSettings.Text = "Settings";
+            this.workerSettings.Click += new System.EventHandler(this.workerSettings_Click);
             // 
             // mnuTools
             // 
@@ -582,7 +583,6 @@ namespace MeGUI
             this.MinimumSize = new System.Drawing.Size(530, 537);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Load += new System.EventHandler(this.MeGUI_Load);
             this.Shown += new System.EventHandler(this.MainForm_Shown);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.MeGUI_DragDrop);
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.MeGUI_DragEnter);
@@ -635,7 +635,6 @@ namespace MeGUI
         private System.Windows.Forms.MenuItem mnuHelp;
         private System.Windows.Forms.MenuItem mnuChangelog;
         private System.Windows.Forms.MenuItem menuItem1;
-        private System.Windows.Forms.MenuItem createNewWorker;
         private System.Windows.Forms.MenuItem viewSummary;
         private System.Windows.Forms.MenuItem showAllProgressWindows;
         private System.Windows.Forms.MenuItem hideAllProgressWindows;
@@ -661,5 +660,6 @@ namespace MeGUI
         private System.Windows.Forms.MenuItem mnutoolsD2VCreator;
         private MeGUI.core.details.JobControl jobControl1;
         private MeGUI.core.gui.LogTree logTree1;
+        private System.Windows.Forms.MenuItem workerSettings;
     }
 }

@@ -597,7 +597,7 @@ namespace MeGUI
                 case IndexType.D2V:
                     {
                         prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(generateD2VIndexJob(videoInput)));
-                        MainForm.Instance.Jobs.addJobsWithDependencies(prepareJobs, true);
+                        MainForm.Instance.Jobs.AddJobsWithDependencies(prepareJobs, true);
                         if (this.closeOnQueue.Checked)
                             this.Close();
                         break;
@@ -605,7 +605,7 @@ namespace MeGUI
                 case IndexType.DGI:
                     {
                         prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(generateDGNVIndexJob(videoInput)));
-                        MainForm.Instance.Jobs.addJobsWithDependencies(prepareJobs, true);
+                        MainForm.Instance.Jobs.AddJobsWithDependencies(prepareJobs, true);
                         if (this.closeOnQueue.Checked)
                             this.Close();
                         break;
@@ -613,7 +613,7 @@ namespace MeGUI
                 case IndexType.DGM:
                     {
                         prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(generateDGMIndexJob(videoInput)));
-                        MainForm.Instance.Jobs.addJobsWithDependencies(prepareJobs, true);
+                        MainForm.Instance.Jobs.AddJobsWithDependencies(prepareJobs, true);
                         if (this.closeOnQueue.Checked)
                             this.Close();
                         break;
@@ -635,7 +635,7 @@ namespace MeGUI
                             }
                         }
                         prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(job));
-                        MainForm.Instance.Jobs.addJobsWithDependencies(prepareJobs, true);
+                        MainForm.Instance.Jobs.AddJobsWithDependencies(prepareJobs, true);
                         if (this.closeOnQueue.Checked)
                             this.Close();
                         break;
@@ -657,7 +657,7 @@ namespace MeGUI
                             }
                         }
                         prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(job));
-                        MainForm.Instance.Jobs.addJobsWithDependencies(prepareJobs, true);
+                        MainForm.Instance.Jobs.AddJobsWithDependencies(prepareJobs, true);
                         if (this.closeOnQueue.Checked)
                             this.Close();
                         break;

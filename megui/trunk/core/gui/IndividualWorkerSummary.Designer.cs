@@ -33,14 +33,11 @@ namespace MeGUI.core.gui
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.startEncodingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pauseResumeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.abortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.shutDownLaterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.shutDownToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.showProgressWindowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.renameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pauseResumeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.workerNameAndJob.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -72,75 +69,51 @@ namespace MeGUI.core.gui
             this.pauseResumeToolStripMenuItem,
             this.stopToolStripMenuItem,
             this.abortToolStripMenuItem,
-            this.shutDownLaterToolStripMenuItem,
-            this.shutDownToolStripMenuItem,
             this.toolStripSeparator1,
-            this.showProgressWindowToolStripMenuItem,
-            this.renameToolStripMenuItem});
+            this.showProgressWindowToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(288, 208);
-            this.contextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip1_Opening);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(288, 230);
+            this.contextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.ContextMenuStrip1_Opening);
             // 
             // startEncodingToolStripMenuItem
             // 
             this.startEncodingToolStripMenuItem.Name = "startEncodingToolStripMenuItem";
-            this.startEncodingToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
+            this.startEncodingToolStripMenuItem.Size = new System.Drawing.Size(281, 22);
             this.startEncodingToolStripMenuItem.Text = "Start worker";
-            this.startEncodingToolStripMenuItem.Click += new System.EventHandler(this.startEncodingToolStripMenuItem_Click);
+            this.startEncodingToolStripMenuItem.Click += new System.EventHandler(this.StartEncodingToolStripMenuItem_Click);
+            // 
+            // stopToolStripMenuItem
+            // 
+            this.stopToolStripMenuItem.Name = "stopToolStripMenuItem";
+            this.stopToolStripMenuItem.Size = new System.Drawing.Size(281, 22);
+            this.stopToolStripMenuItem.Text = "Stop worker after the current job";
+            this.stopToolStripMenuItem.Click += new System.EventHandler(this.StopToolStripMenuItem_Click);
+            // 
+            // abortToolStripMenuItem
+            // 
+            this.abortToolStripMenuItem.Name = "abortToolStripMenuItem";
+            this.abortToolStripMenuItem.Size = new System.Drawing.Size(281, 22);
+            this.abortToolStripMenuItem.Text = "Abort job and stop worker immediately";
+            this.abortToolStripMenuItem.Click += new System.EventHandler(this.AbortToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(278, 6);
+            // 
+            // showProgressWindowToolStripMenuItem
+            // 
+            this.showProgressWindowToolStripMenuItem.Name = "showProgressWindowToolStripMenuItem";
+            this.showProgressWindowToolStripMenuItem.Size = new System.Drawing.Size(281, 22);
+            this.showProgressWindowToolStripMenuItem.Text = "Show progress window";
+            this.showProgressWindowToolStripMenuItem.Click += new System.EventHandler(this.ShowProgressWindowToolStripMenuItem_Click);
             // 
             // pauseResumeToolStripMenuItem
             // 
             this.pauseResumeToolStripMenuItem.Name = "pauseResumeToolStripMenuItem";
             this.pauseResumeToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
             this.pauseResumeToolStripMenuItem.Text = "Suspend worker";
-            this.pauseResumeToolStripMenuItem.Click += new System.EventHandler(this.pauseResumeToolStripMenuItem_Click);
-            // 
-            // stopToolStripMenuItem
-            // 
-            this.stopToolStripMenuItem.Name = "stopToolStripMenuItem";
-            this.stopToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
-            this.stopToolStripMenuItem.Text = "Stop worker after the current job";
-            this.stopToolStripMenuItem.Click += new System.EventHandler(this.stopToolStripMenuItem_Click);
-            // 
-            // abortToolStripMenuItem
-            // 
-            this.abortToolStripMenuItem.Name = "abortToolStripMenuItem";
-            this.abortToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
-            this.abortToolStripMenuItem.Text = "Abort job and stop worker immediately";
-            this.abortToolStripMenuItem.Click += new System.EventHandler(this.abortToolStripMenuItem_Click);
-            // 
-            // shutDownLaterToolStripMenuItem
-            // 
-            this.shutDownLaterToolStripMenuItem.Name = "shutDownLaterToolStripMenuItem";
-            this.shutDownLaterToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
-            this.shutDownLaterToolStripMenuItem.Text = "Delete worker when finished local queue";
-            this.shutDownLaterToolStripMenuItem.Click += new System.EventHandler(this.shutDownLaterToolStripMenuItem_Click);
-            // 
-            // shutDownToolStripMenuItem
-            // 
-            this.shutDownToolStripMenuItem.Name = "shutDownToolStripMenuItem";
-            this.shutDownToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
-            this.shutDownToolStripMenuItem.Text = "Delete worker now";
-            this.shutDownToolStripMenuItem.Click += new System.EventHandler(this.shutDownToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(284, 6);
-            // 
-            // showProgressWindowToolStripMenuItem
-            // 
-            this.showProgressWindowToolStripMenuItem.Name = "showProgressWindowToolStripMenuItem";
-            this.showProgressWindowToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
-            this.showProgressWindowToolStripMenuItem.Text = "Show progress window";
-            this.showProgressWindowToolStripMenuItem.Click += new System.EventHandler(this.showProgressWindowToolStripMenuItem_Click);
-            // 
-            // renameToolStripMenuItem
-            // 
-            this.renameToolStripMenuItem.Name = "renameToolStripMenuItem";
-            this.renameToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
-            this.renameToolStripMenuItem.Text = "Rename worker";
-            this.renameToolStripMenuItem.Click += new System.EventHandler(this.renameToolStripMenuItem_Click);
+            this.pauseResumeToolStripMenuItem.Click += new System.EventHandler(this.PauseResumeToolStripMenuItem_Click);
             // 
             // IndividualWorkerSummary
             // 
@@ -166,11 +139,8 @@ namespace MeGUI.core.gui
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem startEncodingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem abortToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem renameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem stopToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem shutDownToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem showProgressWindowToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem shutDownLaterToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem pauseResumeToolStripMenuItem;
     }

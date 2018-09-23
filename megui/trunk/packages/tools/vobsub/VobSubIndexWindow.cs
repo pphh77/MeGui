@@ -92,7 +92,7 @@ namespace MeGUI
                     if (!dialogMode)
                     {
                         SubtitleIndexJob job = generateJob();
-                        MainForm.Instance.Jobs.addJobsToQueue(job);
+                        MainForm.Instance.Jobs.AddJobsToQueue(job);
                         if (this.closeOnQueue.Checked)
                             this.Close();
                     }

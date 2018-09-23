@@ -20,16 +20,18 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using System.Linq;
 
 using MeGUI.core.util;
 using MeGUI.core.gui;
 
 namespace MeGUI.core.details
 {
+    public enum JobStartInfo { JOB_STARTED, NO_JOBS_WAITING, COULDNT_START }
+
     public partial class JobControl : UserControl
     {
         private Dictionary<string, TaggedJob> allJobs = new Dictionary<string, TaggedJob>(); //storage for all the jobs and profiles known to the system
@@ -39,14 +41,32 @@ namespace MeGUI.core.details
         private AfterEncoding currentAfterEncoding;
         static readonly object resourceLock = new object();
 
+        public JobControl()
+        {
+            InitializeComponent();
+            mainForm = MainForm.Instance;
+            AddClearButton();
+            AddSendToTemporaryWorkerMenuItem();
+            jobQueue.RequestJobDeleted = new RequestJobDeleted(this.DeleteJob);
+            summary = new WorkerSummary();
+        }
+
         #region public interface: process windows, start/stop/abort
+
+        /// <summary>
+        /// shows all process windows
+        /// </summary>
         public void ShowAllProcessWindows()
         {
             foreach (JobWorker w in workers.Values)
-                if (w.IsProgressWindowAvailable) 
+                if (w.IsProgressWindowAvailable)
                     w.ShowProcessWindow();
         }
 
+
+        /// <summary>
+        /// hides all process windows
+        /// </summary>
         public void HideAllProcessWindows()
         {
             foreach (JobWorker w in workers.Values)
@@ -65,81 +85,133 @@ namespace MeGUI.core.details
             this.Invoke((System.Action)delegate { oProgress.Visible = bShow; });
         }
 
+        /// <summary>
+        /// aborts all running workers
+        /// </summary>
         public void AbortAll()
         {
             foreach (JobWorker worker in workers.Values)
-                if (worker.IsEncoding)
+                if (worker.IsRunning)
                     worker.Abort();
-            refresh();
+            RefreshStatus();
         }
 
+        /// <summary>
+        /// starts all workers
+        /// </summary>
+        /// <param name="restartStopping">true if also stopping workers should be started</param>
         public void StartAll(bool restartStopping)
         {
-            if (workers.Values.Count == 0)
-                NewWorker(freeWorkerName(), false);
-
             foreach (JobWorker w in workers.Values)
             {
-                if (!w.IsEncoding)
+                if (!w.IsRunning)
                     w.StartEncoding(false);
                 else if (restartStopping && w.Status == JobWorkerStatus.Stopping)
                     w.SetRunning();
             }
-            refresh();
+            RefreshStatus();
         }
 
+        /// <summary>
+        /// sets all workers to stop after the current job
+        /// </summary>
         public void StopAll()
         {
             foreach (JobWorker w in workers.Values)
-                if (w.IsEncoding) 
+                if (w.IsRunning) 
                     w.SetStopping();
-            refresh();
+            RefreshStatus();
         }
         #endregion
 
-        public JobControl()
+        /// <summary>
+        /// adjusts the worker count either after a job has finished or if the maximum worker number has been changed
+        /// </summary>
+        /// <param name="startIdleWorkers">if true idle workers will be started</param>
+        public void AdjustWorkerCount(bool startIdleWorkers)
         {
-            InitializeComponent();
-            addClearButton();
-            addSendToWorkerMenuItems();
-            addSendToTemporaryWorkerMenuItem();
-            jobQueue.RequestJobDeleted = new RequestJobDeleted(this.DeleteJob);
-            summary = new WorkerSummary(this);
+            lock (mainForm.Jobs.ResourceLock)
+            {
+                // remove workers if needed
+                if (workers.Values.Count > MainForm.Instance.Settings.WorkerMaximumCount)
+                {
+                    foreach (string key in workers.Keys.Reverse())
+                    {
+                        if (!workers.TryGetValue(key, out JobWorker worker))
+                            continue;
+
+                        if (!worker.IsRunning)
+                        {
+                            worker.ShutDown();
+                            if (workers.Values.Count <= MainForm.Instance.Settings.WorkerMaximumCount)
+                                break;
+                        }
+                    }
+                }
+
+                // add workers if needed
+                while (workers.Values.Count < MainForm.Instance.Settings.WorkerMaximumCount)
+                    NewWorker("Worker");
+
+                // check if any jobs can be started
+                if (startIdleWorkers)
+                    StartIdleWorkers();
+            }
         }
 
+        /// <summary>
+        /// created a new worker
+        /// </summary>
+        /// <param name="name">prefix of the worker name</param>
+        /// <returns>the new worker</returns>
+        private JobWorker NewWorker(string prefix)
+        {
+            int num = 0;
+            string name;
+            do
+            {
+                name = prefix + " " + ++num;
+            } while (workers.ContainsKey(name));
+
+            JobWorker w = new JobWorker(mainForm);
+            w.Name = name;
+            w.WorkerFinishedJobs += new EventHandler(WorkerFinishedJobs);
+            workers.Add(w.Name, w);
+            summary.Add(w);
+            return w;
+        }
+
+        /// <summary>
+        /// lock object
+        /// </summary>
         public object ResourceLock
         {
             get { return resourceLock; }
         }
 
-        private void addSendToTemporaryWorkerMenuItem()
+        /// <summary>
+        /// adds the "run in new temporary worker" menu item
+        /// </summary>
+        private void AddSendToTemporaryWorkerMenuItem()
         {
-            jobQueue.AddMenuItem("Run in new temporary worker", null, new MultiJobHandler(
-                delegate(List<TaggedJob> jobs)
+            jobQueue.AddMenuItem("Run in new temporary worker", null, new SingleJobHandler(
+                delegate(TaggedJob job)
                 {
-                    // find a good name
-                    int number = 0;
-                    string name;
-                    do
-                    {
-                        number++;
-                        name = "Temporary worker " + number;
-                    } while (workers.ContainsKey(name));
-                    JobWorker w = NewWorker(name, false);
-
-                    foreach (TaggedJob j in jobs)
-                    {
-                        ReleaseJob(j);
-                        w.AddJob(j);
-                    }
-                    this.refresh();
+                    JobWorker w = NewWorker("Temporary worker");
+                    ReleaseJob(job);
+                    w.AddJob(job);
+                    this.RefreshStatus();
                     w.Mode = JobWorkerMode.CloseOnLocalListCompleted;
                     w.IsTemporaryWorker = true;
                     w.StartEncoding(true);
                 }));
         }
 
-        internal void ReleaseJob(TaggedJob j)
+        /// <summary>
+        /// unassigns 
+        /// </summary>
+        /// <param name="j"></param>
+        public void ReleaseJob(TaggedJob j)
         {
             if (j.OwningWorker == null)
                 return;
@@ -147,88 +219,68 @@ namespace MeGUI.core.details
             workers[j.OwningWorker].RemoveJobFromQueue(j);
             j.OwningWorker = null;
             if (!jobQueue.HasJob(j))
-                jobQueue.queueJob(j);
-            refresh();
-        }
-
-        class SendToWorkerThunk
-        {
-            JobControl c;
-            JobWorker w;
-            public void handleEvent(List<TaggedJob> jobs)
-            {
-                foreach (TaggedJob j in jobs)
-                {
-                    if (j.Status == JobStatus.PROCESSING || j.Status == JobStatus.PAUSED || j.Status == JobStatus.ABORTING)
-                    {
-                        MessageBox.Show("Can't move '" + j.Name + "' because it is currently processing.", "Can't move job", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        continue;
-                    }
-                    if (j.OwningWorker == w.Name)
-                        continue;
-
-                    c.ReleaseJob(j);
-
-                    w.AddJob(j);
-                    j.OwningWorker = w.Name;
-                }
-                c.refresh();
-            }
-
-            public SendToWorkerThunk(JobWorker w, JobControl c)
-            {
-                this.c = c;
-                this.w = w;
-            }
-        }
-
-        private void addSendToWorkerMenuItems()
-        {
-            jobQueue.AddDynamicSubMenu("Send to worker", null,
-                new MultiJobMenuGenerator(delegate
-            {
-                Pair<string, MultiJobHandler>[] list = new Pair<string, MultiJobHandler>[workers.Count];
-                int i = 0;
-                foreach (JobWorker w in workers.Values)
-                {
-                    list[i] = new Pair<string, MultiJobHandler>(w.Name,
-                        new MultiJobHandler((new SendToWorkerThunk(w, this)).handleEvent));
-                    i++;
-                }
-                return list;
-            }));
-        }                
+                jobQueue.QueueJob(j);
+            RefreshStatus();
+        }            
 
         #region properties
-        public MainForm MainForm
+        /// <summary>
+        /// true if any worker is currently running a job
+        /// </summary>
+        public bool IsAnyWorkerRunning
         {
-            set
+            get
             {
-                mainForm = value;
-                mainForm.RegisterForm(summary);
+                foreach (JobWorker w in workers.Values)
+                    if (w.IsRunning) 
+                        return true;
+                return false;
             }
         }
 
-        public bool IsAnyWorkerEncoding
+        /// <summary>
+        /// count of all workers
+        /// </summary>
+        public int WorkersCount
         {
             get
             {
-                foreach (JobWorker w in workers.Values)
-                    if (w.IsEncoding) 
-                        return true;
-                return false;
+                return workers.Values.Count;
             }
         }
-        public bool IsAnyWorkerEncodingAudio
+
+        /// <summary>
+        /// checks if the job can be started based on the worker rule set(s)
+        /// </summary>
+        /// <param name="oJob"></param>
+        /// <returns>true if the new job can be started</returns>
+        public bool CanNewJobBeStarted(Job oJob)
         {
-            get
+            foreach (WorkerSettings oSettings in MainForm.Instance.Settings.WorkerSettings)
             {
+                int iMax = oSettings.MaxCount;
+                if (iMax <= 0)
+                    continue;
+
+                // check if the job which should be started is one of the blocked types
+                if (!oSettings.IsBlockedJob(oJob))
+                    continue;
+
                 foreach (JobWorker w in workers.Values)
-                    if (w.IsEncodingAudio) 
-                        return true;
-                return false;
+                {
+                    if (w.IsRunningBlockedJob(oSettings))
+                        iMax--;
+                }
+
+                if (iMax <= 0)
+                    return false;
             }
+            return true;
         }
+
+        /// <summary>
+        /// what should happen after all jobs are finished
+        /// </summary>
         public AfterEncoding CurrentAfterEncoding
         {
             get
@@ -239,12 +291,20 @@ namespace MeGUI.core.details
         #endregion
 
         #region Clear button
-        private void addClearButton()
+        /// <summary>
+        /// adds the button to remove all jobs from the queue
+        /// </summary>
+        private void AddClearButton()
         {
-            jobQueue.AddButton("Clear", new EventHandler(deleteAllJobsButton_Click));
+            jobQueue.AddButton("Clear", new EventHandler(DeleteAllJobsButton_Click));
         }
 
-        private void deleteAllJobsButton_Click(object sender, EventArgs e)
+        /// <summary>
+        /// if fired all jobs will be deleted
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DeleteAllJobsButton_Click(object sender, EventArgs e)
         {
             int incompleteJobs = 0;
             DialogResult dr = DialogResult.No;
@@ -264,12 +324,16 @@ namespace MeGUI.core.details
             foreach (TaggedJob j in jobList)
             {
                 if (dr == DialogResult.Yes || j.Status == JobStatus.DONE)
-                    reallyDeleteJob(j);
+                    ReallyDeleteJob(j);
             }
         }
         #endregion
         #region deleting jobs
-        internal void DeleteJob(TaggedJob job)
+        /// <summary>
+        /// deletes a selected job
+        /// </summary>
+        /// <param name="job">job to delete</param>
+        public void DeleteJob(TaggedJob job)
         {
             if (job.Status == JobStatus.PROCESSING || job.Status == JobStatus.PAUSED || job.Status == JobStatus.ABORTING)
             {
@@ -279,7 +343,7 @@ namespace MeGUI.core.details
 
             if (job.EnabledJobs.Count == 0 && job.RequiredJobs.Count == 0)
             {
-                reallyDeleteJob(job);
+                ReallyDeleteJob(job);
                 return;
             }
 
@@ -294,17 +358,18 @@ namespace MeGUI.core.details
             switch (dr)
             {
                 case DialogResult.Yes: // Delete all dependent jobs
-                    deleteAllDependantJobs(job);
+                    DeleteAllDependantJobs(job);
                     break;
 
                 case DialogResult.No: // Just delete the single job
-                    reallyDeleteJob(job);
+                    ReallyDeleteJob(job);
                     break;
 
                 case DialogResult.Cancel: // do nothing
                     break;
             }
         }
+
         /// <summary>
         /// removes this job, and any previous jobs that belong to a series of jobs from the
         /// queue, then update the queue positions
@@ -312,10 +377,14 @@ namespace MeGUI.core.details
         /// <param name="job">the job to be removed</param>
         internal void RemoveCompletedJob(TaggedJob job)
         {
-            reallyDeleteJob(job);
+            ReallyDeleteJob(job);
         }
 
-        private void reallyDeleteJob(TaggedJob job)
+        /// <summary>
+        /// force deletion of the selected job without dependencies
+        /// </summary>
+        /// <param name="job">job to delete</param>
+        private void ReallyDeleteJob(TaggedJob job)
         {
             if (job.Status == JobStatus.PROCESSING || job.Status == JobStatus.PAUSED || job.Status == JobStatus.ABORTING) 
                 return;
@@ -342,7 +411,7 @@ namespace MeGUI.core.details
                     workers[job.OwningWorker].RemoveJobFromQueue(job);
 
                 if (jobQueue.HasJob(job))
-                    jobQueue.removeJobFromQueue(job);
+                    jobQueue.RemoveJobFromQueue(job);
 
                 foreach (TaggedJob p in job.RequiredJobs)
                     p.EnabledJobs.Remove(job);
@@ -359,124 +428,75 @@ namespace MeGUI.core.details
             }
         }
 
-        private void deleteAllDependantJobs(TaggedJob job)
+        /// <summary>
+        /// delete also all dependent jobs
+        /// </summary>
+        /// <param name="job">job to delete</param>
+        private void DeleteAllDependantJobs(TaggedJob job)
         {
-            reallyDeleteJob(job);
+            ReallyDeleteJob(job);
 
             foreach (TaggedJob j in job.EnabledJobs)
-                deleteAllDependantJobs(j);
+                DeleteAllDependantJobs(j);
 
             foreach (TaggedJob j in job.RequiredJobs)
-                deleteAllDependantJobs(j);
+                DeleteAllDependantJobs(j);
         }
         #endregion
 
-        public void refresh()
+        /// <summary>
+        /// refresh status
+        /// </summary>
+        public void RefreshStatus()
         {
-            jobQueue.refreshQueue();
+            jobQueue.RefreshQueue();
             summary.RefreshInfo();
         }
-
-        public void StartPostponedWorkers()
-        {
-            foreach (JobWorker w in workers.Values)
-                if (w.Status == JobWorkerStatus.Postponed)
-                    w.StartEncoding(false);
-        }
-            
+        
+        /// <summary>
+        /// start all idle workers
+        /// </summary>
         public void StartIdleWorkers()
         {
             // start idle and postponed workers if required
             foreach (JobWorker w in workers.Values)
-                if (!w.IsEncoding && ((w.Status == JobWorkerStatus.Idle && MainForm.Instance.Settings.AutoStartQueue) || w.Status == JobWorkerStatus.Postponed))
+                if (!w.IsRunning && ((w.Status == JobWorkerStatus.Idle && MainForm.Instance.Settings.AutoStartQueue) || w.Status == JobWorkerStatus.Postponed))
                     w.StartEncoding(false);
         }
 
         #region saving / loading jobs
-        internal List<string> toStringList(IEnumerable<TaggedJob> jobList)
+        public List<string> ToStringList(IEnumerable<TaggedJob> jobList)
         {
             List<string> strings = new List<string>();
             foreach (TaggedJob j in jobList)
                 strings.Add(j.Name);
             return strings;
         }
+
         /// <summary>
         /// saves all the jobs in the queue
         /// </summary>
-        public void saveJobs()
+        public void SaveJobs()
         {
             lock (mainForm.Jobs.ResourceLock)
             {
                 foreach (TaggedJob job in allJobs.Values)
                 {
-                    job.EnabledJobNames = toStringList(job.EnabledJobs);
-                    job.RequiredJobNames = toStringList(job.RequiredJobs);
-                    saveJob(job, mainForm.MeGUIPath);
+                    job.EnabledJobNames = ToStringList(job.EnabledJobs);
+                    job.RequiredJobNames = ToStringList(job.RequiredJobs);
+                    SaveJob(job, mainForm.MeGUIPath);
                 }
-                saveJobLists();
+
+                JobListSerializer s = new JobListSerializer();
+                s.mainJobList = ToStringList(jobQueue.JobList);
+                string path = Path.Combine(mainForm.MeGUIPath, "joblists.xml");
+                Util.XmlSerialize(s, path);
             }
         }
 
         public class JobListSerializer
         {
             public List<string> mainJobList = new List<string>();
-            public List<Pair<string, List<string>>> workersAndTheirJobLists = new List<Pair<string,List<string>>>(); 
-        }
-
-        private void saveJobLists()
-        {
-            JobListSerializer s = new JobListSerializer();
-            s.mainJobList = toStringList(jobQueue.JobList);
-
-            foreach (JobWorker w in workers.Values)
-                s.workersAndTheirJobLists.Add(new Pair<string, List<string>>(
-                    w.Name,
-                    toStringList(w.Jobs)));
-            string path = Path.Combine(mainForm.MeGUIPath, "joblists.xml");
-
-            Util.XmlSerialize(s, path);
-        }
-
-        private void loadJobLists()
-        {
-            string path = Path.Combine(mainForm.MeGUIPath, "joblists.xml");
-
-            JobListSerializer s = Util.XmlDeserializeOrDefault<JobListSerializer>(path);
-            jobQueue.JobList = toJobList(s.mainJobList);
-
-            foreach (Pair<string, List<string>> p in s.workersAndTheirJobLists)
-            {
-                JobWorkerMode mode = JobWorkerMode.RequestNewJobs;
-                bool bIsTemporaryWorker = false;
-                if (p.fst.StartsWith("Temporary worker "))
-                {
-                    if (p.snd.Count == 0) 
-                        continue;
-                    mode = JobWorkerMode.CloseOnLocalListCompleted;
-                    bIsTemporaryWorker = true;
-                }
-                JobWorker w = NewWorker(p.fst, false);
-                w.Mode = mode;
-                w.IsTemporaryWorker = bIsTemporaryWorker;
-
-                // check if there are any unassigned jobs which belongs to this worker
-                foreach (TaggedJob oJob in allJobs.Values)
-                {
-                    if (w.Name.Equals(oJob.OwningWorker) && !p.snd.Contains(oJob.Name))
-                        p.snd.Add(oJob.Name);
-                }
-
-                IEnumerable<TaggedJob> list = toJobList(p.snd);
-                foreach (TaggedJob j in list)
-                    w.AddJob(j);
-            }
-
-            // check if there are any assigned jobs which have no existing worker
-            foreach (TaggedJob oJob in allJobs.Values)
-            {
-                if (oJob.OwningWorker != null && !workers.ContainsKey(oJob.OwningWorker))
-                    oJob.OwningWorker = null;
-            }
         }
 
         /// <summary>
@@ -484,7 +504,7 @@ namespace MeGUI.core.details
         /// upon loading, the jobs are ordered according to their position field
         /// so that the order in which the jobs were previously shown in the GUI is preserved
         /// </summary>
-        public void loadJobs()
+        public void LoadJobs()
         {
             string jobsPath = Path.Combine(mainForm.MeGUIPath, "jobs");
             DirectoryInfo di = FileUtil.ensureDirectoryExists(jobsPath);
@@ -492,7 +512,7 @@ namespace MeGUI.core.details
             foreach (FileInfo fi in files)
             {
                 string fileName = fi.FullName;
-                TaggedJob job = loadJob(fileName);
+                TaggedJob job = LoadJob(fileName);
                 if (job != null && job.Name != null)
                 {
                     if (allJobs.ContainsKey(job.Name))
@@ -508,13 +528,25 @@ namespace MeGUI.core.details
                 if (job.Status == JobStatus.PROCESSING || job.Status == JobStatus.PAUSED || job.Status == JobStatus.ABORTING)
                     job.Status = JobStatus.ABORTED;
 
-                job.RequiredJobs = toJobList(job.RequiredJobNames);
-                job.EnabledJobs = toJobList(job.EnabledJobNames);
+                job.RequiredJobs = ToJobList(job.RequiredJobNames);
+                job.EnabledJobs = ToJobList(job.EnabledJobNames);
             }
-            loadJobLists();
+
+            string path = Path.Combine(mainForm.MeGUIPath, "joblists.xml");
+            JobListSerializer s = Util.XmlDeserializeOrDefault<JobListSerializer>(path);
+            jobQueue.JobList = ToJobList(s.mainJobList);
+
+            foreach (TaggedJob job in allJobs.Values)
+            {
+                if (jobQueue.HasJob(job))
+                    continue;
+                jobQueue.QueueJob(job);
+            }
+
+            AdjustWorkerCount(false);
         }
 
-        internal List<TaggedJob> toJobList(IEnumerable<string> list)
+        public List<TaggedJob> ToJobList(IEnumerable<string> list)
         {
             List<TaggedJob> jobList = new List<TaggedJob>();
             foreach (string name in list)
@@ -532,25 +564,24 @@ namespace MeGUI.core.details
         }
 
         #region individual job saving and loading
-        #region loading and saving jobs
         /// <summary>
         /// saves a job to programdirectory\jobs\jobname.xml
         /// using the XML Serializer we get a humanly readable file
         /// </summary>
         /// <param name="job">the Job object to be saved</param>
         /// <param name="path">The path where the program was launched from</param>
-        internal void saveJob(TaggedJob job, string path)
+        public void SaveJob(TaggedJob job, string path)
         {
-            string fileName = Path.Combine(path, "jobs");
-                   fileName = Path.Combine(fileName, job.Name + ".xml");
+            string fileName = Path.Combine(Path.Combine(path, "jobs"), job.Name + ".xml");
             Util.XmlSerialize(job, fileName);
         }
+
         /// <summary>
         /// loads a job with a given name from programdirectory\jobs\jobname.xml
         /// </summary>
         /// <param name="name">name of the job to be loaded (corresponds to the filename)</param>
         /// <returns>the Job object that was read from the harddisk</returns>
-        internal TaggedJob loadJob(string name)
+        private TaggedJob LoadJob(string name)
         {
             XmlSerializer ser = null;
             using (Stream s = File.OpenRead(name))
@@ -579,72 +610,60 @@ namespace MeGUI.core.details
             }
         }
         #endregion
-        #endregion
-        #endregion
-        #region free job name
-        /// <summary>
-        /// looks up the first free job number
-        /// </summary>
-        /// <returns>the job number that can be attributed to the next job to be added to the queue</returns>
-        private string getFreeJobName()
-        {
-            int jobNr = 1;
-            string name = "";
-            while (true)
-            {
-                name = "job" + jobNr;
-                if (!allJobs.ContainsKey(name))
-                    return name;
-                jobNr++;
-            }
-        }
+
         #endregion
         
         #region adding jobs to queue
-        public void addJobsWithDependencies(JobChain c, bool bStartQueue)
+        public void AddJobsWithDependencies(JobChain c, bool bStartQueue)
         {
             if (c == null)
                 return;
 
             foreach (TaggedJob j in c.Jobs)
-                addJob(j);
-            saveJobs();
+                AddJob(j);
+            SaveJobs();
             if (mainForm.Settings.AutoStartQueue && bStartQueue)
                 StartAll(false);
-            refresh();
+            RefreshStatus();
         }
 
         /// <summary>
         /// adds a job to the Queue (Hashtable) and the listview for graphical display
         /// </summary>
         /// <param name="job">the Job to be added to the next free spot in the queue</param>
-        public void addJobsToQueue(params Job[] jobs)
+        public void AddJobsToQueue(params Job[] jobs)
         {
             foreach (Job j in jobs)
-                addJob(new TaggedJob(j));
-            saveJobs();
+                AddJob(new TaggedJob(j));
+            SaveJobs();
             if (mainForm.Settings.AutoStartQueue)
                 StartAll(false);
-            refresh();
+            RefreshStatus();
         }
 
-        private void addJob(TaggedJob job)
+        private void AddJob(TaggedJob job)
         {
             lock (mainForm.Jobs.ResourceLock)
             {
-                job.Name = getFreeJobName();
+                int jobNr = 1;
+                string name = "";
+                while (true)
+                {
+                    name = "job" + jobNr;
+                    if (!allJobs.ContainsKey(name))
+                    {
+                        job.Name = name;
+                        break;
+                    }
+                    jobNr++;
+                }
                 allJobs[job.Name] = job;
-                jobQueue.queueJob(job);
+                jobQueue.QueueJob(job);
             }
         }
         #endregion
 
-        private void updateProcessingStatus()
-        {
-            throw new Exception();
-        }
-
-        internal void showAfterEncodingStatus(MeGUISettings Settings)
+        public void ShowAfterEncodingStatus(MeGUISettings Settings)
         {
             currentAfterEncoding = Settings.AfterEncoding;
             cbAfterEncoding.SelectedIndex = (int) currentAfterEncoding;
@@ -660,7 +679,7 @@ namespace MeGUI.core.details
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        internal TaggedJob ByName(string p)
+        public TaggedJob ByName(string p)
         {
             return allJobs[p];
         }
@@ -670,7 +689,7 @@ namespace MeGUI.core.details
         /// </summary>
         /// <param name="j"></param>
         /// <returns></returns>
-        internal bool areDependenciesMet(TaggedJob j)
+        public bool AreDependenciesMet(TaggedJob j)
         {
             foreach (TaggedJob job in j.RequiredJobs)
                 if (job.Status != JobStatus.DONE && job.Status != JobStatus.SKIP)
@@ -685,7 +704,7 @@ namespace MeGUI.core.details
         /// is set to 'waiting', and which isn't owned by any JobWorkers
         /// </summary>
         /// <returns></returns>
-        internal TaggedJob getJobToProcess()
+        public TaggedJob GetJobToProcess()
         {
             lock (nextJobLock)
             {
@@ -693,169 +712,72 @@ namespace MeGUI.core.details
                 {
                     if (job.Status == JobStatus.WAITING &&
                         job.OwningWorker == null &&
-                        areDependenciesMet(job))
-                        //(!IsAnyWorkerEncodingAudio || !job.Job.EncodingMode.Equals("audio")))
+                        AreDependenciesMet(job) &&
+                        mainForm.Jobs.CanNewJobBeStarted(job.Job))
                         return job;
                 }
                 return null;
             }
         }
 
-        internal void RenameWorker(string name, string value)
-        {
-            if (workers.ContainsKey(value))
-                throw new NameTakenException(value);
-
-            JobWorker w = workers[name];
-            w.Name = value;
-            workers.Remove(name);
-            workers[value] = w;
-            summary.Rename(name, value);
-
-            foreach (TaggedJob job in allJobs.Values)
-            {
-                if (name == job.OwningWorker)
-                    job.OwningWorker = value;
-            }
-
-        }
-
-        private void jobQueue_StartClicked(object sender, EventArgs e)
+        private void JobQueue_StartClicked(object sender, EventArgs e)
         {
             StartAll(true);
         }
 
-        private void jobQueue_StopClicked(object sender, EventArgs e)
+        private void JobQueue_StopClicked(object sender, EventArgs e)
         {
             StopAll();
         }
 
-        private void jobQueue_AbortClicked(object sender, EventArgs e)
+        private void JobQueue_AbortClicked(object sender, EventArgs e)
         {
             DialogResult r = MessageBox.Show("Do you really want to abort all jobs?", "Really abort?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (r == DialogResult.Yes)
                 AbortAll();
         }
 
-
-        private string freeWorkerName()
-        {
-            int num = 0;
-            string name;
-            do {
-                num++;
-                name = "Worker " + num;
-            } while (workers.ContainsKey(name));
-
-            return name;
-        }
-
-        internal List<Pair<string, bool>> ListWorkers()
+        private List<Pair<string, bool>> ListWorkers()
         {
             List<Pair<string, bool>> ans = new List<Pair<string,bool>>();
             
             foreach (JobWorker w in workers.Values)
             {
-                ans.Add(new Pair<string,bool>(w.Name, w.Visible));
+                ans.Add(new Pair<string,bool>(w.Name, false));
             }
 
             return ans;
         }
 
-        internal void HideAllWorkers()
+        private void WorkerFinishedJobs(object sender, EventArgs e)
         {
-            foreach (JobWorker w in workers.Values)
-                Util.ThreadSafeRun(w, delegate { w.Hide(); });
-        }
-
-        internal void ShowAllWorkers()
-        {
-            foreach (JobWorker w in workers.Values)
-                Util.ThreadSafeRun(w, delegate { w.Show(); });
-        }
-
-        internal void RequestNewWorker()
-        {
-            string name = InputBox.Show("Please enter a name for this new worker", "Please enter a name", freeWorkerName());
-            if (string.IsNullOrEmpty(name))
-                return;
-            if (workers.ContainsKey(name))
-            {
-                MessageBox.Show("A worker by this name already exists. Adding worker failed", "Adding worker failed",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            JobWorker w = NewWorker(name, true);
-            w.StartEncoding(true);
-        }
-
-        private JobWorker NewWorker(string name, bool show)
-        {
-            Debug.Assert(!workers.ContainsKey(name));
-
-            JobWorker w = new JobWorker(mainForm);
-            w.Name = name;
-            w.WorkerFinishedJobs += new EventHandler(WorkerFinishedJobs);
-            workers.Add(w.Name, w);
-            summary.Add(w);
-            mainForm.RegisterForm(w);
-            return w;
-        }
-
-        void WorkerFinishedJobs(object sender, EventArgs e)
-        {
-            mainForm.Jobs.StartPostponedWorkers();
+            StartIdleWorkers();
 
             foreach (JobWorker w in workers.Values)
-                if (w.IsEncoding)
+                if (w.IsRunning)
                     return;
 
             mainForm.runAfterEncodingCommands();
         }
 
-        internal void ShowSummary()
+        public void ShowSummary()
         {
             summary.Show();
+            summary.BringToFront();
         }
 
-        internal void HideSummary()
-        {
-            summary.Hide();
-        }
-
-        public bool SummaryVisible
-        {
-            get { return summary.Visible; }
-        }
-
-        internal void SetWorkerVisible(string p, bool p_2)
-        {
-            if (p_2)
-                Util.ThreadSafeRun(workers[p], delegate { workers[p].Show(); });
-            else
-                Util.ThreadSafeRun(workers[p], delegate { workers[p].Hide(); });
-        }
-
-        private void newWorkerButton_Click(object sender, EventArgs e)
-        {
-            RequestNewWorker();
-        }
-
-        internal void UpdateProgress(string name)
+        public void UpdateProgress(string name)
         {
             summary.RefreshInfo(name);
         }
 
-        internal void ShutDown(JobWorker w)
+        public void ShutDown(JobWorker w)
         {
             workers.Remove(w.Name);
-            if (w.Visible) 
-                Util.ThreadSafeRun(w, delegate { w.Close(); });
             summary.Remove(w.Name);
         }
 
-        internal List<Pair<string, bool>> ListProgressWindows()
+        public List<Pair<string, bool>> ListProgressWindows()
         {
             List<Pair<string, bool>> ans = new List<Pair<string,bool>>();
             foreach (JobWorker w in workers.Values)
@@ -866,22 +788,21 @@ namespace MeGUI.core.details
             return ans;
         }
 
-        internal void HideProgressWindow(string p)
+        public void HideProgressWindow(string p)
         {
             if (workers[p].IsProgressWindowAvailable)
                 workers[p].HideProcessWindow();
         }
 
-        internal void ShowProgressWindow(string p)
+        public void ShowProgressWindow(string p)
         {
             if (workers[p].IsProgressWindowAvailable)
                 workers[p].ShowProcessWindow();
         }
 
-        private void cbAfterEncoding_SelectedIndexChanged(object sender, EventArgs e)
+        private void CbAfterEncoding_SelectedIndexChanged(object sender, EventArgs e)
         {
             currentAfterEncoding = (AfterEncoding)cbAfterEncoding.SelectedIndex;
         }
     }
-    enum JobStartInfo { JOB_STARTED, NO_JOBS_WAITING, COULDNT_START }
 }

@@ -65,11 +65,11 @@ namespace MeGUI
         private decimal forceFilmThreshold, acceptableFPSError;
         private int nbPasses, autoUpdateServerSubList, minComplexity, updateFormSplitter,
                     maxComplexity, jobColumnWidth, inputColumnWidth, outputColumnWidth, codecColumnWidth,
-                    modeColumnWidth, statusColumnWidth, ownerColumnWidth, startColumnWidth, endColumnWidth, fpsColumnWidth,
-                    updateFormUpdateColumnWidth, updateFormNameColumnWidth, updateFormLocalVersionColumnWidth, 
-                    updateFormServerVersionColumnWidth, updateFormLocalDateColumnWidth, updateFormServerDateColumnWidth, 
+                    modeColumnWidth, statusColumnWidth, startColumnWidth, endColumnWidth, fpsColumnWidth,
+                    updateFormUpdateColumnWidth, updateFormNameColumnWidth, updateFormLocalVersionColumnWidth,
+                    updateFormServerVersionColumnWidth, updateFormLocalDateColumnWidth, updateFormServerDateColumnWidth,
                     updateFormLastUsedColumnWidth, updateFormStatusColumnWidth, updateFormServerArchitectureColumnWidth, 
-                    ffmsThreads, chapterCreatorMinimumLength, updateCheckInterval, disablePackageInterval;
+                    ffmsThreads, chapterCreatorMinimumLength, updateCheckInterval, disablePackageInterval, iWorkerMaximumCount;
         private double dpiScaleFactor, dLastDPIScaleFactor;
         private SourceDetectorSettings sdSettings;
         private AutoEncodeDefaultsSettings aedSettings;
@@ -83,6 +83,7 @@ namespace MeGUI
         private OCGUIMode ocGUIMode;
         private AfterEncoding afterEncoding;
         private ProxyMode httpProxyMode;
+        private List<WorkerSettings> arrWorkerSettings;
         private ProgramSettings avimuxgui, avisynth, avisynthplugins, besplit, dgindexim, dgindex, dgindexnv,
                                 eac3to, fdkaac, ffmpeg, ffms, flac, haali, lame, lsmash, mediainfo,
                                 megui_core, megui_help, megui_libs, megui_updater, mkvmerge, mp4box, neroaacenc,
@@ -175,12 +176,11 @@ namespace MeGUI
             updateFormLastUsedColumnWidth = 70;
             updateFormStatusColumnWidth = 111;
             jobColumnWidth = 40;
-            inputColumnWidth = 89;
-            outputColumnWidth = 89;
+            inputColumnWidth = 105;
+            outputColumnWidth = 105;
             codecColumnWidth = 79;
-            modeColumnWidth = 51;
+            modeColumnWidth = 79;
             statusColumnWidth = 65;
-            ownerColumnWidth = 60;
             startColumnWidth = 58;
             endColumnWidth = 58;
             fpsColumnWidth = 95;
@@ -201,6 +201,12 @@ namespace MeGUI
             chapterCreatorSortString = "duration";
             bShowDebugInformation = false;
             bEnableDirectShowSource = false;
+            arrWorkerSettings = new List<MeGUI.WorkerSettings>();
+            arrWorkerSettings.Add(new WorkerSettings(1, new List<MeGUI.WorkerSettings.JobTyp>() { MeGUI.WorkerSettings.JobTyp.Audio }));
+            arrWorkerSettings.Add(new WorkerSettings(1, new List<MeGUI.WorkerSettings.JobTyp>() { MeGUI.WorkerSettings.JobTyp.Audio, MeGUI.WorkerSettings.JobTyp.Demuxer, MeGUI.WorkerSettings.JobTyp.Indexer, MeGUI.WorkerSettings.JobTyp.Muxer }));
+            arrWorkerSettings.Add(new WorkerSettings(1, new List<MeGUI.WorkerSettings.JobTyp>() { MeGUI.WorkerSettings.JobTyp.OneClick }));
+            arrWorkerSettings.Add(new WorkerSettings(1, new List<MeGUI.WorkerSettings.JobTyp>() { MeGUI.WorkerSettings.JobTyp.Video }));
+            iWorkerMaximumCount = 2;
             bFirstUpdateCheck = true;
             dLastDPIScaleFactor = 0;
             oRedistVersions = new Dictionary<string, string>();
@@ -371,12 +377,6 @@ namespace MeGUI
         {
             get { return statusColumnWidth; }
             set { statusColumnWidth = value; }
-        }
-
-        public int OwnerColumnWidth
-        {
-            get { return ownerColumnWidth; }
-            set { ownerColumnWidth = value; }
         }
 
         public int StartColumnWidth
@@ -1048,6 +1048,26 @@ namespace MeGUI
             set { bVobSubberShowAll = value; }
         }
 
+        [XmlIgnore()]
+        [MeGUI.core.plugins.interfaces.PropertyEqualityIgnoreAttribute()]
+        public List<WorkerSettings> WorkerSettings
+        {
+            get { return arrWorkerSettings; }
+            set { arrWorkerSettings = value; }
+        }
+
+        public WorkerSettings[] WorkerSettingsString
+        {
+            get { return arrWorkerSettings.ToArray(); }
+            set { arrWorkerSettings = new List<WorkerSettings>(value); }
+        }
+
+        public int WorkerMaximumCount
+        {
+            get { return iWorkerMaximumCount; }
+            set { iWorkerMaximumCount = value; }
+        }
+
         /// <summary>
         /// always use portable avisynth
         /// </summary>
@@ -1391,12 +1411,11 @@ namespace MeGUI
                 updateFormLastUsedColumnWidth = DPIRescale(70);
                 updateFormStatusColumnWidth = DPIRescale(111);
                 jobColumnWidth = DPIRescale(40);
-                inputColumnWidth = DPIRescale(89);
-                outputColumnWidth = DPIRescale(89);
+                inputColumnWidth = DPIRescale(105);
+                outputColumnWidth = DPIRescale(105);
                 codecColumnWidth = DPIRescale(79);
-                modeColumnWidth = DPIRescale(51);
+                modeColumnWidth = DPIRescale(79);
                 statusColumnWidth = DPIRescale(65);
-                ownerColumnWidth = DPIRescale(60);
                 startColumnWidth = DPIRescale(58);
                 endColumnWidth = DPIRescale(58);
                 fpsColumnWidth = DPIRescale(95);
@@ -1423,7 +1442,6 @@ namespace MeGUI
                 codecColumnWidth = DPIReverse(codecColumnWidth);
                 modeColumnWidth = DPIReverse(modeColumnWidth);
                 statusColumnWidth = DPIReverse(statusColumnWidth);
-                ownerColumnWidth = DPIReverse(ownerColumnWidth);
                 startColumnWidth = DPIReverse(startColumnWidth);
                 endColumnWidth = DPIReverse(endColumnWidth);
                 endColumnWidth = DPIReverse(endColumnWidth);

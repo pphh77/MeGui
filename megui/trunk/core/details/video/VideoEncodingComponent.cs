@@ -225,7 +225,7 @@ namespace MeGUI
                 // add job to queue
                 prepareJobs = new SequentialChain(prepareJobs, new SequentialChain(mJob));
             }
-            MainForm.Instance.Jobs.addJobsWithDependencies(prepareJobs, true);
+            MainForm.Instance.Jobs.AddJobsWithDependencies(prepareJobs, true);
         }
 
         private bool bInitialStart = true;
@@ -455,7 +455,7 @@ namespace MeGUI
             }
 
             AviSynthJob job = new AviSynthJob(VideoInput);
-            MainForm.Instance.Jobs.addJobsToQueue(job);
+            MainForm.Instance.Jobs.AddJobsToQueue(job);
         }
 
         VideoEncoderType lastCodec = null;
