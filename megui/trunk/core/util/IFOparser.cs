@@ -139,6 +139,18 @@ namespace MeGUI.core.util
             catch { return null; }
         }
 
+
+        /// <summary>
+        /// Gets a bit from a byte
+        /// </summary>
+        /// <param name="b"></param>
+        /// <param name="bitNumber"></param>
+        /// <returns>true for 1, false for 0</returns>
+        private static bool GetBit(byte b, int bitNumber)
+        {
+            return (b & (1 << bitNumber)) != 0;
+        }
+
         /// <summary>
         /// get several Subtitles Informations from the IFO file
         /// </summary>
@@ -147,15 +159,16 @@ namespace MeGUI.core.util
         public static string[] GetSubtitlesStreamsInfos(string FileName, int iPGC, bool bGetAllStreams)
         {
             byte[] buff = new byte[4];
-            string[] substreams = new string[32];
+            string[] substreams = new string[32]; // according to the specs 32 is the max value for subtitles streams
 
             try
             {
                 // get the number of subpicture streams in VTS_VOBS
                 int iSubtitleCount = ToInt16(GetFileBlock(FileName, 0x254, 2));
-                if (iSubtitleCount > 32 || bGetAllStreams)
-                    iSubtitleCount = 32; // force the max #. According to the specs 32 is the max value for subtitles streams.
-                string[] subdesc = new string[iSubtitleCount];
+                if (iSubtitleCount == 0 && !bGetAllStreams)
+                    return new string[0];
+
+                string[] subdesc = new string[32];
 
                 FileStream fs = new FileStream(FileName, FileMode.Open, FileAccess.Read);
                 BinaryReader br = new BinaryReader(fs);
@@ -163,7 +176,7 @@ namespace MeGUI.core.util
 
                 // go to the subpicture attributes of VTS_VOBS
                 sr.Seek(0x256, SeekOrigin.Begin);
-                for (int i = 0; i < iSubtitleCount; i++)
+                for (int i = 0; i < 32; i++)
                 {
                     // Presence (1 bit), Coding Mode (1bit), Short Language Code (2bits), Language Extension (1bit), Sub Picture Caption Type (1bit)
 
@@ -204,7 +217,7 @@ namespace MeGUI.core.util
                 // find the VTS_PGC starting address of the requested PGC number in VTS_PGCI
                 long VTS_PGC = VTS_PGCI + GetPGCOffset(FileName, VTS_PGCI, iPGC);
 
-                // go to the Subpicture Stream Control in VTS_PGC of the requested PGC number
+                // go to the Subpicture Stream Control (PGC_SPST_CTL) in VTS_PGC of the requested PGC number
                 sr.Seek(VTS_PGC + 0x1C, SeekOrigin.Begin);
 
                 byte[] iCountType = new byte[4];
@@ -213,10 +226,20 @@ namespace MeGUI.core.util
                     // read subtitle info of stream i
                     br.Read(buff, 0, 4);
 
-                    if (buff[0] < 128)
+                    // if bit 7 = 1 (true) the stream is available
+                    if (!GetBit(buff[0], 7))
                         continue;
 
-                    buff[0] -= 128;
+                    // remove bits 7, 6 and 5 as they are reserved
+                    for (int j = 0; j < 4; j++)
+                    {
+                        if (GetBit(buff[j], 7))
+                            buff[j] -= 128;
+                        if (GetBit(buff[j], 6))
+                            buff[j] -= 64;
+                        if (GetBit(buff[j], 5))
+                            buff[j] -= 32;
+                    }
 
                     if (buff[0] > 0)
                     {
@@ -275,11 +298,22 @@ namespace MeGUI.core.util
                         // read subtitle info of stream i
                         br.Read(buff, 0, 4);
 
-                        if (buff[0] < 128)
+                        // if bit 7 = 1 (true) the stream is available
+                        if (!GetBit(buff[0], 7))
                             continue;
 
                         iCountStream++;
-                        buff[0] -= 128;
+
+                        // remove bits 7, 6 and 5 as they are reserved
+                        for (int j = 0; j < 4; j++)
+                        {
+                            if (GetBit(buff[j], 7))
+                                buff[j] -= 128;
+                            if (GetBit(buff[j], 6))
+                                buff[j] -= 64;
+                            if (GetBit(buff[j], 5))
+                                buff[j] -= 32;
+                        }
 
                         if (buff[0] > 0)
                         {
