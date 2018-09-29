@@ -1,3 +1,4 @@
+2886 [Jobs]                 fixed abort of suspended jobs (regression of 2818)
 2885 [Preset Exporter]      fixed overwrite of output files
 2884 [Worker]               changed worker handling
                             - in "workers\settings" worker rule sets can be specified

@@ -376,6 +376,8 @@ namespace MeGUI.core.gui
                     return;
                 try
                 {
+                    if (currentJob.Status == JobStatus.PAUSED)
+                        currentProcessor.resume();
                     currentJob.Status = JobStatus.ABORTING;
                     RefreshAll();
                     currentProcessor.stop();
@@ -760,7 +762,10 @@ namespace MeGUI.core.gui
             try
             {
                 if (currentProcessor.resume())
+                {
                     currentJob.Status = JobStatus.PROCESSING;
+                    RefreshAll();
+                }
             }
             catch (JobRunException ex)
             {
