@@ -45,15 +45,16 @@ namespace MeGUI.core.gui
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(254, 323);
-            this.button2.Size = new System.Drawing.Size(61, 23);
-            this.button2.Text = "Export...";
-            this.button2.Click += new System.EventHandler(this.export_Click);
+            this.button2.Enabled = false;
+            this.button2.Location = new System.Drawing.Point(266, 323);
+            this.button2.Size = new System.Drawing.Size(49, 23);
+            this.button2.Text = "Export";
+            this.button2.Click += new System.EventHandler(this.Export_Click);
             // 
             // profileList
             // 
-            this.profileList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
             this.profileList.ContextMenuStrip = this.statusCheck;
+            this.profileList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ProfileList_ItemCheck);
             // 
             // PresetExporterToolTip
             // 
@@ -74,14 +75,14 @@ namespace MeGUI.core.gui
             this.checkAllToolStripMenuItem.Name = "checkAllToolStripMenuItem";
             this.checkAllToolStripMenuItem.Size = new System.Drawing.Size(139, 22);
             this.checkAllToolStripMenuItem.Text = "Check All";
-            this.checkAllToolStripMenuItem.Click += new System.EventHandler(this.checkAllToolStripMenuItem_Click);
+            this.checkAllToolStripMenuItem.Click += new System.EventHandler(this.CheckAllToolStripMenuItem_Click);
             // 
             // checkNoneToolStripMenuItem
             // 
             this.checkNoneToolStripMenuItem.Name = "checkNoneToolStripMenuItem";
             this.checkNoneToolStripMenuItem.Size = new System.Drawing.Size(139, 22);
             this.checkNoneToolStripMenuItem.Text = "Check None";
-            this.checkNoneToolStripMenuItem.Click += new System.EventHandler(this.checkNoneToolStripMenuItem_Click);
+            this.checkNoneToolStripMenuItem.Click += new System.EventHandler(this.CheckNoneToolStripMenuItem_Click);
             // 
             // ProfileExporter
             // 

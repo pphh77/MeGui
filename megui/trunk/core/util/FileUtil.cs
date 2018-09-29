@@ -81,8 +81,11 @@ namespace MeGUI.core.util
             return (!File.Exists(strFile));
         }
 
-        public static void CreateZipFile(string path, string filename)
+        public static bool CreateZipFile(string path, string filename)
         {
+            if (!DeleteFile(filename, null))
+                return false;
+
             using (ZipOutputStream outputFile = new ZipOutputStream(File.OpenWrite(filename)))
             {
                 foreach (string file in FileUtil.AllFiles(path))
@@ -94,6 +97,8 @@ namespace MeGUI.core.util
                     input.Close();
                 }
             }
+
+            return true;
         }
 
         public static void ExtractZipFile(Stream s, string extractFolder)
@@ -122,8 +127,12 @@ namespace MeGUI.core.util
 
         public static void DeleteDirectoryIfExists(string p, bool recursive)
         {
-            if (Directory.Exists(p))
-                Directory.Delete(p, recursive);
+            try
+            {
+                if (Directory.Exists(p))
+                    Directory.Delete(p, recursive);
+            }
+            catch { }
         }
 
         public static DirectoryInfo ensureDirectoryExists(string p)

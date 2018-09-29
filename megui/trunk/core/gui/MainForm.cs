@@ -89,10 +89,6 @@ namespace MeGUI
 
         #endregion
 
-        //public void RegisterForm(Form f)
-        //{
-        //}
-
         public void DeleteOnClosing(string file)
         {
             filesToDeleteOnClosing.Add(file);
@@ -106,16 +102,6 @@ namespace MeGUI
         private void mnuGuide_Click(object sender, EventArgs e)
         {
             System.Diagnostics.Process.Start("https://en.wikibooks.org/wiki/MeGUI");
-        }
-
-        /// <summary>
-        /// launches the encoder gui forum in the default browser
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void menuItem2_Click(object sender, EventArgs e)
-        {
-
         }
 
         /// <summary>
@@ -515,6 +501,7 @@ namespace MeGUI
                 }
             }
         }
+
         private void mnuTool_Click(object sender, System.EventArgs e)
         {
             if ((!(sender is System.Windows.Forms.MenuItem)) || (!((sender as MenuItem).Tag is ITool)))
@@ -765,7 +752,7 @@ namespace MeGUI
 
         private void mnuFileExport_Click(object sender, EventArgs e)
         {
-            new ProfileExporter(this).ShowDialog();
+            new ProfileExporter().ShowDialog();
         }
         #endregion
 
@@ -774,11 +761,6 @@ namespace MeGUI
             AdaptiveMuxWindow amw = new AdaptiveMuxWindow();
             amw.Show();
         }
-
-        //private void MeGUI_Load(object sender, EventArgs e)
-        //{
-        //    RegisterForm(this);
-        //}
 
         internal bool CloseSilent()
         {
@@ -821,7 +803,6 @@ namespace MeGUI
         public void setGUIInfo()
         {
             fillMenus();
-            //jobControl1.MainForm = this;
             jobControl1.LoadJobs();
         }
 
@@ -1094,7 +1075,7 @@ namespace MeGUI
                     DateTime creationAPP = File.GetLastWriteTime(Application.ExecutablePath);
                     DateTime creationPDB = File.GetLastWriteTime(strDebugFile);
                     double difference = (creationAPP < creationPDB) ? (creationPDB - creationAPP).TotalSeconds : (creationAPP - creationPDB).TotalSeconds;
-                    if (difference > 60)
+                    if (difference > 360)
                         File.Delete(strDebugFile);
                 }
             } catch { }

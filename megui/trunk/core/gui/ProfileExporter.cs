@@ -20,9 +20,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -34,19 +31,15 @@ namespace MeGUI.core.gui
 {
     public partial class ProfileExporter : MeGUI.core.gui.ProfilePorter
     {
-        private MainForm mainForm;
-        private DirectoryInfo tempFolder;
         private XmlDocument ContextHelp = new XmlDocument();
 
-        public ProfileExporter(MainForm mainForm)
+        public ProfileExporter()
         {
             InitializeComponent();
-            this.mainForm = mainForm;
-
-            Profiles = mainForm.Profiles.AllProfiles;
+            Profiles = MainForm.Instance.Profiles.AllProfiles;
         }
 
-        private List<string> getRequiredFiles(List<Profile> ps)
+        private List<string> GetRequiredFiles(List<Profile> ps)
         {
             List<string> files = new List<string>();
 
@@ -56,58 +49,68 @@ namespace MeGUI.core.gui
             return Util.Unique(files);
         }
 
-        private void export_Click(object sender, EventArgs e)
+        private void Export_Click(object sender, EventArgs e)
         {
-            Util.CatchExceptionsAndTellUser("An error occurred when saving the file", delegate
+            this.Enabled = false;
+            if (ExportProfiles())
             {
-                try
-                {
-                    string filename = askForFilename();
-
-                    tempFolder = FileUtil.CreateTempDirectory();
-
-                    List<Profile> profs = SelectedAndRequiredProfiles;
-                    Dictionary<string, string> subTable =
-                        copyExtraFilesToFolder(getRequiredFiles(profs),
-                        Path.Combine(tempFolder.FullName, "extra"));
-
-                    subTable = turnValuesToZippedStyleName(subTable);
-
-                    fixFileNames(profs, subTable);
-
-                    ProfileManager.WriteProfiles(tempFolder.FullName, profs);
-
-                    FileUtil.CreateZipFile(tempFolder.FullName, filename);
-
-                    FileUtil.DeleteDirectoryIfExists(tempFolder.FullName, true);
-
-                    DialogResult = DialogResult.OK;
-                    MessageBox.Show("Completed successfully", "Export completed successfully", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                catch (CancelledException)
-                {
-                    DialogResult = DialogResult.Cancel;
-                }
-            });
+                MessageBox.Show("File export completed successfully", "Export Result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                DialogResult = DialogResult.OK;
+            }
+            this.Enabled = true;
         }
 
-        private Dictionary<string, string> turnValuesToZippedStyleName(Dictionary<string, string> subTable)
+        private bool ExportProfiles()
+        {
+            string tempFolderName = string.Empty;
+            try
+            {
+                SaveFileDialog outputFilesChooser = new SaveFileDialog
+                {
+                    Title = "Choose your output file",
+                    Filter = "Zip archives|*.zip"
+                };
+                if (outputFilesChooser.ShowDialog() != DialogResult.OK)
+                    return false;
+
+                DirectoryInfo tempFolder = FileUtil.CreateTempDirectory();
+                tempFolderName = tempFolder.FullName;
+
+                List<Profile> profs = SelectedAndRequiredProfiles;
+                Dictionary<string, string> subTable =
+                    copyExtraFilesToFolder(GetRequiredFiles(profs),
+                    Path.Combine(tempFolder.FullName, "extra"));
+
+                subTable = TurnValuesToZippedStyleName(subTable);
+
+                fixFileNames(profs, subTable);
+
+                if (!ProfileManager.WriteProfiles(tempFolder.FullName, profs))
+                {
+                    MessageBox.Show("An error occurred when saving the file", "Export Result", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+
+                if (!FileUtil.CreateZipFile(tempFolder.FullName, outputFilesChooser.FileName))
+                {
+                    MessageBox.Show("An error occurred when saving the file", "Export Result", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+            FileUtil.DeleteDirectoryIfExists(tempFolderName, true);
+            return true;
+        }
+
+        private Dictionary<string, string> TurnValuesToZippedStyleName(Dictionary<string, string> subTable)
         {
             Dictionary<string, string> newTable = new Dictionary<string, string>();
             foreach (string key in subTable.Keys)
                 newTable[key] = getZippedExtraFileName(subTable[key]);
             return newTable;
-        }
-
-        private static string askForFilename()
-        {
-            SaveFileDialog outputFilesChooser = new SaveFileDialog();
-            outputFilesChooser.Title = "Choose your output file";
-            outputFilesChooser.Filter = "Zip archives|*.zip";
-            if (outputFilesChooser.ShowDialog() != DialogResult.OK)
-                throw new CancelledException();
-
-            return outputFilesChooser.FileName;
         }
 
         private string SelectHelpText(string node)
@@ -149,13 +152,10 @@ namespace MeGUI.core.gui
                 ContextHelp.Load(p);
                 SetToolTips();
             }
-            catch
-            {
-                MessageBox.Show("The ContextHelp.xml file could not be found. Please check in the 'Data' directory to see if it exists. Help tooltips will not be available.", "File Not Found", MessageBoxButtons.OK);
-            }
+            catch { }
         }
 
-        private void checkAllToolStripMenuItem_Click(object sender, EventArgs e)
+        private void CheckAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem ts = (ToolStripMenuItem)sender;
             for (int i = 0; i < profileList.Items.Count; i++)
@@ -164,13 +164,18 @@ namespace MeGUI.core.gui
             } 
         }
 
-        private void checkNoneToolStripMenuItem_Click(object sender, EventArgs e)
+        private void CheckNoneToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem ts = (ToolStripMenuItem)sender;
             for (int i = 0; i < profileList.Items.Count; i++)
             {
                 profileList.SetItemChecked(i, false);
             } 
+        }
+
+        private void ProfileList_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            button2.Enabled = (profileList.CheckedItems.Count > 1 || e.NewValue == CheckState.Checked);
         }
     }
 }
