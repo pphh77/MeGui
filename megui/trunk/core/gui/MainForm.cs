@@ -1284,7 +1284,7 @@ namespace MeGUI
                 setOverlayIcon(taskbarIcon, true);
             }
 
-            if (settings.AutoStartQueueStartup)
+            if (settings.WorkerAutoStartOnStartup)
                 jobControl1.StartAll(false);
 
             if (MainForm.Instance.Settings.UpdateMode != UpdateMode.Disabled)

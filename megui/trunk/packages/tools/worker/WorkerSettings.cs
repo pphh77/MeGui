@@ -26,39 +26,39 @@ using System.Xml.Serialization;
 
 namespace MeGUI
 {
+    public enum JobType
+    {
+        [EnumTitle("Audio Job")]
+        Audio,
+        [EnumTitle("Demuxer Job")]
+        Demuxer,
+        [EnumTitle("Indexer Job")]
+        Indexer,
+        [EnumTitle("Muxer Job")]
+        Muxer,
+        [EnumTitle("OneClick Job")]
+        OneClick,
+        [EnumTitle("Video Job")]
+        Video
+    };
+
     public class WorkerSettings
     {
-        private List<JobTyp> _arrJobTypes;
+        private List<JobType> _arrJobTypes;
         private int _iMaxCount;
 
-        public enum JobTyp
-        {
-            [EnumTitle("Audio Job")]
-            Audio,
-            [EnumTitle("DemuxerJob")]
-            Demuxer,
-            [EnumTitle("Indexer Job")]
-            Indexer,
-            [EnumTitle("Muxer Job")]
-            Muxer,
-            [EnumTitle("OneClick Job")]
-            OneClick,
-            [EnumTitle("Video Job")]
-            Video
-        };
-
-        public WorkerSettings() : this (0, new List<JobTyp>())
+        public WorkerSettings() : this (1, new List<JobType>())
         {
 
         }
 
-        public WorkerSettings(int maxCount, List<JobTyp> arrJobTypes)
+        public WorkerSettings(int maxCount, List<JobType> arrJobTypes)
         {
             _iMaxCount = maxCount;
             _arrJobTypes = arrJobTypes;
         }
 
-        public List<JobTyp> JobTypes
+        public List<JobType> JobTypes
         {
             get { return _arrJobTypes; }
             set { _arrJobTypes = value;  }
@@ -72,42 +72,42 @@ namespace MeGUI
 
         public bool IsBlockedJob(Job oJob)
         {
-            foreach (JobTyp oType in _arrJobTypes)
+            foreach (JobType oType in _arrJobTypes)
             {
                 switch (oType)
                 {
-                    case JobTyp.Audio:
+                    case JobType.Audio:
                     {
                         if (oJob is AudioJob)
                             return true;
                         break;
                     }
-                    case JobTyp.Demuxer: 
+                    case JobType.Demuxer: 
                     {
                         if (oJob is SubtitleIndexJob || oJob is HDStreamsExJob || oJob is PgcDemuxJob
                             || oJob is MkvExtractJob || oJob is MeGUI.packages.tools.besplitter.AudioSplitJob)
                             return true;
                         break;
                     }
-                    case JobTyp.Indexer:
+                    case JobType.Indexer:
                     {
                         if (oJob is IndexJob)
                             return true;
                         break;
                     }
-                    case JobTyp.Muxer:
+                    case JobType.Muxer:
                     {
                         if (oJob is MuxJob || oJob is MeGUI.packages.tools.besplitter.AudioJoinJob  || oJob is MP4FpsModJob)
                             return true;
                         break;
                     }
-                    case JobTyp.OneClick:
+                    case JobType.OneClick:
                         {
                             if (oJob is OneClickPostProcessingJob)
                                 return true;
                             break;
                         }
-                    case JobTyp.Video:
+                    case JobType.Video:
                     {
                         if (oJob is VideoJob || oJob is AviSynthJob)
                             return true;
@@ -119,6 +119,23 @@ namespace MeGUI
             return false;
         }
 
+        public static JobType GetJobType(Job oJob)
+        {
+            if (oJob is AudioJob)
+                return JobType.Audio;
+            else if (oJob is SubtitleIndexJob || oJob is HDStreamsExJob || oJob is PgcDemuxJob
+                || oJob is MkvExtractJob || oJob is MeGUI.packages.tools.besplitter.AudioSplitJob)
+                return JobType.Demuxer;
+            else if (oJob is IndexJob)
+                return JobType.Indexer;
+            else if (oJob is MuxJob || oJob is MeGUI.packages.tools.besplitter.AudioJoinJob || oJob is MP4FpsModJob)
+                return JobType.Muxer;
+            else if (oJob is VideoJob || oJob is AviSynthJob)
+                return JobType.Video;
+            else
+                return JobType.OneClick;  // catch-all case (e.g. inlcudes also CleanupJob)
+        }
+
         public bool HasSameJobTypeList(WorkerSettings p)
         {
             var firstNotSecond = _arrJobTypes.Except(p.JobTypes).ToList();
@@ -126,7 +143,7 @@ namespace MeGUI
             return firstNotSecond.Count == 0 && secondNotFirst.Count == 0;
         }
 
-#region equals override
+        #region equals override
         public override bool Equals(System.Object obj)
         {
             // If parameter is null return false.

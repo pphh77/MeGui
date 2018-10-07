@@ -192,9 +192,6 @@ namespace MeGUI
                 settings.AutoLoadDG = cbAutoLoadDG.Checked;
                 settings.EnsureCorrectPlaybackSpeed = chkEnsureCorrectPlaybackSpeed.Checked;
 				settings.ForceFilmThreshold = forceFilmPercentage.Value;
-				settings.DefaultPriority = (ProcessPriority)priority.SelectedIndex;
-				settings.AutoStartQueue = this.autostartQueue.Checked;
-                settings.AutoStartQueueStartup = this.cbAutoStartQueueStartup.Checked;
                 if (donothing.Checked)
                     settings.AfterEncoding = AfterEncoding.DoNothing;
                 else if (shutdown.Checked)
@@ -207,7 +204,6 @@ namespace MeGUI
                     settings.AfterEncodingCommand = command.Text;
                 }
                 settings.AutoOpenScript = openScript.Checked;
-				settings.DeleteCompletedJobs = deleteCompletedJobs.Checked;
 				settings.DeleteIntermediateFiles = deleteIntermediateFiles.Checked;
 				settings.DeleteAbortedOutput = deleteAbortedOutput.Checked;
 				settings.OpenProgressWindow = openProgressWindow.Checked;
@@ -286,15 +282,11 @@ namespace MeGUI
 				autoForceFilm.Checked = settings.AutoForceFilm;
                 cbAutoLoadDG.Checked = settings.AutoLoadDG;
 				forceFilmPercentage.Value = settings.ForceFilmThreshold;
-				priority.SelectedIndex = (int)settings.DefaultPriority;
-				autostartQueue.Checked = settings.AutoStartQueue;
-                cbAutoStartQueueStartup.Checked = settings.AutoStartQueueStartup;
                 donothing.Checked = settings.AfterEncoding == AfterEncoding.DoNothing;
                 shutdown.Checked = settings.AfterEncoding == AfterEncoding.Shutdown;
                 runCommand.Checked = settings.AfterEncoding == AfterEncoding.RunCommand;
                 rbCloseMeGUI.Checked = settings.AfterEncoding == AfterEncoding.CloseMeGUI;
                 command.Text = settings.AfterEncodingCommand;
-				deleteCompletedJobs.Checked = settings.DeleteCompletedJobs;
                 openScript.Checked = settings.AutoOpenScript;
 				deleteIntermediateFiles.Checked = settings.DeleteIntermediateFiles;
 				deleteAbortedOutput.Checked = settings.DeleteAbortedOutput;

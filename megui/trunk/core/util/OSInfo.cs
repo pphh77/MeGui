@@ -781,7 +781,35 @@ namespace MeGUI
         [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)]
         public static extern int SetWindowTheme(IntPtr hWnd, string pszSubAppName, string pszSubIdList);
 
-        #region process handling
+        #region process/thread handling
+
+        /// <summary>
+        /// Gets the desired thread priority based on the process priority
+        /// </summary>
+        /// <param name="priority">the process priority</param>
+        /// <returns>th desired thread priority</returns>
+        public static ThreadPriority GetThreadPriority(WorkerPriorityType priority)
+        {
+            ThreadPriority threadPriority;
+            switch (priority)
+            {
+                case WorkerPriorityType.BELOW_NORMAL:
+                    threadPriority = ThreadPriority.BelowNormal;
+                    break;
+                case WorkerPriorityType.NORMAL:
+                    threadPriority = ThreadPriority.Normal;
+                    break;
+                case WorkerPriorityType.ABOVE_NORMAL:
+                    threadPriority = ThreadPriority.AboveNormal;
+                    break;
+                default:
+                    threadPriority = ThreadPriority.Lowest;
+                    break;
+            }
+            return threadPriority;
+        }
+
+
         [DllImport("ntdll", CharSet = CharSet.Unicode)]
         private static extern int NtSetInformationProcess(IntPtr hProcess, int processInformationClass, ref int processInformation, int processInformationLength);
 
@@ -794,13 +822,14 @@ namespace MeGUI
         [DllImport("Kernel32.dll", ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool SetThreadPriority(IntPtr hThread, int nPriority);
-
         private const int PROCESS_INFORMATION_MEMORY_PRIORITY = 0x27;
         private const int PROCESS_INFORMATION_IO_PRIORITY = 0x21;
         private const int PRIORITY_MEMORY_NORMAL = 5;
         private const int PRIORITY_MEMORY_LOW = 3;
+        private const int PRIORITY_MEMORY_VERY_LOW = 1;
         private const int PRIORITY_IO_NORMAL = 2;
         private const int PRIORITY_IO_LOW = 1;
+        private const int PRIORITY_IO_VERY_LOW = 0;
         private const uint PROCESS_MODE_BACKGROUND_BEGIN = 0x00100000;
         private const uint PROCESS_MODE_BACKGROUND_END = 0x00200000;
         private const int THREAD_MODE_BACKGROUND_BEGIN = 0x00010000;
@@ -818,30 +847,27 @@ namespace MeGUI
         /// <value>
         /// Sets the process, memory and I/O priority on Windows Vista or newer operating systems
         /// </value>
-        public static void SetProcessPriority(Process oMainProcess, ProcessPriority processPriority, int iMinimumChildProcessCount)
+        public static bool SetProcessPriority(Process oMainProcess, WorkerPriorityType processPriority, bool lowIOPriority, int iMinimumChildProcessCount)
         {
             try
             {
                 if (oMainProcess == null || oMainProcess.HasExited)
-                    return;
+                    return false;
 
                 ProcessPriorityClass priority = ProcessPriorityClass.Idle;
                 switch (processPriority)
                 {
-                    case ProcessPriority.IDLE:
-                        priority = ProcessPriorityClass.Idle;
-                        break;
-                    case ProcessPriority.BELOW_NORMAL:
+                    case WorkerPriorityType.BELOW_NORMAL:
                         priority = ProcessPriorityClass.BelowNormal;
                         break;
-                    case ProcessPriority.NORMAL:
+                    case WorkerPriorityType.NORMAL:
                         priority = ProcessPriorityClass.Normal;
                         break;
-                    case ProcessPriority.ABOVE_NORMAL:
+                    case WorkerPriorityType.ABOVE_NORMAL:
                         priority = ProcessPriorityClass.AboveNormal;
                         break;
-                    case ProcessPriority.HIGH:
-                        priority = ProcessPriorityClass.RealTime;
+                    default:
+                        priority = ProcessPriorityClass.Idle;
                         break;
                 }
 
@@ -875,10 +901,10 @@ namespace MeGUI
 
                     int prioIO = PRIORITY_IO_NORMAL;
                     int prioMemory = PRIORITY_MEMORY_NORMAL;
-                    if (priority == ProcessPriorityClass.Idle || priority == ProcessPriorityClass.BelowNormal)
+                    if (lowIOPriority)
                     {
-                        prioIO = PRIORITY_IO_LOW;
-                        prioMemory = PRIORITY_MEMORY_LOW;
+                        prioIO = PRIORITY_IO_VERY_LOW;
+                        prioMemory = PRIORITY_MEMORY_VERY_LOW;
                         SetPriorityClass(oProc.Handle, PROCESS_MODE_BACKGROUND_BEGIN);
                     }
                     else
@@ -887,7 +913,11 @@ namespace MeGUI
                     NtSetInformationProcess(oProc.Handle, PROCESS_INFORMATION_MEMORY_PRIORITY, ref prioMemory, Marshal.SizeOf(prioMemory));
                 }
             }
-            catch { }
+            catch
+            {
+                return false;
+            }
+            return true;
         }
 
 
@@ -907,18 +937,29 @@ namespace MeGUI
         }
 
         /// <value>
-        /// Sets the memory and I/O priority on Windows Vista or newer operating systems
+        /// Sets the thread background priority on Windows Vista or newer operating systems
         /// </value>
-        public static void SetThreadPriority(IntPtr handle, ThreadPriority priority)
+        public static void SetThreadPriority(Thread _thread, bool lowIOPriority)
         {
             if (!OSInfo.IsWindowsVistaOrNewer)
                 return;
 
-            if (priority == ThreadPriority.Lowest || priority == ThreadPriority.BelowNormal)
-                SetThreadPriority(handle, THREAD_MODE_BACKGROUND_BEGIN);
+            if (lowIOPriority)
+                SetThreadPriority((IntPtr)GetNativeThreadId(_thread), THREAD_MODE_BACKGROUND_BEGIN);
             else
-                SetThreadPriority(handle, THREAD_MODE_BACKGROUND_END);
+                SetThreadPriority((IntPtr)GetNativeThreadId(_thread), THREAD_MODE_BACKGROUND_END);
         }
+
+        public static int GetNativeThreadId(Thread thread)
+        {
+            var f = typeof(Thread).GetField("DONT_USE_InternalThread",
+                System.Reflection.BindingFlags.GetField | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            var pInternalThread = (IntPtr)f.GetValue(thread);
+            var nativeId = Marshal.ReadInt32(pInternalThread, (IntPtr.Size == 8) ? 0x022C : 0x0160); // found by analyzing the memory
+            return nativeId;
+        }
+
         #endregion
 
         #region start/stop process

@@ -130,7 +130,7 @@ namespace MeGUI
         /// <param name="priority">the priority to change to</param>
         /// <param name="error">output for any errors that might ocurr during this method</param>
         /// <returns>true if the priority has been changed, false if not</returns>
-        void changePriority(ProcessPriority priority);
+        void changePriority(WorkerPriorityType priority);
         event JobProcessingStatusUpdateCallback StatusUpdate;
     }
 }

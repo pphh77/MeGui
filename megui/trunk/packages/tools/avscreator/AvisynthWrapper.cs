@@ -64,22 +64,27 @@ namespace MeGUI
 
         public AviSynthClip OpenScriptFile(string filePath)
         {
-            return new AviSynthClip("Import", filePath, false);
-        }
-
-        public AviSynthClip ParseScript(string script)
-        {
-            return new AviSynthClip("Eval", script, false);
+            return new AviSynthClip("Import", filePath, false, true);
         }
 
         public AviSynthClip OpenScriptFile(string filePath, bool bRequireRGB24)
         {
-            return new AviSynthClip("Import", filePath, bRequireRGB24);
+            return new AviSynthClip("Import", filePath, bRequireRGB24, true);
+        }
+
+        public AviSynthClip ParseScript(string script)
+        {
+            return new AviSynthClip("Eval", script, false, true);
         }
 
         public AviSynthClip ParseScript(string script, bool bRequireRGB24)
         {
-            return new AviSynthClip("Eval", script, bRequireRGB24);
+            return new AviSynthClip("Eval", script, bRequireRGB24, true);
+        }
+
+        public AviSynthClip ParseScript(string script, bool bRequireRGB24, bool runInThread)
+        {
+            return new AviSynthClip("Eval", script, bRequireRGB24, runInThread);
         }
 
         public void Dispose()
@@ -561,7 +566,7 @@ namespace MeGUI
             return iStartResult;
         }
 
-        public AviSynthClip(string func, string arg, bool bRequireRGB24)
+        public AviSynthClip(string func, string arg, bool bRequireRGB24, bool bRunInThread)
 		{
 			_vi = new AVSDLLVideoInfo();
             _avs = IntPtr.Zero;
@@ -578,34 +583,22 @@ namespace MeGUI
                 if (MainForm.Instance.Settings.ShowDebugInformation)
                     HandleAviSynthWrapperDLL(false, arg);
 
-                Thread t = new Thread(new ThreadStart(delegate
+                System.Windows.Forms.Application.UseWaitCursor = true;
+                if (bRunInThread)
                 {
-                    System.Windows.Forms.Application.UseWaitCursor = true;
-                    try
+                    Thread t = new Thread(new ThreadStart(delegate
                     {
-                        if (MainForm.Instance.Settings.AviSynthPlus)
-                        {
-                            if (0 == dimzon_avs_init_3(ref _avs, func, arg, ref _vi, ref _colorSpace, ref _sampleType,
-                                bRequireRGB24 ? AviSynthColorspace.RGB24.ToString() : AviSynthColorspace.Unknown.ToString()))
-                                bOpenSuccess = true;
-                        }
-                        if (!bOpenSuccess)
-                        {
-                            // fallback to the old function
-                            if (0 == dimzon_avs_init_2(ref _avs, func, arg, ref _vi, ref _colorSpace, ref _sampleType, AviSynthColorspace.RGB24.ToString()))
-                                bOpenSuccess = true;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        strErrorMessage = ex.Message;
-                    }
-                    System.Windows.Forms.Application.UseWaitCursor = false;
-                }));
-                t.Start();
-
-                while (t.ThreadState == ThreadState.Running)
-                    MeGUI.core.util.Util.Wait(100);
+                        bOpenSuccess = OpenAVSScript(func, arg, bRequireRGB24, out strErrorMessage);
+                    }));
+                    t.Start();
+                    while (t.ThreadState == ThreadState.Running)
+                        MeGUI.core.util.Util.Wait(1000);
+                }
+                else
+                {
+                    bOpenSuccess = OpenAVSScript(func, arg, bRequireRGB24, out strErrorMessage);
+                }
+                System.Windows.Forms.Application.UseWaitCursor = false;
             }
 
             if (bOpenSuccess == false)
@@ -646,6 +639,32 @@ namespace MeGUI
                 GC.SuppressFinalize(this);
             if (MainForm.Instance.Settings.ShowDebugInformation)
                 HandleAviSynthWrapperDLL(true, String.Empty);
+        }
+
+        private bool OpenAVSScript(string func, string arg, bool bRequireRGB24, out string strErrorMessage)
+        {
+            bool bOpenSuccess = false;
+            strErrorMessage = string.Empty;
+            try
+            {
+                if (MainForm.Instance.Settings.AviSynthPlus)
+                {
+                    if (0 == dimzon_avs_init_3(ref _avs, func, arg, ref _vi, ref _colorSpace, ref _sampleType,
+                        bRequireRGB24 ? AviSynthColorspace.RGB24.ToString() : AviSynthColorspace.Unknown.ToString()))
+                        bOpenSuccess = true;
+                }
+                if (!bOpenSuccess)
+                {
+                    // fallback to the old function
+                    if (0 == dimzon_avs_init_2(ref _avs, func, arg, ref _vi, ref _colorSpace, ref _sampleType, AviSynthColorspace.RGB24.ToString()))
+                        bOpenSuccess = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                strErrorMessage = ex.Message;
+            }
+            return bOpenSuccess;
         }
 
         private void HandleAviSynthWrapperDLL(bool bUnload, string script)

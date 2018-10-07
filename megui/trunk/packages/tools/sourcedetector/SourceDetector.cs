@@ -95,7 +95,7 @@ namespace MeGUI
 
     public class SourceDetector
     {
-        public SourceDetector(string avsScript, string d2vFile, bool bIsAnime, int iFrameCount,
+        public SourceDetector(string avsScript, string d2vFile, bool bIsAnime, int iFrameCount, ThreadPriority priority,
             SourceDetectorSettings oSettings, UpdateSourceDetectionStatus updateMethod, FinishedAnalysis finishedMethod)
         {
             script = avsScript;
@@ -108,7 +108,9 @@ namespace MeGUI
             majorityFilm = false;
             error = false;
             continueWorking = true;
+            isStopped = false;
             oSourceInfo = new SourceDetectorInfo();
+            this.priority = priority;
 
             analyseUpdate += updateMethod;
             finishedAnalysis += finishedMethod;
@@ -116,7 +118,7 @@ namespace MeGUI
 
         #region variables
         private bool isAnime;
-        private bool error, continueWorking;
+        private bool error, continueWorking, isStopped;
         private bool majorityFilm;
         private string errorMessage = "";
         private SourceDetectorSettings settings;
@@ -133,7 +135,8 @@ namespace MeGUI
         private ManualResetEvent _mre = new System.Threading.ManualResetEvent(true); // lock used to pause processing
         private SourceDetectorInfo oSourceInfo;
         private const int sectionLength = 5; // number of frames in a section. do not change!
-        
+        private Thread analyseThread;
+        private ThreadPriority priority;
         #endregion
 
         #region processing
@@ -203,6 +206,12 @@ namespace MeGUI
                         }
                     })).Start();
 
+                    if (!continueWorking)
+                    {
+                        isStopped = true;
+                        return;
+                    }
+
                     IntPtr zero = new IntPtr(0);
                     if (settings.AnalysePercent == 0)
                     {
@@ -266,6 +275,12 @@ namespace MeGUI
                             _mre.WaitOne();
                             af.Clip.ReadFrame(zero, 0, i);
                         }
+                    }
+
+                    if (!continueWorking)
+                    {
+                        isStopped = true;
+                        return;
                     }
 
                     if (running)
@@ -333,7 +348,14 @@ namespace MeGUI
                 try
                 {
                     Process(resultScript, logFileName, scriptType);
-                    if (error || !continueWorking)
+
+                    if (!continueWorking)
+                    {
+                        isStopped = true;
+                        return;
+                    }
+
+                    if (error)
                         return;
 
                     if (scriptType == 0)
@@ -351,11 +373,12 @@ namespace MeGUI
                     {
                     }
                 }
+                isStopped = true;
             };
 
-            Thread t = new Thread(new ThreadStart(mi));
-            t.Priority = settings.Priority;
-            t.Start();
+            analyseThread = new Thread(new ThreadStart(mi));
+            analyseThread.Priority = priority;
+            analyseThread.Start();
         }
 
         #endregion
@@ -660,7 +683,6 @@ namespace MeGUI
             bool stillWorking = false;
  
             #region final counting
-
             int[] array = new int[] { oSourceInfo.numInt, oSourceInfo.numProg, oSourceInfo.numTC };
             Array.Sort(array);
 
@@ -809,6 +831,7 @@ namespace MeGUI
             }
             #endregion
             #endregion
+
             if (!stillWorking)
                 finishProcessing();
         }
@@ -819,6 +842,8 @@ namespace MeGUI
         {
             _mre.Set();  // Make sure nothing is waiting for pause to stop
 
+            isStopped = true;
+
             if (error)
             {
                 finishedAnalysis(null, true, errorMessage);
@@ -827,6 +852,7 @@ namespace MeGUI
 
             if (!continueWorking)
             {
+                finishedAnalysis(null, true, string.Empty);
                 return;
             }
 
@@ -858,6 +884,10 @@ namespace MeGUI
         public void Stop()
         {
             continueWorking = false;
+            _mre.Set();  // Make sure nothing is waiting for pause to stop
+            while (!isStopped)
+                MeGUI.core.util.Util.Wait(500);
+            finishProcessing();
         }
 
         public bool Pause()
@@ -869,6 +899,20 @@ namespace MeGUI
         {
             return _mre.Set();
         }
+
+        public void ChangePriority(WorkerPriorityType priority)
+        {
+            try
+            {
+                if (analyseThread != null && analyseThread.IsAlive)
+                    analyseThread.Priority = OSInfo.GetThreadPriority(priority);
+            }
+            catch (Exception) 
+            {
+                // process could not be running anymore - ignore
+            }
+        }
+
         #endregion
     }
 }

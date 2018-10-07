@@ -31,7 +31,7 @@ namespace MeGUI
 	public delegate void AbortCallback(); // delegate for Abort event
     public delegate void SuspendCallback(); // delegate for Suspend event
     public delegate void UpdateStatusCallback(StatusUpdate su); // delegate for UpdateStatus event
-	public delegate void PriorityChangedCallback(ProcessPriority priority); // delegate for PriorityChanged event
+	public delegate void PriorityChangedCallback(WorkerPriorityType priority); // delegate for PriorityChanged event
 
     /// <summary>
     /// ProgressWindow is a window that is being shown during encoding and shows the current encoding status
@@ -212,7 +212,7 @@ namespace MeGUI
         /// sets the priority
         /// </summary>
         /// <param name="priority"></param>
-        public void setPriority(ProcessPriority priority)
+        public void setPriority(WorkerPriorityType priority)
         {
             Util.ThreadSafeRun(this.priority, delegate {
                 isSettingPriority = true;
@@ -254,32 +254,9 @@ namespace MeGUI
         /// <param name="e"></param>
         private void priority_SelectedIndexChanged(object sender, System.EventArgs e)
         {
-            if (PriorityChanged != null && !isSettingPriority)
-            {
-                if (!WarnPriority((ProcessPriority)priority.SelectedIndex))
-                {
-                    // priority.Tag contains previous SelectedIndex
-                    setPriority((ProcessPriority)priority.Tag);
-                    return;
-                }
-                else
-                {
-                    PriorityChanged((ProcessPriority)priority.SelectedIndex);
-                }
-            }
-            if (priority.SelectedIndex >= 0)
-                priority.Tag = priority.SelectedIndex;
-        }
-
-        private bool WarnPriority(ProcessPriority priority)
-        {
-            if (priority == ProcessPriority.HIGH)
-            {
-                // when user selected 'HIGH' priority
-                DialogResult res = MessageBox.Show("On Windows System, running processes at high priority causes them to compete against the window manager and compositor processes. Are you sure you want to proceed?", "MeGUI", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                return res == DialogResult.Yes;
-            }
-            else return true;
+            if (PriorityChanged == null || isSettingPriority)
+                return;
+            PriorityChanged((WorkerPriorityType)priority.SelectedIndex);
         }
 
         private void ProgressWindow_VisibleChanged(object sender, EventArgs e)

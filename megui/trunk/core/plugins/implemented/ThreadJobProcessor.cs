@@ -34,7 +34,10 @@ namespace MeGUI
         protected TJob job;
         protected StatusUpdate su;
         protected LogItem log;
-        protected Thread _processingThread;
+        protected Thread processThread;
+        protected ManualResetEvent mre = new System.Threading.ManualResetEvent(true); // lock used to pause processing
+        protected bool continueWorking = true;
+        protected string jobOutputFile = string.Empty;
         #endregion
 
         protected virtual void checkJobIO()
@@ -42,6 +45,7 @@ namespace MeGUI
             // only check if the input file exist if it is not a cleanup job
             if (!(this is MeGUI.core.details.CleanupJobRunner))
                 Util.ensureExists(job.Input);
+            jobOutputFile = job.Output;
         }
 
         protected virtual void doExitConfig()
@@ -49,19 +53,13 @@ namespace MeGUI
             if (su.HasError || su.WasAborted)
                 return;
 
-            if (String.IsNullOrEmpty(job.Output))
-                return;
-
-            if (File.Exists(job.Output))
+            if (!String.IsNullOrEmpty(job.Output) && File.Exists(job.Output))
             {
                 MediaInfoFile oInfo = new MediaInfoFile(job.Output, ref log);
             }
         }
 
-        protected virtual void RunInThread()
-        {
-            
-        }
+        protected virtual void RunInThread() { }
 
         protected void ThreadFinished()
         {
@@ -88,18 +86,10 @@ namespace MeGUI
         {
             try
             {
-                _processingThread = new Thread(new ThreadStart(RunInThread));
-                if (MainForm.Instance.Settings.ProcessingPriority == ProcessPriority.HIGH)
-                    _processingThread.Priority = ThreadPriority.Highest;
-                else if (MainForm.Instance.Settings.ProcessingPriority == ProcessPriority.ABOVE_NORMAL)
-                    _processingThread.Priority = ThreadPriority.AboveNormal;
-                else if (MainForm.Instance.Settings.ProcessingPriority == ProcessPriority.NORMAL)
-                    _processingThread.Priority = ThreadPriority.Normal;
-                else if (MainForm.Instance.Settings.ProcessingPriority == ProcessPriority.BELOW_NORMAL)
-                    _processingThread.Priority = ThreadPriority.BelowNormal;
-                else
-                    _processingThread.Priority = ThreadPriority.Lowest;
-                _processingThread.Start();
+                WorkerPriority.GetJobPriority(job, out WorkerPriorityType oPriority, out bool lowIOPriority);
+                processThread = new Thread(new ThreadStart(RunInThread));
+                processThread.Priority = OSInfo.GetThreadPriority(oPriority);
+                processThread.Start();
                 new System.Windows.Forms.MethodInvoker(this.RunStatusCycle).BeginInvoke(null, null);
             }
             catch (Exception e)
@@ -108,13 +98,15 @@ namespace MeGUI
             }
         }
 
-        public void stop()
+        public virtual void stop()
         {
             try
             {
-                if (IsRunning())
-                    _processingThread.Abort();
-                doExitConfig();
+                su.WasAborted = true;
+                continueWorking = false;
+                mre.Set(); // if it's paused, then unpause
+                while (IsRunning())
+                    MeGUI.core.util.Util.Wait(1000);
                 return;
             }
             catch (Exception e)
@@ -123,53 +115,41 @@ namespace MeGUI
             }
         }
 
-        public bool pause()
+        public virtual bool pause()
         {
-            return false;
+            return mre.Reset();
         }
 
-        public bool resume()
+        public virtual bool resume()
         {
-            return false;
+            return mre.Set();
         }
 
         public bool IsRunning()
         {
-            return (this._processingThread != null && _processingThread.IsAlive);
+            return (this.processThread != null && processThread.IsAlive);
         }
 
-        public void changePriority(ProcessPriority priority)
+        public virtual void changePriority(WorkerPriorityType priority)
         {
             if (!IsRunning())
                 return;
 
             try
             {
-                switch (priority)
-                {
-                    case ProcessPriority.IDLE:
-                        _processingThread.Priority = ThreadPriority.Lowest;
-                        break;
-                    case ProcessPriority.BELOW_NORMAL:
-                        _processingThread.Priority = ThreadPriority.BelowNormal;
-                        break;
-                    case ProcessPriority.NORMAL:
-                        _processingThread.Priority = ThreadPriority.Normal;
-                        break;
-                    case ProcessPriority.ABOVE_NORMAL:
-                        _processingThread.Priority = ThreadPriority.AboveNormal;
-                        break;
-                    case ProcessPriority.HIGH:
-                        _processingThread.Priority = ThreadPriority.Highest;
-                        break;
-                }
-                MainForm.Instance.Settings.ProcessingPriority = priority;
-                return;
+                processThread.Priority = OSInfo.GetThreadPriority(priority);
             }
             catch (Exception e) // process could not be running anymore
             {
                 throw new JobRunException(e);
             }
+        }
+
+        public bool IsJobStopped()
+        {
+            // check for stop or suspend of the thread
+            mre.WaitOne();
+            return !continueWorking;
         }
 
         #endregion
@@ -180,7 +160,7 @@ namespace MeGUI
         {
             while (IsRunning())
             {
-                su.CurrentFileSize = FileSize.Of2(job.Output);
+                su.CurrentFileSize = FileSize.Of2(jobOutputFile);
                 su.FillValues();
                 if (StatusUpdate != null && IsRunning())
                     StatusUpdate(su);

@@ -149,7 +149,7 @@ namespace MeGUI.core.gui
         /// catches the ChangePriority event from the progresswindow and forward it to the encoder class
         /// </summary>
         /// <param name="priority"></param>
-        private void Pw_PriorityChanged(ProcessPriority priority)
+        private void Pw_PriorityChanged(WorkerPriorityType priority)
         {
             try
             {
@@ -504,7 +504,7 @@ namespace MeGUI.core.gui
                 log.LogEvent("Job completed");
                 log.Collapse();
 
-                if (!jobFailed && mainForm.Settings.DeleteCompletedJobs)
+                if (!jobFailed && mainForm.Settings.WorkerRemoveJob)
                     mainForm.Jobs.RemoveCompletedJob(job);
                 else
                     mainForm.Jobs.SaveJob(job, mainForm.MeGUIPath);
@@ -615,7 +615,8 @@ namespace MeGUI.core.gui
                 currentProcessor.StatusUpdate += new JobProcessingStatusUpdateCallback(UpdateGUIStatus);
 
                 // Progress window
-                pw.setPriority(mainForm.Settings.ProcessingPriority);
+                WorkerPriority.GetJobPriority(job.Job, out WorkerPriorityType oPriority, out bool lowIOPriority);
+                pw.setPriority(oPriority);
                 if (mainForm.Settings.OpenProgressWindow && mainForm.Visible)
                     this.ShowProcessWindow();
 

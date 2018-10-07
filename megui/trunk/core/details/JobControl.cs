@@ -460,7 +460,7 @@ namespace MeGUI.core.details
         {
             // start idle and postponed workers if required
             foreach (JobWorker w in workers.Values)
-                if (!w.IsRunning && ((w.Status == JobWorkerStatus.Idle && MainForm.Instance.Settings.AutoStartQueue) || w.Status == JobWorkerStatus.Postponed))
+                if (!w.IsRunning && ((w.Status == JobWorkerStatus.Idle && MainForm.Instance.Settings.WorkerAutoStart) || w.Status == JobWorkerStatus.Postponed))
                     w.StartEncoding(false);
         }
 
@@ -622,7 +622,7 @@ namespace MeGUI.core.details
             foreach (TaggedJob j in c.Jobs)
                 AddJob(j);
             SaveJobs();
-            if (mainForm.Settings.AutoStartQueue && bStartQueue)
+            if (mainForm.Settings.WorkerAutoStart && bStartQueue)
                 StartAll(false);
             RefreshStatus();
         }
@@ -636,7 +636,7 @@ namespace MeGUI.core.details
             foreach (Job j in jobs)
                 AddJob(new TaggedJob(j));
             SaveJobs();
-            if (mainForm.Settings.AutoStartQueue)
+            if (mainForm.Settings.WorkerAutoStart)
                 StartAll(false);
             RefreshStatus();
         }

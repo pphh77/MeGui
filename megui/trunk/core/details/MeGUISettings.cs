@@ -53,15 +53,15 @@ namespace MeGUI
                        strEac3toLastFolderPath, strEac3toLastFilePath, strEac3toLastDestinationPath, tempDirMP4,
                        fdkAacPath, httpproxyaddress, httpproxyport, httpproxyuid, httpproxypwd, defaultOutputDir,
                        appendToForcedStreams, lastUsedOneClickFolder, lastUpdateServer, chapterCreatorSortString;
-        private bool autoForceFilm, autoStartQueue, autoOpenScript, bUseQAAC, bUseDGIndexNV, bUseDGIndexIM,
-                     overwriteStats, keep2of3passOutput, autoUpdate, deleteCompletedJobs, deleteIntermediateFiles,
+        private bool autoForceFilm, autoOpenScript, bUseQAAC, bUseDGIndexNV, bUseDGIndexIM,
+                     overwriteStats, keep2of3passOutput, autoUpdate, deleteIntermediateFiles, workerAutoStart,
                      deleteAbortedOutput, openProgressWindow, bEac3toAutoSelectStreams, bUseFDKAac, bVobSubberKeepAll,
                      alwaysOnTop, addTimePosition, alwaysbackupfiles, bUseITU, bEac3toLastUsedFileMode, bMeGUIx64,
-                     bAutoLoadDG, bAutoStartQueueStartup, bAlwayUsePortableAviSynth, bVobSubberSingleFileExport,
+                     bAutoLoadDG, bAlwayUsePortableAviSynth, bVobSubberSingleFileExport, workerAutoStartOnStartup,
                      bEnsureCorrectPlaybackSpeed, bExternalMuxerX264, bUseNeroAacEnc, bOSx64, bEnableDirectShowSource,
                      bVobSubberExtractForced, bVobSubberShowAll, bUsex64Tools, bShowDebugInformation, bEac3toDefaultToHD,
                      bEac3toEnableEncoder, bEac3toEnableDecoder, bEac3toEnableCustomOptions, bFirstUpdateCheck,
-                     bChapterCreatorCounter, bX264AdvancedSettings, bEac3toAddPrefix;
+                     bChapterCreatorCounter, bX264AdvancedSettings, bEac3toAddPrefix, workerRemoveJob;
         private decimal forceFilmThreshold, acceptableFPSError;
         private int nbPasses, autoUpdateServerSubList, minComplexity, updateFormSplitter,
                     maxComplexity, jobColumnWidth, inputColumnWidth, outputColumnWidth, codecColumnWidth,
@@ -74,7 +74,6 @@ namespace MeGUI
         private SourceDetectorSettings sdSettings;
         private AutoEncodeDefaultsSettings aedSettings;
         private DialogSettings dialogSettings;
-        private ProcessPriority defaultPriority;
         private Point mainFormLocation, updateFormLocation;
         private Size mainFormSize, updateFormSize;
         private FileSize[] customFileSizes;
@@ -84,6 +83,7 @@ namespace MeGUI
         private AfterEncoding afterEncoding;
         private ProxyMode httpProxyMode;
         private List<WorkerSettings> arrWorkerSettings;
+        private List<WorkerPriority> arrWorkerPriority;
         private ProgramSettings avimuxgui, avisynth, avisynthplugins, besplit, dgindexim, dgindex, dgindexnv,
                                 eac3to, fdkaac, ffmpeg, ffms, flac, haali, lame, lsmash, mediainfo,
                                 megui_core, megui_help, megui_libs, megui_updater, mkvmerge, mp4box, neroaacenc,
@@ -125,17 +125,13 @@ namespace MeGUI
             meguiupdatecache = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "update_cache");
 			autoForceFilm = true;
             bAutoLoadDG = true;
-			autoStartQueue = true;
-            bAutoStartQueueStartup = false;
 			forceFilmThreshold = new decimal(95);
 			defaultLanguage1 = "English";
 			defaultLanguage2 = "English";
-            defaultPriority = ProcessPriority.IDLE;
             afterEncoding = AfterEncoding.DoNothing;
 			autoOpenScript = true;
 			overwriteStats = true;
 			keep2of3passOutput = false;
-			deleteCompletedJobs = true;
 			nbPasses = 2;
 			deleteIntermediateFiles = true;
 			deleteAbortedOutput = true;
@@ -201,17 +197,16 @@ namespace MeGUI
             chapterCreatorSortString = "duration";
             bShowDebugInformation = false;
             bEnableDirectShowSource = false;
-            arrWorkerSettings = new List<MeGUI.WorkerSettings>();
-            arrWorkerSettings.Add(new WorkerSettings(1, new List<MeGUI.WorkerSettings.JobTyp>() { MeGUI.WorkerSettings.JobTyp.Audio }));
-            arrWorkerSettings.Add(new WorkerSettings(1, new List<MeGUI.WorkerSettings.JobTyp>() { MeGUI.WorkerSettings.JobTyp.Audio, MeGUI.WorkerSettings.JobTyp.Demuxer, MeGUI.WorkerSettings.JobTyp.Indexer, MeGUI.WorkerSettings.JobTyp.Muxer }));
-            arrWorkerSettings.Add(new WorkerSettings(1, new List<MeGUI.WorkerSettings.JobTyp>() { MeGUI.WorkerSettings.JobTyp.OneClick }));
-            arrWorkerSettings.Add(new WorkerSettings(1, new List<MeGUI.WorkerSettings.JobTyp>() { MeGUI.WorkerSettings.JobTyp.Video }));
-            iWorkerMaximumCount = 2;
             bFirstUpdateCheck = true;
             dLastDPIScaleFactor = 0;
             oRedistVersions = new Dictionary<string, string>();
             bChapterCreatorCounter = true;
             bX264AdvancedSettings = false;
+            workerAutoStart = true;
+            workerAutoStartOnStartup = false;
+            workerRemoveJob = true;
+            ResetWorkerSettings();
+            ResetWorkerPriority();
         }
 
         #region properties
@@ -715,24 +710,6 @@ namespace MeGUI
             set { bAutoLoadDG = value; }
         }
 
-        /// <summary>
-		/// gets / sets whether pressing Queue should automatically start encoding at startup
-		/// </summary>
-		public bool AutoStartQueueStartup
-		{
-            get { return bAutoStartQueueStartup; }
-            set { bAutoStartQueueStartup = value; }
-		}
-
-		/// <summary>
-		/// gets / sets whether pressing Queue should automatically start encoding
-		/// </summary>
-		public bool AutoStartQueue
-		{
-			get {return autoStartQueue;}
-			set {autoStartQueue = value;}
-		}
-
 		/// <summary>
 		/// gets / sets whether megui automatically opens the preview window upon loading an avisynth script
 		/// </summary>
@@ -781,35 +758,6 @@ namespace MeGUI
 		}
 
 		/// <summary>
-		/// default priority for all processes
-		/// </summary>
-        public ProcessPriority DefaultPriority
-		{
-			get {return defaultPriority;}
-			set {defaultPriority = value;}
-		}
-
-        private ProcessPriority processingPriority;
-        private bool processingPrioritySet;
-        /// <summary>
-        /// default priority for all new processes during this session
-        /// </summary>
-        [XmlIgnore()]
-        public ProcessPriority ProcessingPriority
-        {
-            get 
-            {
-                if (!processingPrioritySet)
-                {
-                    processingPriority = defaultPriority;
-                    processingPrioritySet = true;
-                }
-                return processingPriority; 
-            }
-            set { processingPriority = value; }
-        }
-
-		/// <summary>
 		/// sets / gets if the stats file is updated in the 3rd pass of 3 pass encoding
 		/// </summary>
 		public bool OverwriteStats
@@ -834,15 +782,6 @@ namespace MeGUI
 		{
 			get {return nbPasses;}
 			set {nbPasses = value;}
-		}
-
-		/// <summary>
-		/// sets / gets whether completed jobs will be deleted
-		/// </summary>
-		public bool DeleteCompletedJobs
-		{
-			get {return deleteCompletedJobs;}
-			set {deleteCompletedJobs = value;}
 		}
 
 		/// <summary>
@@ -1066,6 +1005,38 @@ namespace MeGUI
         {
             get { return iWorkerMaximumCount; }
             set { iWorkerMaximumCount = value; }
+        }
+
+        [XmlIgnore()]
+        [MeGUI.core.plugins.interfaces.PropertyEqualityIgnoreAttribute()]
+        public List<WorkerPriority> WorkerPriority
+        {
+            get { return arrWorkerPriority; }
+            set { arrWorkerPriority = value; }
+        }
+
+        public WorkerPriority[] WorkerPriorityString
+        {
+            get { return arrWorkerPriority.ToArray(); }
+            set { arrWorkerPriority = new List<WorkerPriority>(value); }
+        }
+
+        public bool WorkerAutoStart
+        {
+            get { return workerAutoStart; }
+            set { workerAutoStart = value; }
+        }
+
+        public bool WorkerAutoStartOnStartup
+        {
+            get { return workerAutoStartOnStartup; }
+            set { workerAutoStartOnStartup = value; }
+        }
+
+        public bool WorkerRemoveJob
+        {
+            get { return workerRemoveJob; }
+            set { workerRemoveJob = value; }
         }
 
         /// <summary>
@@ -1379,6 +1350,55 @@ namespace MeGUI
         }
 
         #region Methods
+        private void VerifySettings()
+        {
+            bool bReset = false;
+            foreach (WorkerSettings oSettings in arrWorkerSettings)
+            {
+                if (oSettings.MaxCount < 1)
+                    bReset = true;
+                if (oSettings.JobTypes.Count < 1)
+                    bReset = true;
+            }
+            if (bReset)
+                ResetWorkerSettings();
+
+            bReset = false;
+            Dictionary<JobType, WorkerPriority> arrDict = new Dictionary<JobType, WorkerPriority>();
+            foreach (WorkerPriority oPriority in arrWorkerPriority)
+            {
+                if (arrDict.ContainsKey(oPriority.JobType))
+                {
+                    bReset = true;
+                    break;
+                }
+                arrDict.Add(oPriority.JobType, oPriority);
+            }
+            if (bReset || arrDict.Count != Enum.GetNames(typeof(JobType)).Length)
+                ResetWorkerPriority();
+        }
+
+        public void ResetWorkerSettings()
+        {
+            arrWorkerSettings = new List<WorkerSettings>();
+            arrWorkerSettings.Add(new WorkerSettings(1, new List<JobType>() { JobType.Audio }));
+            arrWorkerSettings.Add(new WorkerSettings(1, new List<JobType>() { JobType.Audio, JobType.Demuxer, JobType.Indexer, JobType.Muxer }));
+            arrWorkerSettings.Add(new WorkerSettings(1, new List<JobType>() { JobType.OneClick }));
+            arrWorkerSettings.Add(new WorkerSettings(1, new List<JobType>() { JobType.Video }));
+            iWorkerMaximumCount = 2;
+        }
+
+        public void ResetWorkerPriority()
+        {
+            arrWorkerPriority = new List<WorkerPriority>();
+            arrWorkerPriority.Add(new WorkerPriority(JobType.Audio, WorkerPriorityType.BELOW_NORMAL, false));
+            arrWorkerPriority.Add(new WorkerPriority(JobType.Demuxer, WorkerPriorityType.BELOW_NORMAL, false));
+            arrWorkerPriority.Add(new WorkerPriority(JobType.Indexer, WorkerPriorityType.BELOW_NORMAL, false));
+            arrWorkerPriority.Add(new WorkerPriority(JobType.Muxer, WorkerPriorityType.BELOW_NORMAL, false));
+            arrWorkerPriority.Add(new WorkerPriority(JobType.OneClick, WorkerPriorityType.BELOW_NORMAL, false));
+            arrWorkerPriority.Add(new WorkerPriority(JobType.Video, WorkerPriorityType.IDLE, true));
+        }
+
         public int DPIRescale(int iOriginalValue)
         {
             return (int)Math.Round(iOriginalValue * dpiScaleFactor, 0);
@@ -1670,6 +1690,8 @@ namespace MeGUI
             if (!bMeGUIx64)
                 x265.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\x265\x86\x265.exe"));
             xvid.UpdateInformation("xvid_encraw", "Xvid", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\xvid_encraw\xvid_encraw.exe"));
+
+            VerifySettings();
        }
 #endregion
     }

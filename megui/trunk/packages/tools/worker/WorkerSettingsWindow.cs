@@ -19,12 +19,7 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace MeGUI
@@ -36,7 +31,11 @@ namespace MeGUI
             InitializeComponent();
 
             workerMaximumCount.Value = MainForm.Instance.Settings.WorkerMaximumCount;
-            workerJobsListBox.DataSource = EnumProxy.CreateArray(new object[] { WorkerSettings.JobTyp.Audio, WorkerSettings.JobTyp.Demuxer, WorkerSettings.JobTyp.Indexer, WorkerSettings.JobTyp.Muxer, WorkerSettings.JobTyp.OneClick, WorkerSettings.JobTyp.Video });
+            workerJobsListBox.DataSource = EnumProxy.CreateArray(new object[] { JobType.Audio, JobType.Demuxer, JobType.Indexer, JobType.Muxer, JobType.OneClick, JobType.Video });
+            cbJobType.DataSource = EnumProxy.CreateArray(new object[] { JobType.Audio, JobType.Demuxer, JobType.Indexer, JobType.Muxer, JobType.OneClick, JobType.Video });
+            cbAutoStartOnStartup.Checked = MainForm.Instance.Settings.WorkerAutoStartOnStartup;
+            cbAutoStart.Checked = MainForm.Instance.Settings.WorkerAutoStart;
+            cbRemoveJob.Checked = MainForm.Instance.Settings.WorkerRemoveJob;
             UpdateWorkerSettingsListBox();
         }
 
@@ -46,16 +45,16 @@ namespace MeGUI
             foreach (WorkerSettings oSettings in MainForm.Instance.Settings.WorkerSettings)
             {
                 string strText = string.Empty;
-                foreach (WorkerSettings.JobTyp oTyp in oSettings.JobTypes)
+                foreach (JobType oType in oSettings.JobTypes)
                 {
-                    strText += oTyp.ToString() + " Jobs + ";
+                    strText += oType.ToString() + " Jobs + ";
                 }
                 strText = strText.Substring(0, strText.Length - 2) + " <= " + oSettings.MaxCount + " Job(s) in parallel";
                 workerSettingsListBox.Items.Add(strText);
             }
         }
 
-        private void btnAddSettings_Click(object sender, EventArgs e)
+        private void BtnAddSettings_Click(object sender, EventArgs e)
         {
             if (workerJobsListBox.CheckedItems.Count == 0)
             {
@@ -68,9 +67,8 @@ namespace MeGUI
             {
                 if (workerJobsListBox.GetItemCheckState(i) != CheckState.Checked)
                     continue;
-                EnumProxy x = (EnumProxy)workerJobsListBox.Items[i];
-                WorkerSettings.JobTyp oTyp = (WorkerSettings.JobTyp)x.RealValue;
-                oSettings.JobTypes.Add(oTyp);
+                JobType oType = (JobType)((EnumProxy)workerJobsListBox.Items[i]).RealValue;
+                oSettings.JobTypes.Add(oType);
             }
             oSettings.MaxCount = (int)numericUpDown1.Value;
 
@@ -93,7 +91,7 @@ namespace MeGUI
             UpdateWorkerSettingsListBox();
         }
 
-        private void btnDeleteSettings_Click(object sender, EventArgs e)
+        private void BtnDeleteSettings_Click(object sender, EventArgs e)
         {
             int i = workerSettingsListBox.SelectedIndex;
             if (i < 0)
@@ -106,7 +104,7 @@ namespace MeGUI
             UpdateWorkerSettingsListBox();
         }
 
-        private void workerMaximumCount_ValueChanged(object sender, EventArgs e)
+        private void WorkerMaximumCount_ValueChanged(object sender, EventArgs e)
         {
             if (MainForm.Instance.Settings.WorkerMaximumCount == (int)workerMaximumCount.Value)
                 return;
@@ -115,29 +113,85 @@ namespace MeGUI
             MainForm.Instance.Jobs.AdjustWorkerCount(MainForm.Instance.Jobs.IsAnyWorkerRunning);
         }
 
-        private void workerSettingsListBox_SelectedIndexChanged(object sender, EventArgs e)
+        private void WorkerSettingsListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             btnDeleteSettings.Enabled = workerSettingsListBox.SelectedIndex >= 0;
         }
 
-        private void btnResetSettings_Click(object sender, EventArgs e)
+        private void BtnResetSettings_Click(object sender, EventArgs e)
         {
-            MainForm.Instance.Settings.WorkerMaximumCount = 2;
-            workerMaximumCount.Value = 2;
-
-            MainForm.Instance.Settings.WorkerSettings.Clear();
-            MainForm.Instance.Settings.WorkerSettings.Add(new WorkerSettings(1, new List<MeGUI.WorkerSettings.JobTyp>() { MeGUI.WorkerSettings.JobTyp.Audio }));
-            MainForm.Instance.Settings.WorkerSettings.Add(new WorkerSettings(1, new List<MeGUI.WorkerSettings.JobTyp>() { MeGUI.WorkerSettings.JobTyp.Audio, MeGUI.WorkerSettings.JobTyp.Demuxer, MeGUI.WorkerSettings.JobTyp.Indexer, MeGUI.WorkerSettings.JobTyp.Muxer }));
-            MainForm.Instance.Settings.WorkerSettings.Add(new WorkerSettings(1, new List<MeGUI.WorkerSettings.JobTyp>() { MeGUI.WorkerSettings.JobTyp.OneClick }));
-            MainForm.Instance.Settings.WorkerSettings.Add(new WorkerSettings(1, new List<MeGUI.WorkerSettings.JobTyp>() { MeGUI.WorkerSettings.JobTyp.Video }));
-
+            MainForm.Instance.Settings.ResetWorkerSettings();
+            MainForm.Instance.Settings.ResetWorkerPriority();
+            workerMaximumCount.Value = MainForm.Instance.Settings.WorkerMaximumCount;
             UpdateWorkerSettingsListBox();
+            CbJobType_SelectedIndexChanged(null, null);
         }
 
         protected override void OnClosing(CancelEventArgs e)
         {
             e.Cancel = true;
             Hide();
+        }
+
+        bool doNotSave = false;
+        private void CbJobType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            doNotSave = true;
+            JobType oType = (JobType)((EnumProxy)cbJobType.SelectedItem).RealValue;
+            foreach (WorkerPriority oPriority in MainForm.Instance.Settings.WorkerPriority)
+            {
+                if (oType == oPriority.JobType)
+                {
+                    cbProcessPriority.SelectedIndex = (int)oPriority.Priority;
+                    cbIOPriority.SelectedIndex = oPriority.LowIOPriority ? 0 : 1;
+                }
+            }
+            doNotSave = false;
+        }
+
+        private void CbProcessPriority_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (doNotSave)
+                return;
+
+            JobType oType = (JobType)((EnumProxy)cbJobType.SelectedItem).RealValue;
+            foreach (WorkerPriority oPriority in MainForm.Instance.Settings.WorkerPriority)
+            {
+                if (oType == oPriority.JobType)
+                {
+                    oPriority.Priority = (WorkerPriorityType)cbProcessPriority.SelectedIndex;
+                }
+            }
+        }
+
+        private void CbIOPriority_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (doNotSave)
+                return;
+
+            JobType oType = (JobType)((EnumProxy)cbJobType.SelectedItem).RealValue;
+            foreach (WorkerPriority oPriority in MainForm.Instance.Settings.WorkerPriority)
+            {
+                if (oType == oPriority.JobType)
+                {
+                    oPriority.LowIOPriority = (cbIOPriority.SelectedIndex == 0);
+                }
+            }
+        }
+
+        private void CbAutoStartOnStartup_CheckedChanged(object sender, EventArgs e)
+        {
+            MainForm.Instance.Settings.WorkerAutoStartOnStartup = cbAutoStartOnStartup.Checked;
+        }
+
+        private void CbAutoStart_CheckedChanged(object sender, EventArgs e)
+        {
+            MainForm.Instance.Settings.WorkerAutoStart = cbAutoStart.Checked;
+        }
+
+        private void CbRemoveJob_CheckedChanged(object sender, EventArgs e)
+        {
+            MainForm.Instance.Settings.WorkerRemoveJob = cbRemoveJob.Checked;
         }
     }
 }

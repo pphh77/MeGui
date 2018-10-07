@@ -64,6 +64,9 @@ namespace MeGUI
         {
             try
             {
+                // job output file in case of LWLibavVideoSource()
+                base.jobOutputFile = job.Input + ".lwi";
+
                 // generate the avs script
                 StringBuilder strAVSScript = new StringBuilder();
                 MediaInfoFile oInfo = null;
@@ -73,8 +76,20 @@ namespace MeGUI
                 base.log.LogValue("AviSynth script", strAVSScript.ToString(), ImageType.Information);
 
                 // check if the script has a video track, also this call will create the index file if there is one
-                string strErrorText;
-                if (!VideoUtil.AVSScriptHasVideo(strAVSScript.ToString(), out strErrorText))
+                string strErrorText = "no video track found";
+                bool openSuccess = false;
+                try
+                {
+                    strErrorText = String.Empty;
+                    using (AviSynthScriptEnvironment env = new AviSynthScriptEnvironment())
+                        using (AviSynthClip a = env.ParseScript(strAVSScript.ToString(),false, false))
+                            openSuccess = a.HasVideo;
+                }
+                catch (Exception ex)
+                {
+                    strErrorText = ex.Message;
+                }
+                if (!openSuccess)
                 {
                     // avs script has no video track or an error has been thrown
                     base.log.LogEvent(strErrorText, ImageType.Error);
@@ -181,6 +196,16 @@ namespace MeGUI
                 job.FilesToDelete.Add(job.Input + ".lwi");
 
             base.doExitConfig();
+        }
+
+        public override bool pause()
+        {
+            return false;
+        }
+
+        public override bool resume()
+        {
+            return false;
         }
     }
 }

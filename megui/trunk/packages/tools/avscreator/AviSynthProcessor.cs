@@ -181,31 +181,18 @@ namespace MeGUI
         /// <param name="priority">the priority to change to</param>
         /// <param name="error">output for any errors that might ocurr during this method</param>
         /// <returns>true if the priority has been changed, false if not</returns>
-        public void changePriority(ProcessPriority priority)
+        public void changePriority(WorkerPriorityType priority)
         {
-            if (processorThread != null && processorThread.IsAlive)
+            if (this.processorThread == null || !processorThread.IsAlive)
+                return;
+
+            try
             {
-                try
-                {
-                    if (priority == ProcessPriority.IDLE)
-                        processorThread.Priority = ThreadPriority.Lowest;
-                    else if (priority == ProcessPriority.NORMAL)
-                        processorThread.Priority = ThreadPriority.Normal;
-                    else if (priority == ProcessPriority.HIGH)
-                        processorThread.Priority = ThreadPriority.Highest;
-                    return;
-                }
-                catch (Exception e) // process could not be running anymore
-                {
-                    throw new JobRunException(e);
-                }
+                processorThread.Priority = OSInfo.GetThreadPriority(priority);
             }
-            else
+            catch (Exception e) // process could not be running anymore
             {
-                if (processorThread == null)
-                    throw new JobRunException("Process has not been started yet");
-                else
-                    throw new JobRunException("Process has exited");
+                throw new JobRunException(e);
             }
         }
 

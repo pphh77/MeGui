@@ -814,6 +814,7 @@
     <Compile Include="packages\tools\vobsub\VobSubIndexWindow.Designer.cs">
       <DependentUpon>VobSubIndexWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="packages\tools\worker\WorkerPriority.cs" />
     <Compile Include="packages\tools\worker\WorkerSettings.cs" />
     <Compile Include="packages\tools\worker\WorkerSettingsWindow.cs">
       <SubType>Form</SubType>

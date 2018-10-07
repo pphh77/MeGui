@@ -580,16 +580,14 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
 
                 // Take priority from AviSynth thread rather than default in settings
                 // just in case user has managed to change job setting before getting here.
-                if (_encoderThread.Priority == ThreadPriority.Lowest)
-                    this.changePriority(ProcessPriority.IDLE);
-                else if (_encoderThread.Priority == ThreadPriority.BelowNormal)
-                    this.changePriority(ProcessPriority.BELOW_NORMAL);
+                if (_encoderThread.Priority == ThreadPriority.BelowNormal)
+                    this.changePriority(WorkerPriorityType.BELOW_NORMAL);
                 else if (_encoderThread.Priority == ThreadPriority.Normal)
-                    this.changePriority(ProcessPriority.NORMAL);
+                    this.changePriority(WorkerPriorityType.NORMAL);
                 else if (_encoderThread.Priority == ThreadPriority.AboveNormal)
-                    this.changePriority(ProcessPriority.ABOVE_NORMAL);
-                else if (_encoderThread.Priority == ThreadPriority.Highest)
-                    this.changePriority(ProcessPriority.HIGH);
+                    this.changePriority(WorkerPriorityType.ABOVE_NORMAL);
+                else
+                    this.changePriority(WorkerPriorityType.IDLE);
 
                 _log.LogEvent("Process started");
                 stdoutLog = _log.Info(string.Format("[{0:G}] {1}", DateTime.Now, "Standard output stream"));
@@ -693,16 +691,8 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
         {
             Util.ensureExists(audioJob.Input);
             _encoderThread = new Thread(new ThreadStart(this.encode));
-            if (MainForm.Instance.Settings.ProcessingPriority == ProcessPriority.HIGH)
-                _encoderThread.Priority = ThreadPriority.Highest;
-            else if (MainForm.Instance.Settings.ProcessingPriority == ProcessPriority.ABOVE_NORMAL)
-                _encoderThread.Priority = ThreadPriority.AboveNormal;
-            else if (MainForm.Instance.Settings.ProcessingPriority == ProcessPriority.NORMAL)
-                _encoderThread.Priority = ThreadPriority.Normal;
-            else if (MainForm.Instance.Settings.ProcessingPriority == ProcessPriority.BELOW_NORMAL)
-                _encoderThread.Priority = ThreadPriority.BelowNormal;
-            else
-                _encoderThread.Priority = ThreadPriority.Lowest;
+            WorkerPriority.GetJobPriority(audioJob, out WorkerPriorityType oPriority, out bool lowIOPriority);
+            _encoderThread.Priority = OSInfo.GetThreadPriority(oPriority);
             _encoderThread.Start();
         }
 
@@ -2098,45 +2088,20 @@ function x_upmixC" + id + @"(clip stereo)
             return true;
         }
 
-        public void changePriority(ProcessPriority priority)
+        public void changePriority(WorkerPriorityType priority)
         {
-            if (this._encoderThread != null && _encoderThread.IsAlive)
+            if (this._encoderThread == null || !_encoderThread.IsAlive)
+                return;
+
+            try
             {
-                try
-                {
-                    switch (priority)
-                    {
-                        case ProcessPriority.IDLE:
-                            _encoderThread.Priority = ThreadPriority.Lowest;
-                            break;
-                        case ProcessPriority.BELOW_NORMAL:
-                            _encoderThread.Priority = ThreadPriority.BelowNormal;
-                            break;
-                        case ProcessPriority.NORMAL:
-                            _encoderThread.Priority = ThreadPriority.Normal;
-                            break;
-                        case ProcessPriority.ABOVE_NORMAL:
-                            _encoderThread.Priority = ThreadPriority.AboveNormal;
-                            break;
-                        case ProcessPriority.HIGH:
-                            _encoderThread.Priority = ThreadPriority.Highest;
-                            break;
-                    }
-                    OSInfo.SetProcessPriority(_encoderProcess, priority, 0);
-                    MainForm.Instance.Settings.ProcessingPriority = priority;
-                    return;
-                }
-                catch (Exception e) // process could not be running anymore
-                {
-                    throw new JobRunException(e);
-                }
+                _encoderThread.Priority = OSInfo.GetThreadPriority(priority);
+                WorkerPriority.GetJobPriority(audioJob, out WorkerPriorityType oPriority, out bool lowIOPriority);
+                OSInfo.SetProcessPriority(_encoderProcess, priority, lowIOPriority, 0);
             }
-            else
+            catch (Exception e) // process could not be running anymore
             {
-                if (_encoderThread == null)
-                    throw new JobRunException("Thread has not been started yet");
-                else
-                    throw new JobRunException("Thread has exited");
+                throw new JobRunException(e);
             }
         }
 

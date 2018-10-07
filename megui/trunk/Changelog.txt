@@ -1,3 +1,8 @@
+2887 [Worker]               improved the priority system so that for each job type the process and I/O priority can be defined
+                            changing the priority in the progress window does change it only for the current job
+                            moved some settings from options\settings to worker\settings (these will reset to default)
+     [OneClick]             improved priority change and job abort actions
+     [L-SMASH Indexer]      improved priority change and job abort actions
 2886 [Jobs]                 fixed abort of suspended jobs (regression of 2818)
 2885 [Preset Exporter]      fixed overwrite of output files
 2884 [Worker]               changed worker handling

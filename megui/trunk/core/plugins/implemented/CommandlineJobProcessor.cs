@@ -234,7 +234,8 @@ namespace MeGUI
                         WindowUtil.HideWindow(proc.MainWindowHandle);
                 }
 
-                this.changePriority(MainForm.Instance.Settings.ProcessingPriority);
+                WorkerPriority.GetJobPriority(job, out WorkerPriorityType oPriority, out bool lowIOPriority);
+                this.changePriority(oPriority);
             }
             catch (Exception e)
             {
@@ -296,30 +297,20 @@ namespace MeGUI
             return (proc != null && !proc.HasExited);
         }
 
-        public void changePriority(ProcessPriority priority)
+        public void changePriority(WorkerPriorityType priority)
         {
-            if (isRunning())
+            if (!isRunning())
+                return;
+
+            try
             {
-                try
-                {
-                    OSInfo.SetProcessPriority(proc, priority, iMinimumChildProcessCount);
-                    MainForm.Instance.Settings.ProcessingPriority = priority;
-                    return;
-                }
-                catch (Exception e) // process could not be running anymore
-                {
-                    throw new JobRunException(e);
-                }
+                WorkerPriority.GetJobPriority(job, out WorkerPriorityType oPriority, out bool lowIOPriority);
+                OSInfo.SetProcessPriority(proc, priority, lowIOPriority, iMinimumChildProcessCount);
+                return;
             }
-            else
+            catch (Exception e) // process could not be running anymore
             {
-                if (proc == null)
-                    throw new JobRunException("Process has not been started yet");
-                else
-                {
-                    Debug.Assert(proc.HasExited);
-                    throw new JobRunException("Process has exited");
-                }
+                throw new JobRunException(e);
             }
         }
         #endregion

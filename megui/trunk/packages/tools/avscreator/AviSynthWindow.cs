@@ -1082,6 +1082,7 @@ namespace MeGUI
 
                 detector = new SourceDetector(source,
                     input.Filename, deintIsAnime.Checked, numFrames,
+                    mainForm.Settings.SourceDetectorSettings.Priority,
                     mainForm.Settings.SourceDetectorSettings,
                     new UpdateSourceDetectionStatus(analyseUpdate),
                     new FinishedAnalysis(finishedAnalysis));

@@ -19,10 +19,8 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Text;
 
 namespace MeGUI.core.util
 {
@@ -47,10 +45,12 @@ namespace MeGUI.core.util
 
         public static FileSize? Of2(string filename)
         {
-            if (string.IsNullOrEmpty(filename) || !File.Exists(filename)) return null;
+            if (string.IsNullOrEmpty(filename) || !File.Exists(filename))
+                return null;
             
             FileInfo fi = new FileInfo(filename);
-            if (fi.Length <= 0) return null;
+            if (fi.Length <= 0)
+                return null;
             
             return new FileSize(fi.Length);
         }            
