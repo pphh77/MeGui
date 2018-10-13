@@ -375,7 +375,7 @@ namespace MeGUI
             // mnuFileExit
             // 
             this.mnuFileExit.Index = 3;
-            this.mnuFileExit.Shortcut = System.Windows.Forms.Shortcut.CtrlX;
+            this.mnuFileExit.Shortcut = System.Windows.Forms.Shortcut.Alt4;
             this.mnuFileExit.Text = "E&xit";
             this.mnuFileExit.Click += new System.EventHandler(this.mnuFileExit_Click);
             // 
