@@ -632,13 +632,14 @@ namespace MeGUI
             if (video)
             {
                 // use FFVideoSource
-                script.AppendFormat("FFVideoSource(\"{0}\"{1}{2}{3}{4}{5})",
+                script.AppendFormat("FFVideoSource(\"{0}\"{1}{2}{3}{4}{5}{6})",
                     inputFile,
                     (track > -1 ? ", track=" + track : String.Empty),
                     (!String.IsNullOrEmpty(indexFile) ? ", cachefile=\"" + indexFile + "\"" : String.Empty),
                     ((fpsnum > 0 && fpsden > 0 && !variableFrameRate) ? ", fpsnum=" + fpsnum + ", fpsden=" + fpsden : String.Empty),
                     (MainForm.Instance.Settings.FFMSThreads > 0 ? ", threads=" + MainForm.Instance.Settings.FFMSThreads : String.Empty),
-                    (rffmode > 0 ? ", rffmode=" + rffmode : String.Empty));
+                    (rffmode > 0 ? ", rffmode=" + rffmode : String.Empty),
+                    (MainForm.Instance.Settings.Input8Bit && MainForm.Instance.Settings.AviSynthPlus ? ", colorspace=\"YUV420P8\"" : String.Empty));
             }
             else
             {
@@ -707,7 +708,7 @@ namespace MeGUI
 
                 if (iVideoBit <= 8)
                     script.Append(")");
-                else if (!MainForm.Instance.Settings.AviSynthPlus)
+                else if (!MainForm.Instance.Settings.AviSynthPlus || MainForm.Instance.Settings.Input8Bit)
                     script.Append(", format=\"YUV420P8\")");
                 else if (iVideoBit <= 10)
                     script.AppendFormat(", format=\"YUV420P10\"){0}ConvertFromDoubleWidth(bits=10)", Environment.NewLine);

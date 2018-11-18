@@ -117,12 +117,14 @@ namespace MeGUI
             else
                 log.LogValue("color space", colorspace_original.ToString());
 
-            string strEncoder = "x26x";
+            string strEncoder = "ffmpeg";
             if (this is XviDEncoder)
                 strEncoder = "xvid";
+            else if (this is x264Encoder && (MainForm.Instance.Settings.IsMeGUIx64 || !MainForm.Instance.Settings.Usex64Tools))
+                strEncoder = "x264";
 
             AviSynthColorspace colorspace_target = AviSynthColorspaceHelper.GetConvertedColorspace(strEncoder, colorspace_original);
-            if (colorspace_original != colorspace_target 
+            if (colorspace_original != colorspace_target
                 && !AviSynthColorspaceHelper.IsConvertedToColorspace(job.Input, colorspace_target.ToString()))
             {
                 if (MainForm.Instance.DialogManager.AddConvertTo(colorspace_original.ToString(), colorspace_target.ToString()))

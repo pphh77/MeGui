@@ -1,3 +1,5 @@
+2890 [Settings]             added option to restrict input filters to 8 bit (enabled by default)
+     [x264]                 fixed high bit depth support if ffmpeg is not used
 2889 [Queue]                multiple "waiting" jobs can be assigned to a temporary worker to be processed
                             internal queue handling optimizations
 2888 [Main]                 changed File\Exit shortcut from CTRL+X to ALT+F4

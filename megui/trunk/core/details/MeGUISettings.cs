@@ -53,7 +53,7 @@ namespace MeGUI
                        strEac3toLastFolderPath, strEac3toLastFilePath, strEac3toLastDestinationPath, tempDirMP4,
                        fdkAacPath, httpproxyaddress, httpproxyport, httpproxyuid, httpproxypwd, defaultOutputDir,
                        appendToForcedStreams, lastUsedOneClickFolder, lastUpdateServer, chapterCreatorSortString;
-        private bool autoForceFilm, autoOpenScript, bUseQAAC, bUseDGIndexNV, bUseDGIndexIM,
+        private bool autoForceFilm, autoOpenScript, bUseQAAC, bUseDGIndexNV, bUseDGIndexIM, bInput8Bit,
                      overwriteStats, keep2of3passOutput, autoUpdate, deleteIntermediateFiles, workerAutoStart,
                      deleteAbortedOutput, openProgressWindow, bEac3toAutoSelectStreams, bUseFDKAac, bVobSubberKeepAll,
                      alwaysOnTop, addTimePosition, alwaysbackupfiles, bUseITU, bEac3toLastUsedFileMode, bMeGUIx64,
@@ -205,6 +205,7 @@ namespace MeGUI
             workerAutoStart = true;
             workerAutoStartOnStartup = false;
             workerRemoveJob = true;
+            bInput8Bit = true;
             ResetWorkerSettings();
             ResetWorkerPriority();
         }
@@ -1019,6 +1020,12 @@ namespace MeGUI
         {
             get { return arrWorkerPriority.ToArray(); }
             set { arrWorkerPriority = new List<WorkerPriority>(value); }
+        }
+
+        public bool Input8Bit
+        {
+            get { return bInput8Bit; }
+            set { bInput8Bit = value; }
         }
 
         public bool WorkerAutoStart

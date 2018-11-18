@@ -30,69 +30,69 @@ namespace MeGUI
         Unknown = 0,
 
         // 8 bit
-        RGB24       = +1342177281,  // ffmpeg: fail
-        YUY2        = +1610612740,  // ffmpeg: fail
-        YV12        = -1610612728,
-        YV16        = -1610611960,
-        YV24        = -1610611957,
-        YV411       = -1610611959,
-        Y8          = -536870912,   // ffmpeg: fail
-        RGBP        = -1879048191,  // ffmpeg: fail
-        RGBP8       = RGBP,         // ffmpeg: fail
-        RGB32       = +1342177282,  // ffmpeg: fail
-        RGBAP       = -1879048190,  // ffmpeg: fail
-        RGBAP8      = RGBAP,        // ffmpeg: fail
+        RGB24       = +1342177281,  // ffmpeg: fail     x264: warning
+        YUY2        = +1610612740,  // ffmpeg: fail     x264: warning
+        YV12        = -1610612728,  
+        YV16        = -1610611960,  //                  x264: warning
+        YV24        = -1610611957,  //                  x264: warning
+        YV411       = -1610611959,  //                  x264: warning
+        Y8          = -536870912,   // ffmpeg: fail     x264: warning
+        RGBP        = -1879048191,  // ffmpeg: fail     x264: fail
+        RGBP8       = RGBP,         // ffmpeg: fail     x264: fail
+        RGB32       = +1342177282,  // ffmpeg: fail     x264: warning
+        RGBAP       = -1879048190,  // ffmpeg: fail     x264: fail
+        RGBAP8      = RGBAP,        // ffmpeg: fail     x264: fail
         I420        = -1610612720,
 
         // 10 bit
-        RGBP10      = -1878720511,  // ffmpeg: fail
-        YUV444P10   = -1610284277,
-        YUV422P10   = -1610284280,
-        YUV420P10   = -1610285048,
-        Y10         = -536543232,   // ffmpeg: fail
-        RGBAP10     = -1878720510,  // ffmpeg: fail
-        YUVA444P10  = -2012937461,  // ffmpeg: fail
-        YUVA422P10  = -2012937464,  // ffmpeg: fail
-        YUVA420P10  = -2012938232,  // ffmpeg: fail
+        RGBP10      = -1878720511,  // ffmpeg: fail     x264: fail
+        YUV444P10   = -1610284277,  //                  x264: fail
+        YUV422P10   = -1610284280,  //                  x264: fail
+        YUV420P10   = -1610285048,  //                  x264: fail
+        Y10         = -536543232,   // ffmpeg: fail     x264: fail
+        RGBAP10     = -1878720510,  // ffmpeg: fail     x264: fail
+        YUVA444P10  = -2012937461,  // ffmpeg: fail     x264: fail
+        YUVA422P10  = -2012937464,  // ffmpeg: fail     x264: fail
+        YUVA420P10  = -2012938232,  // ffmpeg: fail     x264: fail
 
         // 12 bit
-        RGBP12      = -1878654975,  // ffmpeg: fail
-        YUV444P12   = -1610218741,
-        YUV422P12   = -1610218744,
-        YUV420P12   = -1610219512,
-        Y12         = -536477696,   // ffmpeg: fail
-        RGBAP12     = -1878654974,  // ffmpeg: fail
-        YUVA444P12  = -2012871925,  // ffmpeg: fail
-        YUVA422P12  = -2012871928,  // ffmpeg: fail
-        YUVA420P12  = -2012872696,  // ffmpeg: fail
+        RGBP12      = -1878654975,  // ffmpeg: fail     x264: fail
+        YUV444P12   = -1610218741,  //                  x264: fail
+        YUV422P12   = -1610218744,  //                  x264: fail
+        YUV420P12   = -1610219512,  //                  x264: fail
+        Y12         = -536477696,   // ffmpeg: fail     x264: fail
+        RGBAP12     = -1878654974,  // ffmpeg: fail     x264: fail
+        YUVA444P12  = -2012871925,  // ffmpeg: fail     x264: fail
+        YUVA422P12  = -2012871928,  // ffmpeg: fail     x264: fail
+        YUVA420P12  = -2012872696,  // ffmpeg: fail     x264: fail
 
         // 14 bit
-        RGBP14      = -1878589439,  // ffmpeg: fail
-        YUV444P14   = -1610153205,
-        YUV422P14   = -1610153208,
-        YUV420P14   = -1610153976,
-        Y14         = -536412160,   // ffmpeg: fail
-        RGBAP14     = -1878589438,  // ffmpeg: fail
-        YUVA444P14  = -2012806389,  // ffmpeg: fail
-        YUVA422P14  = -2012806392,  // ffmpeg: fail
-        YUVA420P14  = -2012807160,  // ffmpeg: fail
+        RGBP14      = -1878589439,  // ffmpeg: fail     x264: fail
+        YUV444P14   = -1610153205,  //                  x264: fail
+        YUV422P14   = -1610153208,  //                  x264: fail
+        YUV420P14   = -1610153976,  //                  x264: fail
+        Y14         = -536412160,   // ffmpeg: fail     x264: fail
+        RGBAP14     = -1878589438,  // ffmpeg: fail     x264: fail
+        YUVA444P14  = -2012806389,  // ffmpeg: fail     x264: fail
+        YUVA422P14  = -2012806392,  // ffmpeg: fail     x264: fail
+        YUVA420P14  = -2012807160,  // ffmpeg: fail     x264: fail
 
         // 16 bit
-        RGB48       = 1342242817,   // ffmpeg: fail
-        RGBP16      = -1878982655,  // ffmpeg: fail
-        YUV444P16   = -1610546421,
-        YUV422P16   = -1610546424,
+        RGB48       = 1342242817,   // ffmpeg: fail     x264: warning
+        RGBP16      = -1878982655,  // ffmpeg: fail     x264: fail
+        YUV444P16   = -1610546421,  //                  x264: warning
+        YUV422P16   = -1610546424,  //                  x264: warning
         YUV420P16   = -1610547192,
-        Y16         = -536805376,   // ffmpeg: fail
-        RGB64       = 1342242818,   // ffmpeg: fail
-        RGBAP16     = -1878982654,  // ffmpeg: fail
-        YUVA444P16  = -2013199605,  // ffmpeg: fail
-        YUVA422P16  = -2013199608,  // ffmpeg: fail
-        YUVA420P16  = -2013200376,  // ffmpeg: fail
+        Y16         = -536805376,   // ffmpeg: fail     x264: warning
+        RGB64       = 1342242818,   // ffmpeg: fail     x264: warning
+        RGBAP16     = -1878982654,  // ffmpeg: fail     x264: fail
+        YUVA444P16  = -2013199605,  // ffmpeg: fail     x264: fail
+        YUVA422P16  = -2013199608,  // ffmpeg: fail     x264: fail
+        YUVA420P16  = -2013200376,  // ffmpeg: fail     x264: fail
 
         // 32 bit
-        RGBPS       = -1878917119,  // ffmpeg: fail
-        RGBAPS      = -1878917118   // ffmpeg: fail
+        RGBPS       = -1878917119,  // ffmpeg: fail     x264: fail
+        RGBAPS      = -1878917118   // ffmpeg: fail     x264: fail
     }
 
     class AviSynthColorspaceHelper
@@ -171,9 +171,16 @@ namespace MeGUI
         public static AviSynthColorspace GetConvertedColorspace(string strEncoder, AviSynthColorspace colorspace)
         {
             ArrayList arrCodecsAllowed = new ArrayList();
+
+            // add always available color spaces
             arrCodecsAllowed.Add(AviSynthColorspace.I420);
             arrCodecsAllowed.Add(AviSynthColorspace.YV12);
-            if (!strEncoder.Equals("xvid"))
+
+            // if avs+ is used add the available color spaces for ffmpeg+x264
+            if (!strEncoder.Equals("xvid") && MainForm.Instance.Settings.AviSynthPlus)
+                arrCodecsAllowed.Add(AviSynthColorspace.YUV420P16);
+
+            if (strEncoder.Equals("ffmpeg"))
             {
                 // ffmpeg is used
                 arrCodecsAllowed.Add(AviSynthColorspace.YV16);
@@ -211,15 +218,26 @@ namespace MeGUI
             if (!arrColorspace.TryGetValue(colorspace, out int iBit))
                 return colorspace;
 
-            switch (iBit)
+            if (strEncoder.Equals("ffmpeg"))
             {
-                case 8:  colorspace = AviSynthColorspace.YV12; break;
-                case 10: colorspace = AviSynthColorspace.YUV420P10; break;
-                case 12: colorspace = AviSynthColorspace.YUV420P12; break;
-                case 14: colorspace = AviSynthColorspace.YUV420P14; break;
-                case 16: colorspace = AviSynthColorspace.YUV420P16; break;
-                case 32: colorspace = AviSynthColorspace.YUV420P16; break;
-                default: colorspace = AviSynthColorspace.YV12; break;
+                switch (iBit)
+                {
+                    case 8:  colorspace = AviSynthColorspace.YV12; break;
+                    case 10: colorspace = AviSynthColorspace.YUV420P10; break;
+                    case 12: colorspace = AviSynthColorspace.YUV420P12; break;
+                    case 14: colorspace = AviSynthColorspace.YUV420P14; break;
+                    case 16: colorspace = AviSynthColorspace.YUV420P16; break;
+                    case 32: colorspace = AviSynthColorspace.YUV420P16; break;
+                    default: colorspace = AviSynthColorspace.YV12; break;
+                }
+            }
+            else
+            {
+                switch (iBit)
+                {
+                    case 8: colorspace = AviSynthColorspace.YV12; break;
+                    default: colorspace = AviSynthColorspace.YUV420P16; break;
+                }
             }
 
             return colorspace;

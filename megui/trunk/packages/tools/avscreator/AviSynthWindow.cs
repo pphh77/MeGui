@@ -706,6 +706,8 @@ namespace MeGUI
                     );
                 if (MainForm.Instance.Settings.PortableAviSynth)
                     tempAvs = "LoadPlugin(\"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynth.Path), @"plugins\directshowsource.dll") + "\")\r\n" + tempAvs;
+                if (MainForm.Instance.Settings.AviSynthPlus && MainForm.Instance.Settings.Input8Bit)
+                    tempAvs += "\r\nConvertBits(8)";
             } 
             if (file != null)
                 file.Dispose();

@@ -165,7 +165,9 @@ namespace MeGUI
                     if (String.IsNullOrEmpty(indexFile))
                         indexFile = input;
                     strDLLPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexIM.Path), "dgdecodeim.dll");
-                    inputLine = "LoadPlugin(\"" + strDLLPath + "\")\r\nDGSourceIM(\"" + indexFile + "\", silent=true)"; 
+                    inputLine = "LoadPlugin(\"" + strDLLPath + "\")\r\nDGSourceIM(\"" + indexFile + "\", silent=true)";
+                    if (MainForm.Instance.Settings.AviSynthPlus && MainForm.Instance.Settings.Input8Bit)
+                        inputLine += "\r\nConvertBits(8)";
                     break;
                 case PossibleSources.dgi:
                     UpdateCacher.CheckPackage("dgindexnv");
@@ -175,9 +177,11 @@ namespace MeGUI
                     inputLine = "LoadPlugin(\"" + strDLLPath + "\")\r\nDGSource(\"" + indexFile + "\"";
                     if (MainForm.Instance.Settings.AutoForceFilm &&
                         MainForm.Instance.Settings.ForceFilmThreshold <= (decimal)dgiFile.GetFilmPercent(indexFile))
-                        inputLine += ",fieldop=1";
+                        inputLine += ",fieldop=1)";
                     else
-                        inputLine += ",fieldop=0";
+                        inputLine += ",fieldop=0)";
+                    if (MainForm.Instance.Settings.AviSynthPlus && MainForm.Instance.Settings.Input8Bit)
+                        inputLine += "\r\nConvertBits(8)";
                     break;
                 case PossibleSources.ffindex:
                     inputLine = VideoUtil.getFFMSVideoInputLine(input, indexFile, fps);
@@ -191,6 +195,8 @@ namespace MeGUI
                 case PossibleSources.vdr:
                 case PossibleSources.avisource:
                     inputLine = "AVISource(\"" + input + "\", audio=false)" + VideoUtil.getAssumeFPS(fps, input);
+                    if (MainForm.Instance.Settings.AviSynthPlus && MainForm.Instance.Settings.Input8Bit)
+                        inputLine += "\r\nConvertBits(8)";
                     break;
                 case PossibleSources.directShow:
                     if (dss2)
@@ -210,6 +216,8 @@ namespace MeGUI
                             inputLine = "LoadPlugin(\"" + Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynth.Path), @"plugins\directshowsource.dll") + "\")\r\n";
                         inputLine += "DirectShowSource(\"" + input + "\"" + ((fps > 0) ? ", fps=" + fps.ToString("F3", new CultureInfo("en-us")) : string.Empty) + ", audio=false, convertfps=true)" + VideoUtil.getAssumeFPS(fps, input);
                     }
+                    if (MainForm.Instance.Settings.AviSynthPlus && MainForm.Instance.Settings.Input8Bit)
+                        inputLine += "\r\nConvertBits(8)";
                     if (flipVertical)
                         inputLine = inputLine + "\r\nFlipVertical()";
                     break;

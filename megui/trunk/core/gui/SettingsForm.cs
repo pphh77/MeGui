@@ -252,6 +252,7 @@ namespace MeGUI
                     UpdateCacher.CheckPackage("qaac", useQAAC.Checked, false);
                 settings.UseQAAC = useQAAC.Checked;
 
+                settings.Input8Bit = chkInput8Bit.Checked;
                 settings.UseExternalMuxerX264 = chx264ExternalMuxer.Checked;
                 settings.AlwaysUsePortableAviSynth = cbUseIncludedAviSynth.Checked;
                 settings.ChapterCreatorMinimumLength = (int)minimumTitleLength.Value;
@@ -323,6 +324,7 @@ namespace MeGUI
                 chk64Bit.Checked = settings.Usex64Tools;
                 chkDebugInformation.Checked = settings.ShowDebugInformation;
                 chkDirectShowSource.Checked = settings.EnableDirectShowSource;
+                chkInput8Bit.Checked = settings.Input8Bit;
             }
 		}
 		#endregion
