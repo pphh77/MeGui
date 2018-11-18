@@ -1,3 +1,5 @@
+2889 [Queue]                multiple "waiting" jobs can be assigned to a temporary worker to be processed
+                            internal queue handling optimizations
 2888 [Main]                 changed File\Exit shortcut from CTRL+X to ALT+F4
 2887 [Worker]               improved the priority system so that for each job type the process and I/O priority can be defined
                             changing the priority in the progress window does change it only for the current job

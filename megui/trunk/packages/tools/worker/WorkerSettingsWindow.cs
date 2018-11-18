@@ -125,6 +125,7 @@ namespace MeGUI
             workerMaximumCount.Value = MainForm.Instance.Settings.WorkerMaximumCount;
             UpdateWorkerSettingsListBox();
             CbJobType_SelectedIndexChanged(null, null);
+            MainForm.Instance.Jobs.AdjustWorkerCount(MainForm.Instance.Jobs.IsAnyWorkerRunning);
         }
 
         protected override void OnClosing(CancelEventArgs e)

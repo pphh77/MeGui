@@ -25,7 +25,6 @@ using System.Drawing;
 using System.Windows.Forms;
 
 using MeGUI.core.util;
-using MeGUI.core.details;
 
 namespace MeGUI.core.gui
 {
@@ -64,7 +63,7 @@ namespace MeGUI.core.gui
             IndividualWorkerSummary i = new IndividualWorkerSummary();
             i.Worker = w;
             i.Dock = DockStyle.Bottom;
-            panel1.Controls.Add(i);
+            Util.ThreadSafeRun(panel1, delegate { panel1.Controls.Add(i); });
             displays[w.Name] = i;
             RefreshInfo();
         }

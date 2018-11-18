@@ -82,23 +82,12 @@ namespace MeGUI.core.gui
         private MainForm mainForm;
         private decimal progress;
         private LogItem log;
-        private JobQueue jobQueue;
 
         public event EventHandler WorkerFinishedJobs;
 
         public JobWorker(MainForm mf)
         {
             mainForm = mf;
-
-            jobQueue = new JobQueue();
-            jobQueue.SetStartStopButtonsTogether();
-            jobQueue.RequestJobDeleted = new RequestJobDeleted(GUIDeleteJob);
-            jobQueue.AddMenuItem("Return to main job queue", null, delegate (List<TaggedJob> jobs)
-            {
-                foreach (TaggedJob j in jobs)
-                    mainForm.Jobs.ReleaseJob(j);
-            });
-
             pw = new ProgressWindow();
             pw.Abort += new AbortCallback(Pw_Abort);
             pw.Suspend += new SuspendCallback(Pw_Suspend);
@@ -316,6 +305,11 @@ namespace MeGUI.core.gui
         {
             if (IsRunning)
                 Abort();
+
+            foreach (TaggedJob j in mainForm.Jobs.GlobalJobQueue.JobList)
+                if (j.OwningWorker != null && j.OwningWorker.Equals(Name))
+                    mainForm.Jobs.UnassignJob(j);
+
             mainForm.Jobs.ShutDown(this);
         }
         #endregion
@@ -328,29 +322,6 @@ namespace MeGUI.core.gui
         #region gui updates
         private void RefreshAll()
         {
-            jobQueue.RefreshQueue();
-            switch (Status)
-            {
-                case JobWorkerStatus.Idle:
-                    jobQueue.StartStopMode = StartStopMode.Start;
-                    break;
-
-                case JobWorkerStatus.Postponed:
-                    jobQueue.StartStopMode = StartStopMode.Start;
-                    break;
-
-                case JobWorkerStatus.Stopped:
-                    jobQueue.StartStopMode = StartStopMode.Start;
-                    break;
-
-                case JobWorkerStatus.Running:
-                    jobQueue.StartStopMode = StartStopMode.Stop;
-                    break;
-
-                case JobWorkerStatus.Stopping:
-                    jobQueue.StartStopMode = StartStopMode.Start;
-                    break;
-            }
             UpdateProgress();
             mainForm.Jobs.RefreshStatus();
         }
@@ -410,12 +381,7 @@ namespace MeGUI.core.gui
 
             // check if a temporary worker has to be closed
             if (bIsTemporaryWorker && retval != JobStartInfo.JOB_STARTED)
-            {
-                foreach (TaggedJob j in jobQueue.JobList)
-                    if (j.OwningWorker != null && j.OwningWorker.Equals(Name))
-                        mainForm.Jobs.ReleaseJob(j);
                 ShutDown();
-            }
         }
 
         /// <summary>
@@ -509,16 +475,13 @@ namespace MeGUI.core.gui
                 else
                     mainForm.Jobs.SaveJob(job, mainForm.MeGUIPath);
 
-                if (mode == JobWorkerMode.CloseOnLocalListCompleted)
-                {
-                    ShutDown();
-                    JobInfo = JobStartInfo.COULDNT_START;
-                }
-                else if (job.Status == JobStatus.ABORTED)
+                if (job.Status == JobStatus.ABORTED)
                 {
                     log.LogEvent("Current job was aborted");
                     status = JobWorkerStatus.Stopped;
                     JobInfo = JobStartInfo.COULDNT_START;
+                    if (bIsTemporaryWorker)
+                        ShutDown();
                 }
                 else if (status == JobWorkerStatus.Stopping)
                 {
@@ -526,7 +489,7 @@ namespace MeGUI.core.gui
                     status = JobWorkerStatus.Stopped;
                     JobInfo = JobStartInfo.COULDNT_START;
                 }
-                else if (mainForm.Jobs.WorkersCount <= MainForm.Instance.Settings.WorkerMaximumCount)
+                else if (mainForm.Jobs.WorkersCount <= MainForm.Instance.Settings.WorkerMaximumCount || bIsTemporaryWorker)
                 {
                     JobInfo = StartNextJobInQueue();
                     switch (JobInfo)
@@ -539,10 +502,9 @@ namespace MeGUI.core.gui
                         case JobStartInfo.NO_JOBS_WAITING:
                             if (status != JobWorkerStatus.Postponed)
                                 status = JobWorkerStatus.Idle;
-                            new Thread(delegate ()
-                            {
-                                WorkerFinishedJobs(this, EventArgs.Empty);
-                            }).Start();
+                            if (mode == JobWorkerMode.CloseOnLocalListCompleted)
+                                ShutDown();
+                            WorkerFinishedJobs(this, EventArgs.Empty);
                             break;
                     }
                 }
@@ -566,6 +528,7 @@ namespace MeGUI.core.gui
             public ExceptionType type;
             public JobStartException(string reason, ExceptionType type) : base(reason) { this.type = type; }
         }
+
         /// <summary>
         /// starts the job provided as parameters
         /// </summary>
@@ -578,8 +541,6 @@ namespace MeGUI.core.gui
                 log = mainForm.Log.Info(string.Format("Log for {0} ({1}, {2} -> {3})", job.Name, job.Job.EncodingMode, job.InputFileName, job.OutputFileName));
                 log.LogEvent("Started handling job");
                 log.Expand();
-
-                status = JobWorkerStatus.Running;
 
                 //Check to see if output file already exists before encoding.
                 if (File.Exists(job.Job.Output) &&
@@ -620,9 +581,7 @@ namespace MeGUI.core.gui
                 if (mainForm.Settings.OpenProgressWindow && mainForm.Visible)
                     this.ShowProcessWindow();
 
-                job.Status = JobStatus.PROCESSING;
                 job.Start = DateTime.Now;
-                status = JobWorkerStatus.Running;
                 currentJob = job;
 
                 // Start
@@ -649,54 +608,68 @@ namespace MeGUI.core.gui
                     job.Status = JobStatus.SKIP;
                 currentProcessor = null;
                 currentJob = null;
-                status = JobWorkerStatus.Idle;
                 RefreshAll();
                 return false;
             }
 
         }
 
-        private TaggedJob GetNextJob()
+        /// <summary>
+        /// Returns the first job on the queue whose dependencies have been met, whose status
+        /// is set to 'waiting', and which isn't owned by any JobWorkers
+        /// </summary>
+        /// <returns></returns>
+        private TaggedJob GetNextAvailableJob()
         {
-            foreach (TaggedJob j in jobQueue.JobList)
-                if (j.Status == JobStatus.WAITING && mainForm.Jobs.AreDependenciesMet(j) 
-                    && (mode == JobWorkerMode.CloseOnLocalListCompleted || mainForm.Jobs.CanNewJobBeStarted(j.Job)))
-                    return j;
-            if (mode == JobWorkerMode.RequestNewJobs)
-                return mainForm.Jobs.GetJobToProcess();
-            else
-                return null;
-        }
-
-        private JobStartInfo StartNextJobInQueue()
-        {
+            TaggedJob oJob = null;
             lock (mainForm.Jobs.ResourceLock)
             {
-                TaggedJob job = GetNextJob();
-
-                if (job == null)
+                foreach (TaggedJob job in mainForm.Jobs.GlobalJobQueue.JobList)
                 {
-                    status = JobWorkerStatus.Idle;
-                    return JobStartInfo.NO_JOBS_WAITING;
-                }
+                    if (mode == JobWorkerMode.CloseOnLocalListCompleted &&                  // if this worker is about to be closed after local queue processing
+                        (job.OwningWorker == null || !job.OwningWorker.Equals(this.Name)))  // ignore jobs which are not assigned to this worker
+                        continue;
 
-                while (job != null)
-                {
-                    if (mode == JobWorkerMode.RequestNewJobs && !mainForm.Jobs.CanNewJobBeStarted(job.Job))
+                    if (job.Status == JobStatus.WAITING &&                                  // only process waiting jobs
+                        (job.OwningWorker == null || job.OwningWorker.Equals(this.Name)) && // only process unassigned jobs or jobs which are assigned to the current worker
+                        mainForm.Jobs.AreDependenciesMet(job) &&                            // check if all job dependencies are fullfilled
+                        (mainForm.Jobs.CanNewJobBeStarted(job.Job) || bIsTemporaryWorker))  // check if a blocking encoding is already in process - always process if temporary worker
                     {
-                        // another blocked encoding is already in process. postpone the worker
-                        // temporary workers can always process jobs
-                        status = JobWorkerStatus.Postponed;
-                        return JobStartInfo.NO_JOBS_WAITING;
+                        job.Status = JobStatus.PROCESSING;                                  // mark job as in processing so that no other worker can fetch it
+                        oJob = job;
+                        break;
                     }
-
-                    if (StartEncoding(job)) // successful
-                    {
-                        return JobStartInfo.JOB_STARTED;
-                    }
-                    job = GetNextJob();
                 }
+            }
+            return oJob;
+        }
+
+        /// <summary>
+        /// starts the next job in the queue which is available
+        /// </summary>
+        /// <returns></returns>
+        private JobStartInfo StartNextJobInQueue()
+        {
+            TaggedJob job = GetNextAvailableJob();
+            if (job == null)
+            {
                 status = JobWorkerStatus.Idle;
+                RefreshAll();
+                return JobStartInfo.NO_JOBS_WAITING;
+            }
+
+            status = JobWorkerStatus.Running;
+            RefreshAll();
+
+            if (StartEncoding(job))
+            {
+                // successfully started
+                return JobStartInfo.JOB_STARTED; 
+            }
+            else
+            {
+                status = JobWorkerStatus.Idle;
+                RefreshAll();
                 return JobStartInfo.COULDNT_START;
             }
         }
@@ -775,12 +748,7 @@ namespace MeGUI.core.gui
         }
         #endregion
 
-        internal void RemoveJobFromQueue(TaggedJob job)
-        {
-            jobQueue.RemoveJobFromQueue(job);
-        }
-
-        internal void UserRequestedAbort()
+        public void UserRequestedAbort()
         {
             if (currentJob == null)
             {
@@ -797,12 +765,6 @@ namespace MeGUI.core.gui
             DialogResult r = MessageBox.Show("Do you really want to abort?", "Really abort?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (r == DialogResult.Yes)
                 Abort();
-        }
-
-        internal void AddJob(TaggedJob j)
-        {
-            j.OwningWorker = this.Name;
-            jobQueue.QueueJob(j);
         }
 
         /// <summary>

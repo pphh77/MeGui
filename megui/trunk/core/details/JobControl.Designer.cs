@@ -32,7 +32,7 @@ namespace MeGUI.core.details
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.cbAfterEncoding = new System.Windows.Forms.ComboBox();
             this.helpButton1 = new MeGUI.core.gui.HelpButton();
-            this.jobQueue = new MeGUI.core.gui.JobQueue();
+            this.globalJobQueue = new MeGUI.core.gui.JobQueue();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -96,21 +96,21 @@ namespace MeGUI.core.details
             // 
             // jobQueue
             // 
-            this.jobQueue.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.jobQueue.Location = new System.Drawing.Point(0, 0);
-            this.jobQueue.Name = "jobQueue";
-            this.jobQueue.Size = new System.Drawing.Size(553, 521);
-            this.jobQueue.StartStopMode = MeGUI.core.gui.StartStopMode.Start;
-            this.jobQueue.TabIndex = 0;
-            this.jobQueue.AbortClicked += new System.EventHandler(this.JobQueue_AbortClicked);
-            this.jobQueue.StartClicked += new System.EventHandler(this.JobQueue_StartClicked);
-            this.jobQueue.StopClicked += new System.EventHandler(this.JobQueue_StopClicked);
+            this.globalJobQueue.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.globalJobQueue.Location = new System.Drawing.Point(0, 0);
+            this.globalJobQueue.Name = "jobQueue";
+            this.globalJobQueue.Size = new System.Drawing.Size(553, 521);
+            this.globalJobQueue.StartStopMode = MeGUI.core.gui.StartStopMode.Start;
+            this.globalJobQueue.TabIndex = 0;
+            this.globalJobQueue.AbortClicked += new System.EventHandler(this.JobQueue_AbortClicked);
+            this.globalJobQueue.StartClicked += new System.EventHandler(this.JobQueue_StartClicked);
+            this.globalJobQueue.StopClicked += new System.EventHandler(this.JobQueue_StopClicked);
             // 
             // JobControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.Controls.Add(this.jobQueue);
+            this.Controls.Add(this.globalJobQueue);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "JobControl";
             this.Size = new System.Drawing.Size(553, 550);
@@ -125,7 +125,7 @@ namespace MeGUI.core.details
 
         private System.Windows.Forms.Label lblAfterEncoding;
         private MeGUI.core.gui.HelpButton helpButton1;
-        private MeGUI.core.gui.JobQueue jobQueue;
+        private MeGUI.core.gui.JobQueue globalJobQueue;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.ComboBox cbAfterEncoding;
     }

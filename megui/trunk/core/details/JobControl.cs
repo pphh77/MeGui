@@ -47,8 +47,14 @@ namespace MeGUI.core.details
             mainForm = MainForm.Instance;
             AddClearButton();
             AddSendToTemporaryWorkerMenuItem();
-            jobQueue.RequestJobDeleted = new RequestJobDeleted(this.DeleteJob);
+            globalJobQueue.RequestJobDeleted = new RequestJobDeleted(this.DeleteJob);
             summary = new WorkerSummary();
+        }
+
+        public JobQueue GlobalJobQueue
+        {
+            get { return globalJobQueue; }
+            set { globalJobQueue = value; }
         }
 
         #region public interface: process windows, start/stop/abort
@@ -132,9 +138,10 @@ namespace MeGUI.core.details
         {
             lock (mainForm.Jobs.ResourceLock)
             {
-                // remove workers if needed
-                if (workers.Values.Count > MainForm.Instance.Settings.WorkerMaximumCount)
+                // remove worker(s) if needed
+                if (PermanentWorkerCount > MainForm.Instance.Settings.WorkerMaximumCount)
                 {
+
                     foreach (string key in workers.Keys.Reverse())
                     {
                         if (!workers.TryGetValue(key, out JobWorker worker))
@@ -149,13 +156,27 @@ namespace MeGUI.core.details
                     }
                 }
 
-                // add workers if needed
-                while (workers.Values.Count < MainForm.Instance.Settings.WorkerMaximumCount)
+                // add worker(s) if needed
+                while (PermanentWorkerCount < MainForm.Instance.Settings.WorkerMaximumCount)
                     NewWorker("Worker");
+            }
 
-                // check if any jobs can be started
-                if (startIdleWorkers)
-                    StartIdleWorkers();
+            // check if any jobs can be started
+            if (startIdleWorkers)
+                StartIdleWorkers();
+        }
+
+        private int PermanentWorkerCount
+        {
+            get
+            {
+                int workerCount = 0;
+                foreach (JobWorker w in workers.Values)
+                {
+                    if (!w.IsTemporaryWorker)
+                        workerCount++;
+                }
+                return workerCount;
             }
         }
 
@@ -194,13 +215,18 @@ namespace MeGUI.core.details
         /// </summary>
         private void AddSendToTemporaryWorkerMenuItem()
         {
-            jobQueue.AddMenuItem("Run in new temporary worker", null, new SingleJobHandler(
-                delegate(TaggedJob job)
+            globalJobQueue.AddMenuItem("Run in new temporary worker", null, new MultiJobHandler(
+                delegate (List<TaggedJob> jobs)
                 {
                     JobWorker w = NewWorker("Temporary worker");
-                    ReleaseJob(job);
-                    w.AddJob(job);
-                    this.RefreshStatus();
+
+                    foreach (TaggedJob j in jobs)
+                    {
+                        if (j.Status != JobStatus.WAITING)
+                            continue;
+                        AssignJob(j, w.Name);
+                    }
+                    RefreshStatus();
                     w.Mode = JobWorkerMode.CloseOnLocalListCompleted;
                     w.IsTemporaryWorker = true;
                     w.StartEncoding(true);
@@ -208,20 +234,23 @@ namespace MeGUI.core.details
         }
 
         /// <summary>
-        /// unassigns 
+        /// Unassigns a Job
         /// </summary>
         /// <param name="j"></param>
-        public void ReleaseJob(TaggedJob j)
+        public void UnassignJob(TaggedJob j)
         {
-            if (j.OwningWorker == null)
-                return;
-
-            workers[j.OwningWorker].RemoveJobFromQueue(j);
             j.OwningWorker = null;
-            if (!jobQueue.HasJob(j))
-                jobQueue.QueueJob(j);
-            RefreshStatus();
-        }            
+        }
+        
+        /// <summary>
+        /// Assigns a Job
+        /// </summary>
+        /// <param name="j">the job to assign</param>
+        /// <param name="WorkerName">the worker to assign the job to</param>
+        public void AssignJob(TaggedJob j, string WorkerName)
+        {
+            j.OwningWorker = WorkerName;
+        }
 
         #region properties
         /// <summary>
@@ -296,7 +325,7 @@ namespace MeGUI.core.details
         /// </summary>
         private void AddClearButton()
         {
-            jobQueue.AddButton("Clear", new EventHandler(DeleteAllJobsButton_Click));
+            globalJobQueue.AddButton("Clear", new EventHandler(DeleteAllJobsButton_Click));
         }
 
         /// <summary>
@@ -407,11 +436,8 @@ namespace MeGUI.core.details
 
             lock (mainForm.Jobs.ResourceLock)
             {
-                if (job.OwningWorker != null && workers.ContainsKey(job.OwningWorker))
-                    workers[job.OwningWorker].RemoveJobFromQueue(job);
-
-                if (jobQueue.HasJob(job))
-                    jobQueue.RemoveJobFromQueue(job);
+                if (globalJobQueue.HasJob(job))
+                    globalJobQueue.RemoveJobFromQueue(job);
 
                 foreach (TaggedJob p in job.RequiredJobs)
                     p.EnabledJobs.Remove(job);
@@ -449,7 +475,7 @@ namespace MeGUI.core.details
         /// </summary>
         public void RefreshStatus()
         {
-            jobQueue.RefreshQueue();
+            globalJobQueue.RefreshQueue();
             summary.RefreshInfo();
         }
         
@@ -488,7 +514,7 @@ namespace MeGUI.core.details
                 }
 
                 JobListSerializer s = new JobListSerializer();
-                s.mainJobList = ToStringList(jobQueue.JobList);
+                s.mainJobList = ToStringList(globalJobQueue.JobList);
                 string path = Path.Combine(mainForm.MeGUIPath, "joblists.xml");
                 Util.XmlSerialize(s, path);
             }
@@ -534,13 +560,13 @@ namespace MeGUI.core.details
 
             string path = Path.Combine(mainForm.MeGUIPath, "joblists.xml");
             JobListSerializer s = Util.XmlDeserializeOrDefault<JobListSerializer>(path);
-            jobQueue.JobList = ToJobList(s.mainJobList);
+            globalJobQueue.JobList = ToJobList(s.mainJobList);
 
             foreach (TaggedJob job in allJobs.Values)
             {
-                if (jobQueue.HasJob(job))
+                if (globalJobQueue.HasJob(job))
                     continue;
-                jobQueue.QueueJob(job);
+                globalJobQueue.QueueJob(job);
             }
 
             AdjustWorkerCount(false);
@@ -658,7 +684,7 @@ namespace MeGUI.core.details
                     jobNr++;
                 }
                 allJobs[job.Name] = job;
-                jobQueue.QueueJob(job);
+                globalJobQueue.QueueJob(job);
             }
         }
         #endregion
@@ -698,28 +724,6 @@ namespace MeGUI.core.details
             return true;
         }
 
-        private object nextJobLock = new object();
-        /// <summary>
-        /// Returns the first job on the queue whose dependencies have been met, whose status
-        /// is set to 'waiting', and which isn't owned by any JobWorkers
-        /// </summary>
-        /// <returns></returns>
-        public TaggedJob GetJobToProcess()
-        {
-            lock (nextJobLock)
-            {
-                foreach (TaggedJob job in jobQueue.JobList)
-                {
-                    if (job.Status == JobStatus.WAITING &&
-                        job.OwningWorker == null &&
-                        AreDependenciesMet(job) &&
-                        mainForm.Jobs.CanNewJobBeStarted(job.Job))
-                        return job;
-                }
-                return null;
-            }
-        }
-
         private void JobQueue_StartClicked(object sender, EventArgs e)
         {
             StartAll(true);
@@ -751,11 +755,8 @@ namespace MeGUI.core.details
 
         private void WorkerFinishedJobs(object sender, EventArgs e)
         {
-            StartIdleWorkers();
-
-            foreach (JobWorker w in workers.Values)
-                if (w.IsRunning)
-                    return;
+            if (IsAnyWorkerRunning)
+                return;
 
             mainForm.runAfterEncodingCommands();
         }
