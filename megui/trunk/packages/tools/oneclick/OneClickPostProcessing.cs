@@ -549,9 +549,9 @@ namespace MeGUI
             string cropLine = "#crop";
             string resizeLine = "#resize";
 
-            inputLine = ScriptServer.GetInputLine(inputFile, indexFile, false, oPossibleSource, false, false, false, 0, avsSettings.DSS2);
-            if (!inputLine.EndsWith(")"))
-                inputLine += ")";
+            inputLine = ScriptServer.GetInputLine(
+                inputFile, indexFile, false, oPossibleSource, false, false, false, 0, 
+                avsSettings.DSS2, false, NvDeinterlacerType.nvDeInterlacerNone, 0, 0);
 
             if (IsJobStopped())
                 return "";
@@ -582,9 +582,9 @@ namespace MeGUI
                 return "";
 
             su.Status = "Finalizing preprocessing...   ***PLEASE WAIT***";
-            inputLine = ScriptServer.GetInputLine(inputFile, indexFile, interlaced, oPossibleSource, avsSettings.ColourCorrect, avsSettings.MPEG2Deblock, false, 0, avsSettings.DSS2);
-            if (!inputLine.EndsWith(")"))
-                inputLine += ")";
+            inputLine = ScriptServer.GetInputLine(
+                inputFile, indexFile, interlaced, oPossibleSource, avsSettings.ColourCorrect, avsSettings.MPEG2Deblock, 
+                false, 0, avsSettings.DSS2, false, NvDeinterlacerType.nvDeInterlacerNone, 0, 0);
 
             if (!keepInputResolution && autoCrop)
                 cropLine = ScriptServer.GetCropLine(true, cropValues);

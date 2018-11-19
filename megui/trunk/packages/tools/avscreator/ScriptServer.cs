@@ -136,7 +136,8 @@ namespace MeGUI
         }
 
         public static string GetInputLine(string input, string indexFile, bool interlaced, PossibleSources sourceType,
-            bool colormatrix, bool mpeg2deblock, bool flipVertical, double fps, bool dss2)
+            bool colormatrix, bool mpeg2deblock, bool flipVertical, double fps, bool dss2,
+            bool nvDeint, NvDeinterlacerType nvDeintType, int nvHorizontalResolution, int nvVerticalResolution)
         {
             string inputLine = "#input";
             string strDLLPath = "";
@@ -177,9 +178,14 @@ namespace MeGUI
                     inputLine = "LoadPlugin(\"" + strDLLPath + "\")\r\nDGSource(\"" + indexFile + "\"";
                     if (MainForm.Instance.Settings.AutoForceFilm &&
                         MainForm.Instance.Settings.ForceFilmThreshold <= (decimal)dgiFile.GetFilmPercent(indexFile))
-                        inputLine += ",fieldop=1)";
+                        inputLine += ",fieldop=1";
                     else
-                        inputLine += ",fieldop=0)";
+                        inputLine += ",fieldop=0";
+                    if (nvDeint)
+                        inputLine += ScriptServer.GetNvDeInterlacerLine(true, nvDeintType);
+                    if (nvHorizontalResolution > 0 && nvVerticalResolution > 0)
+                        inputLine += ", resize_w=" + nvHorizontalResolution + ", resize_h=" + nvVerticalResolution;
+                    inputLine += ")";
                     if (MainForm.Instance.Settings.AviSynthPlus && MainForm.Instance.Settings.Input8Bit)
                         inputLine += "\r\nConvertBits(8)";
                     break;

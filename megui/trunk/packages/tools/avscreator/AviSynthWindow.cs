@@ -253,14 +253,6 @@ namespace MeGUI
 
             inputLine = GetInputLine();
 
-            if (nvDeInt.Enabled)
-            {
-                if (nvDeInt.Checked)
-                    inputLine += ScriptServer.GetNvDeInterlacerLine(nvDeInt.Checked, (NvDeinterlacerType)(cbNvDeInt.SelectedItem as EnumProxy).RealValue);
-                if (nvResize.Checked)
-                    inputLine += ", resize_w=" + horizontalResolution.Value.ToString() + ", resize_h=" + verticalResolution.Value.ToString();                
-                inputLine += ")";
-            }
             if (deinterlace.Checked && deinterlaceType.SelectedItem is DeinterlaceFilter)
                 deinterlaceLines = ((DeinterlaceFilter)deinterlaceType.SelectedItem).Script;
             cropLine = ScriptServer.GetCropLine(crop.Checked, Cropping);
@@ -301,17 +293,20 @@ namespace MeGUI
 
         private string _tempInputLine;
         private string _tempInputFileName, _tempInputIndexFile;
-        private bool _tempDeinterlacer, _tempColourCorrect, _tempMpeg2Deblocking, _tempFlipVertical, _tempDSS2;
+        private bool _tempDeinterlacer, _tempColourCorrect, _tempMpeg2Deblocking, _tempFlipVertical, _tempDSS2, _tempNvDeint, _tempNvResize;
         private PossibleSources _tempInputSourceType;
+        private NvDeinterlacerType _tempNvDeintType;
         private double _tempFPS;
+        private decimal _tempNvHorizontalResolution, _tempNvVerticalResolution;
         private string GetInputLine()
         {
             double fps = (double)fpsBox.Value;
 
-            if (_tempInputFileName != this.input.Filename || _tempInputIndexFile != this.indexFile ||
-                _tempDeinterlacer != deinterlace.Checked || _tempInputSourceType != sourceType ||
-                _tempColourCorrect != colourCorrect.Checked || _tempMpeg2Deblocking != mpeg2Deblocking.Checked ||
-                _tempFlipVertical != flipVertical.Checked || _tempFPS != (double)fpsBox.Value || _tempDSS2 != dss2.Checked)
+            if (_tempInputFileName != this.input.Filename || _tempInputIndexFile != this.indexFile || _tempDeinterlacer != deinterlace.Checked ||
+                _tempInputSourceType != sourceType || _tempColourCorrect != colourCorrect.Checked || _tempMpeg2Deblocking != mpeg2Deblocking.Checked ||
+                _tempFlipVertical != flipVertical.Checked || _tempFPS != (double)fpsBox.Value || _tempDSS2 != dss2.Checked ||
+                _tempNvDeint != nvDeInt.Checked || _tempNvDeintType != (NvDeinterlacerType)(cbNvDeInt.SelectedItem as EnumProxy).RealValue ||
+                _tempNvResize != nvResize.Checked || _tempNvHorizontalResolution != horizontalResolution.Value || _tempNvVerticalResolution != verticalResolution.Value)
             {
                 _tempInputFileName = this.input.Filename;
                 _tempInputIndexFile = this.indexFile;
@@ -322,16 +317,26 @@ namespace MeGUI
                 _tempFlipVertical = flipVertical.Checked;
                 _tempFPS = (double)fpsBox.Value;
                 _tempDSS2 = dss2.Checked;
+                _tempNvDeint = nvDeInt.Checked;
+                _tempNvDeintType = (NvDeinterlacerType)(cbNvDeInt.SelectedItem as EnumProxy).RealValue;
+                _tempNvResize = nvResize.Checked;
+                _tempNvHorizontalResolution = horizontalResolution.Value;
+                _tempNvVerticalResolution = verticalResolution.Value;
 
-                _tempInputLine = ScriptServer.GetInputLine(_tempInputFileName,
-                                                  _tempInputIndexFile,
-                                                  _tempDeinterlacer,
-                                                  _tempInputSourceType,
-                                                  _tempColourCorrect,
-                                                  _tempMpeg2Deblocking,
-                                                  _tempFlipVertical,
-                                                  _tempFPS,
-                                                  _tempDSS2);
+                _tempInputLine = ScriptServer.GetInputLine(
+                                                    _tempInputFileName,
+                                                    _tempInputIndexFile,
+                                                    _tempDeinterlacer,
+                                                    _tempInputSourceType,
+                                                    _tempColourCorrect,
+                                                    _tempMpeg2Deblocking,
+                                                    _tempFlipVertical,
+                                                    _tempFPS,
+                                                    _tempDSS2,
+                                                    _tempNvDeint,
+                                                    _tempNvDeintType,
+                                                    (int)_tempNvHorizontalResolution,
+                                                    (int)_tempNvVerticalResolution);
             }
             
             return _tempInputLine;
@@ -1063,9 +1068,9 @@ namespace MeGUI
             {
                 analyseButton.Text = "Abort";
 
-                string source = ScriptServer.GetInputLine(input.Filename, indexFile, false, sourceType, false, false, false, 0, false);
-                if (nvDeInt.Enabled)
-                    source += ")";
+                string source = ScriptServer.GetInputLine(
+                    input.Filename, indexFile, false, sourceType, false, false, false,
+                    0, false, false, NvDeinterlacerType.nvDeInterlacerNone, 0, 0);
 
                 // get number of frames
                 int numFrames = 0;
