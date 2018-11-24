@@ -551,7 +551,7 @@ namespace MeGUI
 
             inputLine = ScriptServer.GetInputLine(
                 inputFile, indexFile, false, oPossibleSource, false, false, false, 0, 
-                avsSettings.DSS2, false, NvDeinterlacerType.nvDeInterlacerNone, 0, 0);
+                avsSettings.DSS2, false, NvDeinterlacerType.nvDeInterlacerNone, 0, 0, false, null);
 
             if (IsJobStopped())
                 return "";
@@ -582,21 +582,24 @@ namespace MeGUI
                 return "";
 
             su.Status = "Finalizing preprocessing...   ***PLEASE WAIT***";
+
+            // get final input filter line
             inputLine = ScriptServer.GetInputLine(
-                inputFile, indexFile, interlaced, oPossibleSource, avsSettings.ColourCorrect, avsSettings.MPEG2Deblock, 
-                false, 0, avsSettings.DSS2, false, NvDeinterlacerType.nvDeInterlacerNone, 0, 0);
+                inputFile, indexFile, interlaced, oPossibleSource, avsSettings.ColourCorrect, avsSettings.MPEG2Deblock,
+                false, 0, avsSettings.DSS2, false, NvDeinterlacerType.nvDeInterlacerNone, 0, 0, false, null);
 
-            if (!keepInputResolution && autoCrop)
-                cropLine = ScriptServer.GetCropLine(true, cropValues);
-
-            denoiseLines = ScriptServer.GetDenoiseLines(avsSettings.Denoise, (DenoiseFilterType)avsSettings.DenoiseMethod);
-
+            // get crop & resize lines
             if (!keepInputResolution)
             {
+                if (autoCrop)
+                    cropLine = ScriptServer.GetCropLine(cropValues);
                 resizeLine = ScriptServer.GetResizeLine(!signalAR || avsSettings.Mod16Method == mod16Method.resize || outputWidthIncludingPadding > 0 || inputWidth != outputWidthCropped,
                                                         outputWidthCropped, outputHeightCropped, outputWidthIncludingPadding, outputHeightIncludingPadding, (ResizeFilterType)avsSettings.ResizeMethod,
                                                         autoCrop, cropValues, inputWidth, inputHeight);
             }
+
+            // get denoise line
+            denoiseLines = ScriptServer.GetDenoiseLines(avsSettings.Denoise, (DenoiseFilterType)avsSettings.DenoiseMethod);
 
             string newScript = ScriptServer.CreateScriptFromTemplate(avsSettings.Template, inputLine, cropLine, resizeLine, denoiseLines, deinterlaceLines);
 

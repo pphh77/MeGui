@@ -79,6 +79,8 @@ namespace MeGUI.core.gui
             this.resize = new System.Windows.Forms.CheckBox();
             this.noiseFilter = new System.Windows.Forms.CheckBox();
             this.resizeFilterType = new System.Windows.Forms.ComboBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.chkNvResize = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.templatePage.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
@@ -88,6 +90,7 @@ namespace MeGUI.core.gui
             this.groupBox1.SuspendLayout();
             this.mpegOptGroupBox.SuspendLayout();
             this.filtersGroupbox.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -227,6 +230,7 @@ namespace MeGUI.core.gui
             // 
             // extraSetupPage
             // 
+            this.extraSetupPage.Controls.Add(this.groupBox3);
             this.extraSetupPage.Controls.Add(this.groupBox2);
             this.extraSetupPage.Controls.Add(this.groupBox1);
             this.extraSetupPage.Controls.Add(this.mpegOptGroupBox);
@@ -458,6 +462,26 @@ namespace MeGUI.core.gui
             this.resizeFilterType.Size = new System.Drawing.Size(121, 21);
             this.resizeFilterType.TabIndex = 1;
             // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.chkNvResize);
+            this.groupBox3.Location = new System.Drawing.Point(3, 309);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(406, 67);
+            this.groupBox3.TabIndex = 25;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = " DGI Source ";
+            // 
+            // chkNvResize
+            // 
+            this.chkNvResize.AutoSize = true;
+            this.chkNvResize.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkNvResize.Location = new System.Drawing.Point(6, 19);
+            this.chkNvResize.Name = "chkNvResize";
+            this.chkNvResize.Size = new System.Drawing.Size(196, 17);
+            this.chkNvResize.TabIndex = 4;
+            this.chkNvResize.Text = "Use Nvidia Crop && Resize if possible";
+            // 
             // AviSynthProfileConfigPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -479,6 +503,8 @@ namespace MeGUI.core.gui
             this.mpegOptGroupBox.ResumeLayout(false);
             this.filtersGroupbox.ResumeLayout(false);
             this.filtersGroupbox.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -516,5 +542,7 @@ namespace MeGUI.core.gui
         private System.Windows.Forms.Label acceptableAspectErrorLabel;
         private System.Windows.Forms.NumericUpDown acceptableAspectError;
         private System.Windows.Forms.CheckBox cbPreferAnimeDeinterlacing;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.CheckBox chkNvResize;
     }
 }

@@ -38,7 +38,7 @@ namespace MeGUI
         private DenoiseFilterType denoiseMethod;
         private mod16Method mod16Method;
         private modValue modValueUsed;
-        private bool preferAnimeDeinterlace, denoise, mpeg2deblock, colourCorrect, dss2, resize, upsize;
+        private bool preferAnimeDeinterlace, denoise, mpeg2deblock, colourCorrect, dss2, resize, upsize, nvResize;
         private decimal acceptableAspectError;
 
         public void FixFileNames(System.Collections.Generic.Dictionary<string, string> _) { }
@@ -58,6 +58,7 @@ namespace MeGUI
             this.dss2 = false;
             this.upsize = false;
             this.acceptableAspectError = 1;
+            this.nvResize = false;
         }
 
         public override bool Equals(object obj)
@@ -106,6 +107,12 @@ namespace MeGUI
         {
             get { return resize; }
             set { resize = value; }
+        }
+
+        public bool NvResize
+        {
+            get { return nvResize; }
+            set { nvResize = value; }
         }
 
         public bool Upsize

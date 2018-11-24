@@ -43,7 +43,6 @@ namespace MeGUI
 		private VideoPlayer player;
         private IMediaFile file;
         private IVideoReader reader;
-		private StringBuilder script;
 		public event OpenScriptCallback OpenScript;
         private Dar? suggestedDar;
         private MainForm mainForm;
@@ -81,7 +80,6 @@ namespace MeGUI
             this.controlsToDisable.Add(openDLLButton);
             this.controlsToDisable.Add(dgOptions);
             enableControls(false);
-            script = new StringBuilder();
 
             this.resizeFilterType.Items.Clear();
             this.resizeFilterType.DataSource = ScriptServer.ListOfResizeFilterType;
@@ -197,7 +195,7 @@ namespace MeGUI
 			{
 				dllPath.Text = openFilterDialog.FileName;
                 string temp = avisynthScript.Text;
-				script = new StringBuilder();
+                StringBuilder script = new StringBuilder();
 				script.Append("LoadPlugin(\"" + openFilterDialog.FileName + "\")\r\n");
 				script.Append(temp);
 				avisynthScript.Text = script.ToString();
@@ -242,35 +240,43 @@ namespace MeGUI
 
 		#region script generation
 		private string generateScript()
-		{
-			script = new StringBuilder();
-			
+		{			
 			string inputLine = "#input";
 			string deinterlaceLines = "#deinterlace";
 			string denoiseLines = "#denoise";
 			string cropLine = "#crop";
 			string resizeLine = "#resize";
 
-            inputLine = GetInputLine();
+            // input
+            if (!String.IsNullOrEmpty(this.input.Filename) && File.Exists(this.input.Filename))
+                inputLine = GetInputLine();
 
+            // deinterlace
             if (deinterlace.Checked && deinterlaceType.SelectedItem is DeinterlaceFilter)
                 deinterlaceLines = ((DeinterlaceFilter)deinterlaceType.SelectedItem).Script;
-            cropLine = ScriptServer.GetCropLine(crop.Checked, Cropping);
+
+            // crop
+            if (!nvResize.Checked && crop.Checked)
+                cropLine = ScriptServer.GetCropLine(Cropping);
             
-            // resize options
-            int iWidth = (int)horizontalResolution.Maximum;
-            int iHeight = (int)verticalResolution.Maximum;
-            if (file != null)
+            // resize
+            if (!nvResize.Checked && horizontalResolution.Value > 0 && verticalResolution.Value > 0)
             {
-                iWidth = (int)file.VideoInfo.Width;
-                iHeight = (int)file.VideoInfo.Height;
-            }
-            if (!nvResize.Checked)
+                int iWidth = (int)horizontalResolution.Maximum;
+                int iHeight = (int)verticalResolution.Maximum;
+                if (file != null)
+                {
+                    iWidth = (int)file.VideoInfo.Width;
+                    iHeight = (int)file.VideoInfo.Height;
+                }
                 resizeLine = ScriptServer.GetResizeLine(resize.Checked, (int)horizontalResolution.Value, (int)verticalResolution.Value, 0, 0, (ResizeFilterType)(resizeFilterType.SelectedItem as EnumProxy).RealValue,
                                                         crop.Checked, Cropping, iWidth, iHeight);
+            }
 
+            // denoise
             denoiseLines = ScriptServer.GetDenoiseLines(noiseFilter.Checked, (DenoiseFilterType)(noiseFilterType.SelectedItem as EnumProxy).RealValue);
 
+            // final script
             string newScript = ScriptServer.CreateScriptFromTemplate(GetProfileSettings().Template, inputLine, cropLine, resizeLine, denoiseLines, deinterlaceLines);
 
             if (this.signalAR.Checked && suggestedDar.HasValue)
@@ -293,20 +299,22 @@ namespace MeGUI
 
         private string _tempInputLine;
         private string _tempInputFileName, _tempInputIndexFile;
-        private bool _tempDeinterlacer, _tempColourCorrect, _tempMpeg2Deblocking, _tempFlipVertical, _tempDSS2, _tempNvDeint, _tempNvResize;
+        private bool _tempDeinterlacer, _tempColourCorrect, _tempMpeg2Deblocking, _tempFlipVertical, _tempDSS2, _tempNvDeint, _tempResize, _tempNvResize, _tempCrop;
         private PossibleSources _tempInputSourceType;
         private NvDeinterlacerType _tempNvDeintType;
+        private CropValues _tempCropValues;
         private double _tempFPS;
         private decimal _tempNvHorizontalResolution, _tempNvVerticalResolution;
         private string GetInputLine()
         {
             double fps = (double)fpsBox.Value;
 
-            if (_tempInputFileName != this.input.Filename || _tempInputIndexFile != this.indexFile || _tempDeinterlacer != deinterlace.Checked ||
+            if (_tempInputFileName != this.input.Filename || _tempInputIndexFile != this.indexFile || _tempDeinterlacer != deinterlace.Checked || _tempResize != resize.Checked ||
                 _tempInputSourceType != sourceType || _tempColourCorrect != colourCorrect.Checked || _tempMpeg2Deblocking != mpeg2Deblocking.Checked ||
-                _tempFlipVertical != flipVertical.Checked || _tempFPS != (double)fpsBox.Value || _tempDSS2 != dss2.Checked ||
-                _tempNvDeint != nvDeInt.Checked || _tempNvDeintType != (NvDeinterlacerType)(cbNvDeInt.SelectedItem as EnumProxy).RealValue ||
-                _tempNvResize != nvResize.Checked || _tempNvHorizontalResolution != horizontalResolution.Value || _tempNvVerticalResolution != verticalResolution.Value)
+                _tempFlipVertical != flipVertical.Checked || _tempFPS != (double)fpsBox.Value || _tempDSS2 != dss2.Checked || _tempNvDeint != nvDeInt.Checked ||
+                _tempNvDeintType != (NvDeinterlacerType)(cbNvDeInt.SelectedItem as EnumProxy).RealValue || _tempNvResize != nvResize.Checked ||  _tempCrop != crop.Checked ||
+                (nvResize.Checked && resize.Checked && (_tempNvHorizontalResolution != horizontalResolution.Value || _tempNvVerticalResolution != verticalResolution.Value)) ||
+                (nvResize.Checked && crop.Checked && _tempCropValues != Cropping))
             {
                 _tempInputFileName = this.input.Filename;
                 _tempInputIndexFile = this.indexFile;
@@ -319,9 +327,12 @@ namespace MeGUI
                 _tempDSS2 = dss2.Checked;
                 _tempNvDeint = nvDeInt.Checked;
                 _tempNvDeintType = (NvDeinterlacerType)(cbNvDeInt.SelectedItem as EnumProxy).RealValue;
+                _tempResize = resize.Checked;
                 _tempNvResize = nvResize.Checked;
                 _tempNvHorizontalResolution = horizontalResolution.Value;
                 _tempNvVerticalResolution = verticalResolution.Value;
+                _tempCrop = crop.Checked;
+                _tempCropValues = Cropping;
 
                 _tempInputLine = ScriptServer.GetInputLine(
                                                     _tempInputFileName,
@@ -335,8 +346,10 @@ namespace MeGUI
                                                     _tempDSS2,
                                                     _tempNvDeint,
                                                     _tempNvDeintType,
-                                                    (int)_tempNvHorizontalResolution,
-                                                    (int)_tempNvVerticalResolution);
+                                                    (_tempNvResize && _tempResize) ? (int)_tempNvHorizontalResolution : 0,
+                                                    (_tempNvResize && _tempResize) ? (int)_tempNvVerticalResolution: 0,
+                                                    _tempCrop,
+                                                    _tempCropValues);
             }
             
             return _tempInputLine;
@@ -1002,6 +1015,7 @@ namespace MeGUI
 				this.deintIsAnime.Checked = value.PreferAnimeDeinterlace;
 				this.noiseFilter.Checked = value.Denoise;
                 this.resize.Checked = value.Resize;
+                this.nvResize.Checked = value.NvResize;
                 this.mod16Box.SelectedIndex = (int)value.Mod16Method;
                 this.signalAR.Checked = (value.Mod16Method != mod16Method.none);
                 this.dss2.Checked = value.DSS2;
@@ -1070,7 +1084,7 @@ namespace MeGUI
 
                 string source = ScriptServer.GetInputLine(
                     input.Filename, indexFile, false, sourceType, false, false, false,
-                    0, false, false, NvDeinterlacerType.nvDeInterlacerNone, 0, 0);
+                    0, false, false, NvDeinterlacerType.nvDeInterlacerNone, 0, 0, false, null);
 
                 // get number of frames
                 int numFrames = 0;
@@ -1229,6 +1243,19 @@ namespace MeGUI
         {
             // just to be sure
             checkNVCompatibleFile(input.Filename);
+        }
+
+        private void nvResize_CheckedChanged(object sender, EventArgs e)
+        {
+            cropLeft.Increment = cropTop.Increment = cropRight.Increment = cropBottom.Increment = (nvResize.Checked ? 4 : 2);
+            if (nvResize.Checked)
+            {
+                cropLeft.Value = cropLeft.Value + cropLeft.Value % 4;
+                cropTop.Value = cropTop.Value + cropTop.Value % 4;
+                cropRight.Value = cropRight.Value + cropRight.Value % 4;
+                cropBottom.Value = cropBottom.Value + cropBottom.Value % 4;
+            }
+            refreshScript(sender, e);
         }
 
         private void openSubtitlesButton_Click(object sender, EventArgs e)

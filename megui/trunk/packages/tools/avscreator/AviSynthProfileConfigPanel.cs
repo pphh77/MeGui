@@ -44,6 +44,7 @@ namespace MeGUI.core.gui
                 oSettings.Template = avisynthScript.Text;
                 oSettings.Resize = resize.Checked;
                 oSettings.ResizeMethod = (ResizeFilterType)(resizeFilterType.SelectedItem as EnumProxy).RealValue;
+                oSettings.NvResize = chkNvResize.Checked;
                 oSettings.PreferAnimeDeinterlace = cbPreferAnimeDeinterlacing.Checked;
                 oSettings.Denoise = noiseFilter.Checked;
                 oSettings.DenoiseMethod = (DenoiseFilterType)(noiseFilterType.SelectedItem as EnumProxy).RealValue;
@@ -60,6 +61,7 @@ namespace MeGUI.core.gui
             {
                 avisynthScript.Text = value.Template;
                 resize.Checked = value.Resize;
+                chkNvResize.Checked = value.NvResize;
                 upsize.Checked = value.Upsize;
                 resizeFilterType.SelectedItem = EnumProxy.Create(value.ResizeMethod);
                 noiseFilterType.SelectedItem = EnumProxy.Create(value.DenoiseMethod);

@@ -137,7 +137,8 @@ namespace MeGUI
 
         public static string GetInputLine(string input, string indexFile, bool interlaced, PossibleSources sourceType,
             bool colormatrix, bool mpeg2deblock, bool flipVertical, double fps, bool dss2,
-            bool nvDeint, NvDeinterlacerType nvDeintType, int nvHorizontalResolution, int nvVerticalResolution)
+            bool nvDeint, NvDeinterlacerType nvDeintType, int nvHorizontalResolution, int nvVerticalResolution,
+            bool nvCrop, CropValues nvCropValues)
         {
             string inputLine = "#input";
             string strDLLPath = "";
@@ -178,11 +179,14 @@ namespace MeGUI
                     inputLine = "LoadPlugin(\"" + strDLLPath + "\")\r\nDGSource(\"" + indexFile + "\"";
                     if (MainForm.Instance.Settings.AutoForceFilm &&
                         MainForm.Instance.Settings.ForceFilmThreshold <= (decimal)dgiFile.GetFilmPercent(indexFile))
-                        inputLine += ",fieldop=1";
-                    else
-                        inputLine += ",fieldop=0";
+                        inputLine += ",fieldop=1"; // fieldop=0 is the default value
                     if (nvDeint)
                         inputLine += ScriptServer.GetNvDeInterlacerLine(true, nvDeintType);
+                    if (nvCrop && nvCropValues.isCropped())
+                    {
+                        GetMod4Cropping(ref nvCropValues);
+                        inputLine += ", crop_t=" + nvCropValues.top + ", crop_b=" + nvCropValues.bottom + ", crop_l=" + nvCropValues.left + ", crop_r=" + nvCropValues.right;
+                    }
                     if (nvHorizontalResolution > 0 && nvVerticalResolution > 0)
                         inputLine += ", resize_w=" + nvHorizontalResolution + ", resize_h=" + nvVerticalResolution;
                     inputLine += ")";
@@ -231,14 +235,25 @@ namespace MeGUI
             return inputLine;
         }
 
-        public static string GetCropLine(bool crop, CropValues cropValues)
+        public static string GetCropLine(CropValues cropValues)
         {
             string cropLine = "#crop";
-            if (crop & cropValues.isCropped())
+            if (cropValues.isCropped())
             {
                 cropLine = string.Format("crop({0}, {1}, {2}, {3})", cropValues.left, cropValues.top, -cropValues.right, -cropValues.bottom);
             }
             return cropLine;
+        }
+
+        private static void GetMod4Cropping(ref CropValues cropValues)
+        {
+            if (!cropValues.isCropped())
+                return;
+
+            cropValues.left = cropValues.left + cropValues.left % 4;
+            cropValues.top = cropValues.top + cropValues.top % 4;
+            cropValues.right = cropValues.right + cropValues.right % 4;
+            cropValues.bottom = cropValues.bottom + cropValues.bottom % 4;
         }
 
         public static string GetResizeLine(bool resize, int hres, int vres, int hresWithBorder, int vresWithBorder, ResizeFilterType type, bool crop, CropValues cropValues, int originalHRes, int originalVRes)

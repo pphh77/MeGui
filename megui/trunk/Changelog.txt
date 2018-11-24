@@ -1,6 +1,9 @@
-2891 [DGIndexIM Indexer]    fixed invalid input filter syntax (regression of 2890)
+2892 [AVS Script Creator]   added an option in the profile to use the DGIndexNV crop & resize filter if possible
+                            if resize with DGIndexNV is enabled also cropping will be done that way (mod4 is forced for crop values)
+                            fixed always applying the resize parameters to DGSource() (regression of 2891)
+2891 [DGIndexNV Indexer]    fixed invalid input filter syntax (regression of 2890)
 2890 [Settings]             added option to restrict input filters to 8 bit (enabled by default)
-     [x264]                 fixed high bit depth support if ffmpeg is not used
+     [x264]                 fixed high bit depth support if ffmpeg is not used (regression of 2874)
 2889 [Queue]                multiple "waiting" jobs can be assigned to a temporary worker to be processed
                             internal queue handling optimizations
 2888 [Main]                 changed File\Exit shortcut from CTRL+X to ALT+F4
