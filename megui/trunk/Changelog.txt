@@ -1,3 +1,4 @@
+2893 [OneClick]             fixed fatal error in some cases (regression of 2882). bug #937
 2892 [AVS Script Creator]   added an option in the profile to use the DGIndexNV crop & resize filter if possible
                             if resize with DGIndexNV is enabled also cropping will be done that way (mod4 is forced for crop values)
                             fixed always applying the resize parameters to DGSource() (regression of 2891)

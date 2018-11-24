@@ -717,9 +717,9 @@ namespace MeGUI
             string strWorkingDirectory = string.Empty;
             if (Directory.Exists(workingDirectory.Filename) && FileUtil.IsDirWriteable(workingDirectory.Filename))
                 strWorkingDirectory = workingDirectory.Filename;
-            else if (Directory.Exists(Path.GetDirectoryName(output.Filename)))
+            else if (File.Exists(output.Filename))
                 strWorkingDirectory = Path.GetDirectoryName(output.Filename);
-            else if (File.Exists(_videoInputInfo.FileName))
+            else if (_videoInputInfo != null && File.Exists(_videoInputInfo.FileName))
                 strWorkingDirectory = Path.GetDirectoryName(_videoInputInfo.FileName);
             if (!String.IsNullOrEmpty(strWorkingDirectory))
             {
@@ -1989,7 +1989,10 @@ namespace MeGUI
                 iSelectedAudioTabPage > audioTracks.Count - 1)
                 iSelectedAudioTabPage = 0;
 
-            IntPtr h = audioTab.Handle;  // fix for TabPages.Insert not working if handle has not been created yet (issue in batch mode)
+            if (!audioTab.IsDisposed)
+            {
+                IntPtr h = audioTab.Handle;  // fix for TabPages.Insert not working if handle has not been created yet (issue in batch mode)
+            }
             audioTab.TabPages.Insert(iSelectedAudioTabPage + 1, p);
             audioTracks.Insert(iSelectedAudioTabPage + 1, a);
             p.Controls.Add(a);
