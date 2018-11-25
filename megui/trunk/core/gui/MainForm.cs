@@ -509,13 +509,6 @@ namespace MeGUI
             ((ITool)(sender as MenuItem).Tag).Run(this);
         }
 
-        private void mnuOptions_Click(object sender, System.EventArgs e)
-        {
-            if ((!(sender is System.Windows.Forms.MenuItem)) || (!((sender as MenuItem).Tag is IOption)))
-                return;
-            ((IOption)(sender as MenuItem).Tag).Run(this);
-        }
-
         private void mnuMuxer_Click(object sender, System.EventArgs e)
         {
             if ((!(sender is System.Windows.Forms.MenuItem)) || (!((sender as MenuItem).Tag is IMuxing)))
@@ -890,44 +883,6 @@ namespace MeGUI
                 index++;
                 mnuTools.MenuItems.Add(m);
             }
-
-            // Fill the Options Menu
-            mnuOptions.MenuItems.Clear();
-            List<MenuItem> optionsItems = new List<MenuItem>();
-            List<Shortcut> usedShortcuts2 = new List<Shortcut>();
-            optionsItems.Add(mnuOptionsSettings);
-            usedShortcuts2.Add(mnuOptionsSettings.Shortcut);
-            foreach (IOption option in PackageSystem.Options.Values)
-            {
-                MenuItem newMenuItem = new MenuItem();
-                newMenuItem.Text = option.Name;
-                newMenuItem.Tag = option;
-                newMenuItem.Click += new System.EventHandler(this.mnuOptions_Click);
-                bool shortcutAttempted = false;
-                foreach (Shortcut s in option.Shortcuts)
-                {
-                    shortcutAttempted = true;
-                    Debug.Assert(s != Shortcut.None);
-                    if (!usedShortcuts.Contains(s))
-                    {
-                        usedShortcuts2.Add(s);
-                        newMenuItem.Shortcut = s;
-                        break;
-                    }
-                }
-                if (shortcutAttempted && newMenuItem.Shortcut == Shortcut.None)
-                    Log.Warn("Shortcut for '" + option.Name + "' is already used. No shortcut selected.");
-                optionsItems.Add(newMenuItem);
-            }
-
-            optionsItems.Sort(new Comparison<MenuItem>(delegate(MenuItem a, MenuItem b) { return (a.Text.CompareTo(b.Text)); }));
-            index = 0;
-            foreach (MenuItem m in optionsItems)
-            {
-                m.Index = index;
-                index++;
-                mnuOptions.MenuItems.Add(m);
-            }
         }
 
         private void addPackages()
@@ -976,8 +931,7 @@ namespace MeGUI
             PackageSystem.Tools.Register(new D2VCreatorTool());
             PackageSystem.Tools.Register(new VobSubTool());
             PackageSystem.Tools.Register(new MeGUI.packages.tools.hdbdextractor.HdBdExtractorTool());
-
-            PackageSystem.Options.Register(new UpdateOptions());
+            PackageSystem.Tools.Register(new UpdateTool());
 
             PackageSystem.MediaFileTypes.Register(new AvsFileFactory());        // HandleLevel 30
             PackageSystem.MediaFileTypes.Register(new dgmFileFactory());        // HandleLevel 20
@@ -1419,15 +1373,6 @@ namespace MeGUI
         {
             if (this.WindowState != FormWindowState.Minimized && this.Visible == true)
                 settings.MainFormSize = this.ClientSize;
-        }
-
-        private WorkerSettingsWindow oWorkerWindow;
-        private void workerSettings_Click(object sender, EventArgs e)
-        {
-            if (oWorkerWindow == null)
-                oWorkerWindow = new WorkerSettingsWindow();
-            oWorkerWindow.Show();
-            oWorkerWindow.BringToFront();
         }
     }
 }

@@ -1259,7 +1259,7 @@ namespace MeGUI
         }
     }
 
-    public class UpdateOptions : MeGUI.core.plugins.interfaces.IOption
+    public class UpdateTool : MeGUI.core.plugins.interfaces.ITool
     {
 
         #region IOption Members

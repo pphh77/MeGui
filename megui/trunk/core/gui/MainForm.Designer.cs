@@ -78,14 +78,11 @@ namespace MeGUI
             this.hideAllProgressWindows = new System.Windows.Forms.MenuItem();
             this.separator2 = new System.Windows.Forms.MenuItem();
             this.menuItem7 = new System.Windows.Forms.MenuItem();
-            this.mnuViewMinimizeToTray = new System.Windows.Forms.MenuItem();
-            this.menuItem1 = new System.Windows.Forms.MenuItem();
             this.viewSummary = new System.Windows.Forms.MenuItem();
-            this.workerSettings = new System.Windows.Forms.MenuItem();
+            this.mnuViewMinimizeToTray = new System.Windows.Forms.MenuItem();
             this.mnuTools = new System.Windows.Forms.MenuItem();
             this.mnutoolsD2VCreator = new System.Windows.Forms.MenuItem();
             this.mnuOptions = new System.Windows.Forms.MenuItem();
-            this.mnuOptionsSettings = new System.Windows.Forms.MenuItem();
             this.mnuHelp = new System.Windows.Forms.MenuItem();
             this.mnuChangelog = new System.Windows.Forms.MenuItem();
             this.mnuDoc = new System.Windows.Forms.MenuItem();
@@ -336,7 +333,6 @@ namespace MeGUI
             this.mainMenu1.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.mnuFile,
             this.mnuView,
-            this.menuItem1,
             this.mnuTools,
             this.mnuOptions,
             this.mnuHelp});
@@ -384,6 +380,7 @@ namespace MeGUI
             this.mnuView.Index = 1;
             this.mnuView.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.progressMenu,
+            this.viewSummary,
             this.mnuViewMinimizeToTray});
             this.mnuView.Text = "&View";
             this.mnuView.Popup += new System.EventHandler(this.mnuView_Popup);
@@ -420,37 +417,23 @@ namespace MeGUI
             this.menuItem7.Index = 3;
             this.menuItem7.Text = "(List of progress windows goes here)";
             // 
+            // viewSummary
+            // 
+            this.viewSummary.Index = 1;
+            this.viewSummary.RadioCheck = true;
+            this.viewSummary.Text = "&Worker Overview";
+            this.viewSummary.Click += new System.EventHandler(this.viewSummary_Click);
+            // 
             // mnuViewMinimizeToTray
             // 
-            this.mnuViewMinimizeToTray.Index = 1;
+            this.mnuViewMinimizeToTray.Index = 2;
             this.mnuViewMinimizeToTray.Shortcut = System.Windows.Forms.Shortcut.CtrlM;
             this.mnuViewMinimizeToTray.Text = "&Minimize to Tray";
             this.mnuViewMinimizeToTray.Click += new System.EventHandler(this.mnuViewMinimizeToTray_Click);
             // 
-            // menuItem1
-            // 
-            this.menuItem1.Index = 2;
-            this.menuItem1.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.viewSummary,
-            this.workerSettings});
-            this.menuItem1.Text = "Workers";
-            // 
-            // viewSummary
-            // 
-            this.viewSummary.Index = 0;
-            this.viewSummary.RadioCheck = true;
-            this.viewSummary.Text = "Overview";
-            this.viewSummary.Click += new System.EventHandler(this.viewSummary_Click);
-            // 
-            // workerSettings
-            // 
-            this.workerSettings.Index = 1;
-            this.workerSettings.Text = "Settings";
-            this.workerSettings.Click += new System.EventHandler(this.workerSettings_Click);
-            // 
             // mnuTools
             // 
-            this.mnuTools.Index = 3;
+            this.mnuTools.Index = 2;
             this.mnuTools.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.mnuMuxers,
             this.mnutoolsD2VCreator});
@@ -466,21 +449,14 @@ namespace MeGUI
             // 
             // mnuOptions
             // 
-            this.mnuOptions.Index = 4;
-            this.mnuOptions.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.mnuOptionsSettings});
+            this.mnuOptions.Index = 3;
+            this.mnuOptions.Shortcut = System.Windows.Forms.Shortcut.CtrlS;
             this.mnuOptions.Text = "&Options";
-            // 
-            // mnuOptionsSettings
-            // 
-            this.mnuOptionsSettings.Index = 0;
-            this.mnuOptionsSettings.Shortcut = System.Windows.Forms.Shortcut.CtrlS;
-            this.mnuOptionsSettings.Text = "Settings";
-            this.mnuOptionsSettings.Click += new System.EventHandler(this.mnuOptionsSettings_Click);
+            this.mnuOptions.Click += new System.EventHandler(this.mnuOptionsSettings_Click);
             // 
             // mnuHelp
             // 
-            this.mnuHelp.Index = 5;
+            this.mnuHelp.Index = 4;
             this.mnuHelp.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.mnuChangelog,
             this.mnuDoc,
@@ -634,7 +610,6 @@ namespace MeGUI
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.MenuItem mnuHelp;
         private System.Windows.Forms.MenuItem mnuChangelog;
-        private System.Windows.Forms.MenuItem menuItem1;
         private System.Windows.Forms.MenuItem viewSummary;
         private System.Windows.Forms.MenuItem showAllProgressWindows;
         private System.Windows.Forms.MenuItem hideAllProgressWindows;
@@ -647,7 +622,6 @@ namespace MeGUI
         private System.Windows.Forms.MenuItem mnuBugTracker;
         private System.Windows.Forms.MenuItem mnuFeaturesReq;
         private System.Windows.Forms.MenuItem mnuOptions;
-        private System.Windows.Forms.MenuItem mnuOptionsSettings;
         private System.Windows.Forms.TabPage logTab;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
@@ -660,6 +634,5 @@ namespace MeGUI
         private System.Windows.Forms.MenuItem mnutoolsD2VCreator;
         private MeGUI.core.details.JobControl jobControl1;
         private MeGUI.core.gui.LogTree logTree1;
-        private System.Windows.Forms.MenuItem workerSettings;
     }
 }

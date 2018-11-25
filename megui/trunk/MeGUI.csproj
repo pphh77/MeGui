@@ -816,12 +816,6 @@
     </Compile>
     <Compile Include="packages\tools\worker\WorkerPriority.cs" />
     <Compile Include="packages\tools\worker\WorkerSettings.cs" />
-    <Compile Include="packages\tools\worker\WorkerSettingsWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="packages\tools\worker\WorkerSettingsWindow.Designer.cs">
-      <DependentUpon>WorkerSettingsWindow.cs</DependentUpon>
-    </Compile>
     <Compile Include="packages\video\huffyuv\hfyuSettings.cs" />
     <Compile Include="packages\video\ffmpeg\ffmpegEncoder.cs" />
     <Compile Include="packages\video\x264\x264ConfigurationPanel.cs">
@@ -1108,9 +1102,6 @@
     <EmbeddedResource Include="packages\tools\vobsub\VobSubIndexWindow.resx">
       <DependentUpon>VobSubIndexWindow.cs</DependentUpon>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="packages\tools\worker\WorkerSettingsWindow.resx">
-      <DependentUpon>WorkerSettingsWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="packages\video\x264\x264ConfigurationPanel.resx">
       <SubType>Designer</SubType>

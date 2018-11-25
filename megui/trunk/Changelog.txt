@@ -1,3 +1,8 @@
+2894 [Main]                 moved menu items:
+                            - "options\update" to "tools\update"
+                            - "options\settings" to "options"
+                            - "workers\settings" to "options"
+                            - "workers\overview" to "view\worker overview"
 2893 [OneClick]             fixed fatal error in some cases (regression of 2882). bug #937
 2892 [AVS Script Creator]   added an option in the profile to use the DGIndexNV crop & resize filter if possible
                             if resize with DGIndexNV is enabled also cropping will be done that way (mod4 is forced for crop values)
