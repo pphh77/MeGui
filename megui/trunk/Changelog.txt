@@ -1,3 +1,4 @@
+2895 [Main]                 show changelog when MeGUI has been updated
 2894 [Main]                 moved menu items:
                             - "options\update" to "tools\update"
                             - "options\settings" to "options"

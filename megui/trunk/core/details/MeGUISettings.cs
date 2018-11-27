@@ -48,7 +48,7 @@ namespace MeGUI
         };
         private string[][] autoUpdateServerLists;
         private DateTime lastUpdateCheck;
-        private string strMainAudioFormat, strMainFileFormat, meguiupdatecache, neroAacEncPath,
+        private string strMainAudioFormat, strMainFileFormat, meguiupdatecache, neroAacEncPath, version,
                        defaultLanguage1, defaultLanguage2, afterEncodingCommand, videoExtension, audioExtension,
                        strEac3toLastFolderPath, strEac3toLastFilePath, strEac3toLastDestinationPath, tempDirMP4,
                        fdkAacPath, httpproxyaddress, httpproxyport, httpproxyuid, httpproxypwd, defaultOutputDir,
@@ -208,6 +208,7 @@ namespace MeGUI
             bInput8Bit = true;
             ResetWorkerSettings();
             ResetWorkerPriority();
+            version = "";
         }
 
         #region properties
@@ -409,6 +410,12 @@ namespace MeGUI
         {
             get { return customDARs; }
             set { customDARs = value; }
+        }
+
+        public string Version
+        {
+            get { return version; }
+            set { version = value; }
         }
 
         public string Eac3toLastFolderPath

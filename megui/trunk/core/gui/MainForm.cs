@@ -1243,6 +1243,12 @@ namespace MeGUI
 
             if (MainForm.Instance.Settings.UpdateMode != UpdateMode.Disabled)
                 _updateHandler.BeginUpdateCheck();
+
+            if (!MainForm.Instance.Settings.Version.Equals(new System.Version(Application.ProductVersion).Build.ToString()))
+            {
+                mnuChangelog_Click(null, null);
+                MainForm.Instance.Settings.Version = new System.Version(Application.ProductVersion).Build.ToString();
+            }
         }
 
         private void getVersionInformation()
