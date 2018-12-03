@@ -1,3 +1,5 @@
+2896 [AVS Script Creator]   fixed Crop() used also if DGIndexNV cropping has been enabled (regression of 2892)
+                            if cropping with DGIndexNV is used, the CLIP values from the dgi file are added to the crop values selected in the GUI
 2895 [Main]                 show changelog when MeGUI has been updated
 2894 [Main]                 moved menu items:
                             - "options\update" to "tools\update"

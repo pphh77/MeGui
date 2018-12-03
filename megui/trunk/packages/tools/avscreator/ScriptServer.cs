@@ -137,8 +137,7 @@ namespace MeGUI
 
         public static string GetInputLine(string input, string indexFile, bool interlaced, PossibleSources sourceType,
             bool colormatrix, bool mpeg2deblock, bool flipVertical, double fps, bool dss2,
-            bool nvDeint, NvDeinterlacerType nvDeintType, int nvHorizontalResolution, int nvVerticalResolution,
-            bool nvCrop, CropValues nvCropValues)
+            NvDeinterlacerType nvDeintType, int nvHorizontalResolution, int nvVerticalResolution, CropValues nvCropValues)
         {
             string inputLine = "#input";
             string strDLLPath = "";
@@ -180,12 +179,17 @@ namespace MeGUI
                     if (MainForm.Instance.Settings.AutoForceFilm &&
                         MainForm.Instance.Settings.ForceFilmThreshold <= (decimal)dgiFile.GetFilmPercent(indexFile))
                         inputLine += ",fieldop=1"; // fieldop=0 is the default value
-                    if (nvDeint)
+                    if (nvDeintType != NvDeinterlacerType.nvDeInterlacerNone)
                         inputLine += ScriptServer.GetNvDeInterlacerLine(true, nvDeintType);
-                    if (nvCrop && nvCropValues.isCropped())
+                    if (nvCropValues != null && nvCropValues.isCropped())
                     {
-                        GetMod4Cropping(ref nvCropValues);
-                        inputLine += ", crop_t=" + nvCropValues.top + ", crop_b=" + nvCropValues.bottom + ", crop_l=" + nvCropValues.left + ", crop_r=" + nvCropValues.right;
+                        CropValues dgiCropping = GetDGICropping(indexFile);
+                        dgiCropping.top += nvCropValues.top;
+                        dgiCropping.bottom += nvCropValues.bottom;
+                        dgiCropping.left += nvCropValues.left;
+                        dgiCropping.right += nvCropValues.right;
+                        GetMod4Cropping(ref dgiCropping);
+                        inputLine += ", crop_t=" + dgiCropping.top + ", crop_b=" + dgiCropping.bottom + ", crop_l=" + dgiCropping.left + ", crop_r=" + dgiCropping.right;
                     }
                     if (nvHorizontalResolution > 0 && nvVerticalResolution > 0)
                         inputLine += ", resize_w=" + nvHorizontalResolution + ", resize_h=" + nvVerticalResolution;
@@ -254,6 +258,34 @@ namespace MeGUI
             cropValues.top = cropValues.top + cropValues.top % 4;
             cropValues.right = cropValues.right + cropValues.right % 4;
             cropValues.bottom = cropValues.bottom + cropValues.bottom % 4;
+        }
+
+        private static CropValues GetDGICropping(string input)
+        {
+            if (!File.Exists(input))
+                return new CropValues();
+
+            using (StreamReader sr = new StreamReader(input, System.Text.Encoding.Default))
+            {
+                string line;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    if (line.ToLower().StartsWith("clip "))
+                    {
+                        string[] values = line.Split(' ');
+                        if (values.Length != 5)
+                            return new CropValues();
+                        CropValues newCrop = new CropValues();
+                        Int32.TryParse(values[1], out newCrop.left);
+                        Int32.TryParse(values[2], out newCrop.right);
+                        Int32.TryParse(values[3], out newCrop.top);
+                        Int32.TryParse(values[4], out newCrop.bottom);
+                        return newCrop;
+                    }
+                }
+            }
+
+            return new CropValues();
         }
 
         public static string GetResizeLine(bool resize, int hres, int vres, int hresWithBorder, int vresWithBorder, ResizeFilterType type, bool crop, CropValues cropValues, int originalHRes, int originalVRes)

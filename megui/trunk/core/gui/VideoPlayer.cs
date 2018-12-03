@@ -137,8 +137,8 @@ namespace MeGUI
                 else
                 {
                     file = mainForm.MediaFileFactory.Open(path);
-                    if (file == null && !(file.VideoInfo.HasVideo && file.CanReadVideo))
-                        throw new ArgumentException("The video stream cannot be opened");
+                    if (file == null)
+                        throw new Exception("The video stream cannot be opened");
                     btnReloadVideo.Enabled = true;
                 }
                 reader = file.GetVideoReader();
@@ -156,8 +156,7 @@ namespace MeGUI
             catch (Exception e)
             {               
                 MessageBox.Show("The file " + path + " cannot be opened.\r\n"
-                    + "Please make sure it's a valid AviSynth script and that AviSynth is properly installed\r\n"
-                    + "Error message for your reference: " + e.Message,
+                    + "Error message: " + e.Message,
                     "Cannot open video input", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 return false;
             }
@@ -208,8 +207,8 @@ namespace MeGUI
                 else
                 {
                     file = mainForm.MediaFileFactory.Open(strFileName);
-                    if (file == null && !(file.VideoInfo.HasVideo && file.CanReadVideo))
-                        throw new ArgumentException("The video stream cannot be opened");
+                    if (file == null)
+                        throw new Exception("The video stream cannot be opened");
                 }
                 reader = file.GetVideoReader();
             }
@@ -226,8 +225,7 @@ namespace MeGUI
             catch (Exception e)
             {
                 MessageBox.Show("The file " + strFileName + " cannot be opened.\r\n"
-                    + "Please make sure it's a valid AviSynth script and that AviSynth is properly installed\r\n"
-                    + "Error message for your reference: " + e.Message,
+                    + "Error message: " + e.Message,
                     "Cannot open video input", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 return false;
             }

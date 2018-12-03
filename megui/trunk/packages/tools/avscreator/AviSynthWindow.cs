@@ -256,11 +256,11 @@ namespace MeGUI
                 deinterlaceLines = ((DeinterlaceFilter)deinterlaceType.SelectedItem).Script;
 
             // crop
-            if (!nvResize.Checked && crop.Checked)
+            if ((!dgOptions.Enabled || !nvResize.Checked) && crop.Checked)
                 cropLine = ScriptServer.GetCropLine(Cropping);
             
             // resize
-            if (!nvResize.Checked && horizontalResolution.Value > 0 && verticalResolution.Value > 0)
+            if ((!dgOptions.Enabled || !nvResize.Checked) && horizontalResolution.Value > 0 && verticalResolution.Value > 0)
             {
                 int iWidth = (int)horizontalResolution.Maximum;
                 int iHeight = (int)verticalResolution.Maximum;
@@ -344,12 +344,10 @@ namespace MeGUI
                                                     _tempFlipVertical,
                                                     _tempFPS,
                                                     _tempDSS2,
-                                                    _tempNvDeint,
-                                                    _tempNvDeintType,
+                                                    nvDeInt.Checked ? _tempNvDeintType : NvDeinterlacerType.nvDeInterlacerNone,
                                                     (_tempNvResize && _tempResize) ? (int)_tempNvHorizontalResolution : 0,
                                                     (_tempNvResize && _tempResize) ? (int)_tempNvVerticalResolution: 0,
-                                                    _tempCrop,
-                                                    _tempCropValues);
+                                                    (_tempNvResize && _tempCrop) ? _tempCropValues : null);
             }
             
             return _tempInputLine;
@@ -402,7 +400,7 @@ namespace MeGUI
             {
                 case ".avs":
                     sourceType = PossibleSources.avs;
-                    videoOutput.Filename = Path.Combine(projectPath, Path.ChangeExtension(fileNameNoPath, "_new.avs")); // to avoid overwritten
+                    videoOutput.Filename = Path.Combine(projectPath, Path.GetFileNameWithoutExtension(fileNameNoPath) + "_new.avs"); // to avoid overwritten
                     openAVSScript(videoInput);
                     break;           
                 case ".d2v":
@@ -432,7 +430,26 @@ namespace MeGUI
                     openVDubFrameServer(videoInput);
                     break;
                 default:
-                    if (File.Exists(videoInput + ".lwi"))
+                    if (File.Exists(videoInput + ".dgi") || File.Exists(Path.ChangeExtension(videoInput, "dgi")))
+                    {
+                        if (FileIndexerWindow.isDGMFile(videoInput))
+                            sourceType = PossibleSources.dgm;
+                        else
+                            sourceType = PossibleSources.dgi;
+                        if (File.Exists(videoInput + ".dgi"))
+                            openVideo(videoInput + ".dgi");
+                        else
+                            openVideo(Path.ChangeExtension(videoInput, "dgi"));
+                    }
+                    else if (File.Exists(videoInput + ".d2v") || File.Exists(Path.ChangeExtension(videoInput, "d2v")))
+                    {
+                        sourceType = PossibleSources.d2v;
+                        if (File.Exists(videoInput + ".d2v"))
+                            openVideo(videoInput);
+                        else
+                            openVideo(Path.ChangeExtension(videoInput, "d2v"));
+                    }
+                    else if (File.Exists(videoInput + ".lwi"))
                     {
                         sourceType = PossibleSources.lsmash;
                         openVideo(videoInput);
@@ -510,11 +527,7 @@ namespace MeGUI
                     this.fpsBox.Enabled = false;
                     this.flipVertical.Enabled = false;
                     this.flipVertical.Checked = false;
-                    this.cbNvDeInt.Enabled = false;
-                    this.nvDeInt.Enabled = false;
-                    this.nvDeInt.Checked = false;
-                    this.nvResize.Enabled = false;                    
-                    this.nvResize.Checked = false;
+                    this.dgOptions.Enabled = false;
                     this.dss2.Enabled = false;
                     this.tabSources.SelectedTab = tabPage1;
                     break;
@@ -529,11 +542,7 @@ namespace MeGUI
                     this.flipVertical.Checked = false;
                     this.dss2.Enabled = false;
                     this.fpsBox.Enabled = false;
-                    this.cbNvDeInt.Enabled = false;
-                    this.nvDeInt.Enabled = false;
-                    this.nvDeInt.Checked = false;
-                    this.nvResize.Enabled = false;
-                    this.nvResize.Checked = false;
+                    this.dgOptions.Enabled = false;
                     this.tabSources.SelectedTab = tabPage1;
                     break;
                 case PossibleSources.ffindex:
@@ -545,11 +554,7 @@ namespace MeGUI
                     this.dss2.Enabled = false;
                     this.fpsBox.Enabled = false;
                     this.flipVertical.Enabled = true;
-                    this.cbNvDeInt.Enabled = false;
-                    this.nvDeInt.Enabled = false;
-                    this.nvDeInt.Checked = false;
-                    this.nvResize.Enabled = false;
-                    this.nvResize.Checked = false;
+                    this.dgOptions.Enabled = false;
                     this.tabSources.SelectedTab = tabPage1;
                     break;
                 case PossibleSources.directShow:
@@ -560,11 +565,7 @@ namespace MeGUI
                     this.dss2.Enabled = true;
                     this.fpsBox.Enabled = true;
                     this.flipVertical.Enabled = true;
-                    this.cbNvDeInt.Enabled = false;
-                    this.nvDeInt.Enabled = false;
-                    this.nvDeInt.Checked = false;
-                    this.nvResize.Enabled = false;
-                    this.nvResize.Checked = false;
+                    this.dgOptions.Enabled = false;
                     this.tabSources.SelectedTab = tabPage2;
                     break;
                 case PossibleSources.dgi:
@@ -576,12 +577,7 @@ namespace MeGUI
                     this.flipVertical.Checked = false;
                     this.dss2.Enabled = false;
                     this.fpsBox.Enabled = false;
-                    this.cbNvDeInt.Enabled = false;
-                    this.nvDeInt.Enabled = true;
-                    this.nvDeInt.Checked = false;
-                    this.nvResize.Enabled = true;
-                    this.nvResize.Checked = false;
-                    this.cbNvDeInt.SelectedIndex = 0;
+                    this.dgOptions.Enabled = true;
                     this.tabSources.SelectedTab = tabPage3;
                     break;
                 case PossibleSources.dgm:
@@ -593,12 +589,7 @@ namespace MeGUI
                     this.flipVertical.Checked = false;
                     this.dss2.Enabled = false;
                     this.fpsBox.Enabled = false;
-                    this.cbNvDeInt.Enabled = false;
-                    this.nvDeInt.Enabled = false;
-                    this.nvDeInt.Checked = false;
-                    this.nvResize.Enabled = false;
-                    this.nvResize.Checked = false;
-                    this.cbNvDeInt.SelectedIndex = 0;
+                    this.dgOptions.Enabled = false;
                     this.tabSources.SelectedTab = tabPage3;
                     break;
             }
@@ -1084,7 +1075,7 @@ namespace MeGUI
 
                 string source = ScriptServer.GetInputLine(
                     input.Filename, indexFile, false, sourceType, false, false, false,
-                    0, false, false, NvDeinterlacerType.nvDeInterlacerNone, 0, 0, false, null);
+                    0, false, NvDeinterlacerType.nvDeInterlacerNone, 0, 0, null);
 
                 // get number of frames
                 int numFrames = 0;
@@ -1243,19 +1234,6 @@ namespace MeGUI
         {
             // just to be sure
             checkNVCompatibleFile(input.Filename);
-        }
-
-        private void nvResize_CheckedChanged(object sender, EventArgs e)
-        {
-            cropLeft.Increment = cropTop.Increment = cropRight.Increment = cropBottom.Increment = (nvResize.Checked ? 4 : 2);
-            if (nvResize.Checked)
-            {
-                cropLeft.Value = cropLeft.Value + cropLeft.Value % 4;
-                cropTop.Value = cropTop.Value + cropTop.Value % 4;
-                cropRight.Value = cropRight.Value + cropRight.Value % 4;
-                cropBottom.Value = cropBottom.Value + cropBottom.Value % 4;
-            }
-            refreshScript(sender, e);
         }
 
         private void openSubtitlesButton_Click(object sender, EventArgs e)

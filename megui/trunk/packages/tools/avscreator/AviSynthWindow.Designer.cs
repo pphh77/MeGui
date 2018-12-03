@@ -75,8 +75,12 @@ namespace MeGUI
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.optionsTab = new System.Windows.Forms.TabPage();
             this.gbOutput = new System.Windows.Forms.GroupBox();
+            this.videoOutput = new MeGUI.FileBar();
             this.label7 = new System.Windows.Forms.Label();
             this.videoGroupBox = new System.Windows.Forms.GroupBox();
+            this.input = new MeGUI.FileBar();
+            this.avsProfile = new MeGUI.core.gui.ConfigableProfilesControl();
+            this.arChooser = new MeGUI.core.gui.ARChooser();
             this.reopenOriginal = new System.Windows.Forms.Button();
             this.tvTypeLabel = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
@@ -134,10 +138,6 @@ namespace MeGUI
             this.saveButton = new System.Windows.Forms.Button();
             this.previewAvsButton = new System.Windows.Forms.Button();
             this.helpButton1 = new MeGUI.core.gui.HelpButton();
-            this.videoOutput = new MeGUI.FileBar();
-            this.input = new MeGUI.FileBar();
-            this.avsProfile = new MeGUI.core.gui.ConfigableProfilesControl();
-            this.arChooser = new MeGUI.core.gui.ARChooser();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
@@ -500,6 +500,18 @@ namespace MeGUI
             this.gbOutput.TabStop = false;
             this.gbOutput.Text = "Output";
             // 
+            // videoOutput
+            // 
+            this.videoOutput.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.videoOutput.Filename = "";
+            this.videoOutput.Filter = "AVI Synth Scripts|*.avs";
+            this.videoOutput.Location = new System.Drawing.Point(96, 18);
+            this.videoOutput.Name = "videoOutput";
+            this.videoOutput.SaveMode = true;
+            this.videoOutput.Size = new System.Drawing.Size(348, 23);
+            this.videoOutput.TabIndex = 7;
+            // 
             // label7
             // 
             this.label7.Location = new System.Drawing.Point(8, 24);
@@ -526,6 +538,43 @@ namespace MeGUI
             this.videoGroupBox.TabIndex = 5;
             this.videoGroupBox.TabStop = false;
             this.videoGroupBox.Text = "Input";
+            // 
+            // input
+            // 
+            this.input.AllowDrop = true;
+            this.input.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.input.Filename = "";
+            this.input.Filter = "All files|*.*";
+            this.input.FilterIndex = 1;
+            this.input.Location = new System.Drawing.Point(96, 16);
+            this.input.Name = "input";
+            this.input.Size = new System.Drawing.Size(348, 23);
+            this.input.TabIndex = 1;
+            this.input.Title = "Select a source file";
+            this.input.FileSelected += new MeGUI.FileBarEventHandler(this.input_FileSelected);
+            // 
+            // avsProfile
+            // 
+            this.avsProfile.Location = new System.Drawing.Point(96, 111);
+            this.avsProfile.Name = "avsProfile";
+            this.avsProfile.ProfileSet = "AviSynth";
+            this.avsProfile.Size = new System.Drawing.Size(348, 22);
+            this.avsProfile.TabIndex = 22;
+            this.avsProfile.SelectedProfileChanged += new System.EventHandler(this.ProfileChanged);
+            // 
+            // arChooser
+            // 
+            this.arChooser.CustomDARs = new MeGUI.core.util.Dar[0];
+            this.arChooser.HasLater = false;
+            this.arChooser.Location = new System.Drawing.Point(96, 76);
+            this.arChooser.MaximumSize = new System.Drawing.Size(1000, 29);
+            this.arChooser.MinimumSize = new System.Drawing.Size(64, 29);
+            this.arChooser.Name = "arChooser";
+            this.arChooser.SelectedIndex = 0;
+            this.arChooser.Size = new System.Drawing.Size(214, 29);
+            this.arChooser.TabIndex = 21;
+            this.arChooser.SelectionChanged += new MeGUI.StringChanged(this.inputDARChanged);
             // 
             // reopenOriginal
             // 
@@ -774,7 +823,7 @@ namespace MeGUI
             this.fpsBox.DecimalPlaces = 3;
             this.fpsBox.Location = new System.Drawing.Point(40, 43);
             this.fpsBox.Maximum = new decimal(new int[] {
-            1000,
+            999999,
             0,
             0,
             0});
@@ -843,7 +892,7 @@ namespace MeGUI
             this.nvResize.TabIndex = 2;
             this.nvResize.Text = "Nvidia Crop && Resize";
             this.nvResize.UseVisualStyleBackColor = true;
-            this.nvResize.CheckedChanged += new System.EventHandler(this.nvResize_CheckedChanged);
+            this.nvResize.CheckedChanged += new System.EventHandler(this.refreshScript);
             this.nvResize.Click += new System.EventHandler(this.nvDeInt_Click);
             // 
             // cbNvDeInt
@@ -1187,55 +1236,6 @@ namespace MeGUI
             this.helpButton1.Name = "helpButton1";
             this.helpButton1.Size = new System.Drawing.Size(38, 23);
             this.helpButton1.TabIndex = 17;
-            // 
-            // videoOutput
-            // 
-            this.videoOutput.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.videoOutput.Filename = "";
-            this.videoOutput.Filter = "AVI Synth Scripts|*.avs";
-            this.videoOutput.Location = new System.Drawing.Point(96, 18);
-            this.videoOutput.Name = "videoOutput";
-            this.videoOutput.SaveMode = true;
-            this.videoOutput.Size = new System.Drawing.Size(348, 23);
-            this.videoOutput.TabIndex = 7;
-            // 
-            // input
-            // 
-            this.input.AllowDrop = true;
-            this.input.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.input.Filename = "";
-            this.input.Filter = "All files|*.*";
-            this.input.FilterIndex = 1;
-            this.input.Location = new System.Drawing.Point(96, 16);
-            this.input.Name = "input";
-            this.input.Size = new System.Drawing.Size(348, 23);
-            this.input.TabIndex = 1;
-            this.input.Title = "Select a source file";
-            this.input.FileSelected += new MeGUI.FileBarEventHandler(this.input_FileSelected);
-            // 
-            // avsProfile
-            // 
-            this.avsProfile.Location = new System.Drawing.Point(96, 111);
-            this.avsProfile.Name = "avsProfile";
-            this.avsProfile.ProfileSet = "AviSynth";
-            this.avsProfile.Size = new System.Drawing.Size(348, 22);
-            this.avsProfile.TabIndex = 22;
-            this.avsProfile.SelectedProfileChanged += new System.EventHandler(this.ProfileChanged);
-            // 
-            // arChooser
-            // 
-            this.arChooser.CustomDARs = new MeGUI.core.util.Dar[0];
-            this.arChooser.HasLater = false;
-            this.arChooser.Location = new System.Drawing.Point(96, 76);
-            this.arChooser.MaximumSize = new System.Drawing.Size(1000, 29);
-            this.arChooser.MinimumSize = new System.Drawing.Size(64, 29);
-            this.arChooser.Name = "arChooser";
-            this.arChooser.SelectedIndex = 0;
-            this.arChooser.Size = new System.Drawing.Size(214, 29);
-            this.arChooser.TabIndex = 21;
-            this.arChooser.SelectionChanged += new MeGUI.StringChanged(this.inputDARChanged);
             // 
             // AviSynthWindow
             // 

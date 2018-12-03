@@ -45,7 +45,15 @@ namespace MeGUI
 
         public IMediaFile Open(string file)
         {
-            return new MediaInfoFile(file);
+            MediaInfoFile oFile = new MediaInfoFile(file, false);
+            if (oFile == null)
+                return null;
+            if (!oFile.HasAudio && !oFile.HasVideo)
+            {
+                oFile.Dispose();
+                return null;
+            }
+            return oFile;
         }
 
         #endregion
@@ -64,7 +72,7 @@ namespace MeGUI
 
         public string ID
         {
-            get { return "MediaInfo/DirectShowSource"; }
+            get { return "MediaInfo"; }
         }
 
         #endregion
@@ -125,22 +133,27 @@ namespace MeGUI
         }
         #endregion
 
+        public MediaInfoFile(string file) : this(file, 1, 0)
+        {
+        }
+
         public MediaInfoFile(string file, ref LogItem oLog) : this(file, ref oLog, 1, 0)
         {
         }
 
         public MediaInfoFile(string file, ref LogItem oLog, int iPGCNumber, int iAngleNumber)
         {
-            GetSourceInformation(file, oLog, iPGCNumber, iAngleNumber);
+            GetSourceInformation(file, oLog, iPGCNumber, iAngleNumber, true);
         }
 
-        public MediaInfoFile(string file) : this(file, 1, 0)
+        public MediaInfoFile(string file, bool bGetIndexFileData)
         {
+            GetSourceInformation(file, null, 1, 0, bGetIndexFileData);
         }
 
         public MediaInfoFile(string file, int iPGCNumber, int iAngleNumber)
         {
-            GetSourceInformation(file, null, iPGCNumber, iAngleNumber);
+            GetSourceInformation(file, null, iPGCNumber, iAngleNumber, true);
         }
 
         /// <summary>
@@ -148,7 +161,7 @@ namespace MeGUI
         /// </summary>
         /// <param name="file">the file to be analyzed</param>
         /// <param name="oLog">the log item</param>
-        private void GetSourceInformation(string file, LogItem oLog, int iPGCNumber, int iAngleNumber)
+        private void GetSourceInformation(string file, LogItem oLog, int iPGCNumber, int iAngleNumber, bool bGetIndexFileData)
         {
             if (file.Contains("|"))
                 file = file.Split('|')[0];
@@ -189,6 +202,9 @@ namespace MeGUI
                 if (Path.GetExtension(file).ToLowerInvariant().Equals(".d2v") ||
                     Path.GetExtension(file).ToLowerInvariant().Equals(".dgi"))
                 {
+                    if (!bGetIndexFileData)
+                        return;
+
                     using (StreamReader sr = new StreamReader(file, Encoding.Default))
                     {
                         string line = null;
@@ -237,6 +253,9 @@ namespace MeGUI
                 }
                 else if (Path.GetExtension(file).ToLowerInvariant().Equals(".lwi"))
                 {
+                    if (!bGetIndexFileData)
+                        return;
+
                     using (StreamReader sr = new StreamReader(file, Encoding.Default))
                     {
                         string line = null;
@@ -1590,7 +1609,7 @@ namespace MeGUI
                     {
                         videoSourceFile = AvsFile.ParseScript(ScriptServer.GetInputLine(
                             _file, null, false, PossibleSources.directShow, false, false, false, VideoInfo.FPS,
-                            false, false, NvDeinterlacerType.nvDeInterlacerNone, 0, 0, false, null), true);
+                            false, NvDeinterlacerType.nvDeInterlacerNone, 0, 0, null), true);
                         videoReader = null;
                     }
                     if (videoReader == null)
