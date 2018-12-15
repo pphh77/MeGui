@@ -183,16 +183,11 @@ namespace MeGUI
                         inputLine += ScriptServer.GetNvDeInterlacerLine(true, nvDeintType);
                     if (nvCropValues != null && nvCropValues.isCropped())
                     {
-                        CropValues dgiCropping = GetDGICropping(indexFile);
-                        dgiCropping.top += nvCropValues.top;
-                        dgiCropping.bottom += nvCropValues.bottom;
-                        dgiCropping.left += nvCropValues.left;
-                        dgiCropping.right += nvCropValues.right;
-                        GetMod4Cropping(ref dgiCropping);
-                        inputLine += ", crop_t=" + dgiCropping.top + ", crop_b=" + dgiCropping.bottom + ", crop_l=" + dgiCropping.left + ", crop_r=" + dgiCropping.right;
+                        GetMod4Cropping(ref nvCropValues);
+                        inputLine += ", ct=" + nvCropValues.top + ", cb=" + nvCropValues.bottom + ", cl=" + nvCropValues.left + ", cr=" + nvCropValues.right;
                     }
                     if (nvHorizontalResolution > 0 && nvVerticalResolution > 0)
-                        inputLine += ", resize_w=" + nvHorizontalResolution + ", resize_h=" + nvVerticalResolution;
+                        inputLine += ", rw=" + nvHorizontalResolution + ", rh=" + nvVerticalResolution;
                     inputLine += ")";
                     if (MainForm.Instance.Settings.AviSynthPlus && MainForm.Instance.Settings.Input8Bit)
                         inputLine += "\r\nConvertBits(8)";
@@ -254,38 +249,10 @@ namespace MeGUI
             if (!cropValues.isCropped())
                 return;
 
-            cropValues.left = cropValues.left + cropValues.left % 4;
-            cropValues.top = cropValues.top + cropValues.top % 4;
-            cropValues.right = cropValues.right + cropValues.right % 4;
-            cropValues.bottom = cropValues.bottom + cropValues.bottom % 4;
-        }
-
-        private static CropValues GetDGICropping(string input)
-        {
-            if (!File.Exists(input))
-                return new CropValues();
-
-            using (StreamReader sr = new StreamReader(input, System.Text.Encoding.Default))
-            {
-                string line;
-                while ((line = sr.ReadLine()) != null)
-                {
-                    if (line.ToLower().StartsWith("clip "))
-                    {
-                        string[] values = line.Split(' ');
-                        if (values.Length != 5)
-                            return new CropValues();
-                        CropValues newCrop = new CropValues();
-                        Int32.TryParse(values[1], out newCrop.left);
-                        Int32.TryParse(values[2], out newCrop.right);
-                        Int32.TryParse(values[3], out newCrop.top);
-                        Int32.TryParse(values[4], out newCrop.bottom);
-                        return newCrop;
-                    }
-                }
-            }
-
-            return new CropValues();
+            cropValues.left = cropValues.left + cropValues.left % 2;
+            cropValues.top = cropValues.top + cropValues.top % 2;
+            cropValues.right = cropValues.right + cropValues.right % 2;
+            cropValues.bottom = cropValues.bottom + cropValues.bottom % 2;
         }
 
         public static string GetResizeLine(bool resize, int hres, int vres, int hresWithBorder, int vresWithBorder, ResizeFilterType type, bool crop, CropValues cropValues, int originalHRes, int originalVRes)

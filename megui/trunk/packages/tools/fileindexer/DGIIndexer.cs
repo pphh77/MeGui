@@ -127,53 +127,55 @@ namespace MeGUI
                 }
 
                 if (!File.Exists(strINIFile) || !bResponseOnAudioMismatchFound || !bEnable_Info_Log || !bFull_Path_In_Files)
-                {
-                    sb = new StringBuilder();
-                    sb.AppendLine("Version=");
-                    sb.AppendLine("Window_Position=0,0");
-                    sb.AppendLine("Info_Window_Position=0,0");
-                    sb.AppendLine("Process_Priority=2");
-                    sb.AppendLine("Playback_Speed=3");
-                    sb.AppendLine("AVS_Template_Folder=");
-                    sb.AppendLine("AVS_Template_File=template.avs");
-                    sb.AppendLine("AVS_Template_File_Index=0");
-                    sb.AppendLine("AVS_Enable_Template=1");
-                    sb.AppendLine("AVS_Overwrite=0");
-                    sb.AppendLine("Full_Path_In_Files=1");
-                    sb.AppendLine("MRUList[0]=");
-                    sb.AppendLine("MRUList[1]=");
-                    sb.AppendLine("MRUList[2]=");
-                    sb.AppendLine("MRUList[3]=");
-                    sb.AppendLine("Enable_Info_Log=1");
-                    sb.AppendLine("Loop_Playback=0");
-                    sb.AppendLine("AVC_Extension=264");
-                    sb.AppendLine("MPG_Extension=m2v");
-                    sb.AppendLine("VC1_Extension=vc1");
-                    sb.AppendLine("HEVC_Extension=265");
-                    sb.AppendLine("Deinterlace=0");
-                    sb.AppendLine("UsePF=0");
-                    sb.AppendLine("AlwaysCrop=1");
-                    sb.AppendLine("UseD3D=0");
-                    sb.AppendLine("Snapped=0");
-                    sb.AppendLine("ResponseOnAudioMismatch=1");
-                    sb.AppendLine("Enable_Audio_Demux=1");
-                    sb.AppendLine("CUDA_Device=255");
-                    sb.AppendLine("Decode_Modes=0,0,0,0");
-                    sb.AppendLine("Full_Info=1");
-                    sb.AppendLine("Bare_Demux=0");
-                    sb.AppendLine("Disable_Encrypted_Audio_Warning=0");
-                    sb.AppendLine("Fine_Cropping=0");
-                    sb.AppendLine("Force_Zoom=0");
-                    sb.AppendLine("StrictAVC=0");
-                                       
-                    log.LogEvent("Created " + strFileName, ImageType.Information);
-                    bChanged = true;
-                }
-
-                if (bChanged)
+                    ResetINI(strINIFile);
+                else if (bChanged)
                     File.WriteAllText(strINIFile, sb.ToString(), Encoding.UTF8);
             }
             catch (Exception) { }
+        }
+
+        private void ResetINI(string strINIFile)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("Version=DGIndexNV 2053.0.0.163");
+            sb.AppendLine("Window_Position=100,100");
+            sb.AppendLine("Info_Window_Position=100,100");
+            sb.AppendLine("Process_Priority=2");
+            sb.AppendLine("Playback_Speed=3");
+            sb.AppendLine("AVS_Template_Folder=");
+            sb.AppendLine("AVS_Template_File=template.avs");
+            sb.AppendLine("AVS_Template_File_Index=0");
+            sb.AppendLine("AVS_Enable_Template=1");
+            sb.AppendLine("AVS_Overwrite=0");
+            sb.AppendLine("Full_Path_In_Files=1");
+            sb.AppendLine("MRUList[0]=");
+            sb.AppendLine("MRUList[1]=");
+            sb.AppendLine("MRUList[2]=");
+            sb.AppendLine("MRUList[3]=");
+            sb.AppendLine("Enable_Info_Log=1");
+            sb.AppendLine("Loop_Playback=0");
+            sb.AppendLine("AVC_Extension=264");
+            sb.AppendLine("MPG_Extension=m2v");
+            sb.AppendLine("VC1_Extension=vc1");
+            sb.AppendLine("HEVC_Extension=265");
+            sb.AppendLine("Deinterlace=0");
+            sb.AppendLine("UsePF=0");
+            sb.AppendLine("UseD3D=0");
+            sb.AppendLine("Snapped=0");
+            sb.AppendLine("ResponseOnAudioMismatch=1");
+            sb.AppendLine("Enable_Demux=1");
+            sb.AppendLine("CUDA_Device=255");
+            sb.AppendLine("Decode_Modes=0,0,0,0");
+            sb.AppendLine("Full_Info=1");
+            sb.AppendLine("Bare_Demux=0");
+            sb.AppendLine("Disable_Encrypted_Audio_Warning=0");
+            sb.AppendLine("Force_Zoom=0");
+            sb.AppendLine("StrictAVC=0");
+            sb.AppendLine("PGSForcedOnly=0");
+
+            File.WriteAllText(strINIFile, sb.ToString(), Encoding.UTF8);
+
+            log.LogEvent("Reset " + Path.GetFileName(strINIFile), ImageType.Information);
         }
 
         protected override void checkJobIO()
@@ -226,10 +228,68 @@ namespace MeGUI
             }
         }
 
+        public static bool DGIHasFullPath(string dgiFile)
+        {
+            using (StreamReader sr = new StreamReader(dgiFile, Encoding.UTF8))
+            {
+                string line = null;
+                int iLineCount = 0;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    iLineCount++;
+                    if (iLineCount == 4)
+                    {
+                        string strSourceFile = line.Substring(0, line.LastIndexOf(" "));
+                        return File.Exists(strSourceFile);
+                    }
+                }
+            }
+            return false;
+        }
+
+        private void AddFullPathToDGI()
+        {
+            int iLineCount = 0;
+            string line = null;
+            using (StreamReader reader = new StreamReader(job.Output, Encoding.UTF8))
+            {
+                using (StreamWriter writer = new StreamWriter(job.Output + ".temp", false, new UTF8Encoding(false)))
+                {
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        iLineCount++;
+                        if (iLineCount == 4)
+                        {
+                            string strSize = line.Substring(line.LastIndexOf(" "));
+                            writer.WriteLine(job.Input + strSize);
+                        }
+                        else
+                        {
+                            writer.WriteLine(line);
+                        }
+                    }
+                }
+            }
+            FileUtil.DeleteFile(job.Output, log);
+            File.Move(job.Output + ".temp", job.Output);
+            log.LogEvent("Corrected missing Full_Path_In_Files=1", ImageType.Information);
+        }
+
         protected override void doExitConfig()
         {
             if (!File.Exists(job.Output))
+            {
                 su.HasError = true;
+            }
+            else
+            {
+                if (!DGIHasFullPath(job.Output))
+                {
+                    string strINIFile = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexNV.Path), "DGIndexIM.ini");
+                    ResetINI(strINIFile);
+                    AddFullPathToDGI();
+                }
+            }
 
             base.doExitConfig();
         }

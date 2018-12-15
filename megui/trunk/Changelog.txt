@@ -1,54 +1,35 @@
-2896 [AVS Script Creator]   fixed Crop() used also if DGIndexNV cropping has been enabled (regression of 2892)
-                            if cropping with DGIndexNV is used, the CLIP values from the dgi file are added to the crop values selected in the GUI
-2895 [Main]                 show changelog when MeGUI has been updated
-2894 [Main]                 moved menu items:
-                            - "options\update" to "tools\update"
-                            - "options\settings" to "options"
-                            - "workers\settings" to "options"
-                            - "workers\overview" to "view\worker overview"
-2893 [OneClick]             fixed fatal error in some cases (regression of 2882). bug #937
-2892 [AVS Script Creator]   added an option in the profile to use the DGIndexNV crop & resize filter if possible
-                            if resize with DGIndexNV is enabled also cropping will be done that way (mod4 is forced for crop values)
-                            fixed always applying the resize parameters to DGSource() (regression of 2891)
-2891 [DGIndexNV Indexer]    fixed invalid input filter syntax (regression of 2890)
-2890 [Settings]             added option to restrict input filters to 8 bit (enabled by default)
-     [x264]                 fixed high bit depth support if ffmpeg is not used (regression of 2874)
-2889 [Queue]                multiple "waiting" jobs can be assigned to a temporary worker to be processed
-                            internal queue handling optimizations
-2888 [Main]                 changed File\Exit shortcut from CTRL+X to ALT+F4
-2887 [Worker]               improved the priority system so that for each job type the process and I/O priority can be defined
-                            changing the priority in the progress window does change it only for the current job
-                            moved some settings from options\settings to worker\settings (these will reset to default)
-     [OneClick]             improved priority change and job abort actions
-     [L-SMASH Indexer]      improved priority change and job abort actions
-2886 [Jobs]                 fixed abort of suspended jobs (regression of 2818)
-2885 [Preset Exporter]      fixed overwrite of output files
-2884 [Worker]               changed worker handling
-                            - in "workers\settings" worker rule sets can be specified
-                              based on those rules it is determined how many jobs of which type are allowed to run in parallel
-                              also on that page the maximum number of workers can be set (default: 2)
-                            - temporary workers ignore all restrictions
-                            - removed several obsolete worker windows and options
-2883 [IFOParser]            improved subtitle detection. bug #925
-2882 [OneClick]             fixed only using at maximum 2 audio/subtible tracks in batch mode (regression of 2861). bug #927
-2881 [HD Streams Extractor] force "-keepDialnorm" if required for a E-AC3 tracks
-2880 [AVS Script Creator]   fixed initial MediaInfo warning (regression of 2877)
-2879 [Queue]                improved power save mode supression (requires at least Windows 7)
-2878 [MediaInfo]            improved track detection of Blu-ray playlists
-2877 [OneClick]             added support for VFR input files (requires mkv/mp4 output)
-     [FFMS Indexer]         added support for VFR input files
-     [MKV Muxer]            added detection of timestamp files (must be in the format "videoinputfilename".timestamp.txt)
-     [MP4 Muxer]            added mp4fpsmod tool to mux timecodes into mp4 files
-     [x264]                 added support for --tc-in
-                            
+2897 [DGIndexNV Indexer]    adjusted AVS script parameters (requires DGIndexNV 2053.163+)
+                            mod2 is forced for crop values (was mod4 before)
+                            added a check to ensure that the full path information is written into the dgi file
+
+
+Changelog 2876 --> 2896
+
+Features/Changes:
+[Worker]               improved worker handling
+                       - for each job type the process and I/O priority can be defined
+                       - changing the priority in the progress window does change it only for the current job
+                       - rule sets can be specified based on which it is determined how many jobs of which type are allowed to run in parallel
+                       - settings to be found in the options window	  
+[Main]                 some menu items have been moved/renamed:
+                       - "options\settings"       to "options"
+                       - "options\update"         to "tools\update"
+                       - "workers\worker summary" to "view\worker overview"
+[Settings]             input filters are restricted to 8 bit by default (to be disabled in the options window)
+[OneClick]             added support for VFR input files (requires mkv/mp4 output)
+ 
+
+Enhancements/Fixes:
+[OneClick]             fixed only using at maximum 2 audio/subtitle tracks in batch mode (regression of 2861). bug #927
+[x264]                 fixed high bit depth support if ffmpeg is not used (regression of 2874)
+[AVS Script Creator]   if resize with DGIndexNV is enabled also cropping will be done that way (mod4 is forced for crop values)
 
 
 Changelog 2836 --> 2876
 
-
 Features/Changes:
                        added high bit depth support (requires AVS+)
-					   therefore avs4x26x has been replaced by ffmpeg when using x26x
+                       therefore avs4x26x has been replaced by ffmpeg when using x26x
 [AviSynth]             changed default value of "always use the included AviSynth" to enabled
 [Chapter Creator]      - added option to use an automated counter for chapters (enabled by default)
                        - added fps selector for the input source.it does change the time codes if the input fps is not known (e.g. as with TXT/XML)
