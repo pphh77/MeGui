@@ -120,6 +120,10 @@ namespace MeGUI.core.gui
         {
             InitializeComponent();
             oTemporaryItem = new SCItem(null, false);
+
+            // DPI rescale
+            if (MainForm.Instance != null)
+                dropDownButton.Height = textBox1.Height + MainForm.Instance.Settings.DPIRescale(3);
         }
 
         private NiceComboBoxItem selectedItem;

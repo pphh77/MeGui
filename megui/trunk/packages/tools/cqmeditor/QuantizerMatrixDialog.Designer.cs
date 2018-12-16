@@ -912,9 +912,9 @@ namespace MeGUI
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.CancelButton = this.okButton;
             this.ClientSize = new System.Drawing.Size(415, 277);
+            this.Controls.Add(this.operationsGroupbox);
             this.Controls.Add(this.helpButton1);
             this.Controls.Add(this.okButton);
-            this.Controls.Add(this.operationsGroupbox);
             this.Controls.Add(this.matrixGroupbox);
             this.Controls.Add(this.predefinedMatrix);
             this.Controls.Add(this.predefinedMatrixLabel);

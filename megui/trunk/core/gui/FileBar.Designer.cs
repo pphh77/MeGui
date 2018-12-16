@@ -67,7 +67,6 @@ namespace MeGUI
             // 
             // openButton
             // 
-            this.openButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.openButton.Location = new System.Drawing.Point(243, 0);
             this.openButton.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
             this.openButton.Name = "openButton";

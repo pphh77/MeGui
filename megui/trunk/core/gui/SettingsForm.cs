@@ -59,6 +59,14 @@ namespace MeGUI
             cbAutoStart.Checked = MainForm.Instance.Settings.WorkerAutoStart;
             cbRemoveJob.Checked = MainForm.Instance.Settings.WorkerRemoveJob;
             UpdateWorkerSettingsListBox();
+
+            // DPI rescale
+            if (MainForm.Instance != null)
+            {
+                workerJobsListBox.Height = MainForm.Instance.Settings.DPIRescale(84);
+                workerSettingsListBox.Height = MainForm.Instance.Settings.DPIRescale(160);
+                numericUpDown1.Location = new System.Drawing.Point(numericUpDown1.Location.X, workerJobsListBox.Height + workerJobsListBox.Location.Y - MainForm.Instance.Settings.DPIRescale(numericUpDown1.Height));
+            }
         }
 
         /// <summary>

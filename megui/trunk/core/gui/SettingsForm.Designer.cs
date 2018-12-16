@@ -83,29 +83,6 @@ namespace MeGUI
             this.gbDefaultOutput = new System.Windows.Forms.GroupBox();
             this.btnClearOutputDirecoty = new System.Windows.Forms.Button();
             this.clearDefaultOutputDir = new System.Windows.Forms.Button();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
-            this.groupBox11 = new System.Windows.Forms.GroupBox();
-            this.cbRemoveJob = new System.Windows.Forms.CheckBox();
-            this.cbAutoStart = new System.Windows.Forms.CheckBox();
-            this.cbAutoStartOnStartup = new System.Windows.Forms.CheckBox();
-            this.workerMaximumCount = new System.Windows.Forms.NumericUpDown();
-            this.label6 = new System.Windows.Forms.Label();
-            this.groupBox10 = new System.Windows.Forms.GroupBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.cbIOPriority = new System.Windows.Forms.ComboBox();
-            this.cbProcessPriority = new System.Windows.Forms.ComboBox();
-            this.cbJobType = new System.Windows.Forms.ComboBox();
-            this.groupBox9 = new System.Windows.Forms.GroupBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.workerJobsListBox = new System.Windows.Forms.CheckedListBox();
-            this.btnAddSettings = new System.Windows.Forms.Button();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
-            this.groupBox8 = new System.Windows.Forms.GroupBox();
-            this.btnResetSettings = new System.Windows.Forms.Button();
-            this.workerSettingsListBox = new System.Windows.Forms.ListBox();
-            this.btnDeleteSettings = new System.Windows.Forms.Button();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -138,6 +115,29 @@ namespace MeGUI
             this.keep2ndPassOutput = new System.Windows.Forms.CheckBox();
             this.label13 = new System.Windows.Forms.Label();
             this.nbPasses = new System.Windows.Forms.NumericUpDown();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.groupBox11 = new System.Windows.Forms.GroupBox();
+            this.cbRemoveJob = new System.Windows.Forms.CheckBox();
+            this.cbAutoStart = new System.Windows.Forms.CheckBox();
+            this.cbAutoStartOnStartup = new System.Windows.Forms.CheckBox();
+            this.workerMaximumCount = new System.Windows.Forms.NumericUpDown();
+            this.label6 = new System.Windows.Forms.Label();
+            this.groupBox10 = new System.Windows.Forms.GroupBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.cbIOPriority = new System.Windows.Forms.ComboBox();
+            this.cbProcessPriority = new System.Windows.Forms.ComboBox();
+            this.cbJobType = new System.Windows.Forms.ComboBox();
+            this.groupBox9 = new System.Windows.Forms.GroupBox();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.btnAddSettings = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
+            this.workerJobsListBox = new System.Windows.Forms.CheckedListBox();
+            this.groupBox8 = new System.Windows.Forms.GroupBox();
+            this.btnDeleteSettings = new System.Windows.Forms.Button();
+            this.btnResetSettings = new System.Windows.Forms.Button();
+            this.workerSettingsListBox = new System.Windows.Forms.ListBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.useFDKAac = new System.Windows.Forms.CheckBox();
@@ -160,7 +160,6 @@ namespace MeGUI
             this.useDGIndexIM = new System.Windows.Forms.CheckBox();
             this.useDGIndexNV = new System.Windows.Forms.CheckBox();
             this.cbAutoLoadDG = new System.Windows.Forms.CheckBox();
-            this.percentLabel = new System.Windows.Forms.Label();
             this.forceFilmPercentage = new System.Windows.Forms.NumericUpDown();
             this.autoForceFilm = new System.Windows.Forms.CheckBox();
             this.audioExtLabel = new System.Windows.Forms.Label();
@@ -182,13 +181,6 @@ namespace MeGUI
             this.tabPage1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.gbDefaultOutput.SuspendLayout();
-            this.tabPage4.SuspendLayout();
-            this.groupBox11.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.workerMaximumCount)).BeginInit();
-            this.groupBox10.SuspendLayout();
-            this.groupBox9.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
-            this.groupBox8.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.gbVideoPreview.SuspendLayout();
@@ -196,6 +188,13 @@ namespace MeGUI
             this.outputExtensions.SuspendLayout();
             this.autoModeGroupbox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nbPasses)).BeginInit();
+            this.tabPage4.SuspendLayout();
+            this.groupBox11.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.workerMaximumCount)).BeginInit();
+            this.groupBox10.SuspendLayout();
+            this.groupBox9.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            this.groupBox8.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.groupBox7.SuspendLayout();
             this.groupBox6.SuspendLayout();
@@ -339,7 +338,7 @@ namespace MeGUI
             // lblMinimumLength
             // 
             this.lblMinimumLength.AutoSize = true;
-            this.lblMinimumLength.Location = new System.Drawing.Point(10, 229);
+            this.lblMinimumLength.Location = new System.Drawing.Point(9, 181);
             this.lblMinimumLength.Name = "lblMinimumLength";
             this.lblMinimumLength.Size = new System.Drawing.Size(255, 13);
             this.lblMinimumLength.TabIndex = 24;
@@ -347,14 +346,14 @@ namespace MeGUI
             // 
             // minimumTitleLength
             // 
-            this.minimumTitleLength.Location = new System.Drawing.Point(368, 226);
+            this.minimumTitleLength.Location = new System.Drawing.Point(377, 179);
             this.minimumTitleLength.Maximum = new decimal(new int[] {
             9999,
             0,
             0,
             0});
             this.minimumTitleLength.Name = "minimumTitleLength";
-            this.minimumTitleLength.Size = new System.Drawing.Size(54, 21);
+            this.minimumTitleLength.Size = new System.Drawing.Size(65, 21);
             this.minimumTitleLength.TabIndex = 23;
             this.minimumTitleLength.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.minimumTitleLength.Value = new decimal(new int[] {
@@ -390,7 +389,7 @@ namespace MeGUI
             0,
             0,
             196608});
-            this.acceptableFPSError.Location = new System.Drawing.Point(171, 197);
+            this.acceptableFPSError.Location = new System.Drawing.Point(377, 152);
             this.acceptableFPSError.Maximum = new decimal(new int[] {
             5,
             0,
@@ -402,8 +401,9 @@ namespace MeGUI
             0,
             196608});
             this.acceptableFPSError.Name = "acceptableFPSError";
-            this.acceptableFPSError.Size = new System.Drawing.Size(79, 21);
+            this.acceptableFPSError.Size = new System.Drawing.Size(65, 21);
             this.acceptableFPSError.TabIndex = 7;
+            this.acceptableFPSError.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.acceptableFPSError.Value = new decimal(new int[] {
             1,
             0,
@@ -412,15 +412,17 @@ namespace MeGUI
             // 
             // label15
             // 
-            this.label15.Location = new System.Drawing.Point(10, 194);
+            this.label15.AutoSize = true;
+            this.label15.BackColor = System.Drawing.Color.Transparent;
+            this.label15.Location = new System.Drawing.Point(9, 154);
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(155, 32);
+            this.label15.Size = new System.Drawing.Size(245, 13);
             this.label15.TabIndex = 6;
             this.label15.Text = "Acceptable FPS rounding error (bitrate calculator)";
             // 
             // resetDialogs
             // 
-            this.resetDialogs.Location = new System.Drawing.Point(368, 166);
+            this.resetDialogs.Location = new System.Drawing.Point(13, 230);
             this.resetDialogs.Name = "resetDialogs";
             this.resetDialogs.Size = new System.Drawing.Size(154, 21);
             this.resetDialogs.TabIndex = 16;
@@ -430,7 +432,7 @@ namespace MeGUI
             // 
             // configSourceDetector
             // 
-            this.configSourceDetector.Location = new System.Drawing.Point(368, 197);
+            this.configSourceDetector.Location = new System.Drawing.Point(377, 230);
             this.configSourceDetector.Name = "configSourceDetector";
             this.configSourceDetector.Size = new System.Drawing.Size(154, 21);
             this.configSourceDetector.TabIndex = 17;
@@ -564,287 +566,6 @@ namespace MeGUI
             this.clearDefaultOutputDir.TabIndex = 41;
             this.clearDefaultOutputDir.Text = "x";
             this.clearDefaultOutputDir.Click += new System.EventHandler(this.clearDefaultOutputDir_Click);
-            // 
-            // tabPage4
-            // 
-            this.tabPage4.Controls.Add(this.groupBox11);
-            this.tabPage4.Controls.Add(this.groupBox10);
-            this.tabPage4.Controls.Add(this.groupBox9);
-            this.tabPage4.Controls.Add(this.groupBox8);
-            this.tabPage4.Location = new System.Drawing.Point(4, 22);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(589, 387);
-            this.tabPage4.TabIndex = 3;
-            this.tabPage4.Text = "Worker/Job/Queue";
-            this.tabPage4.UseVisualStyleBackColor = true;
-            // 
-            // groupBox11
-            // 
-            this.groupBox11.Controls.Add(this.cbRemoveJob);
-            this.groupBox11.Controls.Add(this.cbAutoStart);
-            this.groupBox11.Controls.Add(this.cbAutoStartOnStartup);
-            this.groupBox11.Controls.Add(this.workerMaximumCount);
-            this.groupBox11.Controls.Add(this.label6);
-            this.groupBox11.Location = new System.Drawing.Point(252, 310);
-            this.groupBox11.Name = "groupBox11";
-            this.groupBox11.Size = new System.Drawing.Size(329, 71);
-            this.groupBox11.TabIndex = 12;
-            this.groupBox11.TabStop = false;
-            this.groupBox11.Text = " global worker settings ";
-            // 
-            // cbRemoveJob
-            // 
-            this.cbRemoveJob.AutoSize = true;
-            this.cbRemoveJob.Checked = true;
-            this.cbRemoveJob.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbRemoveJob.Location = new System.Drawing.Point(178, 43);
-            this.cbRemoveJob.Name = "cbRemoveJob";
-            this.cbRemoveJob.Size = new System.Drawing.Size(137, 17);
-            this.cbRemoveJob.TabIndex = 22;
-            this.cbRemoveJob.Text = "remove completed jobs";
-            this.cbRemoveJob.CheckedChanged += new System.EventHandler(this.CbRemoveJob_CheckedChanged);
-            // 
-            // cbAutoStart
-            // 
-            this.cbAutoStart.AutoSize = true;
-            this.cbAutoStart.Checked = true;
-            this.cbAutoStart.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbAutoStart.Location = new System.Drawing.Point(178, 19);
-            this.cbAutoStart.Name = "cbAutoStart";
-            this.cbAutoStart.Size = new System.Drawing.Size(121, 17);
-            this.cbAutoStart.TabIndex = 21;
-            this.cbAutoStart.Text = "auto-start new jobs";
-            this.cbAutoStart.CheckedChanged += new System.EventHandler(this.CbAutoStart_CheckedChanged);
-            // 
-            // cbAutoStartOnStartup
-            // 
-            this.cbAutoStartOnStartup.AutoSize = true;
-            this.cbAutoStartOnStartup.Location = new System.Drawing.Point(6, 19);
-            this.cbAutoStartOnStartup.Name = "cbAutoStartOnStartup";
-            this.cbAutoStartOnStartup.Size = new System.Drawing.Size(170, 17);
-            this.cbAutoStartOnStartup.TabIndex = 20;
-            this.cbAutoStartOnStartup.Text = "auto-start on application start";
-            this.cbAutoStartOnStartup.UseVisualStyleBackColor = true;
-            this.cbAutoStartOnStartup.CheckedChanged += new System.EventHandler(this.CbAutoStartOnStartup_CheckedChanged);
-            // 
-            // workerMaximumCount
-            // 
-            this.workerMaximumCount.Location = new System.Drawing.Point(123, 41);
-            this.workerMaximumCount.Maximum = new decimal(new int[] {
-            99,
-            0,
-            0,
-            0});
-            this.workerMaximumCount.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.workerMaximumCount.Name = "workerMaximumCount";
-            this.workerMaximumCount.Size = new System.Drawing.Size(34, 21);
-            this.workerMaximumCount.TabIndex = 7;
-            this.workerMaximumCount.Value = new decimal(new int[] {
-            2,
-            0,
-            0,
-            0});
-            this.workerMaximumCount.ValueChanged += new System.EventHandler(this.WorkerMaximumCount_ValueChanged);
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(6, 44);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(115, 13);
-            this.label6.TabIndex = 9;
-            this.label6.Text = "maximum parallel jobs:";
-            // 
-            // groupBox10
-            // 
-            this.groupBox10.Controls.Add(this.label5);
-            this.groupBox10.Controls.Add(this.label4);
-            this.groupBox10.Controls.Add(this.label3);
-            this.groupBox10.Controls.Add(this.cbIOPriority);
-            this.groupBox10.Controls.Add(this.cbProcessPriority);
-            this.groupBox10.Controls.Add(this.cbJobType);
-            this.groupBox10.Location = new System.Drawing.Point(252, 232);
-            this.groupBox10.Name = "groupBox10";
-            this.groupBox10.Size = new System.Drawing.Size(328, 72);
-            this.groupBox10.TabIndex = 11;
-            this.groupBox10.TabStop = false;
-            this.groupBox10.Text = " worker priority ";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(109, 20);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(81, 13);
-            this.label5.TabIndex = 19;
-            this.label5.Text = "Process Priority";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(215, 20);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(60, 13);
-            this.label4.TabIndex = 18;
-            this.label4.Text = "I/O Priority";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(3, 20);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(51, 13);
-            this.label3.TabIndex = 17;
-            this.label3.Text = "Job Type";
-            // 
-            // cbIOPriority
-            // 
-            this.cbIOPriority.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbIOPriority.FormattingEnabled = true;
-            this.cbIOPriority.Items.AddRange(new object[] {
-            "low",
-            "normal"});
-            this.cbIOPriority.Location = new System.Drawing.Point(218, 40);
-            this.cbIOPriority.Name = "cbIOPriority";
-            this.cbIOPriority.Size = new System.Drawing.Size(100, 21);
-            this.cbIOPriority.TabIndex = 16;
-            this.cbIOPriority.SelectedIndexChanged += new System.EventHandler(this.CbIOPriority_SelectedIndexChanged);
-            // 
-            // cbProcessPriority
-            // 
-            this.cbProcessPriority.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbProcessPriority.FormattingEnabled = true;
-            this.cbProcessPriority.Items.AddRange(new object[] {
-            "low",
-            "below normal",
-            "normal",
-            "above normal"});
-            this.cbProcessPriority.Location = new System.Drawing.Point(112, 40);
-            this.cbProcessPriority.Name = "cbProcessPriority";
-            this.cbProcessPriority.Size = new System.Drawing.Size(100, 21);
-            this.cbProcessPriority.TabIndex = 15;
-            this.cbProcessPriority.SelectedIndexChanged += new System.EventHandler(this.CbProcessPriority_SelectedIndexChanged);
-            // 
-            // cbJobType
-            // 
-            this.cbJobType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbJobType.FormattingEnabled = true;
-            this.cbJobType.Location = new System.Drawing.Point(6, 40);
-            this.cbJobType.Name = "cbJobType";
-            this.cbJobType.Size = new System.Drawing.Size(100, 21);
-            this.cbJobType.TabIndex = 14;
-            this.cbJobType.SelectedIndexChanged += new System.EventHandler(this.CbJobType_SelectedIndexChanged);
-            // 
-            // groupBox9
-            // 
-            this.groupBox9.Controls.Add(this.label2);
-            this.groupBox9.Controls.Add(this.workerJobsListBox);
-            this.groupBox9.Controls.Add(this.btnAddSettings);
-            this.groupBox9.Controls.Add(this.numericUpDown1);
-            this.groupBox9.Location = new System.Drawing.Point(7, 232);
-            this.groupBox9.Name = "groupBox9";
-            this.groupBox9.Size = new System.Drawing.Size(239, 149);
-            this.groupBox9.TabIndex = 10;
-            this.groupBox9.TabStop = false;
-            this.groupBox9.Text = " worker rule ";
-            // 
-            // label2
-            // 
-            this.label2.Location = new System.Drawing.Point(120, 23);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(113, 53);
-            this.label2.TabIndex = 5;
-            this.label2.Text = "maximum parallel jobs of the selected job(s):";
-            // 
-            // workerJobsListBox
-            // 
-            this.workerJobsListBox.FormattingEnabled = true;
-            this.workerJobsListBox.Location = new System.Drawing.Point(6, 16);
-            this.workerJobsListBox.Name = "workerJobsListBox";
-            this.workerJobsListBox.Size = new System.Drawing.Size(108, 84);
-            this.workerJobsListBox.TabIndex = 1;
-            // 
-            // btnAddSettings
-            // 
-            this.btnAddSettings.Location = new System.Drawing.Point(6, 116);
-            this.btnAddSettings.Name = "btnAddSettings";
-            this.btnAddSettings.Size = new System.Drawing.Size(227, 23);
-            this.btnAddSettings.TabIndex = 2;
-            this.btnAddSettings.Text = "add rule set";
-            this.btnAddSettings.UseVisualStyleBackColor = true;
-            this.btnAddSettings.Click += new System.EventHandler(this.BtnAddSettings_Click);
-            // 
-            // numericUpDown1
-            // 
-            this.numericUpDown1.Location = new System.Drawing.Point(147, 79);
-            this.numericUpDown1.Maximum = new decimal(new int[] {
-            99,
-            0,
-            0,
-            0});
-            this.numericUpDown1.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(34, 21);
-            this.numericUpDown1.TabIndex = 4;
-            this.numericUpDown1.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            // 
-            // groupBox8
-            // 
-            this.groupBox8.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox8.Controls.Add(this.btnResetSettings);
-            this.groupBox8.Controls.Add(this.workerSettingsListBox);
-            this.groupBox8.Controls.Add(this.btnDeleteSettings);
-            this.groupBox8.Location = new System.Drawing.Point(7, 3);
-            this.groupBox8.Name = "groupBox8";
-            this.groupBox8.Size = new System.Drawing.Size(574, 223);
-            this.groupBox8.TabIndex = 9;
-            this.groupBox8.TabStop = false;
-            this.groupBox8.Text = " worker rule set - defines how many jobs of specific types can run in parallel";
-            // 
-            // btnResetSettings
-            // 
-            this.btnResetSettings.Location = new System.Drawing.Point(354, 194);
-            this.btnResetSettings.Name = "btnResetSettings";
-            this.btnResetSettings.Size = new System.Drawing.Size(214, 23);
-            this.btnResetSettings.TabIndex = 10;
-            this.btnResetSettings.Text = "load default worker settings";
-            this.btnResetSettings.UseVisualStyleBackColor = true;
-            this.btnResetSettings.Click += new System.EventHandler(this.BtnResetSettings_Click);
-            // 
-            // workerSettingsListBox
-            // 
-            this.workerSettingsListBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.workerSettingsListBox.FormattingEnabled = true;
-            this.workerSettingsListBox.Location = new System.Drawing.Point(6, 19);
-            this.workerSettingsListBox.Name = "workerSettingsListBox";
-            this.workerSettingsListBox.Size = new System.Drawing.Size(562, 160);
-            this.workerSettingsListBox.TabIndex = 1;
-            this.workerSettingsListBox.SelectedIndexChanged += new System.EventHandler(this.WorkerSettingsListBox_SelectedIndexChanged);
-            // 
-            // btnDeleteSettings
-            // 
-            this.btnDeleteSettings.Location = new System.Drawing.Point(6, 194);
-            this.btnDeleteSettings.Name = "btnDeleteSettings";
-            this.btnDeleteSettings.Size = new System.Drawing.Size(227, 23);
-            this.btnDeleteSettings.TabIndex = 3;
-            this.btnDeleteSettings.Text = "remove rule set";
-            this.btnDeleteSettings.UseVisualStyleBackColor = true;
-            this.btnDeleteSettings.Click += new System.EventHandler(this.BtnDeleteSettings_Click);
             // 
             // tabPage3
             // 
@@ -1201,6 +922,292 @@ namespace MeGUI
             0,
             0});
             // 
+            // tabPage4
+            // 
+            this.tabPage4.Controls.Add(this.groupBox11);
+            this.tabPage4.Controls.Add(this.groupBox10);
+            this.tabPage4.Controls.Add(this.groupBox9);
+            this.tabPage4.Controls.Add(this.groupBox8);
+            this.tabPage4.Location = new System.Drawing.Point(4, 22);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage4.Size = new System.Drawing.Size(589, 387);
+            this.tabPage4.TabIndex = 3;
+            this.tabPage4.Text = "Worker/Job/Queue";
+            this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // groupBox11
+            // 
+            this.groupBox11.Controls.Add(this.cbRemoveJob);
+            this.groupBox11.Controls.Add(this.cbAutoStart);
+            this.groupBox11.Controls.Add(this.cbAutoStartOnStartup);
+            this.groupBox11.Controls.Add(this.workerMaximumCount);
+            this.groupBox11.Controls.Add(this.label6);
+            this.groupBox11.Location = new System.Drawing.Point(252, 310);
+            this.groupBox11.Name = "groupBox11";
+            this.groupBox11.Size = new System.Drawing.Size(329, 71);
+            this.groupBox11.TabIndex = 12;
+            this.groupBox11.TabStop = false;
+            this.groupBox11.Text = " global worker settings ";
+            // 
+            // cbRemoveJob
+            // 
+            this.cbRemoveJob.AutoSize = true;
+            this.cbRemoveJob.Checked = true;
+            this.cbRemoveJob.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbRemoveJob.Location = new System.Drawing.Point(178, 43);
+            this.cbRemoveJob.Name = "cbRemoveJob";
+            this.cbRemoveJob.Size = new System.Drawing.Size(137, 17);
+            this.cbRemoveJob.TabIndex = 22;
+            this.cbRemoveJob.Text = "remove completed jobs";
+            this.cbRemoveJob.CheckedChanged += new System.EventHandler(this.CbRemoveJob_CheckedChanged);
+            // 
+            // cbAutoStart
+            // 
+            this.cbAutoStart.AutoSize = true;
+            this.cbAutoStart.Checked = true;
+            this.cbAutoStart.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbAutoStart.Location = new System.Drawing.Point(178, 19);
+            this.cbAutoStart.Name = "cbAutoStart";
+            this.cbAutoStart.Size = new System.Drawing.Size(121, 17);
+            this.cbAutoStart.TabIndex = 21;
+            this.cbAutoStart.Text = "auto-start new jobs";
+            this.cbAutoStart.CheckedChanged += new System.EventHandler(this.CbAutoStart_CheckedChanged);
+            // 
+            // cbAutoStartOnStartup
+            // 
+            this.cbAutoStartOnStartup.AutoSize = true;
+            this.cbAutoStartOnStartup.Location = new System.Drawing.Point(6, 19);
+            this.cbAutoStartOnStartup.Name = "cbAutoStartOnStartup";
+            this.cbAutoStartOnStartup.Size = new System.Drawing.Size(170, 17);
+            this.cbAutoStartOnStartup.TabIndex = 20;
+            this.cbAutoStartOnStartup.Text = "auto-start on application start";
+            this.cbAutoStartOnStartup.UseVisualStyleBackColor = true;
+            this.cbAutoStartOnStartup.CheckedChanged += new System.EventHandler(this.CbAutoStartOnStartup_CheckedChanged);
+            // 
+            // workerMaximumCount
+            // 
+            this.workerMaximumCount.Location = new System.Drawing.Point(123, 41);
+            this.workerMaximumCount.Maximum = new decimal(new int[] {
+            99,
+            0,
+            0,
+            0});
+            this.workerMaximumCount.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.workerMaximumCount.Name = "workerMaximumCount";
+            this.workerMaximumCount.Size = new System.Drawing.Size(34, 21);
+            this.workerMaximumCount.TabIndex = 7;
+            this.workerMaximumCount.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            this.workerMaximumCount.ValueChanged += new System.EventHandler(this.WorkerMaximumCount_ValueChanged);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(6, 44);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(115, 13);
+            this.label6.TabIndex = 9;
+            this.label6.Text = "maximum parallel jobs:";
+            // 
+            // groupBox10
+            // 
+            this.groupBox10.Controls.Add(this.label5);
+            this.groupBox10.Controls.Add(this.label4);
+            this.groupBox10.Controls.Add(this.label3);
+            this.groupBox10.Controls.Add(this.cbIOPriority);
+            this.groupBox10.Controls.Add(this.cbProcessPriority);
+            this.groupBox10.Controls.Add(this.cbJobType);
+            this.groupBox10.Location = new System.Drawing.Point(252, 232);
+            this.groupBox10.Name = "groupBox10";
+            this.groupBox10.Size = new System.Drawing.Size(328, 72);
+            this.groupBox10.TabIndex = 11;
+            this.groupBox10.TabStop = false;
+            this.groupBox10.Text = " worker priority ";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(109, 20);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(81, 13);
+            this.label5.TabIndex = 19;
+            this.label5.Text = "Process Priority";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(215, 20);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(60, 13);
+            this.label4.TabIndex = 18;
+            this.label4.Text = "I/O Priority";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(3, 20);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(51, 13);
+            this.label3.TabIndex = 17;
+            this.label3.Text = "Job Type";
+            // 
+            // cbIOPriority
+            // 
+            this.cbIOPriority.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbIOPriority.FormattingEnabled = true;
+            this.cbIOPriority.Items.AddRange(new object[] {
+            "low",
+            "normal"});
+            this.cbIOPriority.Location = new System.Drawing.Point(218, 40);
+            this.cbIOPriority.Name = "cbIOPriority";
+            this.cbIOPriority.Size = new System.Drawing.Size(100, 21);
+            this.cbIOPriority.TabIndex = 16;
+            this.cbIOPriority.SelectedIndexChanged += new System.EventHandler(this.CbIOPriority_SelectedIndexChanged);
+            // 
+            // cbProcessPriority
+            // 
+            this.cbProcessPriority.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbProcessPriority.FormattingEnabled = true;
+            this.cbProcessPriority.Items.AddRange(new object[] {
+            "low",
+            "below normal",
+            "normal",
+            "above normal"});
+            this.cbProcessPriority.Location = new System.Drawing.Point(112, 40);
+            this.cbProcessPriority.Name = "cbProcessPriority";
+            this.cbProcessPriority.Size = new System.Drawing.Size(100, 21);
+            this.cbProcessPriority.TabIndex = 15;
+            this.cbProcessPriority.SelectedIndexChanged += new System.EventHandler(this.CbProcessPriority_SelectedIndexChanged);
+            // 
+            // cbJobType
+            // 
+            this.cbJobType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbJobType.FormattingEnabled = true;
+            this.cbJobType.Location = new System.Drawing.Point(6, 40);
+            this.cbJobType.Name = "cbJobType";
+            this.cbJobType.Size = new System.Drawing.Size(100, 21);
+            this.cbJobType.TabIndex = 14;
+            this.cbJobType.SelectedIndexChanged += new System.EventHandler(this.CbJobType_SelectedIndexChanged);
+            // 
+            // groupBox9
+            // 
+            this.groupBox9.Controls.Add(this.numericUpDown1);
+            this.groupBox9.Controls.Add(this.btnAddSettings);
+            this.groupBox9.Controls.Add(this.label2);
+            this.groupBox9.Controls.Add(this.workerJobsListBox);
+            this.groupBox9.Location = new System.Drawing.Point(7, 232);
+            this.groupBox9.Name = "groupBox9";
+            this.groupBox9.Size = new System.Drawing.Size(239, 149);
+            this.groupBox9.TabIndex = 10;
+            this.groupBox9.TabStop = false;
+            this.groupBox9.Text = " worker rule ";
+            // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.numericUpDown1.Location = new System.Drawing.Point(160, 79);
+            this.numericUpDown1.Maximum = new decimal(new int[] {
+            99,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(34, 21);
+            this.numericUpDown1.TabIndex = 4;
+            this.numericUpDown1.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // btnAddSettings
+            // 
+            this.btnAddSettings.Location = new System.Drawing.Point(6, 116);
+            this.btnAddSettings.Name = "btnAddSettings";
+            this.btnAddSettings.Size = new System.Drawing.Size(227, 23);
+            this.btnAddSettings.TabIndex = 2;
+            this.btnAddSettings.Text = "add rule set";
+            this.btnAddSettings.UseVisualStyleBackColor = true;
+            this.btnAddSettings.Click += new System.EventHandler(this.BtnAddSettings_Click);
+            // 
+            // label2
+            // 
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label2.BackColor = System.Drawing.Color.Transparent;
+            this.label2.Location = new System.Drawing.Point(120, 23);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(113, 77);
+            this.label2.TabIndex = 5;
+            this.label2.Text = "maximum parallel jobs of the selected job(s):";
+            // 
+            // workerJobsListBox
+            // 
+            this.workerJobsListBox.FormattingEnabled = true;
+            this.workerJobsListBox.Location = new System.Drawing.Point(6, 16);
+            this.workerJobsListBox.Name = "workerJobsListBox";
+            this.workerJobsListBox.Size = new System.Drawing.Size(108, 84);
+            this.workerJobsListBox.TabIndex = 1;
+            // 
+            // groupBox8
+            // 
+            this.groupBox8.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox8.Controls.Add(this.btnDeleteSettings);
+            this.groupBox8.Controls.Add(this.btnResetSettings);
+            this.groupBox8.Controls.Add(this.workerSettingsListBox);
+            this.groupBox8.Location = new System.Drawing.Point(7, 3);
+            this.groupBox8.Name = "groupBox8";
+            this.groupBox8.Size = new System.Drawing.Size(574, 223);
+            this.groupBox8.TabIndex = 9;
+            this.groupBox8.TabStop = false;
+            this.groupBox8.Text = " worker rule set - defines how many jobs of specific types can run in parallel";
+            // 
+            // btnDeleteSettings
+            // 
+            this.btnDeleteSettings.Location = new System.Drawing.Point(6, 194);
+            this.btnDeleteSettings.Name = "btnDeleteSettings";
+            this.btnDeleteSettings.Size = new System.Drawing.Size(227, 23);
+            this.btnDeleteSettings.TabIndex = 3;
+            this.btnDeleteSettings.Text = "remove rule set";
+            this.btnDeleteSettings.UseVisualStyleBackColor = true;
+            this.btnDeleteSettings.Click += new System.EventHandler(this.BtnDeleteSettings_Click);
+            // 
+            // btnResetSettings
+            // 
+            this.btnResetSettings.Location = new System.Drawing.Point(354, 194);
+            this.btnResetSettings.Name = "btnResetSettings";
+            this.btnResetSettings.Size = new System.Drawing.Size(214, 23);
+            this.btnResetSettings.TabIndex = 10;
+            this.btnResetSettings.Text = "load default worker settings";
+            this.btnResetSettings.UseVisualStyleBackColor = true;
+            this.btnResetSettings.Click += new System.EventHandler(this.BtnResetSettings_Click);
+            // 
+            // workerSettingsListBox
+            // 
+            this.workerSettingsListBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.workerSettingsListBox.Location = new System.Drawing.Point(6, 19);
+            this.workerSettingsListBox.Name = "workerSettingsListBox";
+            this.workerSettingsListBox.Size = new System.Drawing.Size(562, 160);
+            this.workerSettingsListBox.TabIndex = 1;
+            this.workerSettingsListBox.SelectedIndexChanged += new System.EventHandler(this.WorkerSettingsListBox_SelectedIndexChanged);
+            // 
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this.groupBox7);
@@ -1420,7 +1427,6 @@ namespace MeGUI
             this.vobGroupBox.Controls.Add(this.useDGIndexIM);
             this.vobGroupBox.Controls.Add(this.useDGIndexNV);
             this.vobGroupBox.Controls.Add(this.cbAutoLoadDG);
-            this.vobGroupBox.Controls.Add(this.percentLabel);
             this.vobGroupBox.Controls.Add(this.forceFilmPercentage);
             this.vobGroupBox.Controls.Add(this.autoForceFilm);
             this.vobGroupBox.Location = new System.Drawing.Point(4, 122);
@@ -1462,19 +1468,9 @@ namespace MeGUI
             this.cbAutoLoadDG.Text = "autoload VOB files incrementally";
             this.cbAutoLoadDG.UseVisualStyleBackColor = true;
             // 
-            // percentLabel
-            // 
-            this.percentLabel.Location = new System.Drawing.Point(397, 28);
-            this.percentLabel.Margin = new System.Windows.Forms.Padding(3);
-            this.percentLabel.Name = "percentLabel";
-            this.percentLabel.Size = new System.Drawing.Size(50, 13);
-            this.percentLabel.TabIndex = 4;
-            this.percentLabel.Text = "Percent";
-            this.percentLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
             // forceFilmPercentage
             // 
-            this.forceFilmPercentage.Location = new System.Drawing.Point(351, 24);
+            this.forceFilmPercentage.Location = new System.Drawing.Point(392, 23);
             this.forceFilmPercentage.Name = "forceFilmPercentage";
             this.forceFilmPercentage.Size = new System.Drawing.Size(40, 21);
             this.forceFilmPercentage.TabIndex = 3;
@@ -1486,11 +1482,12 @@ namespace MeGUI
             // 
             // autoForceFilm
             // 
+            this.autoForceFilm.AutoSize = true;
             this.autoForceFilm.Location = new System.Drawing.Point(225, 24);
             this.autoForceFilm.Name = "autoForceFilm";
-            this.autoForceFilm.Size = new System.Drawing.Size(120, 17);
+            this.autoForceFilm.Size = new System.Drawing.Size(161, 17);
             this.autoForceFilm.TabIndex = 2;
-            this.autoForceFilm.Text = "Auto Force Film at";
+            this.autoForceFilm.Text = "Auto Force Film at (percent)";
             // 
             // audioExtLabel
             // 
@@ -1623,15 +1620,6 @@ namespace MeGUI
             this.tabPage1.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.gbDefaultOutput.ResumeLayout(false);
-            this.tabPage4.ResumeLayout(false);
-            this.groupBox11.ResumeLayout(false);
-            this.groupBox11.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.workerMaximumCount)).EndInit();
-            this.groupBox10.ResumeLayout(false);
-            this.groupBox10.PerformLayout();
-            this.groupBox9.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
-            this.groupBox8.ResumeLayout(false);
             this.tabPage3.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
@@ -1644,6 +1632,15 @@ namespace MeGUI
             this.autoModeGroupbox.ResumeLayout(false);
             this.autoModeGroupbox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nbPasses)).EndInit();
+            this.tabPage4.ResumeLayout(false);
+            this.groupBox11.ResumeLayout(false);
+            this.groupBox11.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.workerMaximumCount)).EndInit();
+            this.groupBox10.ResumeLayout(false);
+            this.groupBox10.PerformLayout();
+            this.groupBox9.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            this.groupBox8.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.groupBox7.ResumeLayout(false);
             this.groupBox7.PerformLayout();
@@ -1718,7 +1715,6 @@ namespace MeGUI
         private System.Windows.Forms.CheckBox backupfiles;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.GroupBox vobGroupBox;
-        private System.Windows.Forms.Label percentLabel;
         private System.Windows.Forms.NumericUpDown forceFilmPercentage;
         private System.Windows.Forms.CheckBox autoForceFilm;
         private System.Windows.Forms.GroupBox groupBox4;

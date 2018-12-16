@@ -400,6 +400,9 @@ namespace MeGUI
             // 
             // btOutput
             // 
+            this.btOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.btOutput.Location = new System.Drawing.Point(392, 48);
             this.btOutput.Name = "btOutput";
             this.btOutput.Size = new System.Drawing.Size(55, 23);

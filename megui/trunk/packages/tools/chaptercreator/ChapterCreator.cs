@@ -51,6 +51,13 @@ namespace MeGUI
             pgc.FramesPerSecond = 23.976;
             bFPSKnown = false;
             chkCounter.Checked = MainForm.Instance.Settings.ChapterCreatorCounter;
+
+            // DPI rescale
+            if (MainForm.Instance != null)
+            {
+                btOutput.Height = output.Height + MainForm.Instance.Settings.DPIRescale(2);
+                btInput.Height = input.Height + MainForm.Instance.Settings.DPIRescale(2);
+            }
         }
 
         private void ChapterCreator_Load(object sender, EventArgs e)

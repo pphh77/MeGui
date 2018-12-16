@@ -132,10 +132,10 @@ namespace MeGUI.core.details.audio
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.BesweetChannelsLabel, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.lbSampleRate, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.autoGain, 1, 5);
-            this.tableLayoutPanel1.Controls.Add(this.normalize, 2, 5);
-            this.tableLayoutPanel1.Controls.Add(this.applyDRC, 1, 4);
             this.tableLayoutPanel1.Controls.Add(this.lbTimeModification, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.normalize, 2, 4);
+            this.tableLayoutPanel1.Controls.Add(this.applyDRC, 1, 5);
+            this.tableLayoutPanel1.Controls.Add(this.autoGain, 1, 4);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 16);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -194,40 +194,43 @@ namespace MeGUI.core.details.audio
             // 
             // label1
             // 
-            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 13);
+            this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label1.Location = new System.Drawing.Point(3, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(94, 13);
+            this.label1.Size = new System.Drawing.Size(94, 26);
             this.label1.TabIndex = 14;
             this.label1.Text = "Preferred Decoder";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // BesweetChannelsLabel
             // 
-            this.BesweetChannelsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.BesweetChannelsLabel.AutoSize = true;
-            this.BesweetChannelsLabel.Location = new System.Drawing.Point(3, 39);
+            this.BesweetChannelsLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.BesweetChannelsLabel.Location = new System.Drawing.Point(3, 26);
             this.BesweetChannelsLabel.Name = "BesweetChannelsLabel";
-            this.BesweetChannelsLabel.Size = new System.Drawing.Size(86, 13);
+            this.BesweetChannelsLabel.Size = new System.Drawing.Size(94, 26);
             this.BesweetChannelsLabel.TabIndex = 2;
             this.BesweetChannelsLabel.Text = "Output Channels";
+            this.BesweetChannelsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // lbSampleRate
             // 
-            this.lbSampleRate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lbSampleRate.AutoSize = true;
-            this.lbSampleRate.Location = new System.Drawing.Point(3, 65);
+            this.lbSampleRate.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lbSampleRate.Location = new System.Drawing.Point(3, 52);
             this.lbSampleRate.Name = "lbSampleRate";
-            this.lbSampleRate.Size = new System.Drawing.Size(68, 13);
+            this.lbSampleRate.Size = new System.Drawing.Size(94, 26);
             this.lbSampleRate.TabIndex = 11;
             this.lbSampleRate.Text = "Sample Rate";
+            this.lbSampleRate.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // autoGain
             // 
             this.autoGain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.autoGain.AutoSize = true;
-            this.autoGain.Location = new System.Drawing.Point(103, 133);
+            this.autoGain.Location = new System.Drawing.Point(103, 107);
             this.autoGain.Name = "autoGain";
             this.autoGain.Size = new System.Drawing.Size(117, 20);
             this.autoGain.TabIndex = 6;
@@ -235,8 +238,7 @@ namespace MeGUI.core.details.audio
             // 
             // normalize
             // 
-            this.normalize.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.normalize.Location = new System.Drawing.Point(226, 133);
+            this.normalize.Location = new System.Drawing.Point(303, 107);
             this.normalize.Name = "normalize";
             this.normalize.Size = new System.Drawing.Size(52, 20);
             this.normalize.TabIndex = 10;
@@ -250,8 +252,7 @@ namespace MeGUI.core.details.audio
             // 
             this.applyDRC.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.applyDRC.AutoSize = true;
-            this.tableLayoutPanel1.SetColumnSpan(this.applyDRC, 2);
-            this.applyDRC.Location = new System.Drawing.Point(103, 110);
+            this.applyDRC.Location = new System.Drawing.Point(103, 136);
             this.applyDRC.Name = "applyDRC";
             this.applyDRC.Size = new System.Drawing.Size(194, 17);
             this.applyDRC.TabIndex = 9;
@@ -260,13 +261,14 @@ namespace MeGUI.core.details.audio
             // 
             // lbTimeModification
             // 
-            this.lbTimeModification.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lbTimeModification.AutoSize = true;
-            this.lbTimeModification.Location = new System.Drawing.Point(3, 91);
+            this.lbTimeModification.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lbTimeModification.Location = new System.Drawing.Point(3, 78);
             this.lbTimeModification.Name = "lbTimeModification";
-            this.lbTimeModification.Size = new System.Drawing.Size(90, 13);
+            this.lbTimeModification.Size = new System.Drawing.Size(94, 26);
             this.lbTimeModification.TabIndex = 18;
             this.lbTimeModification.Text = "Time Modification";
+            this.lbTimeModification.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // Page2
             // 
