@@ -134,6 +134,7 @@ namespace MeGUI
             this.encoderProfile.ProfileSet = "Audio";
             this.encoderProfile.Size = new System.Drawing.Size(313, 22);
             this.encoderProfile.TabIndex = 48;
+            this.encoderProfile.UpdateSelectedProfile = false;
             // 
             // label1
             // 

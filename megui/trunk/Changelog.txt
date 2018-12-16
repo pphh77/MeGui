@@ -1,3 +1,4 @@
+2898 [Main]                 fixed OneClick audio/video profile selections overwriting the main tab profile selections at next restart
 2897 [DGIndexNV Indexer]    adjusted AVS script parameters (requires DGIndexNV 2053.163+)
                             mod2 is forced for crop values (was mod4 before)
                             added a check to ensure that the full path information is written into the dgi file

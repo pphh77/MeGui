@@ -145,11 +145,21 @@ namespace MeGUI.core.gui
                 SelectedProfileChanged(this, EventArgs.Empty);
         }
 
-        public event EventHandler SelectedProfileChanged;
+        private bool bUpdateSelectedProfile = true;
+        /// <summary>
+        /// The string describing the profile set to request from the profile manager
+        /// </summary>
+        public bool UpdateSelectedProfile
+        {
+            get { return bUpdateSelectedProfile; }
+            set { bUpdateSelectedProfile = value; }
+        }
 
+        public event EventHandler SelectedProfileChanged;
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Manager.SetSelectedProfile(SelectedProfile);
+            if (bUpdateSelectedProfile)
+                Manager.SetSelectedProfile(SelectedProfile);
             raiseProfileChangedEvent();
         }
     }

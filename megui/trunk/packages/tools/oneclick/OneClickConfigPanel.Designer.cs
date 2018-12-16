@@ -203,6 +203,7 @@ namespace MeGUI.packages.tools.oneclick
             this.avsProfile.ProfileSet = "AviSynth";
             this.avsProfile.Size = new System.Drawing.Size(298, 22);
             this.avsProfile.TabIndex = 39;
+            this.avsProfile.UpdateSelectedProfile = false;
             // 
             // preprocessVideo
             // 
@@ -352,6 +353,7 @@ namespace MeGUI.packages.tools.oneclick
             this.videoProfile.ProfileSet = "Video";
             this.videoProfile.Size = new System.Drawing.Size(326, 22);
             this.videoProfile.TabIndex = 40;
+            this.videoProfile.UpdateSelectedProfile = false;
             // 
             // videoCodecLabel
             // 

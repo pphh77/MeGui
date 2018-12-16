@@ -695,12 +695,6 @@ namespace MeGUI
             }
         }
 
-        public GenericProfile<TSettings> SSelectedProfile
-        {
-            get { return (GenericProfile<TSettings>)SelectedProfile; }
-            set { SelectedProfile = value; }
-        }
-
         protected override Profile genScratchpad()
         {
             return new GenericProfile<TSettings>(ProfileManager.ScratchPadName, new TSettings());
