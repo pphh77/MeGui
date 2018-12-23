@@ -1018,11 +1018,11 @@ namespace MeGUI
                     }
 
                     oInfo.Audio.RemoveRange(iAudioCount, oInfo.Audio.Count - iAudioCount);
-                    if (iAudioEac3toCount != oInfo.Audio.Count)
+                    if (infoLog != null && iAudioEac3toCount != oInfo.Audio.Count)
                         infoLog.LogEvent((iAudioEac3toCount - oInfo.Audio.Count) + " eac3to audio tracks do not correlate to MediaInfo tracks. Therefore these tracks will be ignored.", ImageType.Warning);
 
                     oInfo.Text.RemoveRange(iTextCount, oInfo.Text.Count - iTextCount);
-                    if (iTextEac3toCount != oInfo.Text.Count)
+                    if (infoLog != null && iTextEac3toCount != oInfo.Text.Count)
                         infoLog.LogEvent((iTextEac3toCount - oInfo.Text.Count) + " eac3to subtitle tracks do not correlate to MediaInfo tracks. Therefore these tracks will be ignored.", ImageType.Warning);
                 }
                 else if (oInfo.Audio.Count == 0 && oInfo.Video.Count == 0 && Path.GetExtension(strFile).ToLowerInvariant().Equals(".avs"))

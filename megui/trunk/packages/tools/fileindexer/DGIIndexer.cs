@@ -71,7 +71,6 @@ namespace MeGUI
                 bool bChanged = false;
                 bool bResponseOnAudioMismatchFound = false;
                 bool bEnable_Info_Log = false;
-                bool bFull_Path_In_Files = false;
                 string strINIFile = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexNV.Path), strFileName);
                 StringBuilder sb = new StringBuilder();
                 if (File.Exists(strINIFile))
@@ -106,18 +105,6 @@ namespace MeGUI
                                 continue;
                             }
 
-                            if (line.StartsWith("Full_Path_In_Files", StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                bFull_Path_In_Files = true;
-                                if (!line.Equals("Full_Path_In_Files=1", StringComparison.InvariantCultureIgnoreCase))
-                                {
-                                    sb.AppendLine("Full_Path_In_Files=1");
-                                    log.LogEvent("Full_Path_In_Files=1 written to " + strFileName, ImageType.Information);
-                                    bChanged = true;
-                                }
-                                continue;
-                            }
-
                             if (String.IsNullOrEmpty(line))
                                 continue;
 
@@ -126,7 +113,7 @@ namespace MeGUI
                     }
                 }
 
-                if (!File.Exists(strINIFile) || !bResponseOnAudioMismatchFound || !bEnable_Info_Log || !bFull_Path_In_Files)
+                if (!File.Exists(strINIFile) || !bResponseOnAudioMismatchFound || !bEnable_Info_Log)
                     ResetINI(strINIFile);
                 else if (bChanged)
                     File.WriteAllText(strINIFile, sb.ToString(), Encoding.UTF8);
@@ -251,6 +238,7 @@ namespace MeGUI
         {
             int iLineCount = 0;
             string line = null;
+            bool bPathExtended = false;
             using (StreamReader reader = new StreamReader(job.Output, Encoding.UTF8))
             {
                 using (StreamWriter writer = new StreamWriter(job.Output + ".temp", false, new UTF8Encoding(false)))
@@ -258,10 +246,20 @@ namespace MeGUI
                     while ((line = reader.ReadLine()) != null)
                     {
                         iLineCount++;
-                        if (iLineCount == 4)
+                        if (!bPathExtended && iLineCount >= 4)
                         {
-                            string strSize = line.Substring(line.LastIndexOf(" "));
-                            writer.WriteLine(job.Input + strSize);
+                            if (String.IsNullOrEmpty(line))
+                            {
+                                bPathExtended = true;
+                                writer.WriteLine(line);
+                            }
+                            else
+                            {
+                                string strSize = line.Substring(line.LastIndexOf(" "));
+                                string strSourceFile = line.Substring(0, line.LastIndexOf(" "));
+                                string strFullPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(job.Input), strSourceFile));
+                                writer.WriteLine(strFullPath + strSize);
+                            }
                         }
                         else
                         {
@@ -284,11 +282,7 @@ namespace MeGUI
             else
             {
                 if (!DGIHasFullPath(job.Output))
-                {
-                    string strINIFile = Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexNV.Path), "DGIndexIM.ini");
-                    ResetINI(strINIFile);
                     AddFullPathToDGI();
-                }
             }
 
             base.doExitConfig();

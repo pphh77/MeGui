@@ -1,3 +1,4 @@
+2900 [DGIndexNV/IM Indexer] fixed broken dgi file for multi segment input files (regression of 2897)
 2899 [Settings]             fixed worker settings window when using High DPI (regression of 2884)
 2898 [Main]                 fixed OneClick audio/video profile selections overwriting the main tab profile selections at next restart
 2897 [DGIndexNV Indexer]    adjusted AVS script parameters (requires DGIndexNV 2053.163+)

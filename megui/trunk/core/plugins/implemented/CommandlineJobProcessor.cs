@@ -157,6 +157,7 @@ namespace MeGUI
             }
             else
             {
+                su.Status = "Finalizing...";
                 su.IsComplete = true;
                 doExitConfig();
                 StatusUpdate(su);
