@@ -31,7 +31,7 @@ namespace MeGUI.core.gui
 
         private void config_Click(object sender, EventArgs e)
         {
-            Manager.Configure(SelectedProfile);
+            Manager.Configure(SelectedProfile, UpdateSelectedProfile, GetInstance);
         }
     }
 }

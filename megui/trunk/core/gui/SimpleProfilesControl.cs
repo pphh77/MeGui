@@ -38,7 +38,6 @@ namespace MeGUI.core.gui
             manager.SetSettings(value);
         }
 
-
         [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Profile SelectedProfile
         {
@@ -60,6 +59,11 @@ namespace MeGUI.core.gui
                 comboBox1.SelectedIndex = 0;
                 MessageBox.Show("The profile \"" + fqname + "\" could not be selected.\r\nSelecting profile \"" + comboBox1.SelectedItem.ToString() + "\" instead.", "Profile couldn't be selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+        }
+
+        public SimpleProfilesControl GetInstance
+        {
+            get { return this; }
         }
 
         public void SelectProfile(Profile prof)
@@ -94,13 +98,19 @@ namespace MeGUI.core.gui
                     value.AddProfilesChangedListener(ProfileSet, ProfilesChanged);
                 }
                 manager = value; 
-                RefreshProfiles(); 
+                RefreshProfiles(null); 
             }
         }
 
-        private void ProfilesChanged(object _, EventArgs __)
+        private void ProfilesChanged(object _, EventArgs args)
         {
-            RefreshProfiles();
+            if (args is SelectedProfileEventArgs)
+            {
+                if (this == ((SelectedProfileEventArgs)args).Instance)
+                    RefreshProfiles(((SelectedProfileEventArgs)args).SelectedProfile);
+            }
+            else
+                RefreshProfiles(null);
         }
 
         private string profileSet;
@@ -120,7 +130,7 @@ namespace MeGUI.core.gui
             }
         }
 
-        protected void RefreshProfiles()
+        protected void RefreshProfiles(string SelectedProfile)
         {
             comboBox1.Items.Clear();
             foreach (Named<Profile> oProfile in Manager.Profiles(ProfileSet))
@@ -136,7 +146,10 @@ namespace MeGUI.core.gui
 
                 comboBox1.Items.Add(oProfile);
             }
-            SelectProfile(Manager.GetSelectedProfile(ProfileSet));
+            if (String.IsNullOrEmpty(SelectedProfile))
+                SelectProfile(Manager.GetSelectedProfile(ProfileSet));
+            else
+                SelectProfile(SelectedProfile);
         }
 
         protected void raiseProfileChangedEvent()
@@ -176,6 +189,28 @@ namespace MeGUI.core.gui
             : base("The profile '" + name + "' couldn't be selected.")
         {
             this.name = name;
+        }
+    }
+
+    public class SelectedProfileEventArgs : EventArgs
+    {
+        private readonly string selectedProfile;
+        private readonly SimpleProfilesControl instance;
+
+        public SelectedProfileEventArgs(string selectedProfile, SimpleProfilesControl instance)
+        {
+            this.selectedProfile = selectedProfile;
+            this.instance = instance;
+        }
+
+        public string SelectedProfile
+        {
+            get { return this.selectedProfile; }
+        }
+
+        public SimpleProfilesControl Instance
+        {
+            get { return this.instance; }
         }
     }
 }

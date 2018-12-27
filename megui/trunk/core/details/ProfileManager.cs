@@ -536,9 +536,9 @@ namespace MeGUI
             return p.GetType().GetGenericArguments()[0];
         }
 
-        public void Configure(Profile SelectedProfile)
+        public void Configure(Profile SelectedProfile, bool UpdateSelectedProfile, SimpleProfilesControl instance)
         {
-            bySettingsType(GetSettingsType(SelectedProfile)).ConfigureProfiles();
+            bySettingsType(GetSettingsType(SelectedProfile)).ConfigureProfiles(SelectedProfile, UpdateSelectedProfile, instance);
         }
 
         public void SetSettings(GenericSettings s)
@@ -573,7 +573,7 @@ namespace MeGUI
 
                 selectedProfile = value.Item2 ?? profiles[0];
 
-                raiseChangedEvent();
+                raiseChangedEvent(null, null);
             }
         }
 
@@ -583,10 +583,10 @@ namespace MeGUI
             set { ProfilesAndSelected = new Tuple<IEnumerable<Profile>,Profile>(value, null); }
         }
 
-        protected void raiseChangedEvent()
+        protected void raiseChangedEvent(string selectedProfile, SimpleProfilesControl Instance)
         {
             if (ProfilesChanged != null)
-                ProfilesChanged(this, EventArgs.Empty);
+                ProfilesChanged(this, new SelectedProfileEventArgs(selectedProfile, Instance));
         }
 
         protected List<Profile> profiles = new List<Profile>();
@@ -620,7 +620,7 @@ namespace MeGUI
             SelectedProfile = p;
         }
 
-        public abstract void ConfigureProfiles();
+        public abstract void ConfigureProfiles(Profile SelectedProfile, bool UpdateSelectedProfile, SimpleProfilesControl Instance);
 
         public abstract Type SettingsType { get; }
         
@@ -654,7 +654,7 @@ namespace MeGUI
             if (i < 0)
             {
                 profiles.Add(prof);
-                raiseChangedEvent();
+                raiseChangedEvent(null, null);
             }
             else if (asker.overwriteProfile(prof.FQName))
                 profiles[i] = prof;
@@ -705,12 +705,18 @@ namespace MeGUI
         where TSettings : GenericSettings, new()
         where TPanel : Control, Editable<TSettings>, new()
     {
-        public override void ConfigureProfiles()
+        public override void ConfigureProfiles(Profile SelectedProfile, bool UpdateSelectedProfile, SimpleProfilesControl Instance)
         {
             // used to init with mainForm, but that is not required any more. OTOH, a ProfileManager instance might be required
             TPanel t = new TPanel();
             ProfileConfigurationWindow<TSettings, TPanel> w = new ProfileConfigurationWindow<TSettings, TPanel>(t, ID);
-            w.Profiles = SProfiles;
+
+            Tuple<IEnumerable<GenericProfile<TSettings>>, GenericProfile<TSettings>> profiles = 
+                new Tuple<IEnumerable<GenericProfile<TSettings>>, GenericProfile<TSettings>>(
+                Util.CastAll<Profile, GenericProfile<TSettings>>(ProfilesAndSelected.Item1),
+                (GenericProfile<TSettings>)SelectedProfile);
+
+            w.Profiles = profiles;
             if (w.ShowDialog() == DialogResult.Cancel)
                 return;
 
@@ -720,8 +726,9 @@ namespace MeGUI
                 if (p.FQName.Equals(w.SelectedProfile.FQName))
                 {
                     // profile exist - set it
-                    SelectedProfile = w.SelectedProfile;
-                    raiseChangedEvent();
+                    if (UpdateSelectedProfile)
+                        SelectedProfile = w.SelectedProfile;
+                    raiseChangedEvent(w.SelectedProfile.FQName, Instance);
                     break;
                 }
             }
