@@ -572,8 +572,6 @@ namespace MeGUI
                     profiles.Add(genScratchpad());
 
                 selectedProfile = value.Item2 ?? profiles[0];
-
-                raiseChangedEvent(null, null);
             }
         }
 
@@ -720,6 +718,8 @@ namespace MeGUI
             if (w.ShowDialog() == DialogResult.Cancel)
                 return;
 
+            bool bRaiseEvent = false;
+
             // set if possible the selected profile
             foreach (GenericProfile<TSettings> p in SProfiles.Item1)
             {
@@ -728,7 +728,7 @@ namespace MeGUI
                     // profile exist - set it
                     if (UpdateSelectedProfile)
                         SelectedProfile = w.SelectedProfile;
-                    raiseChangedEvent(w.SelectedProfile.FQName, Instance);
+                    bRaiseEvent = true;
                     break;
                 }
             }
@@ -737,7 +737,11 @@ namespace MeGUI
             {
                 SProfiles = w.Profiles;
                 MainForm.Instance.Profiles.SaveProfiles();
+                bRaiseEvent = true;
             }
+
+            if (bRaiseEvent)
+                raiseChangedEvent(w.SelectedProfile.FQName, Instance);
         }
 
         public SpecificProfileType(string name)

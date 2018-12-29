@@ -1,3 +1,4 @@
+2902 [Profiles]             fixed not applying new settings immediately (regression of 2901)
 2901 [OneClick]             fixed not selecting the desired profile in profile config (regression of 2898)
 2900 [DGIndexNV/IM Indexer] fixed broken dgi file for multi segment input files (regression of 2897)
 2899 [Settings]             fixed worker settings window when using High DPI (regression of 2884)

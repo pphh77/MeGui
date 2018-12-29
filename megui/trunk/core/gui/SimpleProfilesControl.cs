@@ -44,6 +44,11 @@ namespace MeGUI.core.gui
             get { return ((Named<Profile>)comboBox1.SelectedItem).Data; }
         }
 
+        public void SelectProfile(Profile prof)
+        {
+            SelectProfile(prof.FQName);
+        }
+
         public void SelectProfile(string fqname)
         {
             foreach (Named<Profile> n in comboBox1.Items)
@@ -64,11 +69,6 @@ namespace MeGUI.core.gui
         public SimpleProfilesControl GetInstance
         {
             get { return this; }
-        }
-
-        public void SelectProfile(Profile prof)
-        {
-            SelectProfile(prof.FQName);
         }
 
         public void SetProfileNameOrWarn(string fqname)
