@@ -53,7 +53,9 @@ namespace MeGUI
             this.chapterName = new System.Windows.Forms.TextBox();
             this.chapterNameLabel = new System.Windows.Forms.Label();
             this.chapterListView = new System.Windows.Forms.ListView();
-            this.timecodeColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.timecodeInColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.timecodeOutColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.frameColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.nameColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.startTime = new System.Windows.Forms.TextBox();
             this.startTimeLabel = new System.Windows.Forms.Label();
@@ -65,7 +67,6 @@ namespace MeGUI
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.gbInput = new System.Windows.Forms.GroupBox();
             this.lblFPSIn = new System.Windows.Forms.Label();
-            this.fpsChooserIn = new MeGUI.core.gui.FPSChooser();
             this.btInput = new System.Windows.Forms.Button();
             this.input = new System.Windows.Forms.TextBox();
             this.rbFromFile = new System.Windows.Forms.RadioButton();
@@ -74,13 +75,15 @@ namespace MeGUI
             this.closeOnQueue = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lblFPSOut = new System.Windows.Forms.Label();
-            this.fpsChooserOut = new MeGUI.core.gui.FPSChooser();
             this.rbXML = new System.Windows.Forms.RadioButton();
             this.rbQPF = new System.Windows.Forms.RadioButton();
             this.rbTXT = new System.Windows.Forms.RadioButton();
             this.btOutput = new System.Windows.Forms.Button();
             this.output = new System.Windows.Forms.TextBox();
+            this.chkOnTop = new System.Windows.Forms.CheckBox();
+            this.fpsChooserOut = new MeGUI.core.gui.FPSChooser();
             this.helpButton1 = new MeGUI.core.gui.HelpButton();
+            this.fpsChooserIn = new MeGUI.core.gui.FPSChooser();
             this.chaptersGroupbox.SuspendLayout();
             this.gbInput.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -126,6 +129,8 @@ namespace MeGUI
             this.chapterName.TabIndex = 38;
             this.chapterName.Text = "Chapter";
             this.chapterName.TextChanged += new System.EventHandler(this.chapterName_TextChanged);
+            this.chapterName.KeyDown += new System.Windows.Forms.KeyEventHandler(this.startTime_KeyDown);
+            this.chapterName.KeyUp += new System.Windows.Forms.KeyEventHandler(this.startTime_KeyUp);
             // 
             // chapterNameLabel
             // 
@@ -138,7 +143,9 @@ namespace MeGUI
             // chapterListView
             // 
             this.chapterListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.timecodeColumn,
+            this.frameColumn,
+            this.timecodeInColumn,
+            this.timecodeOutColumn,
             this.nameColumn});
             this.chapterListView.FullRowSelect = true;
             this.chapterListView.Location = new System.Drawing.Point(10, 24);
@@ -150,15 +157,25 @@ namespace MeGUI
             this.chapterListView.SelectedIndexChanged += new System.EventHandler(this.chapterListView_SelectedIndexChanged);
             this.chapterListView.DoubleClick += new System.EventHandler(this.chapterListView_DoubleClick);
             // 
-            // timecodeColumn
+            // timecodeInColumn
             // 
-            this.timecodeColumn.Text = "Timecode";
-            this.timecodeColumn.Width = 100;
+            this.timecodeInColumn.Text = "Timecode In";
+            this.timecodeInColumn.Width = 80;
+            // 
+            // timecodeOutColumn
+            // 
+            this.timecodeOutColumn.Text = "Timecode Out";
+            this.timecodeOutColumn.Width = 80;
+            // 
+            // frameColumn
+            // 
+            this.frameColumn.Text = "Frame";
+            this.frameColumn.Width = 48;
             // 
             // nameColumn
             // 
             this.nameColumn.Text = "Name";
-            this.nameColumn.Width = 250;
+            this.nameColumn.Width = 143;
             // 
             // startTime
             // 
@@ -168,6 +185,8 @@ namespace MeGUI
             this.startTime.TabIndex = 23;
             this.startTime.Text = "00:00:00.000";
             this.startTime.TextChanged += new System.EventHandler(this.startTime_TextChanged);
+            this.startTime.KeyDown += new System.Windows.Forms.KeyEventHandler(this.startTime_KeyDown);
+            this.startTime.KeyUp += new System.Windows.Forms.KeyEventHandler(this.startTime_KeyUp);
             // 
             // startTimeLabel
             // 
@@ -255,19 +274,6 @@ namespace MeGUI
             this.lblFPSIn.TabIndex = 16;
             this.lblFPSIn.Text = "FPS";
             // 
-            // fpsChooserIn
-            // 
-            this.fpsChooserIn.BackColor = System.Drawing.SystemColors.Control;
-            this.fpsChooserIn.Location = new System.Drawing.Point(283, 42);
-            this.fpsChooserIn.MaximumSize = new System.Drawing.Size(1000, 29);
-            this.fpsChooserIn.MinimumSize = new System.Drawing.Size(64, 29);
-            this.fpsChooserIn.Name = "fpsChooserIn";
-            this.fpsChooserIn.NullString = null;
-            this.fpsChooserIn.SelectedIndex = 0;
-            this.fpsChooserIn.Size = new System.Drawing.Size(98, 29);
-            this.fpsChooserIn.TabIndex = 15;
-            this.fpsChooserIn.SelectionChanged += new MeGUI.StringChanged(this.fpsChooserIn_SelectionChanged);
-            // 
             // btInput
             // 
             this.btInput.Location = new System.Drawing.Point(392, 19);
@@ -352,17 +358,6 @@ namespace MeGUI
             this.lblFPSOut.TabIndex = 15;
             this.lblFPSOut.Text = "FPS";
             // 
-            // fpsChooserOut
-            // 
-            this.fpsChooserOut.Location = new System.Drawing.Point(284, 14);
-            this.fpsChooserOut.MaximumSize = new System.Drawing.Size(1000, 29);
-            this.fpsChooserOut.MinimumSize = new System.Drawing.Size(64, 29);
-            this.fpsChooserOut.Name = "fpsChooserOut";
-            this.fpsChooserOut.NullString = null;
-            this.fpsChooserOut.SelectedIndex = 0;
-            this.fpsChooserOut.Size = new System.Drawing.Size(98, 29);
-            this.fpsChooserOut.TabIndex = 14;
-            // 
             // rbXML
             // 
             this.rbXML.AutoSize = true;
@@ -419,6 +414,31 @@ namespace MeGUI
             this.output.Size = new System.Drawing.Size(365, 21);
             this.output.TabIndex = 9;
             // 
+            // chkOnTop
+            // 
+            this.chkOnTop.AutoSize = true;
+            this.chkOnTop.Checked = true;
+            this.chkOnTop.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkOnTop.Location = new System.Drawing.Point(160, 523);
+            this.chkOnTop.Name = "chkOnTop";
+            this.chkOnTop.Size = new System.Drawing.Size(135, 17);
+            this.chkOnTop.TabIndex = 40;
+            this.chkOnTop.Text = "stay on top of preview";
+            this.chkOnTop.UseVisualStyleBackColor = true;
+            this.chkOnTop.CheckedChanged += new System.EventHandler(this.chkOnTop_CheckedChanged);
+            // 
+            // fpsChooserOut
+            // 
+            this.fpsChooserOut.Location = new System.Drawing.Point(284, 14);
+            this.fpsChooserOut.MaximumSize = new System.Drawing.Size(1000, 29);
+            this.fpsChooserOut.MinimumSize = new System.Drawing.Size(64, 29);
+            this.fpsChooserOut.Name = "fpsChooserOut";
+            this.fpsChooserOut.NullString = " unknown";
+            this.fpsChooserOut.SelectedIndex = 0;
+            this.fpsChooserOut.Size = new System.Drawing.Size(98, 29);
+            this.fpsChooserOut.TabIndex = 14;
+            this.fpsChooserOut.SelectionChanged += new MeGUI.StringChanged(this.fpsChooserOut_SelectionChanged);
+            // 
             // helpButton1
             // 
             this.helpButton1.ArticleName = "Chapter Creator";
@@ -429,11 +449,25 @@ namespace MeGUI
             this.helpButton1.Size = new System.Drawing.Size(38, 23);
             this.helpButton1.TabIndex = 42;
             // 
+            // fpsChooserIn
+            // 
+            this.fpsChooserIn.BackColor = System.Drawing.SystemColors.Control;
+            this.fpsChooserIn.Location = new System.Drawing.Point(283, 42);
+            this.fpsChooserIn.MaximumSize = new System.Drawing.Size(1000, 29);
+            this.fpsChooserIn.MinimumSize = new System.Drawing.Size(64, 29);
+            this.fpsChooserIn.Name = "fpsChooserIn";
+            this.fpsChooserIn.NullString = " unknown";
+            this.fpsChooserIn.SelectedIndex = 0;
+            this.fpsChooserIn.Size = new System.Drawing.Size(98, 29);
+            this.fpsChooserIn.TabIndex = 15;
+            this.fpsChooserIn.SelectionChanged += new MeGUI.StringChanged(this.fpsChooserIn_SelectionChanged);
+            // 
             // ChapterCreator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(468, 554);
+            this.Controls.Add(this.chkOnTop);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.closeOnQueue);
             this.Controls.Add(this.helpButton1);
@@ -464,7 +498,7 @@ namespace MeGUI
         private System.Windows.Forms.Button clearZonesButton;
         private System.Windows.Forms.Button showVideoButton;
         private System.Windows.Forms.Button removeZoneButton;
-        private System.Windows.Forms.ColumnHeader timecodeColumn;
+        private System.Windows.Forms.ColumnHeader timecodeInColumn;
         private System.Windows.Forms.ColumnHeader nameColumn;
         private System.Windows.Forms.Label startTimeLabel;
         private System.Windows.Forms.Label chapterNameLabel;
@@ -492,5 +526,8 @@ namespace MeGUI
         private System.Windows.Forms.Label lblFPSIn;
         private core.gui.FPSChooser fpsChooserIn;
         private System.Windows.Forms.CheckBox chkCounter;
+        private System.Windows.Forms.ColumnHeader timecodeOutColumn;
+        private System.Windows.Forms.CheckBox chkOnTop;
+        private System.Windows.Forms.ColumnHeader frameColumn;
     }
 }

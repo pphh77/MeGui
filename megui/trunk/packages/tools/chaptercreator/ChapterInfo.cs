@@ -61,6 +61,27 @@ namespace MeGUI
 
         public ChapterInfo()
         {
+            ResetChapterInfo();
+        }
+
+        public ChapterInfo(ChapterInfo oOther)
+        {
+            Title = oOther.Title;
+            SourceFilePath = oOther.SourceFilePath;
+            SourceType = oOther.SourceType;
+            FramesPerSecond = oOther.FramesPerSecond;
+            TitleNumber = oOther.TitleNumber;
+            PGCNumber = oOther.PGCNumber;
+            AngleNumber = oOther.AngleNumber;
+            Chapters = new List<Chapter>();
+            oOther.Chapters.ForEach((item) =>
+            {
+                Chapters.Add(new Chapter(item));
+            });
+        }
+
+        private void ResetChapterInfo()
+        {
             Title = string.Empty;
             SourceFilePath = string.Empty;
             SourceType = string.Empty;
@@ -94,11 +115,14 @@ namespace MeGUI
 
         public bool LoadFile(string strFileName)
         {
+            ResetChapterInfo();
+
             if (!File.Exists(strFileName))
                 return false;
 
+            // try to get the chapter information from plain chapter files
             FileInfo oFileInfo = new FileInfo(strFileName);
-            if (oFileInfo.Length < 2097152)
+            if (oFileInfo.Length < 20971520) // max 20 MB files are supported to avoid reading large files
             {
                 if (LoadText(strFileName) || LoadText2(strFileName) || LoadXML(strFileName))
                     return true;
@@ -118,6 +142,7 @@ namespace MeGUI
             return true;
         }
 
+        #region helper functions
         public void ChangeFps(double fps)
         {
             if (FramesPerSecond == 0 || FramesPerSecond == fps)
@@ -127,43 +152,32 @@ namespace MeGUI
             }
 
             for (int i = 0; i < Chapters.Count; i++)
-            {
-                Chapter c = Chapters[i];
-                double frames = c.Time.TotalSeconds * FramesPerSecond;
-                Chapters[i] = new Chapter() { Name = c.Name, Time = new TimeSpan((long)Math.Round(frames / fps * TimeSpan.TicksPerSecond)) };
-            }
+                Chapters[i] = Chapter.ChangeChapterFPS(Chapters[i], FramesPerSecond, fps);
 
             double totalFrames = Duration.TotalSeconds * FramesPerSecond;
             Duration = new TimeSpan((long)Math.Round((totalFrames / fps) * TimeSpan.TicksPerSecond));
             FramesPerSecond = fps;
         }
 
-        public bool SaveText(string strFileName)
+        /// <summary>
+        /// gets Timeline for tsMuxeR
+        /// </summary>
+        /// <returns>chapters Timeline as string</returns>
+        public string GetChapterTimeLine()
         {
-            try
-            {
-                List<string> lines = new List<string>();
-                int i = 0;
-                foreach (Chapter c in Chapters)
-                {
-                    i++;
-                    if (c.Time.ToString().Length == 8)
-                        lines.Add("CHAPTER" + i.ToString("00") + "=" + c.Time.ToString() + ".000"); // better formating
-                    else if (c.Time.ToString().Length > 12)
-                        lines.Add("CHAPTER" + i.ToString("00") + "=" + c.Time.ToString().Substring(0, 12)); // remove some duration length too long
-                    else
-                        lines.Add("CHAPTER" + i.ToString("00") + "=" + c.Time.ToString());
-                    lines.Add("CHAPTER" + i.ToString("00") + "NAME=" + c.Name);
-                }
-                File.WriteAllLines(strFileName, lines.ToArray(), Encoding.UTF8);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
+            string strTimeLine = string.Empty;
 
+            foreach (Chapter oChapter in Chapters)
+                strTimeLine += oChapter.Time.ToString().Substring(0, 12) + ";";
+
+            if (strTimeLine.EndsWith(";"))
+                strTimeLine = strTimeLine.Substring(0, strTimeLine.Length - 1);
+
+            return strTimeLine;
+        }
+        #endregion
+
+        #region load file
         private bool LoadText(string strFileName)
         {
             try
@@ -242,64 +256,6 @@ namespace MeGUI
             return Chapters.Count != 0;
         }
 
-        public bool SaveQpfile(string strFileName)
-        {
-            try
-            {
-                List<string> lines = new List<string>();
-                foreach (Chapter c in Chapters)
-                    lines.Add(string.Format("{0} K", (long)Math.Round(c.Time.TotalSeconds * FramesPerSecond)));
-                File.WriteAllLines(strFileName, lines.ToArray());
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        public bool SaveXml(string filename)
-        {
-            try
-            {
-                Random rndb = new Random();
-                XmlTextWriter xmlchap = new XmlTextWriter(filename, Encoding.UTF8);
-                xmlchap.Formatting = Formatting.Indented;
-                xmlchap.WriteStartDocument();
-                xmlchap.WriteComment("<!DOCTYPE Tags SYSTEM " + "\"" + "matroskatags.dtd" + "\"" + ">");
-                xmlchap.WriteStartElement("Chapters");
-                xmlchap.WriteStartElement("EditionEntry");
-                xmlchap.WriteElementString("EditionFlagHidden", "0");
-                xmlchap.WriteElementString("EditionFlagDefault", "0");
-                xmlchap.WriteElementString("EditionUID", Convert.ToString(rndb.Next(1, Int32.MaxValue)));
-                foreach (Chapter c in Chapters)
-                {
-                    xmlchap.WriteStartElement("ChapterAtom");
-                    xmlchap.WriteStartElement("ChapterDisplay");
-                    xmlchap.WriteElementString("ChapterString", c.Name);
-                    xmlchap.WriteElementString("ChapterLanguage", "und");
-                    xmlchap.WriteEndElement();
-                    xmlchap.WriteElementString("ChapterUID", Convert.ToString(rndb.Next(1, Int32.MaxValue)));
-                    if (c.Time.ToString().Length == 8)
-                        xmlchap.WriteElementString("ChapterTimeStart", c.Time.ToString() + ".0000000");
-                    else
-                        xmlchap.WriteElementString("ChapterTimeStart", c.Time.ToString());
-                    xmlchap.WriteElementString("ChapterFlagHidden", "0");
-                    xmlchap.WriteElementString("ChapterFlagEnabled", "1");
-                    xmlchap.WriteEndElement();
-                }
-                xmlchap.WriteEndElement();
-                xmlchap.WriteEndElement();
-                xmlchap.Flush();
-                xmlchap.Close();
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-            return true;
-        }
-
         private bool LoadXML(string strFileName)
         {
             try
@@ -359,6 +315,92 @@ namespace MeGUI
 
             return Chapters.Count != 0;
         }
+        #endregion
+
+        #region save file
+        public bool SaveText(string strFileName)
+        {
+            try
+            {
+                List<string> lines = new List<string>();
+                int i = 0;
+                foreach (Chapter c in Chapters)
+                {
+                    i++;
+                    if (c.Time.ToString().Length == 8)
+                        lines.Add("CHAPTER" + i.ToString("00") + "=" + c.Time.ToString() + ".000"); // better formating
+                    else if (c.Time.ToString().Length > 12)
+                        lines.Add("CHAPTER" + i.ToString("00") + "=" + c.Time.ToString().Substring(0, 12)); // remove some duration length too long
+                    else
+                        lines.Add("CHAPTER" + i.ToString("00") + "=" + c.Time.ToString());
+                    lines.Add("CHAPTER" + i.ToString("00") + "NAME=" + c.Name);
+                }
+                File.WriteAllLines(strFileName, lines.ToArray(), Encoding.UTF8);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public bool SaveQpfile(string strFileName)
+        {
+            try
+            {
+                List<string> lines = new List<string>();
+                foreach (Chapter c in Chapters)
+                    lines.Add(string.Format("{0} K", (long)Math.Round(c.Time.TotalSeconds * FramesPerSecond)));
+                File.WriteAllLines(strFileName, lines.ToArray());
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public bool SaveXml(string filename)
+        {
+            try
+            {
+                Random rndb = new Random();
+                XmlTextWriter xmlchap = new XmlTextWriter(filename, Encoding.UTF8);
+                xmlchap.Formatting = Formatting.Indented;
+                xmlchap.WriteStartDocument();
+                xmlchap.WriteComment("<!DOCTYPE Tags SYSTEM " + "\"" + "matroskatags.dtd" + "\"" + ">");
+                xmlchap.WriteStartElement("Chapters");
+                xmlchap.WriteStartElement("EditionEntry");
+                xmlchap.WriteElementString("EditionFlagHidden", "0");
+                xmlchap.WriteElementString("EditionFlagDefault", "0");
+                xmlchap.WriteElementString("EditionUID", Convert.ToString(rndb.Next(1, Int32.MaxValue)));
+                foreach (Chapter c in Chapters)
+                {
+                    xmlchap.WriteStartElement("ChapterAtom");
+                    xmlchap.WriteStartElement("ChapterDisplay");
+                    xmlchap.WriteElementString("ChapterString", c.Name);
+                    xmlchap.WriteElementString("ChapterLanguage", "und");
+                    xmlchap.WriteEndElement();
+                    xmlchap.WriteElementString("ChapterUID", Convert.ToString(rndb.Next(1, Int32.MaxValue)));
+                    if (c.Time.ToString().Length == 8)
+                        xmlchap.WriteElementString("ChapterTimeStart", c.Time.ToString() + ".0000000");
+                    else
+                        xmlchap.WriteElementString("ChapterTimeStart", c.Time.ToString());
+                    xmlchap.WriteElementString("ChapterFlagHidden", "0");
+                    xmlchap.WriteElementString("ChapterFlagEnabled", "1");
+                    xmlchap.WriteEndElement();
+                }
+                xmlchap.WriteEndElement();
+                xmlchap.WriteEndElement();
+                xmlchap.Flush();
+                xmlchap.Close();
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
 
         /// <summary>
         /// Creates Apple Style Chapters XML File
@@ -408,22 +450,6 @@ namespace MeGUI
                 return false;
             }
         }
-
-        /// <summary>
-        /// gets Timeline for tsMuxeR
-        /// </summary>
-        /// <returns>chapters Timeline as string</returns>
-        public string GetChapterTimeLine()
-        {
-            string strTimeLine = string.Empty;
-
-            foreach (Chapter oChapter in Chapters)
-                strTimeLine += oChapter.Time.ToString().Substring(0,12) + ";";
-
-            if (strTimeLine.EndsWith(";"))
-                strTimeLine = strTimeLine.Substring(0, strTimeLine.Length - 1);
-
-            return strTimeLine;
-        }
+#endregion
     }
 }

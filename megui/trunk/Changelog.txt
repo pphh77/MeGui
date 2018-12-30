@@ -1,3 +1,5 @@
+2903 [Chapter Creator]      added frame + output time code (if different from input)
+                            improved/changed handling e.g. input/output fps will be locked based on source/preview
 2902 [Profiles]             fixed not applying new settings immediately (regression of 2901)
 2901 [OneClick]             fixed not selecting the desired profile in profile config (regression of 2898)
 2900 [DGIndexNV/IM Indexer] fixed broken dgi file for multi segment input files (regression of 2897)
