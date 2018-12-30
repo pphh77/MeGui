@@ -311,6 +311,13 @@
     <Compile Include="packages\audio\fdkaac\FDKAACConfigurationPanel.Designer.cs">
       <DependentUpon>FDKAACConfigurationPanel.cs</DependentUpon>
     </Compile>
+    <Compile Include="packages\audio\ffaac\FFAACConfigurationPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="packages\audio\ffaac\FFAACConfigurationPanel.Designer.cs">
+      <DependentUpon>FFAACConfigurationPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="packages\audio\ffaac\FFAACSettings.cs" />
     <Compile Include="packages\muxer\ffmpeg\FFmpegMuxer.cs" />
     <Compile Include="packages\reader\lmash\lsmashReader.cs" />
     <Compile Include="packages\reader\mediainfo\wrapper\AudioTrack.cs" />
@@ -879,6 +886,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="packages\audio\fdkaac\FDKAACConfigurationPanel.resx">
       <DependentUpon>FDKAACConfigurationPanel.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="packages\audio\ffaac\FFAACConfigurationPanel.resx">
+      <DependentUpon>FFAACConfigurationPanel.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="packages\tools\avscreator\AviSynthProfileConfigPanel.resx">

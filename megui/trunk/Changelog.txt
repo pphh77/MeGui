@@ -1,3 +1,5 @@
+2904 [FFmpeg AAC Encoder]   added FFmpeg AAC encoder. patch by Yarick Yermak (patch #71)
+                            unlike the other AAC encoder this one is available without any additional actions
 2903 [Chapter Creator]      added frame + output time code (if different from input)
                             improved/changed handling e.g. input/output fps will be locked based on source/preview
 2902 [Profiles]             fixed not applying new settings immediately (regression of 2901)

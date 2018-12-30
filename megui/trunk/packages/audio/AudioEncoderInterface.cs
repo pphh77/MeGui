@@ -55,7 +55,8 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 ((j as AudioJob).Settings is FlacSettings) ||
                 ((j as AudioJob).Settings is QaacSettings) ||
                 ((j as AudioJob).Settings is OpusSettings) ||
-                ((j as AudioJob).Settings is FDKAACSettings)))
+                ((j as AudioJob).Settings is FDKAACSettings) ||
+                ((j as AudioJob).Settings is FFAACSettings)))
                 return new AviSynthAudioEncoder(mf.Settings);
             return null;
         }
@@ -342,7 +343,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 if (System.Text.RegularExpressions.Regex.IsMatch(line.ToLowerInvariant(), @"^processed\s?[0-9]{0,5}\s?seconds..."))
                     return;
             }
-            else if (audioJob.Settings is AC3Settings || audioJob.Settings is MP2Settings)
+            else if (audioJob.Settings is AC3Settings || audioJob.Settings is MP2Settings || audioJob.Settings is FFAACSettings)
             {
                 if (System.Text.RegularExpressions.Regex.IsMatch(line.ToLowerInvariant(), @"^size= "))
                     return;
@@ -1656,13 +1657,13 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 {
                     switch (oSettings.Profile)
                     {
-                        case FdkAACProfile.M4LC:  sb.Append(" -p 2"); break; // default
-                        case FdkAACProfile.M4HE:  sb.Append(" -p 5"); break;
+                        case FdkAACProfile.M4LC: sb.Append(" -p 2"); break; // default
+                        case FdkAACProfile.M4HE: sb.Append(" -p 5"); break;
+                        case FdkAACProfile.M4LD: sb.Append(" -p 23"); break;
                         case FdkAACProfile.M4HE2: sb.Append(" -p 29"); break;
-                        case FdkAACProfile.M4LD:  sb.Append(" -p 23"); break;
                         case FdkAACProfile.M4ELD: sb.Append(" -p 39"); break;
-                        case FdkAACProfile.M2LC:  sb.Append(" -p 129"); break;
-                        case FdkAACProfile.M2HE:  sb.Append(" -p 132"); break;
+                        case FdkAACProfile.M2LC: sb.Append(" -p 129"); break;
+                        case FdkAACProfile.M2HE: sb.Append(" -p 132"); break;
                         case FdkAACProfile.M2HE2: sb.Append(" -p 156"); break;
                     }
                 }
@@ -1671,6 +1672,47 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                     sb.Append(" " + oSettings.CustomEncoderOptions.Trim());
 
                 sb.Append(" - -o \"{0}\"");
+            }
+            else if (audioJob.Settings is FFAACSettings)
+            {
+                UpdateCacher.CheckPackage("ffmpeg");
+                FFAACSettings oSettings = audioJob.Settings as FFAACSettings;
+                _encoderExecutablePath = this._settings.FFmpeg.Path;
+                _sendWavHeaderToEncoderStdIn = HeaderType.W64;
+
+                script.Append("32==Audiobits(last)?ConvertAudioTo16bit(last):last" + Environment.NewLine); // ffmp2 encoder doesn't support 32 bits streams
+
+                sb.Append(" -i - -y");
+                if (!oSettings.CustomEncoderOptions.Contains("-acodec ") && !oSettings.CustomEncoderOptions.Contains("-codec:a "))
+                    sb.Append(" -codec:a aac");
+
+                if (!oSettings.CustomEncoderOptions.Contains("-b:a ") && !oSettings.CustomEncoderOptions.Contains("-q:a "))
+                {
+                    switch (oSettings.Mode)
+                    {
+                        case FFAACMode.CBR: // default
+                            sb.Append(" -b:a " + oSettings.Bitrate + "k");
+                            break;
+                        case FFAACMode.VBR:
+                            sb.Append(" -q:a " + Math.Max(oSettings.Quality / 50.0, 0.1));
+                            break;
+                    }
+                }
+
+                if (!oSettings.CustomEncoderOptions.Contains("-profile:a "))
+                {
+                    switch (oSettings.Profile)
+                    {
+                        case FFAACProfile.M4LC: sb.Append(" -profile:a aac_low"); break; // default
+                        case FFAACProfile.M4PNS: sb.Append(" -profile:a mpeg2_aac_low"); break;
+                        case FFAACProfile.M4LTP: sb.Append(" -profile:a aac_ltp"); break;
+                        case FFAACProfile.M4MAIN: sb.Append(" -profile:a aac_main"); break;
+                    }
+                }
+
+                if (!String.IsNullOrEmpty(oSettings.CustomEncoderOptions))
+                    sb.Append(" " + oSettings.CustomEncoderOptions.Trim());
+                sb.Append(" \"{0}\"");
             }
 
             _encoderCommandLine = sb.ToString().Trim();

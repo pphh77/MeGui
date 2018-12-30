@@ -1207,7 +1207,7 @@ namespace MeGUI
         
         public override string GetInputTypeFilter()
         {
-            return "All supported types|*.avs;*.wav;*.pcm;*.mpa;*.mp2;*.mp3;*.ac3;*.dts";
+            return "All supported types|*.avs;*.wav;*.pcm;*.mpa;*.mp2;*.mp3;*.ac3;*.dts;*.m4a;*.aac";
         }
 
         public override IJobProcessor CreateEncoder(MeGUISettings settings)
@@ -1239,6 +1239,7 @@ namespace MeGUI
             RegisterEncoder(new QaacEncodingProvider());
             RegisterEncoder(new OpusEncodingProvider());
             RegisterEncoder(new FdkaacEncodingProvider());
+            RegisterEncoder(new FfaacEncodingProvider());
         }
     }
     #endregion
@@ -1394,6 +1395,18 @@ namespace MeGUI
             supportedTypes.Add(AudioType.M4A);
             supportedTypes.Add(AudioType.MP4AAC);
             supportedEncoderTypes.Add(AudioEncoderType.FDKAAC);
+        }
+    }
+
+    public class FfaacEncodingProvider : AudioEncodingProvider
+    {
+        public FfaacEncodingProvider()
+            : base()
+        {
+            supportedCodecs.Add(AudioCodec.AAC);
+            supportedTypes.Add(AudioType.M4A);
+            supportedTypes.Add(AudioType.MP4AAC);
+            supportedEncoderTypes.Add(AudioEncoderType.FFAAC);
         }
     }
     #endregion

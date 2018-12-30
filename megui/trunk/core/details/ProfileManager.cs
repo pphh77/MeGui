@@ -74,7 +74,8 @@ namespace MeGUI
             SafeRegister<QaacSettings, MeGUI.packages.audio.qaac.qaacConfigurationPanel>("Audio");
             SafeRegister<OpusSettings, MeGUI.packages.audio.opus.OpusConfigurationPanel>("Audio");
             SafeRegister<FDKAACSettings, MeGUI.packages.audio.fdkaac.FDKAACConfigurationPanel>("Audio");
-            
+            SafeRegister<FFAACSettings, MeGUI.packages.audio.ffaac.FFAACConfigurationPanel>("Audio");
+
             SafeRegister<OneClickSettings, OneClickConfigPanel>();
             SafeRegister<AviSynthSettings, AviSynthProfileConfigPanel>();
         }
