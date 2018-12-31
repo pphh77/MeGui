@@ -104,35 +104,6 @@ namespace MeGUI
             System.Diagnostics.Process.Start("https://en.wikibooks.org/wiki/MeGUI");
         }
 
-        /// <summary>
-        /// shows the changelog dialog window
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void mnuChangelog_Click(object sender, EventArgs e)
-        {
-            string strChangeLog = Path.Combine(Application.StartupPath, "changelog.txt");
-
-            if (File.Exists(strChangeLog))
-            {
-                try
-                {
-                    Process oProcess = new Process();
-                    oProcess.StartInfo.FileName = strChangeLog;
-                    oProcess.StartInfo.UseShellExecute = true;
-                    oProcess.Start();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(strChangeLog + " cannot be opened:\r\n" + ex.Message, "Process error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-            else
-            {
-                MessageBox.Show(strChangeLog + " not found", "Changelog not found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-        }
-
         public MainForm()
         {
             // Log File Handling
@@ -185,6 +156,88 @@ namespace MeGUI
                 this.Location = new Point(oLocation.X, this.Location.Y);
             else if (this.Location.X + this.Size.Width > iScreenWidth)
                 this.Location = new Point(iScreenWidth - this.Size.Width, this.Location.Y);
+
+            GetChangeLog();
+        }
+
+        private void MainForm_Shown(object sender, EventArgs e)
+        {
+            this.ClientSize = settings.MainFormSize;
+
+            if (OSInfo.IsWindows7OrNewer)
+            {
+                taskbarItem = (ITaskbarList3)new ProgressTaskbar();
+                setOverlayIcon(taskbarIcon, true);
+            }
+
+            if (settings.WorkerAutoStartOnStartup)
+                jobControl1.StartAll(false);
+
+            if (MainForm.Instance.Settings.UpdateMode != UpdateMode.Disabled)
+                _updateHandler.BeginUpdateCheck();
+        }
+
+        private void GetChangeLog()
+        {
+            try
+            {
+                txtChangeLog.Font = new Font(FontFamily.GenericMonospace, txtChangeLog.Font.Size);
+
+                // check if changelog is available
+                string changeLog = Path.Combine(Application.StartupPath, "changelog.txt");
+                if (!File.Exists(changeLog))
+                {
+                    txtChangeLog.Text = "Changelog cannot be found: " + changeLog;
+                    return;
+                }
+
+                // copy the complete file content into the text box
+                txtChangeLog.Text = File.ReadAllText(changeLog);
+
+                // if the last used version is equal to the currently used version, do not take any special actions
+                if (MainForm.Instance.Settings.Version.Equals(new System.Version(Application.ProductVersion).Build.ToString()))
+                    return;
+
+                if (!String.IsNullOrEmpty(MainForm.Instance.Settings.Version))
+                {
+                    if ((new System.Version(Application.ProductVersion).Build) > Int32.Parse(MainForm.Instance.Settings.Version))
+                    {
+                        // the last used version is known and the version is lower than the used version
+                        // therefore try to highlight only the new changes
+
+                        int startIndex = 0;
+                        string version = "";
+                        bool bDark = true;
+
+                        foreach (string line in txtChangeLog.Lines)
+                        {
+                            if (FileUtil.RegExMatch(line, @"^\d{4,} ", true))
+                                version = line.Substring(0, line.IndexOf(" "));
+                            else if (FileUtil.RegExMatch(line, @"--> \d{4,}$", true))
+                                version = line.Substring(line.IndexOf("--> ") + 4);
+
+                            if (bDark && !String.IsNullOrEmpty(version) && Int32.Parse(version) <= Int32.Parse(MainForm.Instance.Settings.Version))
+                                bDark = false;
+
+                            txtChangeLog.Select(startIndex, line.Length);
+                            if (bDark)
+                                txtChangeLog.SelectionColor = Color.Black;
+                            else
+                                txtChangeLog.SelectionColor = Color.LightGray;
+
+                            startIndex += line.Length + 1;
+                        }
+                    }
+                }
+
+                // select the changelog tab
+                tabControl1.SelectedIndex = 3;
+                MainForm.Instance.Settings.Version = new System.Version(Application.ProductVersion).Build.ToString();
+            }
+            catch (Exception ex)
+            {
+                txtChangeLog.Text = "Changelog cannot be displayed: " + ex.Message;
+            }
         }
 
         #region GUI properties
@@ -1225,29 +1278,6 @@ namespace MeGUI
                     this.saveSettings();
                     Jobs.ShowAfterEncodingStatus(settings);
                 }
-            }
-        }
-
-        private void MainForm_Shown(object sender, EventArgs e)
-        {
-            this.ClientSize = settings.MainFormSize;
-
-            if (OSInfo.IsWindows7OrNewer)
-            {
-                taskbarItem = (ITaskbarList3)new ProgressTaskbar();
-                setOverlayIcon(taskbarIcon, true);
-            }
-
-            if (settings.WorkerAutoStartOnStartup)
-                jobControl1.StartAll(false);
-
-            if (MainForm.Instance.Settings.UpdateMode != UpdateMode.Disabled)
-                _updateHandler.BeginUpdateCheck();
-
-            if (!MainForm.Instance.Settings.Version.Equals(new System.Version(Application.ProductVersion).Build.ToString()))
-            {
-                mnuChangelog_Click(null, null);
-                MainForm.Instance.Settings.Version = new System.Version(Application.ProductVersion).Build.ToString();
             }
         }
 

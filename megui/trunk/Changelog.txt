@@ -1,3 +1,5 @@
+2905 [Main]                 moved the changelog to the tab control
+                            new entries after an update will be highlighted
 2904 [FFmpeg AAC Encoder]   added FFmpeg AAC encoder. patch by Yarick Yermak (patch #71)
                             unlike the other AAC encoder this one is available without any additional actions
 2903 [Chapter Creator]      added frame + output time code (if different from input)
