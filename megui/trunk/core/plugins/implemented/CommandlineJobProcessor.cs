@@ -246,11 +246,11 @@ namespace MeGUI
 
         public void stop()
         {
-            if (proc == null || proc.HasExited)
-                return;
-
             try
             {
+                if (proc == null || proc.HasExited)
+                    return;
+
                 bWaitForExit = true;
                 mre.Set(); // if it's paused, then unpause
                 su.WasAborted = true;

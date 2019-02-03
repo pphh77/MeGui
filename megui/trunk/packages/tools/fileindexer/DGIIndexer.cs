@@ -217,7 +217,7 @@ namespace MeGUI
 
         public static bool DGIHasFullPath(string dgiFile)
         {
-            using (StreamReader sr = new StreamReader(dgiFile, Encoding.UTF8))
+            using (StreamReader sr = new StreamReader(dgiFile, Encoding.Default))
             {
                 string line = null;
                 int iLineCount = 0;
@@ -239,9 +239,9 @@ namespace MeGUI
             int iLineCount = 0;
             string line = null;
             bool bPathExtended = false;
-            using (StreamReader reader = new StreamReader(job.Output, Encoding.UTF8))
+            using (StreamReader reader = new StreamReader(job.Output, Encoding.Default))
             {
-                using (StreamWriter writer = new StreamWriter(job.Output + ".temp", false, new UTF8Encoding(false)))
+                using (StreamWriter writer = new StreamWriter(job.Output + ".temp", false, Encoding.Default))
                 {
                     while ((line = reader.ReadLine()) != null)
                     {
