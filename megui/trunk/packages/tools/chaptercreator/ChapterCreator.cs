@@ -34,14 +34,34 @@ namespace MeGUI
 	/// Summary description for ChapterCreator.
 	/// </summary>
 	public partial class ChapterCreator : Form
-	{
-		private string videoInput;
-		private VideoPlayer player;
-		private int introEndFrame = 0, creditsStartFrame = 0;
+    {
+        #region properties
+        private string videoInput;
+        private VideoPlayer player;
         private ChapterInfo pgc;
+        private bool bInputFPSKnown = false;
 
-		#region start / stop
-		public ChapterCreator()
+        /// <summary>
+        /// sets the video input to be used for a zone preview
+        /// </summary>
+        public string VideoInput
+        {
+            set { this.videoInput = value; }
+        }
+
+        /// <summary>
+        /// gets / sets the start frame of the credits
+        /// </summary>
+        public int CreditsStartFrame { get; set; } = 0;
+
+        /// <summary>
+        /// gets / sets the end frame of the intro
+        /// </summary>
+        public int IntroEndFrame { get; set; } = 0;
+        #endregion
+
+        #region start / stop
+        public ChapterCreator()
 		{
 			InitializeComponent();
             pgc = new ChapterInfo();
@@ -391,14 +411,14 @@ namespace MeGUI
             if (pgc.FramesPerSecond > 0)
             {
                 fpsChooserIn.Value = (decimal)pgc.FramesPerSecond;
-                fpsChooserIn.Enabled = false;
+                bInputFPSKnown = true;
                 if (fpsChooserOut.Value == null)
                     fpsChooserOut.Value = (decimal)pgc.FramesPerSecond;
             }
             else
             {
                 fpsChooserIn.Value = null;
-                fpsChooserIn.Enabled = true;
+                bInputFPSKnown = false;
                 pgc.FramesPerSecond = 0;
             }
             bNoUpdates = false;
@@ -475,10 +495,10 @@ namespace MeGUI
 			{
 				player.Closed += new EventHandler(player_Closed);
 				player.ChapterSet += new ChapterSetCallback(player_ChapterSet);
-				if (introEndFrame > 0)
-					player.IntroEnd = this.introEndFrame;
-				if (creditsStartFrame > 0)
-					player.CreditsStart = this.creditsStartFrame;
+				if (IntroEndFrame > 0)
+					player.IntroEnd = this.IntroEndFrame;
+				if (CreditsStartFrame > 0)
+					player.CreditsStart = this.CreditsStartFrame;
                 player.Show();
                 player.SetScreenSize();
                 this.TopMost = player.TopMost = true;
@@ -489,8 +509,7 @@ namespace MeGUI
 
                 bNoUpdates = true;
                 fpsChooserOut.Value = (decimal)player.Framerate;
-                fpsChooserOut.Enabled = false;
-                if (fpsChooserIn.Value == null || fpsChooserIn.Enabled)
+                if (fpsChooserIn.Value == null || !bInputFPSKnown)
                     fpsChooserIn.Value = (decimal)player.Framerate;
                 bNoUpdates = false;
             }
@@ -512,39 +531,10 @@ namespace MeGUI
             }
 		}
 
-		#region properties
-		/// <summary>
-		/// sets the video input to be used for a zone preview
-		/// </summary>
-		public string VideoInput
-		{
-			set { this.videoInput = value; }
-		}
-
-		/// <summary>
-		/// gets / sets the start frame of the credits
-		/// </summary>
-		public int CreditsStartFrame
-		{
-			get { return this.creditsStartFrame; }
-			set {creditsStartFrame = value; }
-		}
-
-		/// <summary>
-		/// gets / sets the end frame of the intro
-		/// </summary>
-		public int IntroEndFrame
-		{
-			get { return this.introEndFrame; }
-			set { introEndFrame = value; }
-		}
-		#endregion
-
-		private void player_Closed(object sender, EventArgs e)
+        private void player_Closed(object sender, EventArgs e)
 		{
             this.TopMost = false;
             player = null;
-            fpsChooserOut.Enabled = true;
 		}
 
 		private void player_ChapterSet(int frameNumber)

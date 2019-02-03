@@ -1,3 +1,4 @@
+2907 [Chapter Creator]      input/output fps will not be locked anymore
 2906 [DGIndexNV Indexer]    fixed handling of file names with special (upper) ASCII characters
 2905 [Main]                 moved the changelog to the tab control
                             new entries after an update will be highlighted
