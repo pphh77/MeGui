@@ -77,7 +77,7 @@ namespace MeGUI
                 {
                     // Read the file
                     string line;
-                    using (StreamReader file = new StreamReader(strINIFile))
+                    using (StreamReader file = new StreamReader(strINIFile, Encoding.Default))
                     {
                         while ((line = file.ReadLine()) != null)
                         {
@@ -116,7 +116,7 @@ namespace MeGUI
                 if (!File.Exists(strINIFile) || !bResponseOnAudioMismatchFound || !bEnable_Info_Log)
                     ResetINI(strINIFile);
                 else if (bChanged)
-                    File.WriteAllText(strINIFile, sb.ToString(), Encoding.UTF8);
+                    File.WriteAllText(strINIFile, sb.ToString(), Encoding.Default);
             }
             catch (Exception) { }
         }
@@ -160,7 +160,7 @@ namespace MeGUI
             sb.AppendLine("StrictAVC=0");
             sb.AppendLine("PGSForcedOnly=0");
 
-            File.WriteAllText(strINIFile, sb.ToString(), Encoding.UTF8);
+            File.WriteAllText(strINIFile, sb.ToString(), Encoding.Default);
 
             log.LogEvent("Reset " + Path.GetFileName(strINIFile), ImageType.Information);
         }
