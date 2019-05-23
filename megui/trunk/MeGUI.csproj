@@ -304,6 +304,13 @@
     </Compile>
     <Compile Include="core\plugins\implemented\ThreadJobProcessor.cs" />
     <Compile Include="core\util\SubtitleUtil.cs" />
+    <Compile Include="packages\audio\fhgaac\FHGAACConfigurationPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="packages\audio\fhgaac\FHGAACConfigurationPanel.Designer.cs">
+      <DependentUpon>FHGAACConfigurationPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="packages\audio\fhgaac\FHGAACSettings.cs" />
     <Compile Include="packages\audio\fdkaac\FDKAACSettings.cs" />
     <Compile Include="packages\audio\fdkaac\FDKAACConfigurationPanel.cs">
       <SubType>UserControl</SubType>
@@ -890,6 +897,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="packages\audio\ffaac\FFAACConfigurationPanel.resx">
       <DependentUpon>FFAACConfigurationPanel.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="packages\audio\fhgaac\FHGAACConfigurationPanel.resx">
+      <DependentUpon>FHGAACConfigurationPanel.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="packages\tools\avscreator\AviSynthProfileConfigPanel.resx">

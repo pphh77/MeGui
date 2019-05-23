@@ -506,6 +506,12 @@ namespace MeGUI
                     if (MainForm.Instance.Settings.UseFDKAac && File.Exists(MainForm.Instance.Settings.Fdkaac.Path))
                         upgradeable.AvailableVersion.UploadDate = upgradeable.CurrentVersion.UploadDate;
                 }
+                else if (upgradeable.Name.Equals("fhgaacenc"))
+                {
+                    continue;
+                    //if (File.Exists(MainForm.Instance.Settings.Fhgaacenc.Path))
+                    //    upgradeable.AvailableVersion.UploadDate = upgradeable.CurrentVersion.UploadDate;
+                }
                 if (upgradeable.DownloadChecked)
                     numUpdateableFiles++;
             }

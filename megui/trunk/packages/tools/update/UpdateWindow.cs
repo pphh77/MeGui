@@ -106,6 +106,11 @@ namespace MeGUI
                         if (MainForm.Instance.Settings.UseFDKAac && File.Exists(MainForm.Instance.Settings.Fdkaac.Path))
                             latest.UploadDate = currentVersion.UploadDate;
                     }
+                    else if (this.name == "fhgaacenc")
+                    {
+                        //if (File.Exists(MainForm.Instance.Settings.Fhgaacenc.Path))
+                        //latest.UploadDate = currentVersion.UploadDate;
+                    }
                     return latest != null && (latest.CompareTo(currentVersion) != 0);
                 }
             }
@@ -142,6 +147,20 @@ namespace MeGUI
                                 CurrentVersion.UploadDate = fi.LastWriteTimeUtc;
                             }
                         }
+                        break;
+                    case "fhgaacenc":
+                        //if (MainForm.Instance.Settings.UseFhgaacenc)
+                        //{
+                        //    if (MainForm.Instance.Settings.Fhgaacenc.UpdateAllowed())
+                        //        arrPath.AddRange(MainForm.Instance.Settings.Fhgaacenc.Files);
+                        //    if (File.Exists(MainForm.Instance.Settings.Fhgaacenc.Path))
+                        //    {
+                        //        System.Diagnostics.FileVersionInfo finfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(MainForm.Instance.Settings.Fhgaacenc.Path);
+                        //        FileInfo fi = new FileInfo(MainForm.Instance.Settings.Fhgaacenc.Path);
+                        //        CurrentVersion.FileVersion = finfo.FileMajorPart + "." + finfo.FileMinorPart + "." + finfo.FileBuildPart + "." + finfo.FilePrivatePart;
+                        //        CurrentVersion.UploadDate = fi.LastWriteTimeUtc;
+                        //    }
+                        //}
                         break;
                     default:
                         ProgramSettings pSettings = UpdateCacher.GetPackage(this.name);

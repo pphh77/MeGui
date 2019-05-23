@@ -56,7 +56,8 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 ((j as AudioJob).Settings is QaacSettings) ||
                 ((j as AudioJob).Settings is OpusSettings) ||
                 ((j as AudioJob).Settings is FDKAACSettings) ||
-                ((j as AudioJob).Settings is FFAACSettings)))
+                ((j as AudioJob).Settings is FFAACSettings) ||
+                ((j as AudioJob).Settings is FHGAACSettings)))
                 return new AviSynthAudioEncoder(mf.Settings);
             return null;
         }
@@ -1713,6 +1714,60 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 if (!String.IsNullOrEmpty(oSettings.CustomEncoderOptions))
                     sb.Append(" " + oSettings.CustomEncoderOptions.Trim());
                 sb.Append(" \"{0}\"");
+            }
+            else if (audioJob.Settings is FHGAACSettings)
+            {
+                UpdateCacher.CheckPackage("fhgaacenc");
+                var oSettings = audioJob.Settings as FHGAACSettings;
+                _encoderExecutablePath = _settings.FhgAACencPath;
+                _sendWavHeaderToEncoderStdIn = HeaderType.WAV;
+
+                /* original fhgaacenc encoder doesn't support 32 bits streams(http://tmkk.undo.jp/tools/fhgaacenc-20120624.zip),
+                 * modified by Case(built on 2015-10-24) is supported.
+                 */
+                script.Append("32==Audiobits(last)?ConvertAudioTo16bit(last):last" + Environment.NewLine);
+
+                if (!oSettings.CustomEncoderOptions.Contains("--ignorelength"))
+                    sb.Append(" --ignorelength");
+                if (Path.GetExtension(audioJob.Output).ToLower() == ".aac" && !oSettings.CustomEncoderOptions.Contains("--adts"))
+                    sb.Append(" --adts");
+                if (!oSettings.CustomEncoderOptions.Contains("--cbr ") && !oSettings.CustomEncoderOptions.Contains("--vbr "))
+                {
+                    switch (oSettings.Mode)
+                    {
+                        case FhGAAMode.CBR:
+                            if (!oSettings.CustomEncoderOptions.Contains("--cbr "))
+                                sb.Append(" --cbr " + oSettings.Bitrate);
+                            break;
+                        case FhGAAMode.VBR:
+                            sb.Append(" --vbr " + oSettings.Quality);
+                            break;
+                    }
+                }
+
+                if (!oSettings.CustomEncoderOptions.Contains("--profile ") && oSettings.Mode != FhGAAMode.VBR)
+                {
+                    switch (oSettings.Profile)
+                    {
+                        case FhGAACProfile.LC:
+                            sb.Append(" --profile lc");
+                            break;
+                        case FhGAACProfile.HE:
+                            sb.Append(" --profile he");
+                            break;
+                        case FhGAACProfile.HE2:
+                            sb.Append(" --profile hev2");
+                            break;
+                        default:
+                            sb.Append(" --profile auto");
+                            break;
+                    }
+                }
+
+                if (!String.IsNullOrEmpty(oSettings.CustomEncoderOptions))
+                    sb.Append(" " + oSettings.CustomEncoderOptions.Trim());
+
+                sb.Append(" - \"{0}\"");
             }
 
             _encoderCommandLine = sb.ToString().Trim();

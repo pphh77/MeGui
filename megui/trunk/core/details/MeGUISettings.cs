@@ -60,7 +60,7 @@ namespace MeGUI
         private string strMainAudioFormat, strMainFileFormat, meguiupdatecache, neroAacEncPath, version,
                        defaultLanguage1, defaultLanguage2, afterEncodingCommand, videoExtension, audioExtension,
                        strEac3toLastFolderPath, strEac3toLastFilePath, strEac3toLastDestinationPath, tempDirMP4,
-                       fdkAacPath, httpproxyaddress, httpproxyport, httpproxyuid, httpproxypwd, defaultOutputDir,
+                       fdkAacPath, fhgAacPath, httpproxyaddress, httpproxyport, httpproxyuid, httpproxypwd, defaultOutputDir,
                        appendToForcedStreams, lastUsedOneClickFolder, lastUpdateServer, chapterCreatorSortString;
         private bool autoForceFilm, autoOpenScript, bUseQAAC, bUseDGIndexNV, bUseDGIndexIM, bInput8Bit,
                      overwriteStats, keep2of3passOutput, autoUpdate, deleteIntermediateFiles, workerAutoStart,
@@ -95,7 +95,7 @@ namespace MeGUI
         private List<WorkerSettings> arrWorkerSettings;
         private List<WorkerPriority> arrWorkerPriority;
         private ProgramSettings avimuxgui, avisynth, avisynthplugins, besplit, dgindexim, dgindex, dgindexnv,
-                                eac3to, fdkaac, ffmpeg, ffms, flac, haali, lame, lsmash, mediainfo,
+                                eac3to, fdkaac, fhgaacenc, ffmpeg, ffms, flac, haali, lame, lsmash, mediainfo,
                                 megui_core, megui_help, megui_libs, megui_updater, mkvmerge, mp4box, neroaacenc,
                                 oggenc, opus, pgcdemux, qaac, redist, tsmuxer, vsrip, x264, x265, xvid;
         Dictionary<string, string> oRedistVersions;
@@ -1122,6 +1122,25 @@ namespace MeGUI
             }
         }
 
+        public string FhgAACencPath
+        {
+            get
+            {
+                if (!File.Exists(fhgAacPath))
+                    fhgAacPath = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath),
+                        @"tools\fhgaacenc\fhgaacenc.exe");
+                return fhgAacPath;
+            }
+            set
+            {
+                if (!File.Exists(value))
+                    fhgAacPath = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath),
+                        @"tools\fhgaacenc\fhgaacenc.exe");
+                else
+                    fhgAacPath = value;
+            }
+        }
+
         public bool UseDGIndexNV
         {
             get { return bUseDGIndexNV; }
@@ -1211,6 +1230,12 @@ namespace MeGUI
         {
             get { return fdkaac; }
             set { fdkaac = value; }
+        }
+
+        public ProgramSettings Fhgaacenc
+        {
+            get => fhgaacenc;
+            set => fhgaacenc = value;
         }
 
         /// <summary>
@@ -1569,6 +1594,8 @@ namespace MeGUI
                 eac3to = new ProgramSettings("eac3to");
             if (fdkaac == null)
                 fdkaac = new ProgramSettings("fdkaac");
+            if (fhgaacenc == null)
+                fhgaacenc = new ProgramSettings("fhgaacenc");
             if (ffmpeg == null)
                 ffmpeg = new ProgramSettings("ffmpeg");
             if (ffms == null)
@@ -1677,6 +1704,8 @@ namespace MeGUI
             fdkaac.UpdateInformation("fdkaac", "FDK-AAC", FDKAacPath);
             if (!MainForm.Instance.Settings.UseFDKAac)
                 UpdateCacher.CheckPackage("fdkaac", false, false);
+            fhgaacenc.UpdateInformation("fhgaacenc", "Winamp-FhG AAC", FhgAACencPath);
+            UpdateCacher.CheckPackage("fhgaacenc", false, false);
             ffmpeg.UpdateInformation("ffmpeg", "FFmpeg", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\ffmpeg\ffmpeg.exe"));
             ffms.UpdateInformation("ffms", "FFMS", Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\ffms\ffmsindex.exe"));
             ffms.Files.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"tools\ffms\ffms2.dll"));
