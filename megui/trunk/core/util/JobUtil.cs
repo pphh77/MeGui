@@ -61,6 +61,8 @@ namespace MeGUI
 			
 			if (Path.GetDirectoryName(settings.Logfile).Equals("")) // no path set
 				settings.Logfile = Path.ChangeExtension(output, ".stats");
+            if (Path.GetDirectoryName(settings.SaveLogFileName).Equals("")) 
+                settings.SaveLogFileName = Path.ChangeExtension(output, ".log");
 			if (job.Settings.VideoEncodingType == VideoCodecSettings.VideoEncodingMode.twopassAutomated) // automated 2 pass, change type to 2 pass 2nd pass
 			{
 				job.Settings.VideoEncodingType = VideoCodecSettings.VideoEncodingMode.twopass2;

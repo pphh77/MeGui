@@ -245,6 +245,16 @@ namespace MeGUI.packages.video.x264
             this.deviceGroupbox = new System.Windows.Forms.GroupBox();
             this.targetDevice = new System.Windows.Forms.ComboBox();
             this.ch10BitsEncoder = new System.Windows.Forms.CheckBox();
+            this.ExtendTabPage = new System.Windows.Forms.TabPage();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.readmod1 = new System.Windows.Forms.Label();
+            this.saveLogFileCK = new System.Windows.Forms.CheckBox();
+            this.fadeicUpDown = new System.Windows.Forms.NumericUpDown();
+            this.fadecompensatelabel = new System.Windows.Forms.Label();
+            this.fGOicUpDown = new System.Windows.Forms.NumericUpDown();
+            this.fgolabel = new System.Windows.Forms.Label();
+            this.seilabel = new System.Windows.Forms.Label();
+            this.optSEI = new System.Windows.Forms.ComboBox();
             this.tabControl1.SuspendLayout();
             this.mainTabPage.SuspendLayout();
             this.x264CodecGeneralGroupbox.SuspendLayout();
@@ -313,6 +323,10 @@ namespace MeGUI.packages.video.x264
             this.avcProfileGroupbox.SuspendLayout();
             this.avcLevelGroupbox.SuspendLayout();
             this.deviceGroupbox.SuspendLayout();
+            this.ExtendTabPage.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.fadeicUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.fGOicUpDown)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -321,9 +335,11 @@ namespace MeGUI.packages.video.x264
             this.tabControl1.Controls.Add(this.RCTabPage);
             this.tabControl1.Controls.Add(this.AnalysisTabPage);
             this.tabControl1.Controls.Add(this.MiscTabPage);
+            this.tabControl1.Controls.Add(this.ExtendTabPage);
             this.tabControl1.Size = new System.Drawing.Size(510, 429);
             this.tabControl1.SizeMode = System.Windows.Forms.TabSizeMode.FillToRight;
             this.tabControl1.TabIndex = 0;
+            this.tabControl1.Controls.SetChildIndex(this.ExtendTabPage, 0);
             this.tabControl1.Controls.SetChildIndex(this.MiscTabPage, 0);
             this.tabControl1.Controls.SetChildIndex(this.AnalysisTabPage, 0);
             this.tabControl1.Controls.SetChildIndex(this.RCTabPage, 0);
@@ -2106,7 +2122,7 @@ namespace MeGUI.packages.video.x264
             this.x264MBGroupbox.Controls.Add(this.x264P4x4mv);
             this.x264MBGroupbox.Controls.Add(this.x264B8x8mv);
             this.x264MBGroupbox.Controls.Add(this.x264P8x8mv);
-            this.x264MBGroupbox.Location = new System.Drawing.Point(296, 6);
+            this.x264MBGroupbox.Location = new System.Drawing.Point(296, 7);
             this.x264MBGroupbox.Name = "x264MBGroupbox";
             this.x264MBGroupbox.Size = new System.Drawing.Size(202, 123);
             this.x264MBGroupbox.TabIndex = 27;
@@ -2210,7 +2226,7 @@ namespace MeGUI.packages.video.x264
             this.x264OtherOptionsGroupbox.Controls.Add(this.x264METypeLabel);
             this.x264OtherOptionsGroupbox.Controls.Add(this.x264METype);
             this.x264OtherOptionsGroupbox.Controls.Add(this.x264MERange);
-            this.x264OtherOptionsGroupbox.Location = new System.Drawing.Point(6, 6);
+            this.x264OtherOptionsGroupbox.Location = new System.Drawing.Point(6, 7);
             this.x264OtherOptionsGroupbox.Name = "x264OtherOptionsGroupbox";
             this.x264OtherOptionsGroupbox.Size = new System.Drawing.Size(284, 123);
             this.x264OtherOptionsGroupbox.TabIndex = 19;
@@ -2848,7 +2864,7 @@ namespace MeGUI.packages.video.x264
             // gbx264CustomCmd
             // 
             this.gbx264CustomCmd.Controls.Add(this.customCommandlineOptions);
-            this.gbx264CustomCmd.Location = new System.Drawing.Point(6, 6);
+            this.gbx264CustomCmd.Location = new System.Drawing.Point(6, 7);
             this.gbx264CustomCmd.Name = "gbx264CustomCmd";
             this.gbx264CustomCmd.Size = new System.Drawing.Size(490, 65);
             this.gbx264CustomCmd.TabIndex = 27;
@@ -2942,6 +2958,132 @@ namespace MeGUI.packages.video.x264
             this.ch10BitsEncoder.UseVisualStyleBackColor = true;
             this.ch10BitsEncoder.CheckedChanged += new System.EventHandler(this.ch10BitsEncoder_CheckedChanged);
             // 
+            // ExtendTabPage
+            // 
+            this.ExtendTabPage.Controls.Add(this.groupBox1);
+            this.ExtendTabPage.Location = new System.Drawing.Point(4, 22);
+            this.ExtendTabPage.Name = "ExtendTabPage";
+            this.ExtendTabPage.Padding = new System.Windows.Forms.Padding(3);
+            this.ExtendTabPage.Size = new System.Drawing.Size(502, 403);
+            this.ExtendTabPage.TabIndex = 7;
+            this.ExtendTabPage.Text = "Extend";
+            this.ExtendTabPage.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.readmod1);
+            this.groupBox1.Controls.Add(this.saveLogFileCK);
+            this.groupBox1.Controls.Add(this.fadeicUpDown);
+            this.groupBox1.Controls.Add(this.fadecompensatelabel);
+            this.groupBox1.Controls.Add(this.fGOicUpDown);
+            this.groupBox1.Controls.Add(this.fgolabel);
+            this.groupBox1.Controls.Add(this.seilabel);
+            this.groupBox1.Controls.Add(this.optSEI);
+            this.groupBox1.Location = new System.Drawing.Point(6, 6);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(490, 141);
+            this.groupBox1.TabIndex = 33;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "x264Mod option";
+            // 
+            // readmod1
+            // 
+            this.readmod1.AutoSize = true;
+            this.readmod1.Location = new System.Drawing.Point(14, 110);
+            this.readmod1.Name = "readmod1";
+            this.readmod1.Size = new System.Drawing.Size(450, 13);
+            this.readmod1.TabIndex = 40;
+            this.readmod1.Text = "the above options are the support options for the modified version of x264.\nif the x264 used by megui is not supported, please keep the default and do not modify it.";
+            this.readmod1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // saveLogFileCK
+            // 
+            this.saveLogFileCK.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.saveLogFileCK.Location = new System.Drawing.Point(260, 54);
+            this.saveLogFileCK.Name = "saveLogFileCK";
+            this.saveLogFileCK.Padding = new System.Windows.Forms.Padding(3);
+            this.saveLogFileCK.Size = new System.Drawing.Size(183, 24);
+            this.saveLogFileCK.TabIndex = 39;
+            this.saveLogFileCK.Text = "save log to file";
+            this.saveLogFileCK.CheckedChanged += new System.EventHandler(this.updateEvent);
+            // 
+            // fadeicUpDown
+            // 
+            this.fadeicUpDown.DecimalPlaces = 2;
+            this.fadeicUpDown.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
+            this.fadeicUpDown.Location = new System.Drawing.Point(181, 58);
+            this.fadeicUpDown.Maximum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.fadeicUpDown.Name = "fadeicUpDown";
+            this.fadeicUpDown.Size = new System.Drawing.Size(45, 20);
+            this.fadeicUpDown.TabIndex = 38;
+            this.fadeicUpDown.ValueChanged += new System.EventHandler(this.updateEvent);
+            // 
+            // fadecompensatelabel
+            // 
+            this.fadecompensatelabel.Location = new System.Drawing.Point(14, 55);
+            this.fadecompensatelabel.Margin = new System.Windows.Forms.Padding(3);
+            this.fadecompensatelabel.Name = "fadecompensatelabel";
+            this.fadecompensatelabel.Size = new System.Drawing.Size(161, 23);
+            this.fadecompensatelabel.TabIndex = 37;
+            this.fadecompensatelabel.Text = "fade compensate";
+            this.fadecompensatelabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // fGOicUpDown
+            // 
+            this.fGOicUpDown.Location = new System.Drawing.Point(395, 17);
+            this.fGOicUpDown.Maximum = new decimal(new int[] {
+            15,
+            0,
+            0,
+            0});
+            this.fGOicUpDown.Name = "fGOicUpDown";
+            this.fGOicUpDown.Size = new System.Drawing.Size(48, 20);
+            this.fGOicUpDown.TabIndex = 36;
+            this.fGOicUpDown.ValueChanged += new System.EventHandler(this.updateEvent);
+            // 
+            // fgolabel
+            // 
+            this.fgolabel.Location = new System.Drawing.Point(266, 14);
+            this.fgolabel.Margin = new System.Windows.Forms.Padding(3);
+            this.fgolabel.Name = "fgolabel";
+            this.fgolabel.Size = new System.Drawing.Size(118, 23);
+            this.fgolabel.TabIndex = 35;
+            this.fgolabel.Text = "film grain optimization";
+            this.fgolabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // seilabel
+            // 
+            this.seilabel.Location = new System.Drawing.Point(14, 17);
+            this.seilabel.Margin = new System.Windows.Forms.Padding(3);
+            this.seilabel.Name = "seilabel";
+            this.seilabel.Size = new System.Drawing.Size(94, 23);
+            this.seilabel.TabIndex = 34;
+            this.seilabel.Text = "x264 write option";
+            this.seilabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // optSEI
+            // 
+            this.optSEI.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.optSEI.FormattingEnabled = true;
+            this.optSEI.Items.AddRange(new object[] {
+            "no",
+            "info",
+            "options",
+            "info and options"});
+            this.optSEI.Location = new System.Drawing.Point(138, 19);
+            this.optSEI.Name = "optSEI";
+            this.optSEI.Size = new System.Drawing.Size(88, 21);
+            this.optSEI.TabIndex = 33;
+            this.optSEI.SelectedIndexChanged += new System.EventHandler(this.updateEvent);
+            // 
             // x264ConfigurationPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -3034,6 +3176,11 @@ namespace MeGUI.packages.video.x264
             this.avcProfileGroupbox.ResumeLayout(false);
             this.avcLevelGroupbox.ResumeLayout(false);
             this.deviceGroupbox.ResumeLayout(false);
+            this.ExtendTabPage.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.fadeicUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.fGOicUpDown)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -3237,5 +3384,15 @@ namespace MeGUI.packages.video.x264
         private System.Windows.Forms.CheckBox chkTuneFastDecode;
         private System.Windows.Forms.CheckBox stitchable;
         private System.Windows.Forms.CheckBox ch10BitsEncoder;
+        private System.Windows.Forms.TabPage ExtendTabPage;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.ComboBox optSEI;
+        private System.Windows.Forms.Label seilabel;
+        private System.Windows.Forms.Label fgolabel;
+        private System.Windows.Forms.NumericUpDown fGOicUpDown;
+        private System.Windows.Forms.Label fadecompensatelabel;
+        private System.Windows.Forms.NumericUpDown fadeicUpDown;
+        private System.Windows.Forms.CheckBox saveLogFileCK;
+        private System.Windows.Forms.Label readmod1;
     }
 }

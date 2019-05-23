@@ -75,7 +75,7 @@ namespace MeGUI
         private int bitrateQuantizer, keyframeInterval, nbBframes, minQuantizer, maxQuantizer, maxNumberOfPasses, nbThreads;
 		private bool v4mv, qpel, trellis;
 		private decimal creditsQuantizer;
-		private string logfile, customEncoderOptions, videoName;
+		private string logfile, customEncoderOptions, videoName, saveLogFileName;
         private VideoEncoderType vet;
         private VideoEncodingMode videoEncodyingType;
 
@@ -92,6 +92,7 @@ namespace MeGUI
             customEncoderOptions = "";
             videoName = "";
             nbThreads = 1;
+            saveLogFileName = ".log";
 		}
         public VideoCodec Codec
         {
@@ -159,6 +160,16 @@ namespace MeGUI
 			get { return logfile; }
 			set { logfile = value; }
 		}
+
+        /// <summary>
+        /// x264 log file name
+        /// </summary>
+	    public string SaveLogFileName
+        {
+            get => saveLogFileName;
+            set => saveLogFileName = value;
+        }
+
         /// <summary>
         /// gets / sets Video Tracks Name (used with the muxers)
         /// </summary>

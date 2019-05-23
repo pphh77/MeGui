@@ -644,6 +644,34 @@ Don't optimize headers based on video content
 			<Recommended>Enabled if you want to merge video files</Recommended>
 			<Default>Disabled</Default>
 		</stitchable>
+    <optsei name="Opt in SEI">
+      <Text>
+        Set level of writing options in SEI
+      </Text>
+      <Recommended>3 Write x264 information and options</Recommended>
+      <Default>Write x264 information and options</Default>
+    </optsei>
+    <fgo name="Film Grain Optimization">
+      <Text>
+        Activates Film Grain Optimization. (requires subme>=7)
+      </Text>
+      <Recommended>0</Recommended>
+      <Default>0</Default>
+    </fgo>
+    <fadecompensate name="Fade Compensate">
+      <Text>
+        Allocate more bits to fades
+      </Text>
+      <Recommended>0.00</Recommended>
+      <Default>0.00</Default>
+    </fadecompensate>
+    <savelogfile name="Save Log File">
+      <Text>
+        Save log to file
+      </Text>
+      <Recommended>Disabled</Recommended>
+      <Default>Disabled</Default>
+    </savelogfile>
 		<quiet name="Quiet Mode">
 			<Text>Enable Quiet Mode (do not display output information).</Text>
 			<Recommended>Disabled</Recommended>

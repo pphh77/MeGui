@@ -105,13 +105,13 @@ namespace MeGUI
             bframePredictionMode, vbvBufferSize, vbvMaxBitrate, meType, meRange, minGOPSize, macroBlockOptions,
             quantizerMatrixType, x264Trellis, noiseReduction, deadZoneInter, deadZoneIntra, AQMode, profile,
             lookahead, slicesnb, maxSliceSyzeBytes, maxSliceSyzeMBs, bFramePyramid, weightedPPrediction, x264Nalhrd,
-            colorMatrix, transfer, colorPrim, x264PullDown, sampleAR, _gopCalculation;
+            colorMatrix, transfer, colorPrim, x264PullDown, sampleAR, _gopCalculation, optSEI, fGO;
 		decimal ipFactor, pbFactor, chromaQPOffset, vbvInitialBuffer, bitrateVariance, quantCompression,
-			tempComplexityBlur, tempQuanBlurCC, scdSensitivity, bframeBias, quantizerCrf, AQStrength, psyRDO, psyTrellis;
+            tempComplexityBlur, tempQuanBlurCC, scdSensitivity, bframeBias, quantizerCrf, AQStrength, psyRDO, psyTrellis, fadeCompensate;
 		bool deblock, cabac, p4x4mv, p8x8mv, b8x8mv, i4x4mv, i8x8mv, weightedBPrediction, blurayCompat,
 			chromaME, adaptiveDCT, noMixedRefs, noFastPSkip, psnrCalc, noDctDecimate, ssimCalc, useQPFile,
             FullRange, noMBTree, threadInput, noPsy, scenecut, x264Aud, x264SlowFirstpass, picStruct,
-            fakeInterlaced, nonDeterministic, tuneFastDecode, tuneZeroLatency, stitchable, x26410Bits;
+            fakeInterlaced, nonDeterministic, tuneFastDecode, tuneZeroLatency, stitchable, x26410Bits, saveLogFile;
 		string quantizerMatrix, qpfile, openGop, range, tcfile;
         x264PresetLevelModes preset;
         x264InterlacedModes interlacedMode;
@@ -220,6 +220,10 @@ namespace MeGUI
             stitchable = false;
             x26410Bits = false;
             tcfile = String.Empty;
+            optSEI = 3;
+            fGO = 0;
+            fadeCompensate = new decimal(0.0);
+            saveLogFile = false;
 		}
 		#endregion
 		#region properties
@@ -560,6 +564,31 @@ namespace MeGUI
             get { return x26410Bits; }
             set { x26410Bits = value; }
         }
+
+        public int OptSei
+        {
+            get => optSEI;
+            set => optSEI = value;
+        }
+
+        public int Fgo
+        {
+            get => fGO;
+            set => fGO = value;
+        }
+
+        public decimal FadeCompensate
+        {
+            get => fadeCompensate;
+            set => fadeCompensate = value;
+        }
+
+        public bool SaveLogFile
+        {
+            get => saveLogFile;
+            set => saveLogFile = value;
+        }
+
         /// <summary>
         /// Only for XML export/import. For all other purposes use OpenGopValue()
         /// </summary>

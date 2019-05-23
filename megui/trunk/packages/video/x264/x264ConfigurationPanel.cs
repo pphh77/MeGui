@@ -1304,6 +1304,10 @@ namespace MeGUI.packages.video.x264
                 }
                 xs.BlurayCompat = chkBlurayCompat.Checked;
                 xs.X26410Bits = ch10BitsEncoder.Checked;
+                xs.OptSei = optSEI.SelectedIndex;
+                xs.Fgo = (int) fGOicUpDown.Value;
+                xs.FadeCompensate = fadeicUpDown.Value;
+                xs.SaveLogFile = saveLogFileCK.Checked;
                 return xs;
             }
             set
@@ -1325,6 +1329,10 @@ namespace MeGUI.packages.video.x264
                 noDCTDecimateOption.Checked = xs.NoDCTDecimate;
                 ssim.Checked = xs.SSIMCalculation;
                 stitchable.Checked = xs.StitchAble;
+                optSEI.SelectedIndex = xs.OptSei;
+                fadeicUpDown.Value = xs.FadeCompensate;
+                fGOicUpDown.Value = xs.Fgo;
+                saveLogFileCK.Checked = xs.SaveLogFile;
                 updateDeviceBlocked = true;
                 targetDevice.SelectedItem = xs.TargetDevice.Name;
                 updateDeviceBlocked = false;
@@ -1606,6 +1614,13 @@ namespace MeGUI.packages.video.x264
             tooltipHelp.SetToolTip(chkTuneFastDecode, SelectHelpText("fastdecode"));
             tooltipHelp.SetToolTip(chkTuneZeroLatency, SelectHelpText("zerolatency"));
 
+            /**************************/
+            /* Extend Tooltips */
+            /**************************/
+            tooltipHelp.SetToolTip(optSEI,SelectHelpText("optsei"));
+            tooltipHelp.SetToolTip(fGOicUpDown,SelectHelpText("fgo"));
+            tooltipHelp.SetToolTip(fadeicUpDown,SelectHelpText("fadecompensate"));
+            tooltipHelp.SetToolTip(saveLogFileCK,SelectHelpText("savelogfile"));
         }
         #endregion
         #region GUI State adjustment
@@ -1823,6 +1838,8 @@ namespace MeGUI.packages.video.x264
                     tabControl1.TabPages.Add(AnalysisTabPage);
                 if (!tabControl1.TabPages.Contains(MiscTabPage))
                     tabControl1.TabPages.Add(MiscTabPage);
+                if (!tabControl1.TabPages.Contains(ExtendTabPage))
+                    tabControl1.TabPages.Add(ExtendTabPage);
                 x264EncodingMode.Visible = true;
                 cbTarget.Visible = false;
                 avcProfileGroupbox.Enabled = !ch10BitsEncoder.Checked;
@@ -1838,6 +1855,8 @@ namespace MeGUI.packages.video.x264
                     tabControl1.TabPages.Remove(AnalysisTabPage);
                 if (tabControl1.TabPages.Contains(MiscTabPage))
                     tabControl1.TabPages.Remove(MiscTabPage);
+                if (tabControl1.TabPages.Contains(ExtendTabPage))
+                    tabControl1.TabPages.Remove(ExtendTabPage);
                 x264EncodingMode.Visible = false;
                 cbTarget.Visible = true;
                 avcProfileGroupbox.Enabled = false;
@@ -1953,6 +1972,12 @@ namespace MeGUI.packages.video.x264
 
             // to update presets label
             tbx264Presets_Scroll(null, null);
+
+            // Extend Tab
+            this.optSEI.SelectedIndex = 3;
+            this.fGOicUpDown.Value = 0;
+            this.fadeicUpDown.Value = 0.0M;
+            this.saveLogFileCK.Checked = false;
         }
 
         private void btPresetSettings_Click(object sender, EventArgs e)

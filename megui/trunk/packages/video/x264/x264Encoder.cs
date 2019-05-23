@@ -517,7 +517,11 @@ namespace MeGUI
             {
                 if (!xs.CustomEncoderOptions.Contains("--aq-mode "))
                     if (xs.AQmode != x264Settings.GetDefaultAQMode(xs.x264PresetLevel, xs.x264PsyTuning))
+                    {
                         sb.Append("--aq-mode " + xs.AQmode.ToString() + " ");
+                        if (xs.AQmode == 4)
+                            log?.LogEvent("Contains the unofficial value of the x264 parameter \"--aq-mode 4\",please make sure that the x264 used by MeGui supports the value of this parameter!");
+                    }
 
                 if (!xs.CustomEncoderOptions.Contains("--aq-strength "))
                 {
@@ -833,6 +837,45 @@ namespace MeGUI
             if (!xs.CustomEncoderOptions.Contains("--stitchable"))
                 if (xs.StitchAble)
                     sb.Append("--stitchable ");
+
+            #endregion
+
+            #region Extend
+
+            if (!xs.CustomEncoderOptions.Contains("--opt"))
+            {
+                if (xs.OptSei != 3)
+                {
+                    sb.Append("--opt " + xs.OptSei + " ");
+                    log?.LogEvent("Contains unofficial x264 parameter \"--opt\",please make sure that x264 used by MeGui supports this parameter!");
+                }
+            }
+            if (!xs.CustomEncoderOptions.Contains("--fgo"))
+            {
+                {
+                    if (xs.Fgo != 0)
+                    {
+                        sb.Append("--fgo " + xs.Fgo + " ");
+                        log?.LogEvent("Contains unofficial x264 parameter \"--fgo\",please make sure that x264 used by MeGui supports this parameter!");
+                    }
+                }
+            }
+            if (!xs.CustomEncoderOptions.Contains("--fade-compensate"))
+            {
+                if (xs.FadeCompensate != 0)
+                {
+                    sb.Append("--fade-compensate " + xs.FadeCompensate + " ");
+                    log?.LogEvent("Contains unofficial x264 parameter \"--fade-compensate\",please make sure that x264 used by MeGui supports this parameter!");
+                }
+            }
+            if (!xs.CustomEncoderOptions.Contains("--log-file"))
+            {
+                if (xs.SaveLogFile)
+                {
+                    sb.Append("--log-file " + "\"" + xs.SaveLogFileName + "\" ");
+                    log?.LogEvent("Contains unofficial x264 parameter \"--log-file\",please make sure that x264 used by MeGui supports this parameter!");
+                }
+            }
 
             #endregion
 
