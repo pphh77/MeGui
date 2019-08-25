@@ -1,3 +1,4 @@
+2909 [OneClick]             fixed not applying "automatic deinterlacing" filters. Bug #945 (regression of 2887)
 2908 [DGIndexIM Indexer]    fixed handling of file names with special (upper) ASCII characters
 2907 [Chapter Creator]      input/output fps will not be locked anymore
 2906 [DGIndexNV Indexer]    fixed handling of file names with special (upper) ASCII characters

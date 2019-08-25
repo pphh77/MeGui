@@ -31,7 +31,14 @@ namespace MeGUI
 	/// Summary description for Form1.
 	/// </summary>
 	public delegate void UpdateSourceDetectionStatus(int numDone, int total); // catches the UpdateGUI events fired from the encoder
-    public delegate void FinishedAnalysis(SourceInfo info, bool error, string errorMessage);
+    public delegate void FinishedAnalysis(SourceInfo info, ExitType exit, string errorMessage);
+
+    public enum ExitType
+    {
+        OK,
+        ERROR,
+        ABORT
+    };
 
     public class SourceInfo
     {
@@ -142,7 +149,7 @@ namespace MeGUI
         #region processing
 
         #region helper methods
-        private string findPortions(List<int[]> portions, int selectEvery, int selectLength, int numPortions,
+        private string FindPortions(List<int[]> portions, int selectEvery, int selectLength, int numPortions,
             int sectionCount, int inputFrames, string type, out string trimLine, out int frameCount)
         {
             frameCount = 0;
@@ -297,13 +304,13 @@ namespace MeGUI
             {
                 error = true;
                 errorMessage = "Error opening analysis script:\r\n" + ex.Message;
-                finishProcessing();
+                FinishProcessing();
             }
         }
         #endregion
 
         #region script generation and running
-        private void runScript(int scriptType, string trimLine)
+        private void RunScript(int scriptType, string trimLine)
         {
             int selectEvery = sectionLength;
             if (settings.AnalysePercent > 0)
@@ -424,7 +431,7 @@ namespace MeGUI
                 instream = null;
                 error = true;
                 errorMessage = "Opening the field order analysis file failed.";
-                finishProcessing();
+                FinishProcessing();
                 return false;
             }
 
@@ -449,7 +456,7 @@ namespace MeGUI
                     {
                         error = true;
                         errorMessage = "Unexpected value in file " + filename + "\r\nLine contents: " + line;
-                        finishProcessing();
+                        FinishProcessing();
                         return false;
                     }
                     if (valueA > valueB)
@@ -513,7 +520,7 @@ namespace MeGUI
                 fieldOrder = FieldOrder.VARIABLE;
             }
 
-            finishProcessing();
+            FinishProcessing();
         }
 
         private bool GetSectionCounts(string logFileName)
@@ -538,7 +545,7 @@ namespace MeGUI
             {
                 error = true;
                 errorMessage = "Cannot open analysis log file \"" + logFileName + "\". error: " + ex.Message;
-                finishProcessing();
+                FinishProcessing();
                 return false;
             }
 
@@ -694,14 +701,14 @@ namespace MeGUI
                 {
                     analysis += "Source is declared as repetition-upconverted. Decimation is required\r\n";
                     type = SourceType.DECIMATING;
-                    finishProcessing();
+                    FinishProcessing();
                     return;
                 }
                 else
                 {
                     analysis += "Source does not have enough data. This either comes from an internal error or an unexpected source type.\r\n";
                     type = SourceType.NOT_ENOUGH_SECTIONS;
-                    finishProcessing();
+                    FinishProcessing();
                     return;
                 }
             }
@@ -721,7 +728,7 @@ namespace MeGUI
                         analysis += "Source is declared as repetition-upconverted. Decimation is required\r\n";
                         type = SourceType.DECIMATING;
                     }
-                    finishProcessing();
+                    FinishProcessing();
                     return;
                 }
                 else if (array[2] == oSourceInfo.numInt)
@@ -729,14 +736,14 @@ namespace MeGUI
                     analysis += "Source is declared interlaced.\r\n";
                     type = SourceType.INTERLACED;
                     stillWorking = true;
-                    runScript(1, "#no trimming"); //field order script
+                    RunScript(1, "#no trimming"); //field order script
                 }
                 else
                 {
                     analysis += "Source is declared telecined.\r\n";
                     type = SourceType.FILM;
                     stillWorking = true;
-                    runScript(1, "#no trimming"); //field order script
+                    RunScript(1, "#no trimming"); //field order script
                 }
             }
             #endregion
@@ -758,7 +765,7 @@ namespace MeGUI
                     }
                     type = SourceType.HYBRID_FILM_INTERLACED;
                     stillWorking = true;
-                    runScript(1, "#no trimming");
+                    RunScript(1, "#no trimming");
 
                 }
                 else if (array[0] == oSourceInfo.numInt)
@@ -769,7 +776,7 @@ namespace MeGUI
                         type = SourceType.HYBRID_FILM_INTERLACED;
                         majorityFilm = true;
                         stillWorking = true;
-                        runScript(1, "#no trimming");
+                        RunScript(1, "#no trimming");
                     }
                     else
                     {
@@ -784,11 +791,11 @@ namespace MeGUI
                         string textLines = "The number of portions is " + oSourceInfo.numPortions[1] + ".\r\n";
                         if (oSourceInfo.numPortions[1] <= settings.MaxPortions)
                         {
-                            textLines = findPortions(oSourceInfo.portions[1], selectEvery, selectLength,
+                            textLines = FindPortions(oSourceInfo.portions[1], selectEvery, selectLength,
                                 oSourceInfo.numPortions[1], oSourceInfo.sectionCount, inputFrames, "telecined", out trimLine, out frameCount);
                         }
                         stillWorking = true;
-                        runScript(1, trimLine);
+                        RunScript(1, trimLine);
                     }
                 }
                 else if (array[0] == oSourceInfo.numTC)
@@ -800,7 +807,7 @@ namespace MeGUI
                         majorityFilm = false;
 
                         stillWorking = true;
-                        runScript(1, "#no trimming");
+                        RunScript(1, "#no trimming");
                     }
                     else
                     {
@@ -816,7 +823,7 @@ namespace MeGUI
                             oSourceInfo.numPortions[0] <= settings.MaxPortions &&
                             array[2] < ((double)array[1] * settings.PortionThreshold))
                         {
-                            textLines = findPortions(oSourceInfo.portions[0], selectEvery, selectLength,
+                            textLines = FindPortions(oSourceInfo.portions[0], selectEvery, selectLength,
                                 oSourceInfo.numPortions[0], oSourceInfo.sectionCount, inputFrames, "interlaced", out trimLine, out frameCount);
                             analysis += textLines;
                         }
@@ -825,7 +832,7 @@ namespace MeGUI
                             analysis += "This should be deinterlaced by a deinterlacer that tries to weave it before deinterlacing.\r\n";
                         }
                         stillWorking = true;
-                        runScript(1, trimLine); //field order script
+                        RunScript(1, trimLine); //field order script
                     }
                 }
             }
@@ -833,12 +840,12 @@ namespace MeGUI
             #endregion
 
             if (!stillWorking)
-                finishProcessing();
+                FinishProcessing();
         }
         #endregion
 
         #region finalizing
-        private void finishProcessing()
+        private void FinishProcessing()
         {
             _mre.Set();  // Make sure nothing is waiting for pause to stop
 
@@ -846,13 +853,13 @@ namespace MeGUI
 
             if (error)
             {
-                finishedAnalysis(null, true, errorMessage);
+                finishedAnalysis(null, ExitType.ERROR, errorMessage);
                 return;
             }
 
             if (!continueWorking)
             {
-                finishedAnalysis(null, true, string.Empty);
+                finishedAnalysis(null, ExitType.ABORT, String.Empty);
                 return;
             }
 
@@ -869,7 +876,7 @@ namespace MeGUI
             info.analysisResult = analysis;
             info.isAnime = isAnime;
 
-            finishedAnalysis(info, false, null);
+            finishedAnalysis(info, ExitType.OK, String.Empty);
         }
         #endregion
 
@@ -878,16 +885,15 @@ namespace MeGUI
         #region program interface
         public void Analyse()
         {
-            runScript(0, "#no trimming");
+            RunScript(0, "#no trimming");
         }
 
         public void Stop()
         {
             continueWorking = false;
-            _mre.Set();  // Make sure nothing is waiting for pause to stop
             while (!isStopped)
                 MeGUI.core.util.Util.Wait(500);
-            finishProcessing();
+            FinishProcessing();
         }
 
         public bool Pause()

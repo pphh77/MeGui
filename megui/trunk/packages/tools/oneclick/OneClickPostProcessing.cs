@@ -569,13 +569,15 @@ namespace MeGUI
                 finished = false;
                 _sourceDetector.Analyse();
                 WaitTillAnalyseFinished();
-                _sourceDetector.Stop();
                 _sourceDetector = null;
-                deinterlaceLines = filters[0].Script;
-                if (interlaced)
-                    _log.LogValue("Deinterlacing used", deinterlaceLines, ImageType.Warning);
-                else
-                    _log.LogValue("Deinterlacing used", deinterlaceLines);              
+                if (filters != null)
+                {
+                    deinterlaceLines = filters[0].Script;
+                    if (interlaced)
+                        _log.LogValue("Deinterlacing used", deinterlaceLines, ImageType.Warning);
+                    else
+                        _log.LogValue("Deinterlacing used", deinterlaceLines);
+                }
             }
 
             if (IsJobStopped())
@@ -697,16 +699,20 @@ namespace MeGUI
             return strOutputAVSFile;
         }
 
-        public void FinishedAnalysis(SourceInfo info, bool error, string errorMessage)
+
+        public void FinishedAnalysis(SourceInfo info, ExitType exit, string errorMessage)
         {
-            if (error || info == null)
+            if (exit != ExitType.OK)
             {
-                if (!string.IsNullOrEmpty(errorMessage))
+                if (exit == ExitType.ERROR)
                 {
                     LogItem oSourceLog = log.LogEvent("Source detection");
-                    oSourceLog.LogValue("Source detection failed", errorMessage, ImageType.Warning);
+                    if (!string.IsNullOrEmpty(errorMessage))
+                        oSourceLog.LogValue("Source detection failed", errorMessage, ImageType.Warning);
+                    else
+                        oSourceLog.LogValue("Source detection failed", "An error occurred in source detection. Doing no processing", ImageType.Warning);
+                    filters = new DeinterlaceFilter[] { new DeinterlaceFilter("Error", "#An error occurred in source detection. Doing no processing") };
                 }
-                filters = new DeinterlaceFilter[] { new DeinterlaceFilter("Error", "#An error occurred in source detection. Doing no processing")};
                 interlaced = false;
             }
             else

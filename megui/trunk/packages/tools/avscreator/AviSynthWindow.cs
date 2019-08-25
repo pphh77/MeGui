@@ -1096,8 +1096,8 @@ namespace MeGUI
                     input.Filename, deintIsAnime.Checked, numFrames,
                     mainForm.Settings.SourceDetectorSettings.Priority,
                     mainForm.Settings.SourceDetectorSettings,
-                    new UpdateSourceDetectionStatus(analyseUpdate),
-                    new FinishedAnalysis(finishedAnalysis));
+                    new UpdateSourceDetectionStatus(AnalyseUpdate),
+                    new FinishedAnalysis(FinishedAnalysis));
                     detector.Analyse();
                 deintStatusLabel.Text = "Analysing...";
             }
@@ -1115,11 +1115,10 @@ namespace MeGUI
         }
                 
 
-        public void finishedAnalysis(SourceInfo info, bool error, string errorMessage)
+        public void FinishedAnalysis(SourceInfo info, ExitType exit, string errorMessage)
         {
-            if (error)
+            if (exit == ExitType.ERROR)
             {
-                detector.Stop();
                 Invoke(new MethodInvoker(delegate
                 {
                     MessageBox.Show(this, errorMessage, "Error in analysis", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1128,7 +1127,7 @@ namespace MeGUI
                     this.deintProgressBar.Value = 0;
                 }));
             }
-            else
+            else if (exit == ExitType.OK)
             {
                 try
                 {
@@ -1157,16 +1156,19 @@ namespace MeGUI
             }
             detector = null;
 
+            if (info == null)
+                return;
+
             this._oLog = mainForm.AVSScriptCreatorLog;
             if (_oLog == null)
             {
                 _oLog = mainForm.Log.Info("AVS Script Creator");
                 mainForm.AVSScriptCreatorLog = _oLog;
             }
-            _oLog.LogValue("Source detection: " + Path.GetFileName(input.Filename), info.analysisResult, error ? ImageType.Warning : ImageType.Information);
+            _oLog.LogValue("Source detection: " + Path.GetFileName(input.Filename), info.analysisResult, exit == ExitType.ERROR ? ImageType.Warning : ImageType.Information);
         }
 
-        public void analyseUpdate(int amountDone, int total)
+        public void AnalyseUpdate(int amountDone, int total)
         {
             try
             {

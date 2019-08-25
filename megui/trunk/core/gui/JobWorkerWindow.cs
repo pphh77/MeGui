@@ -467,7 +467,10 @@ namespace MeGUI.core.gui
                 currentJob = null;
 
                 // Logging
-                log.LogEvent("Job completed");
+                if (job.Status == JobStatus.ABORTED)
+                    log.LogEvent("Job aborted");
+                else
+                    log.LogEvent("Job completed");
                 log.Collapse();
 
                 if (!jobFailed && mainForm.Settings.WorkerRemoveJob)
@@ -477,7 +480,6 @@ namespace MeGUI.core.gui
 
                 if (job.Status == JobStatus.ABORTED)
                 {
-                    log.LogEvent("Current job was aborted");
                     status = JobWorkerStatus.Stopped;
                     JobInfo = JobStartInfo.COULDNT_START;
                     if (bIsTemporaryWorker)
