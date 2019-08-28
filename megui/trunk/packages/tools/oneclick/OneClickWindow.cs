@@ -537,24 +537,12 @@ namespace MeGUI
                     {
                         string typeString;
                         if (audioTracks[i].SelectedItem.IsStandard)
-                        {
-                            AudioTrackInfo ati = (AudioTrackInfo)audioTracks[i].SelectedStream.TrackInfo;
-                            typeString = "file." + ati.Codec;
-                        }
+                            typeString = audioTracks[i].SelectedStream.TrackInfo.DemuxFileName;
                         else
                             typeString = audioTracks[i].SelectedFile;
 
                         if (VideoUtil.guessAudioType(typeString) != null)
-                        {
                             dictatedOutputTypes.Add(VideoUtil.guessAudioMuxableType(typeString, false));
-                        }
-                        else if (audioTracks[i].SelectedItem.IsStandard)
-                        {
-                            AudioTrackInfo ati = (AudioTrackInfo)audioTracks[i].SelectedStream.TrackInfo;
-                            typeString = ati.DemuxFileName;
-                            if (VideoUtil.guessAudioType(typeString) != null)
-                                dictatedOutputTypes.Add(VideoUtil.guessAudioMuxableType(typeString, false));
-                        }
                     }
                 }
             }

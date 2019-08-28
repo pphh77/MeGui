@@ -1,3 +1,4 @@
+2911 [OneClick]             fixed an error when switching profile settings. Bug #946
 2910 [Updater]              added support for Visual C++ 2019 redist files
 2909 [OneClick]             fixed not applying "automatic deinterlacing" filters. Bug #945 (regression of 2887)
 2908 [DGIndexIM Indexer]    fixed handling of file names with special (upper) ASCII characters
