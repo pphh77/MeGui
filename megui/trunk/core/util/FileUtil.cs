@@ -1000,7 +1000,7 @@ namespace MeGUI.core.util
             if (!RegExMatch(strValue, @"^Microsoft Visual C\+\+.*Redistributable", true))
                 return;
 
-            Match oMatch = Regex.Match(strValue, @" \d{4} ");
+            Match oMatch = Regex.Match(strValue, @"( \d{4} | \d{4}-\d{4} )");
             if (!oMatch.Success)
                 return;
             year = oMatch.Value.Trim();
@@ -1026,8 +1026,29 @@ namespace MeGUI.core.util
             foreach (string strDirectory in Directory.GetDirectories(Path.GetDirectoryName(MainForm.Instance.Settings.Redist.Path)))
             {
                 string strPackage = new DirectoryInfo(strDirectory).Name;
+
                 if (MainForm.Instance.Settings.RedistVersions.ContainsKey(strPackage))
                     continue;
+
+                bool bFound = false;
+                foreach (string version in MainForm.Instance.Settings.RedistVersions.Keys)
+                {
+                    if (Regex.IsMatch(version, @"\d{4}-\d{4}_x(64|86)") && Regex.IsMatch(strPackage, @"\d{4}_x(64|86)"))
+                    {
+                        int start = Int32.Parse(version.Substring(0, 4));
+                        int end = Int32.Parse(version.Substring(5, 4));
+                        int value = Int32.Parse(strPackage.Substring(0, 4));
+                        if (value >= start && value <= end && version.Substring(10, 3).Equals(strPackage.Substring(5, 3)))
+                            bFound = true;
+                    }
+
+                    if (version.Equals(strPackage))
+                        bFound = true;
+                }
+
+                if (bFound)
+                    continue;
+
                 CopyRuntimeFiles(strDirectory);
                 MainForm.Instance.UpdateHandler.AddTextToLog("redist files copied: " + strPackage, ImageType.Information, false);
             }
