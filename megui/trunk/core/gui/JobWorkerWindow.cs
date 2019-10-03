@@ -515,7 +515,7 @@ namespace MeGUI.core.gui
 
                 mainForm.Jobs.AdjustWorkerCount(true);
 
-                if (!mainForm.Jobs.IsAnyWorkerRunning)
+                if (!mainForm.Jobs.IsAnyJobRunning)
                     MeGUI.core.util.WindowUtil.AllowSystemPowerdown();
 
                 RefreshAll();
@@ -724,6 +724,9 @@ namespace MeGUI.core.gui
                 {
                     currentJob.Status = JobStatus.PAUSED;
                     RefreshAll();
+
+                    if (!mainForm.Jobs.IsAnyJobRunning)
+                        MeGUI.core.util.WindowUtil.AllowSystemPowerdown();
                 }
             }
             catch (JobRunException ex)
@@ -741,6 +744,8 @@ namespace MeGUI.core.gui
                 {
                     currentJob.Status = JobStatus.PROCESSING;
                     RefreshAll();
+
+                    MeGUI.core.util.WindowUtil.PreventSystemPowerdown();
                 }
             }
             catch (JobRunException ex)

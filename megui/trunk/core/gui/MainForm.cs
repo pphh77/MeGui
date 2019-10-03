@@ -541,20 +541,6 @@ namespace MeGUI
             this.Close();
         }
 
-        private void mnuToolsSettings_Click(object sender, System.EventArgs e)
-        {
-            using (SettingsForm sform = new SettingsForm())
-            {
-                sform.Settings = this.settings;
-                if (sform.ShowDialog() == DialogResult.OK)
-                {
-                    this.settings = sform.Settings;
-                    this.saveSettings();
-                    Jobs.ShowAfterEncodingStatus(settings);
-                }
-            }
-        }
-
         private void mnuTool_Click(object sender, System.EventArgs e)
         {
             if ((!(sender is System.Windows.Forms.MenuItem)) || (!((sender as MenuItem).Tag is ITool)))
@@ -1274,9 +1260,19 @@ namespace MeGUI
                 sform.Settings = this.settings;
                 if (sform.ShowDialog() == DialogResult.OK)
                 {
+                    MeGUISettings.StandbySettings oldStandbyValue = this.settings.StandbySetting;
+                    
                     this.settings = sform.Settings;
                     this.saveSettings();
                     Jobs.ShowAfterEncodingStatus(settings);
+
+                    // check if standby settings have been changed and if yes, change them now
+                    if (oldStandbyValue != settings.StandbySetting)
+                    {
+                        MeGUI.core.util.WindowUtil.AllowSystemPowerdown();
+                        if (MainForm.Instance.Jobs.IsAnyJobRunning)
+                            MeGUI.core.util.WindowUtil.PreventSystemPowerdown();
+                    }
                 }
             }
         }

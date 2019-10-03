@@ -46,6 +46,15 @@ namespace MeGUI
             [EnumTitle("Show Advanced Settings")]
             Advanced
         };
+        public enum StandbySettings
+        {
+            [EnumTitle("Do not prevent standby")]
+            SystemDefault,
+            [EnumTitle("Prevent system standby")]
+            DisableSystemStandby,
+            [EnumTitle("Prevent monitor standby")]
+            DisableMonitorStandby
+        };
         private string[][] autoUpdateServerLists;
         private DateTime lastUpdateCheck;
         private string strMainAudioFormat, strMainFileFormat, meguiupdatecache, neroAacEncPath, version,
@@ -80,6 +89,7 @@ namespace MeGUI
         private FPS[] customFPSs;
         private Dar[] customDARs;
         private OCGUIMode ocGUIMode;
+        private StandbySettings standbySetting;
         private AfterEncoding afterEncoding;
         private ProxyMode httpProxyMode;
         private List<WorkerSettings> arrWorkerSettings;
@@ -209,6 +219,7 @@ namespace MeGUI
             ResetWorkerSettings();
             ResetWorkerPriority();
             version = "";
+            standbySetting = StandbySettings.DisableSystemStandby;
         }
 
         #region properties
@@ -515,6 +526,15 @@ namespace MeGUI
         {
             get { return ocGUIMode; }
             set { ocGUIMode = value; }
+        }
+
+        /// <summary>
+        /// Gets / sets the standby settings
+        /// </summary>
+        public StandbySettings StandbySetting
+        {
+            get { return standbySetting; }
+            set { standbySetting = value; }
         }
 
         /// <summary>

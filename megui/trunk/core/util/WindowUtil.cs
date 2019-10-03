@@ -94,6 +94,10 @@ namespace MeGUI.core.util
             if (!OSInfo.IsWindows7OrNewer)
                 return;
 
+            // do not continue if standby should not be supressed
+            if (MainForm.Instance.Settings.StandbySetting == MeGUISettings.StandbySettings.SystemDefault)
+                return;
+
             // check if there is any power request already set
             if (currentPowerRequest != IntPtr.Zero)
                 return;
@@ -102,7 +106,7 @@ namespace MeGUI.core.util
             POWER_REQUEST_CONTEXT pContext;
             pContext.Flags = POWER_REQUEST_CONTEXT_SIMPLE_STRING;
             pContext.Version = POWER_REQUEST_CONTEXT_VERSION;
-            pContext.SimpleReasonString = "standby suppressed as jobs are running";
+            pContext.SimpleReasonString = "standby suppressed as at least one job is running";
 
             currentPowerRequest = PowerCreateRequest(ref pContext);
 
@@ -112,7 +116,11 @@ namespace MeGUI.core.util
                 return;
             }
 
-            if (!PowerSetRequest(currentPowerRequest, PowerRequestType.PowerRequestSystemRequired))
+            PowerRequestType oType = PowerRequestType.PowerRequestSystemRequired;
+            if (MainForm.Instance.Settings.StandbySetting == MeGUISettings.StandbySettings.DisableMonitorStandby)
+                oType = PowerRequestType.PowerRequestDisplayRequired;
+
+            if (!PowerSetRequest(currentPowerRequest, oType))
             {
                 // Failed to set power request
                 currentPowerRequest = IntPtr.Zero;
@@ -129,6 +137,9 @@ namespace MeGUI.core.util
                 return;
 
             if (PowerClearRequest(currentPowerRequest, PowerRequestType.PowerRequestSystemRequired))
+                currentPowerRequest = IntPtr.Zero;
+
+            if (PowerClearRequest(currentPowerRequest, PowerRequestType.PowerRequestDisplayRequired))
                 currentPowerRequest = IntPtr.Zero;
         }
 

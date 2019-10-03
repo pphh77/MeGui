@@ -66,6 +66,8 @@ namespace MeGUI
                 workerJobsListBox.Height = MainForm.Instance.Settings.DPIRescale(84);
                 workerSettingsListBox.Height = MainForm.Instance.Settings.DPIRescale(160);
                 numericUpDown1.Location = new System.Drawing.Point(numericUpDown1.Location.X, workerJobsListBox.Height + workerJobsListBox.Location.Y - MainForm.Instance.Settings.DPIRescale(numericUpDown1.Height));
+
+                cbStandbySettings.DataSource = EnumProxy.CreateArray(new object[] { MeGUISettings.StandbySettings.SystemDefault, MeGUISettings.StandbySettings.DisableSystemStandby, MeGUISettings.StandbySettings.DisableMonitorStandby });
             }
         }
 
@@ -429,7 +431,10 @@ namespace MeGUI
                 settings.ShowDebugInformation = chkDebugInformation.Checked;
                 settings.EnableDirectShowSource = chkDirectShowSource.Checked;
 
-				return settings;
+                EnumProxy o = cbStandbySettings.SelectedItem as EnumProxy;
+                settings.StandbySetting = (MeGUISettings.StandbySettings)o.RealValue;
+
+                return settings;
 			}
 			set
 			{
@@ -494,6 +499,8 @@ namespace MeGUI
                 chkDebugInformation.Checked = settings.ShowDebugInformation;
                 chkDirectShowSource.Checked = settings.EnableDirectShowSource;
                 chkInput8Bit.Checked = settings.Input8Bit;
+
+                cbStandbySettings.SelectedItem = EnumProxy.Create(MainForm.Instance.Settings.StandbySetting);
             }
 		}
 		#endregion

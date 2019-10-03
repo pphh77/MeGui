@@ -268,6 +268,20 @@ namespace MeGUI.core.details
         }
 
         /// <summary>
+        /// true if any job is currently in state processing
+        /// </summary>
+        public bool IsAnyJobRunning
+        {
+            get
+            {
+                foreach (JobWorker w in workers.Values)
+                    if (w.JobStatus == JobStatus.PROCESSING)
+                        return true;
+                return false;
+            }
+        }
+
+        /// <summary>
         /// count of all workers
         /// </summary>
         public int WorkersCount
