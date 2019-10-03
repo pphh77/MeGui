@@ -37,6 +37,11 @@ namespace MeGUI
         public frmStreamSelect(string strFileOrFolderInput, SelectionMode selectionMode)
         {
             InitializeComponent();
+
+            listBox1.Height = MainForm.Instance.Settings.DPIRescale(238);
+            btnOK.BringToFront();
+            btnCancel.BringToFront();
+
             listBox1.SelectionMode = selectionMode;
             arrChapterInfo = new List<ChapterInfo>();
 

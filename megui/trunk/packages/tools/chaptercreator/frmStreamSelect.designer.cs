@@ -69,7 +69,7 @@ namespace MeGUI
             // btnOK
             // 
             this.btnOK.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.btnOK.Location = new System.Drawing.Point(127, 353);
+            this.btnOK.Location = new System.Drawing.Point(130, 353);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(76, 22);
             this.btnOK.TabIndex = 1;
@@ -85,7 +85,7 @@ namespace MeGUI
             this.listBox1.FormattingEnabled = true;
             this.listBox1.Location = new System.Drawing.Point(13, 93);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(423, 238);
+            this.listBox1.Size = new System.Drawing.Size(429, 238);
             this.listBox1.TabIndex = 2;
             this.listBox1.DoubleClick += new System.EventHandler(this.btnOK_Click);
             // 
@@ -93,7 +93,7 @@ namespace MeGUI
             // 
             this.btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(227, 353);
+            this.btnCancel.Location = new System.Drawing.Point(230, 353);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(76, 22);
             this.btnCancel.TabIndex = 6;
@@ -102,13 +102,15 @@ namespace MeGUI
             // 
             // groupBox1
             // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.panel1);
             this.groupBox1.Controls.Add(this.btnSortChapter);
             this.groupBox1.Controls.Add(this.btnSortName);
             this.groupBox1.Controls.Add(this.btnSortDuration);
             this.groupBox1.Location = new System.Drawing.Point(13, 8);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(423, 81);
+            this.groupBox1.Size = new System.Drawing.Size(429, 81);
             this.groupBox1.TabIndex = 14;
             this.groupBox1.TabStop = false;
             // 
@@ -206,7 +208,7 @@ namespace MeGUI
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(448, 387);
+            this.ClientSize = new System.Drawing.Size(454, 387);
             this.ControlBox = false;
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnCancel);
@@ -216,6 +218,7 @@ namespace MeGUI
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(470, 426);
             this.Name = "frmStreamSelect";
             this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
