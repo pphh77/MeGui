@@ -1213,6 +1213,7 @@ namespace MeGUI
 
             // only the following container formats are supported
             if (_strContainer.ToUpperInvariant().Equals("MATROSKA") ||
+                _strContainer.ToUpperInvariant().Equals("WEBM") ||
                 _strContainer.ToUpperInvariant().Equals("MPEG-TS") ||
                 _strContainer.ToUpperInvariant().Equals("MPEG-PS") ||
                 _strContainer.ToUpperInvariant().Equals("MPEG VIDEO") ||
@@ -1248,6 +1249,7 @@ namespace MeGUI
 
             // only the following container formats are supported
             if (_strContainer.ToUpperInvariant().Equals("MATROSKA") ||
+                _strContainer.ToUpperInvariant().Equals("WEBM") ||
                 _strContainer.ToUpperInvariant().Equals("MPEG-TS") ||
                 _strContainer.ToUpperInvariant().Equals("MPEG-PS") ||
                 _strContainer.ToUpperInvariant().Equals("MPEG VIDEO") ||
@@ -1341,10 +1343,10 @@ namespace MeGUI
                 oType = FileIndexerWindow.IndexType.D2V;
             else if (isAVISourceIndexable(true))
                 oType = FileIndexerWindow.IndexType.AVISOURCE;
-            else if (isLSMASHIndexable(bWriteableDirOnly))
-                oType = FileIndexerWindow.IndexType.LSMASH;
             else if (isFFMSIndexable())
                 oType = FileIndexerWindow.IndexType.FFMS;
+            else if (isLSMASHIndexable(bWriteableDirOnly))
+                oType = FileIndexerWindow.IndexType.LSMASH;
             else
             {
                 oType = FileIndexerWindow.IndexType.NONE;

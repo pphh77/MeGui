@@ -246,6 +246,7 @@ namespace MeGUI
                     case "PCM": strExtension = "wav"; break;
                     case "MS/ACM": strExtension = "wav"; break;
                     case "VORBIS": strExtension = "ogg"; break;
+                    case "OPUS": strExtension = "opus"; break;
                     case "FLAC": strExtension = "flac"; break;
                     case "REAL": strExtension = "ra"; break;
                     case "AAC": strExtension = "aac"; break;
@@ -267,6 +268,9 @@ namespace MeGUI
                     case "MPEG1": strExtension = "m1v"; break;
                     case "MPEG2": strExtension = "m2v"; break;
                     case "VC1": strExtension = "vc1"; break;
+                    case "VP9": strExtension = "webm"; break;
+                    case "VP8": strExtension = "webm"; break;
+                    case "AV1": strExtension = "webm"; break;
                     default: strExtension = strCodec + ".unknown"; break;
                 }
 
