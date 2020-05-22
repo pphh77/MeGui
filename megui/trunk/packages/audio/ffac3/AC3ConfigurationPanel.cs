@@ -73,7 +73,3 @@ namespace MeGUI.packages.audio.ffac3
         #endregion
     }
 }
-
-
-
-

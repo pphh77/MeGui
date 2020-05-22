@@ -1,25 +1,23 @@
-2913 [Jobs]                 added in the Options window the possibility to enable/disable standby when jobs are running
-2912 [Chapter Creator]      improved High DPI support
-2911 [OneClick]             fixed an error when switching profile settings. Bug #946
-2910 [Updater]              added support for Visual C++ 2019 redist files
-2909 [OneClick]             fixed not applying "automatic deinterlacing" filters. Bug #945 (regression of 2887)
-2908 [DGIndexIM Indexer]    fixed handling of file names with special (upper) ASCII characters
-2907 [Chapter Creator]      input/output fps will not be locked anymore
-2906 [DGIndexNV Indexer]    fixed handling of file names with special (upper) ASCII characters
-2905 [Main]                 moved the changelog to the tab control
-                            new entries after an update will be highlighted
-2904 [FFmpeg AAC Encoder]   added FFmpeg AAC encoder. patch by Yarick Yermak (patch #71)
-                            unlike the other AAC encoder this one is available without any additional actions
-2903 [Chapter Creator]      added frame + output time code (if different from input)
-                            improved/changed handling e.g. input/output fps will be locked based on source/preview
-2902 [Profiles]             fixed not applying new settings immediately (regression of 2901)
-2901 [OneClick]             fixed not selecting the desired profile in profile config (regression of 2898)
-2900 [DGIndexNV/IM Indexer] fixed broken dgi file for multi segment input files (regression of 2897)
-2899 [Settings]             fixed worker settings window when using High DPI (regression of 2884)
-2898 [Main]                 fixed OneClick audio/video profile selections overwriting the main tab profile selections at next restart
-2897 [DGIndexNV Indexer]    adjusted AVS script parameters (requires DGIndexNV 2053.163+)
-                            mod2 is forced for crop values (was mod4 before)
-                            added a check to ensure that the full path information is written into the dgi file
+2914 [Audio Encoder]        improved error handling
+
+Changelog 2896 --> 2913
+
+Features/Changes:
+[DGIndexNV Indexer]    adjusted AVS script parameters (requires DGIndexNV 2053.163+)
+[DGIndexNV Indexer]    mod2 is forced for crop values (was mod4 before)
+[FFmpeg AAC Encoder]   added FFmpeg AAC encoder. patch by Yarick Yermak (patch #71)
+[FFmpeg AAC Encoder]   unlike the other AAC encoder this one is available without any additional actions
+[Main]                 moved the changelog to the tab control
+[Main]                 new entries after an update will be highlighted
+[Chapter Creator]      added frame + output time code (if different from input)
+[Chapter Creator]      improved/changed handling
+
+Enhancements/Fixes:
+[Jobs]                 added in the Options window the possibility to enable/disable standby when jobs are running
+[OneClick]             fixed an error when switching profile settings. Bug #946
+[OneClick]             fixed not applying "automatic deinterlacing" filters. Bug #945 (regression of 2887)
+[Settings]             fixed worker settings window when using High DPI (regression of 2884)
+[Main]                 fixed OneClick audio/video profile selections overwriting the main tab profile selections at next restart
 
 
 Changelog 2876 --> 2896
@@ -42,22 +40,6 @@ Enhancements/Fixes:
 [OneClick]             fixed only using at maximum 2 audio/subtitle tracks in batch mode (regression of 2861). bug #927
 [x264]                 fixed high bit depth support if ffmpeg is not used (regression of 2874)
 [AVS Script Creator]   if resize with DGIndexNV is enabled also cropping will be done that way (mod4 is forced for crop values)
-
-
-Changelog 2836 --> 2876
-
-Features/Changes:
-                       added high bit depth support (requires AVS+)
-                       therefore avs4x26x has been replaced by ffmpeg when using x26x
-[AviSynth]             changed default value of "always use the included AviSynth" to enabled
-[Chapter Creator]      - added option to use an automated counter for chapters (enabled by default)
-                       - added fps selector for the input source.it does change the time codes if the input fps is not known (e.g. as with TXT/XML)
-                       - the output fps value is used during saving for all output types
-
-Enhancements/Fixes:
-[HD Streams Extractor] added an option to select if the output prefix should be added (default: enabled)
-[OneClick]             fixed tracks 2 to n-1 not properly selecting their input track stream (regression of 2808). bug #907
-[OneClick]             fixed audio track processing for some file types if DG* indexer is used (e.g. VOB without IFO)
 
 
 Known Problems:

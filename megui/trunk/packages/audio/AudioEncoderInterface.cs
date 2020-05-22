@@ -473,6 +473,12 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                                 }
                                 setProgress(1M);
 
+                                if (!String.IsNullOrEmpty(audioJob.Output) && File.Exists(audioJob.Output) && (new System.IO.FileInfo(audioJob.Output).Length) == 0)
+                                {
+                                    _log.LogValue("Output file is empty, nothing was encoded", "", ImageType.Error);
+                                    su.HasError = true;
+                                }
+
                                 if (_sendWavHeaderToEncoderStdIn != HeaderType.NONE && a.BytesPerSample % 2 == 1)
                                     target.WriteByte(0);
                             }

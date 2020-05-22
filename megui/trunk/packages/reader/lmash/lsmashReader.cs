@@ -19,11 +19,7 @@
 // ****************************************************************************
 
 using System;
-using System.Drawing;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Xml.Serialization;
-using System.Windows.Forms;
 
 using MeGUI.core.util;
 
@@ -148,4 +144,3 @@ namespace MeGUI
         #endregion
     }
 }
-
