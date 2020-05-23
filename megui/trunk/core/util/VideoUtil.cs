@@ -658,6 +658,24 @@ namespace MeGUI
             UpdateCacher.CheckPackage("lsmash");
 
             int iVideoBits = 8;
+
+            if (!String.IsNullOrEmpty(indexFile) && String.IsNullOrEmpty(inputFile))
+            {
+                using (StreamReader sr = new StreamReader(indexFile, System.Text.Encoding.Default))
+                {
+                    string line = null;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        if (line.StartsWith("<InputFilePath>"))
+                        {
+                            string strSourceFile = line.Substring(15, line.LastIndexOf("</InputFilePath>") - 15);
+                            if (File.Exists(strSourceFile))
+                                inputFile = strSourceFile;
+                            break;
+                        }
+                    }
+                }
+            }
             if (File.Exists(inputFile) && oInfo == null)
                 oInfo = new MediaInfoFile(inputFile);
             if (oInfo != null)
@@ -667,6 +685,11 @@ namespace MeGUI
                     if (fps == 0 && oInfo.VideoInfo.FPS > 0)
                         fps = oInfo.VideoInfo.FPS;
                     iVideoBits = oInfo.VideoInfo.BitDepth;
+                }
+                if (String.IsNullOrEmpty(indexFile) && !oInfo.FileName.Equals(inputFile))
+                {
+                    indexFile = inputFile;
+                    inputFile = oInfo.FileName;
                 }
             }
 
@@ -686,11 +709,6 @@ namespace MeGUI
             script.AppendFormat("LoadPlugin(\"{0}\"){1}",
                 MainForm.Instance.Settings.LSMASH.Path,
                 Environment.NewLine);
-
-            if (iVideoBit > 8 && MainForm.Instance.Settings.AviSynthPlus)
-                script.AppendFormat("LoadPlugin(\"{0}\"){1}",
-                    Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynth.Path), @"plugins\ConvertStacked.dll"),
-                    Environment.NewLine);
 
             if (inputFile.ToLowerInvariant().EndsWith(".lwi") && File.Exists(inputFile))
                 inputFile = inputFile.Substring(0, inputFile.Length - 4);

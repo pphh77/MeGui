@@ -65,7 +65,6 @@ namespace MeGUI
     public class lsmashFile : IMediaFile
     {
         private AvsFile reader;
-        private string fileName;
         private VideoInformation info;
 
         /// <summary>
@@ -75,28 +74,8 @@ namespace MeGUI
         /// <param name="indexFile">the LSMASHIndex index file that this reader will process</param>
         public lsmashFile(string fileName, string indexFile)
         {
-            if (!String.IsNullOrEmpty(indexFile) && String.IsNullOrEmpty(fileName))
-            {
-                using (StreamReader sr = new StreamReader(indexFile, System.Text.Encoding.Default))
-                {
-                    string line = null;
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        if (line.StartsWith("<InputFilePath>"))
-                        {
-                            string strSourceFile = line.Substring(15, line.LastIndexOf("</InputFilePath>") - 15);
-                            if (File.Exists(strSourceFile))
-                                this.fileName = strSourceFile;
-                            break;
-                        }
-                    }
-                }
-            }
-            else
-                this.fileName = fileName;
-
             MediaInfoFile oInfo = null;
-            reader = AvsFile.ParseScript(VideoUtil.getLSMASHVideoInputLine(this.fileName, indexFile, 0, ref oInfo), true);
+            reader = AvsFile.ParseScript(VideoUtil.getLSMASHVideoInputLine(fileName, indexFile, 0, ref oInfo), true);
             info = reader.VideoInfo.Clone();
             if (oInfo != null)
                 info.DAR = oInfo.VideoInfo.DAR;
