@@ -1,3 +1,4 @@
+2916 [FFmpeg AAC Encoder]   fixed quality mode using the wrong number format (regression of 2904)
 2915 [L-SMASH Indexer]      added support for recent versions
                             enabled VC-1 decoding support
                             enabled custom index file locations
