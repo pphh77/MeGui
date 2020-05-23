@@ -1,3 +1,6 @@
+2915 [L-SMASH Indexer]      added support for recent versions
+                            enabled VC-1 decoding support
+                            enabled custom index file locations
 2914 [Audio Encoder]        improved error handling
 
 Changelog 2896 --> 2913

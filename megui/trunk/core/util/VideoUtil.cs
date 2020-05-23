@@ -693,38 +693,39 @@ namespace MeGUI
                     Environment.NewLine);
 
             if (inputFile.ToLowerInvariant().EndsWith(".lwi") && File.Exists(inputFile))
-                indexFile = inputFile;
-            if (!String.IsNullOrEmpty(indexFile) &&
-                (indexFile.ToLowerInvariant().Equals(inputFile.ToLowerInvariant() + ".lwi") || !File.Exists(indexFile)))
+                inputFile = inputFile.Substring(0, inputFile.Length - 4);
+            if (!String.IsNullOrEmpty(indexFile) && indexFile.ToLowerInvariant().Equals(inputFile.ToLowerInvariant() + ".lwi"))
                 indexFile = null;
 
             bool bUseLsmash = UseLSMASHVideoSource(inputFile, video);
             if (video)
             {
-                script.AppendFormat("{0}(\"{1}\"{2}",
+                script.AppendFormat("{0}(\"{1}\"{2}{3}",
                     (bUseLsmash ? "LSMASHVideoSource" : "LWLibavVideoSource"),
-                    (!String.IsNullOrEmpty(indexFile) ? indexFile : inputFile),
-                    (track > -1 ? (bUseLsmash ? ", track=" + track : ", stream_index=" + track) : String.Empty));
+                    inputFile,
+                    (track > -1 ? (bUseLsmash ? ", track=" + track : ", stream_index=" + track) : String.Empty),
+                    (!bUseLsmash && !String.IsNullOrEmpty(indexFile) ? ", cachefile=\"" + indexFile + "\"" : String.Empty));
 
                 if (iVideoBit <= 8)
                     script.Append(")");
                 else if (!MainForm.Instance.Settings.AviSynthPlus || MainForm.Instance.Settings.Input8Bit)
                     script.Append(", format=\"YUV420P8\")");
                 else if (iVideoBit <= 10)
-                    script.AppendFormat(", format=\"YUV420P10\"){0}ConvertFromDoubleWidth(bits=10)", Environment.NewLine);
+                    script.AppendFormat(", format=\"YUV420P10\")", Environment.NewLine);
                 else if (iVideoBit <= 12)
-                    script.AppendFormat(", format=\"YUV420P12\"){0}ConvertFromDoubleWidth(bits=12)", Environment.NewLine);
+                    script.AppendFormat(", format=\"YUV420P12\")", Environment.NewLine);
                 else if (iVideoBit <= 14)
-                    script.AppendFormat(", format=\"YUV420P14\"){0}ConvertFromDoubleWidth(bits=14)", Environment.NewLine);
+                    script.AppendFormat(", format=\"YUV420P14\")", Environment.NewLine);
                 else
-                    script.AppendFormat(", format=\"YUV420P16\"){0}ConvertFromDoubleWidth(bits=16)", Environment.NewLine);
+                    script.AppendFormat(", format=\"YUV420P16\")", Environment.NewLine);
             }
             else
             {
-                script.AppendFormat("{0}(\"{1}\"{2}){3}",
+                script.AppendFormat("{0}(\"{1}\"{2}{3}){4}",
                     (bUseLsmash ? "LSMASHAudioSource" : "LWLibavAudioSource"),
-                    (!String.IsNullOrEmpty(indexFile) ? indexFile : inputFile),
+                    inputFile,
                     (track > -1 ? (bUseLsmash ? ", track=" + track : ", stream_index=" + track) : String.Empty),
+                    (!bUseLsmash && !String.IsNullOrEmpty(indexFile) ? ", cachefile=\"" + indexFile + "\"" : String.Empty),
                     Environment.NewLine);
             }
             return script.ToString();

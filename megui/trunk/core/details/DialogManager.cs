@@ -221,7 +221,7 @@ namespace MeGUI
             FileIndexerWindow.IndexType oIndexer = FileIndexerWindow.IndexType.NONE;
 
             // check if OCE or FileIndexer can be used
-            if (!iFile.recommendIndexer(out oIndexer, true))
+            if (!iFile.recommendIndexer(out oIndexer))
             {
                 // they cannot be used
                 if (iFile.isAVISourceIndexable(false))

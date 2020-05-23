@@ -64,7 +64,7 @@ namespace MeGUI.packages.tools.oneclick
                 if (iFile == null)
                 {
                     MediaInfoFile iFileTemp = new MediaInfoFile(oFileToProcess.FilePath, ref _log, oFileToProcess.PGCNumber, oFileToProcess.AngleNumber);
-                    if (iFileTemp.recommendIndexer(oSettings.IndexerPriority, true))
+                    if (iFileTemp.recommendIndexer(oSettings.IndexerPriority))
                         iFile = iFileTemp;
                     else if (iFileTemp.ContainerFileTypeString.Equals("AVS"))
                     {
@@ -144,7 +144,7 @@ namespace MeGUI.packages.tools.oneclick
                     {
                         MediaInfoFile iFileTemp = new MediaInfoFile(strSourceFile, ref _log, frm.IsDVDSource ? oChapterInfo.PGCNumber : 1,
                             frm.IsDVDSource ? oChapterInfo.AngleNumber : 0);
-                        if (iFileTemp.recommendIndexer(oSettings.IndexerPriority, false))
+                        if (iFileTemp.recommendIndexer(oSettings.IndexerPriority))
                             iFile = iFileTemp;
                         else
                             _log.LogEvent(strSourceFile + " cannot be processed as no indexer can be used. skipping...");
@@ -181,7 +181,7 @@ namespace MeGUI.packages.tools.oneclick
                 if (iFile == null)
                 {
                     MediaInfoFile iFileTemp = new MediaInfoFile(strFileName, ref _log);
-                    if (iFileTemp.recommendIndexer(oSettings.IndexerPriority, true))
+                    if (iFileTemp.recommendIndexer(oSettings.IndexerPriority))
                         iFile = iFileTemp;
                     else if (iFileTemp.ContainerFileTypeString.Equals("AVS"))
                     {
@@ -213,7 +213,7 @@ namespace MeGUI.packages.tools.oneclick
                 return false;
 
             MediaInfoFile iFile = new MediaInfoFile(this.strInput, ref this._log);
-            if (iFile.recommendIndexer(oSettings.IndexerPriority, true))
+            if (iFile.recommendIndexer(oSettings.IndexerPriority))
                 return getInputIndexerBased(iFile, oSettings);
             else if (iFile.ContainerFileTypeString.Equals("AVS"))
             {

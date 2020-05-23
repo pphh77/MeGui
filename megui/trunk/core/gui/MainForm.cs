@@ -671,8 +671,7 @@ namespace MeGUI
             iFile = new MediaInfoFile(file);
             if (iFile.HasVideo)
             {
-                FileIndexerWindow.IndexType x;
-                if (iFile.recommendIndexer(out x, true))
+                if (iFile.recommendIndexer(out _))
                 {
                     openIndexableFile(file);
                 }

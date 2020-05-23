@@ -309,7 +309,7 @@ namespace MeGUI
             if (iFile != null)
             {
                 IndexType newType = IndexType.NONE;
-                iFile.recommendIndexer(out newType, true);
+                iFile.recommendIndexer(out newType);
                 if (newType == IndexType.D2V || newType == IndexType.DGM ||
                     newType == IndexType.DGI || newType == IndexType.FFMS ||
                     newType == IndexType.LSMASH)
@@ -318,7 +318,7 @@ namespace MeGUI
                     btnDGM.Enabled = iFile.isDGMIndexable();
                     btnDGI.Enabled = iFile.isDGIIndexable();
                     btnFFMS.Enabled = iFile.isFFMSIndexable();
-                    btnLSMASH.Enabled = iFile.isLSMASHIndexable(true);
+                    btnLSMASH.Enabled = iFile.isLSMASHIndexable();
 
                     gbIndexer.Enabled = gbAudio.Enabled = gbOutput.Enabled = true;
                     changeIndexer(newType);

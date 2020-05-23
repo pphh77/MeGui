@@ -70,7 +70,7 @@ namespace MeGUI
                 // generate the avs script
                 StringBuilder strAVSScript = new StringBuilder();
                 MediaInfoFile oInfo = null;
-                strAVSScript.Append(VideoUtil.getLSMASHVideoInputLine(job.Input, job.Input + ".lwi", 0, ref oInfo));
+                strAVSScript.Append(VideoUtil.getLSMASHVideoInputLine(job.Input, job.Output, 0, ref oInfo));
                 if (oInfo != null)
                     oInfo.Dispose();
                 base.log.LogValue("AviSynth script", strAVSScript.ToString(), ImageType.Information);
@@ -111,38 +111,6 @@ namespace MeGUI
                 job.FilesToDelete.Add(job.Input + ".lwi");
                 base.doExitConfig();
                 return;
-            }
-
-            bool bFound = File.Exists(job.Input + ".lwi");
-            if (bFound)
-            {
-                // LWLibavVideoSource() and therefore an index file is used
-                string inputIndex = job.Input + ".lwi";
-                string outputIndex = job.Output;
-
-                if (!String.IsNullOrEmpty(outputIndex) && !outputIndex.ToLowerInvariant().Equals(inputIndex.ToLowerInvariant()))
-                {
-                    // index in a location different from the standard one should be used
-                    su.Status = "Copying LSMASH index...";
-                    try
-                    {
-                        // try to delete the destination file
-                        if (FileUtil.DeleteFile(outputIndex, log))
-                        {
-                            // destination file is deleted / not available ==> copy source to destination
-                            File.Copy(inputIndex, outputIndex, true);
-                            base.log.LogEvent(inputIndex + " moved to " + outputIndex);
-                            FileUtil.DeleteFile(inputIndex, base.log);
-                        }
-                        else
-                            su.HasError = true;
-                    }
-                    catch (Exception e)
-                    {
-                        base.log.LogEvent(inputIndex + " not moved to " + outputIndex + ". error: " + e.Message + " " + e.StackTrace, ImageType.Error);
-                        su.HasError = true;
-                    }
-                }
             }
 
             if (job.DemuxMode == 0 || job.AudioTracks.Count == 0 || su.HasError)
@@ -191,9 +159,6 @@ namespace MeGUI
                 if (++iTracksFound == job.AudioTracks.Count)
                     break;
             }
-
-            if (!bFound && File.Exists(job.Input + ".lwi"))
-                job.FilesToDelete.Add(job.Input + ".lwi");
 
             base.doExitConfig();
         }

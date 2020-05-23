@@ -629,16 +629,25 @@ namespace MeGUI
             get
             {
                 SourceInfo info = new SourceInfo();
-                try { info.sourceType = (SourceType)((EnumProxy)deintSourceType.SelectedItem).Tag; }
+                try 
+                {
+                    if (deintSourceType.SelectedItem != null)
+                        info.sourceType = (SourceType)((EnumProxy)deintSourceType.SelectedItem).Tag; 
+                }
                 catch (NullReferenceException) { info.sourceType = SourceType.UNKNOWN; }
-                try { info.fieldOrder = (FieldOrder)((EnumProxy)deintFieldOrder.SelectedItem).Tag; }
+                try 
+                {
+                    if (deintFieldOrder.SelectedItem != null)
+                        info.fieldOrder = (FieldOrder)((EnumProxy)deintFieldOrder.SelectedItem).Tag; 
+                }
                 catch (NullReferenceException) { info.fieldOrder = FieldOrder.UNKNOWN; }
                 info.decimateM = (int)deintM.Value;
                 try
                 {
-                    info.majorityFilm =
-                        ((UserSourceType)((EnumProxy)deintSourceType.SelectedItem).RealValue) == UserSourceType.HybridFilmInterlaced ||
-                        ((UserSourceType)((EnumProxy)deintSourceType.SelectedItem).RealValue) == UserSourceType.HybridProgressiveFilm;
+                    if (deintSourceType.SelectedItem != null)
+                        info.majorityFilm =
+                            ((UserSourceType)((EnumProxy)deintSourceType.SelectedItem).RealValue) == UserSourceType.HybridFilmInterlaced ||
+                            ((UserSourceType)((EnumProxy)deintSourceType.SelectedItem).RealValue) == UserSourceType.HybridProgressiveFilm;
                 }
                 catch (NullReferenceException) { }
                 info.isAnime = deintIsAnime.Checked;
