@@ -258,11 +258,8 @@ namespace MeGUI
                 {
                     foreach (Process oProc in OSInfo.GetChildProcesses(proc))
                     {
-                        if (oProc.ProcessName.ToLowerInvariant().Equals("ffmpeg"))
-                        {
-                            OSInfo.KillProcess(oProc);
-                            break;
-                        }
+                        if (!oProc.ProcessName.ToLowerInvariant().Equals("conhost"))
+                            try { OSInfo.KillProcess(oProc); } catch { }
                     }
                 }
                 proc.Kill();
