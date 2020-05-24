@@ -59,6 +59,15 @@ namespace MeGUI.core.gui
                     return;
                 }
             }
+            RefreshProfiles(null);
+            foreach (Named<Profile> n in comboBox1.Items)
+            {
+                if (n.Data.FQName == fqname)
+                {
+                    comboBox1.SelectedItem = n;
+                    return;
+                }
+            }
             if (comboBox1.Items.Count > 0)
             {
                 comboBox1.SelectedIndex = 0;

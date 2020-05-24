@@ -1,3 +1,4 @@
+2918 [Profile Selector]     fixed new profile not available immediately. Bug #953
 2917 [L-SMASH Indexer]      always show source and cachefile (if available)
 2916 [FFmpeg AAC Encoder]   fixed quality mode using the wrong number format (regression of 2904)
 2915 [L-SMASH Indexer]      added support for recent versions
