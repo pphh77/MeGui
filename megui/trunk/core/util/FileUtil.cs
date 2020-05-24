@@ -1023,6 +1023,9 @@ namespace MeGUI.core.util
         {
             UpdateCacher.CheckPackage("redist");
 
+            if (!File.Exists(MainForm.Instance.Settings.Redist.Path))
+                return;
+
             foreach (string strDirectory in Directory.GetDirectories(Path.GetDirectoryName(MainForm.Instance.Settings.Redist.Path)))
             {
                 string strPackage = new DirectoryInfo(strDirectory).Name;
