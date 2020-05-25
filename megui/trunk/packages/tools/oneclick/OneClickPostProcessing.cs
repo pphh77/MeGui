@@ -54,6 +54,10 @@ namespace MeGUI
 
         protected override void RunInThread()
         {
+            JobChain c = null;
+            List<string> intermediateFiles = new List<string>();
+            bool bError = false;
+
             try
             {
                 log.LogEvent("Processing thread started");
@@ -65,8 +69,6 @@ namespace MeGUI
                 List<AudioTrackInfo> arrAudioTracks = new List<AudioTrackInfo>();
                 List<AudioJob> arrAudioJobs = new List<AudioJob>();
                 List<MuxStream> arrMuxStreams = new List<MuxStream>();
-                List<string> intermediateFiles = new List<string>();
-
                 FileUtil.ensureDirectoryExists(job.PostprocessingProperties.WorkingDirectory);
 
                 // audio handling
@@ -157,24 +159,36 @@ namespace MeGUI
                 if (String.IsNullOrEmpty(job.PostprocessingProperties.VideoFileToMux))
                 {
                     //Open the video
-                    avsFile = CreateAVSFile(job.IndexFile, job.Input, job.PostprocessingProperties.DAR,
+                    try
+                    {
+                        avsFile = CreateAVSFile(job.IndexFile, job.Input, job.PostprocessingProperties.DAR,
                         job.PostprocessingProperties.HorizontalOutputResolution, log,
                         job.PostprocessingProperties.AvsSettings, job.PostprocessingProperties.AutoDeinterlace, videoSettings,
                         job.PostprocessingProperties.AutoCrop, job.PostprocessingProperties.KeepInputResolution,
                         job.PostprocessingProperties.UseChaptersMarks);
+                    }
+                    catch (Exception ex)
+                    {
+                        log.LogValue("An error occurred creating the AVS file", ex, ImageType.Error);
+                    }
 
                     if (IsJobStopped())
                         return;
 
-                    // check AVS file 
-                    JobUtil.GetInputProperties(avsFile, out ulong frameCount, out double frameRate);
+                    if (!String.IsNullOrEmpty(avsFile))
+                    {
+                        // check AVS file 
+                        JobUtil.GetInputProperties(avsFile, out ulong frameCount, out double frameRate);
 
-                    myVideo.Input = avsFile;
-                    myVideo.Output = Path.Combine(job.PostprocessingProperties.WorkingDirectory, Path.GetFileNameWithoutExtension(job.Input) + "_Video");
-                    myVideo.NumberOfFrames = frameCount;
-                    myVideo.Framerate = (decimal)frameRate;
-                    myVideo.VideoType = new MuxableType((new VideoEncoderProvider().GetSupportedOutput(videoSettings.EncoderType))[0], videoSettings.Codec);
-                    myVideo.Settings = videoSettings;
+                        myVideo.Input = avsFile;
+                        myVideo.Output = Path.Combine(job.PostprocessingProperties.WorkingDirectory, Path.GetFileNameWithoutExtension(job.Input) + "_Video");
+                        myVideo.NumberOfFrames = frameCount;
+                        myVideo.Framerate = (decimal)frameRate;
+                        myVideo.VideoType = new MuxableType((new VideoEncoderProvider().GetSupportedOutput(videoSettings.EncoderType))[0], videoSettings.Codec);
+                        myVideo.Settings = videoSettings;
+                    }
+                    else
+                        bError = true;
                 }
                 else
                 {
@@ -206,105 +220,105 @@ namespace MeGUI
                 foreach (string file in job.PostprocessingProperties.FilesToDelete)
                     intermediateFiles.Add(file);
 
-                if (!string.IsNullOrEmpty(avsFile) || !String.IsNullOrEmpty(job.PostprocessingProperties.VideoFileToMux))
+                // subtitle handling
+                List<MuxStream> subtitles = new List<MuxStream>();
+                if (job.PostprocessingProperties.SubtitleTracks.Count > 0)
                 {
-                    // subtitle handling
-                    List<MuxStream> subtitles = new List<MuxStream>();
-                    if (job.PostprocessingProperties.SubtitleTracks.Count > 0)
+                    foreach (OneClickStream oTrack in job.PostprocessingProperties.SubtitleTracks)
                     {
-                        foreach (OneClickStream oTrack in job.PostprocessingProperties.SubtitleTracks)
+                        if (oTrack.TrackInfo.ExtractMKVTrack)
                         {
-                            if (oTrack.TrackInfo.ExtractMKVTrack)
+                            //demuxed MKV
+                            string trackFile = Path.GetDirectoryName(job.IndexFile) + "\\" + oTrack.TrackInfo.DemuxFileName;
+                            if (File.Exists(trackFile))
                             {
-                                //demuxed MKV
-                                string trackFile = Path.GetDirectoryName(job.IndexFile) + "\\" + oTrack.TrackInfo.DemuxFileName;
-                                if (File.Exists(trackFile))
-                                {
-                                    intermediateFiles.Add(trackFile);
-                                    if (Path.GetExtension(trackFile).ToLowerInvariant().Equals(".idx"))
-                                        intermediateFiles.Add(FileUtil.GetPathWithoutExtension(trackFile) + ".sub");
+                                intermediateFiles.Add(trackFile);
+                                if (Path.GetExtension(trackFile).ToLowerInvariant().Equals(".idx"))
+                                    intermediateFiles.Add(FileUtil.GetPathWithoutExtension(trackFile) + ".sub");
 
-                                    subtitles.Add(new MuxStream(trackFile, oTrack.Language, oTrack.Name, oTrack.Delay, oTrack.DefaultStream, oTrack.ForcedStream, null));
-                                }
-                                else
-                                    log.LogEvent("Ignoring subtitle as the it cannot be found: " + trackFile, ImageType.Warning);
+                                subtitles.Add(new MuxStream(trackFile, oTrack.Language, oTrack.Name, oTrack.Delay, oTrack.DefaultStream, oTrack.ForcedStream, null));
                             }
                             else
+                                log.LogEvent("Ignoring subtitle as the it cannot be found: " + trackFile, ImageType.Warning);
+                        }
+                        else
+                        {
+                            // sometimes the language is detected differently by vsrip and the IFO parser. Therefore search also for other files
+                            string strDemuxFile = oTrack.DemuxFilePath;
+                            if (!File.Exists(strDemuxFile) && Path.GetFileNameWithoutExtension(strDemuxFile).Contains("_"))
                             {
-                                // sometimes the language is detected differently by vsrip and the IFO parser. Therefore search also for other files
-                                string strDemuxFile = oTrack.DemuxFilePath;
-                                if (!File.Exists(strDemuxFile) && Path.GetFileNameWithoutExtension(strDemuxFile).Contains("_"))
+                                string strDemuxFileName = Path.GetFileNameWithoutExtension(strDemuxFile);
+                                strDemuxFileName = strDemuxFileName.Substring(0, strDemuxFileName.LastIndexOf("_")) + "_*" + Path.GetExtension(strDemuxFile);
+                                foreach (string strFileName in Directory.GetFiles(Path.GetDirectoryName(strDemuxFile), strDemuxFileName))
                                 {
-                                    string strDemuxFileName = Path.GetFileNameWithoutExtension(strDemuxFile);
-                                    strDemuxFileName = strDemuxFileName.Substring(0, strDemuxFileName.LastIndexOf("_")) + "_*" + Path.GetExtension(strDemuxFile);
-                                    foreach (string strFileName in Directory.GetFiles(Path.GetDirectoryName(strDemuxFile), strDemuxFileName))
-                                    {
-                                        strDemuxFile = Path.Combine(Path.GetDirectoryName(strDemuxFile), strFileName);
-                                        intermediateFiles.Add(strDemuxFile);
-                                        intermediateFiles.Add(Path.ChangeExtension(strDemuxFile, ".sub"));
-                                        log.LogEvent("Subtitle + " + oTrack.DemuxFilePath + " cannot be found. " + strFileName + " will be used instead", ImageType.Information);
-                                        break;
-                                    }
+                                    strDemuxFile = Path.Combine(Path.GetDirectoryName(strDemuxFile), strFileName);
+                                    intermediateFiles.Add(strDemuxFile);
+                                    intermediateFiles.Add(Path.ChangeExtension(strDemuxFile, ".sub"));
+                                    log.LogEvent("Subtitle + " + oTrack.DemuxFilePath + " cannot be found. " + strFileName + " will be used instead", ImageType.Information);
+                                    break;
                                 }
-                                if (File.Exists(strDemuxFile))
-                                {
-                                    string strTrackName = oTrack.Name;
-
-                                    // check if a forced stream is available
-                                    string strForcedFile = Path.Combine(Path.GetDirectoryName(strDemuxFile), Path.GetFileNameWithoutExtension(strDemuxFile) + "_forced.idx");
-                                    if (File.Exists(strForcedFile))
-                                    {
-                                        subtitles.Add(new MuxStream(strForcedFile, oTrack.Language, SubtitleUtil.ApplyForcedStringToTrackName(true, oTrack.Name), oTrack.Delay, oTrack.DefaultStream, true, null));
-                                        intermediateFiles.Add(strForcedFile);
-                                        intermediateFiles.Add(Path.ChangeExtension(strForcedFile, ".sub"));
-                                    }
-                                    subtitles.Add(new MuxStream(strDemuxFile, oTrack.Language, SubtitleUtil.ApplyForcedStringToTrackName(false, oTrack.Name), oTrack.Delay, oTrack.DefaultStream, (File.Exists(strForcedFile) ? false : oTrack.ForcedStream), null));
-                                }
-                                else
-                                    log.LogEvent("Ignoring subtitle as the it cannot be found: " + oTrack.DemuxFilePath, ImageType.Warning);
                             }
+                            if (File.Exists(strDemuxFile))
+                            {
+                                string strTrackName = oTrack.Name;
+
+                                // check if a forced stream is available
+                                string strForcedFile = Path.Combine(Path.GetDirectoryName(strDemuxFile), Path.GetFileNameWithoutExtension(strDemuxFile) + "_forced.idx");
+                                if (File.Exists(strForcedFile))
+                                {
+                                    subtitles.Add(new MuxStream(strForcedFile, oTrack.Language, SubtitleUtil.ApplyForcedStringToTrackName(true, oTrack.Name), oTrack.Delay, oTrack.DefaultStream, true, null));
+                                    intermediateFiles.Add(strForcedFile);
+                                    intermediateFiles.Add(Path.ChangeExtension(strForcedFile, ".sub"));
+                                }
+                                subtitles.Add(new MuxStream(strDemuxFile, oTrack.Language, SubtitleUtil.ApplyForcedStringToTrackName(false, oTrack.Name), oTrack.Delay, oTrack.DefaultStream, (File.Exists(strForcedFile) ? false : oTrack.ForcedStream), null));
+                            }
+                            else
+                                log.LogEvent("Ignoring subtitle as the it cannot be found: " + oTrack.DemuxFilePath, ImageType.Warning);
                         }
                     }
 
                     if (IsJobStopped())
                         return;
+                    
+                    if (!bError)
+                        c = VideoUtil.GenerateJobSeries(myVideo, job.PostprocessingProperties.FinalOutput, arrAudioJobs.ToArray(), 
+                            subtitles.ToArray(), job.PostprocessingProperties.Attachments, job.PostprocessingProperties.TimeStampFile,
+                            job.PostprocessingProperties.ChapterInfo, job.PostprocessingProperties.OutputSize,
+                            job.PostprocessingProperties.Splitting, job.PostprocessingProperties.Container,
+                            job.PostprocessingProperties.PrerenderJob, arrMuxStreams.ToArray(),
+                            log, job.PostprocessingProperties.DeviceOutputType, null, job.PostprocessingProperties.VideoFileToMux, 
+                            job.PostprocessingProperties.AudioTracks.ToArray(), true);
 
-                    JobChain c = VideoUtil.GenerateJobSeries(myVideo, job.PostprocessingProperties.FinalOutput, arrAudioJobs.ToArray(), 
-                        subtitles.ToArray(), job.PostprocessingProperties.Attachments, job.PostprocessingProperties.TimeStampFile,
-                        job.PostprocessingProperties.ChapterInfo, job.PostprocessingProperties.OutputSize,
-                        job.PostprocessingProperties.Splitting, job.PostprocessingProperties.Container,
-                        job.PostprocessingProperties.PrerenderJob, arrMuxStreams.ToArray(),
-                        log, job.PostprocessingProperties.DeviceOutputType, null, job.PostprocessingProperties.VideoFileToMux, 
-                        job.PostprocessingProperties.AudioTracks.ToArray(), true);
-                    if (c == null)
-                    {
-                        log.Warn("Job creation aborted");
-                        return;
-                    }
-
-                    if (!String.IsNullOrEmpty(job.PostprocessingProperties.TimeStampFile) &&
+                    if (c != null && !String.IsNullOrEmpty(job.PostprocessingProperties.TimeStampFile) &&
                         c.Jobs[c.Jobs.Length - 1].Job is MuxJob && (c.Jobs[c.Jobs.Length - 1].Job as MuxJob).MuxType == MuxerType.MP4BOX)
                     {
                         // last job is a mp4box job and vfr timecode data has to be applied
                         MP4FpsModJob mp4FpsMod = new MP4FpsModJob(((MuxJob)c.Jobs[c.Jobs.Length - 1].Job).Output, job.PostprocessingProperties.TimeStampFile);
                         c = new SequentialChain(c, new SequentialChain(mp4FpsMod));
-                    }
-
-                    c = CleanupJob.AddAfter(c, intermediateFiles, job.PostprocessingProperties.FinalOutput);
-                    MainForm.Instance.Jobs.AddJobsWithDependencies(c, false);
-
-                    // batch processing other input files if necessary
-                    if (job.PostprocessingProperties.FilesToProcess.Count > 0)
-                    {
-                        OneClickWindow ocw = new OneClickWindow();
-                        ocw.setBatchProcessing(job.PostprocessingProperties.FilesToProcess, job.PostprocessingProperties.OneClickSetting);
-                    }
+                    }   
                 }
             }
             catch (Exception e)
             {
                 log.LogValue("An error occurred", e, ImageType.Error);
+                bError = true;
+            }
+
+            if (c == null || bError)
+            {
+                log.Error("Job creation aborted");
                 su.HasError = true;
+            }
+
+            // add cleanup job also in case of an error
+            c = CleanupJob.AddAfter(c, intermediateFiles, job.PostprocessingProperties.FinalOutput);
+            MainForm.Instance.Jobs.AddJobsWithDependencies(c, false);
+
+            // batch processing other input files if necessary
+            if (job.PostprocessingProperties.FilesToProcess.Count > 0)
+            {
+                OneClickWindow ocw = new OneClickWindow();
+                ocw.setBatchProcessing(job.PostprocessingProperties.FilesToProcess, job.PostprocessingProperties.OneClickSetting);
             }
 
             su.IsComplete = true;
