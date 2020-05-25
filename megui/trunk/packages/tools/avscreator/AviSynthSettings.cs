@@ -126,7 +126,19 @@ namespace MeGUI
 			get {return template;}
 			set
             {
-				string[] lines = value.Split('\r', '\n');
+                if (!value.Contains("<input>"))
+                    value = "<input>\r\n" + value;
+                if (!value.Contains("<crop>"))
+                {
+                    if (!value.Contains("<deinterlace>"))
+                        value = value.Replace("<input>", "<input>\r\n<crop>");
+                    else
+                        value = value.Replace("<deinterlace>", "<deinterlace>\r\n<crop>");
+                }
+                if (!value.Contains("<resize>"))
+                    value = value.Replace("<crop>", "<crop>\r\n<resize>");
+
+                string[] lines = value.Split('\r', '\n');
 				StringBuilder script = new StringBuilder();
 				script.EnsureCapacity(value.Length);
 				foreach (string line in lines)

@@ -1,3 +1,4 @@
+2923 [AviSynth Profiles]    ensured that every template has the crucial entries for input, crop and resize. Bug #951
 2922 [QAAC]                 fixed not able to encode. Bug #954 (regression of 2914)
 2921 [OneClick]             subsequent jobs in batch mode and the cleanup job will be created in any case
 2920 [Video Encoder]        improved job abort behavior
