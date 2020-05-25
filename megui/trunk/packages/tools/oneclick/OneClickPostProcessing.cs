@@ -276,27 +276,27 @@ namespace MeGUI
                                 log.LogEvent("Ignoring subtitle as the it cannot be found: " + oTrack.DemuxFilePath, ImageType.Warning);
                         }
                     }
-
-                    if (IsJobStopped())
-                        return;
-                    
-                    if (!bError)
-                        c = VideoUtil.GenerateJobSeries(myVideo, job.PostprocessingProperties.FinalOutput, arrAudioJobs.ToArray(), 
-                            subtitles.ToArray(), job.PostprocessingProperties.Attachments, job.PostprocessingProperties.TimeStampFile,
-                            job.PostprocessingProperties.ChapterInfo, job.PostprocessingProperties.OutputSize,
-                            job.PostprocessingProperties.Splitting, job.PostprocessingProperties.Container,
-                            job.PostprocessingProperties.PrerenderJob, arrMuxStreams.ToArray(),
-                            log, job.PostprocessingProperties.DeviceOutputType, null, job.PostprocessingProperties.VideoFileToMux, 
-                            job.PostprocessingProperties.AudioTracks.ToArray(), true);
-
-                    if (c != null && !String.IsNullOrEmpty(job.PostprocessingProperties.TimeStampFile) &&
-                        c.Jobs[c.Jobs.Length - 1].Job is MuxJob && (c.Jobs[c.Jobs.Length - 1].Job as MuxJob).MuxType == MuxerType.MP4BOX)
-                    {
-                        // last job is a mp4box job and vfr timecode data has to be applied
-                        MP4FpsModJob mp4FpsMod = new MP4FpsModJob(((MuxJob)c.Jobs[c.Jobs.Length - 1].Job).Output, job.PostprocessingProperties.TimeStampFile);
-                        c = new SequentialChain(c, new SequentialChain(mp4FpsMod));
-                    }   
                 }
+
+                if (IsJobStopped())
+                    return;
+                    
+                if (!bError)
+                    c = VideoUtil.GenerateJobSeries(myVideo, job.PostprocessingProperties.FinalOutput, arrAudioJobs.ToArray(), 
+                        subtitles.ToArray(), job.PostprocessingProperties.Attachments, job.PostprocessingProperties.TimeStampFile,
+                        job.PostprocessingProperties.ChapterInfo, job.PostprocessingProperties.OutputSize,
+                        job.PostprocessingProperties.Splitting, job.PostprocessingProperties.Container,
+                        job.PostprocessingProperties.PrerenderJob, arrMuxStreams.ToArray(),
+                        log, job.PostprocessingProperties.DeviceOutputType, null, job.PostprocessingProperties.VideoFileToMux, 
+                        job.PostprocessingProperties.AudioTracks.ToArray(), true);
+
+                if (c != null && !String.IsNullOrEmpty(job.PostprocessingProperties.TimeStampFile) &&
+                    c.Jobs[c.Jobs.Length - 1].Job is MuxJob && (c.Jobs[c.Jobs.Length - 1].Job as MuxJob).MuxType == MuxerType.MP4BOX)
+                {
+                    // last job is a mp4box job and vfr timecode data has to be applied
+                    MP4FpsModJob mp4FpsMod = new MP4FpsModJob(((MuxJob)c.Jobs[c.Jobs.Length - 1].Job).Output, job.PostprocessingProperties.TimeStampFile);
+                    c = new SequentialChain(c, new SequentialChain(mp4FpsMod));
+                }   
             }
             catch (Exception e)
             {
