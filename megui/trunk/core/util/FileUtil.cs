@@ -1028,6 +1028,10 @@ namespace MeGUI.core.util
 
             foreach (string strDirectory in Directory.GetDirectories(Path.GetDirectoryName(MainForm.Instance.Settings.Redist.Path)))
             {
+                // skip if the redist directory is empty
+                if (Directory.GetFiles(strDirectory).Count() == 0)
+                    continue;
+
                 string strPackage = new DirectoryInfo(strDirectory).Name;
 
                 if (MainForm.Instance.Settings.RedistVersions.ContainsKey(strPackage))
