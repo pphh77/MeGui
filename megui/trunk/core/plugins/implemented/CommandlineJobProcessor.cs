@@ -337,7 +337,7 @@ namespace MeGUI
 
         protected void readStdOut()
         {
-            StreamReader sr = null;
+            StreamReader sr;
             try
             {
                 sr = proc.StandardOutput;
@@ -353,7 +353,7 @@ namespace MeGUI
 
         protected void readStdErr()
         {
-            StreamReader sr = null;
+            StreamReader sr;
             try
             {
                 sr = proc.StandardError;
@@ -371,6 +371,9 @@ namespace MeGUI
         {
             if (String.IsNullOrEmpty(line.Trim()))
                 return;
+
+            byte[] bytes = System.Text.Encoding.GetEncoding(0).GetBytes(line);
+            line = System.Text.Encoding.UTF8.GetString(bytes);
 
             if (stream == StreamType.Stdout)
                 stdoutLog.LogEvent(line, oType);
