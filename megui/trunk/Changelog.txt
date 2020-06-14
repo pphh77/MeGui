@@ -1,3 +1,4 @@
+2927 [Audio Encoder]        improved log output
 2926 [Log]                  improved log output of Unicode/extended ASCII characters
 2925 [Updater]              do not try to copy empty redist directories
 2924 [OneClick]             fixed missing jobs if the mux job does not contain any subtitles (regression of 2921)

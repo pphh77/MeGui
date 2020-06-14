@@ -221,6 +221,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                     if (!String.IsNullOrEmpty(audioJob.Output) && File.Exists(audioJob.Output))
                     {
                         MediaInfoFile oInfo = new MediaInfoFile(audioJob.Output, ref _log);
+                        oInfo.Dispose();
                     }
                 }
                 else if (su.HasError && !bShowError && audioJob.Settings is QaacSettings && _encoderStdErr != null && _encoderStdErr.ToLowerInvariant().Contains("coreaudiotoolbox.dll"))
@@ -269,7 +270,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
 
         private void readStdOut()
         {
-            StreamReader sr = null;
+            StreamReader sr;
             try
             {
                 sr = _encoderProcess.StandardOutput;
@@ -285,7 +286,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
 
         private void readStdErr()
         {
-            StreamReader sr = null;
+            StreamReader sr;
             try
             {
                 sr = _encoderProcess.StandardError;
@@ -354,6 +355,9 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                     return;
             }
 
+            byte[] bytes = System.Text.Encoding.GetEncoding(0).GetBytes(line);
+            line = System.Text.Encoding.UTF8.GetString(bytes);
+
             if (stream == StreamType.Stderr)
                 _encoderStdErr += line + "\n";
 
@@ -391,121 +395,128 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                     }
                 }));
                 t.Start();
-                createAviSynthScript();
-                raiseEvent("Preprocessing...please wait, it may take some time");
-                su.ResetTime();
-                using (AviSynthScriptEnvironment env = new AviSynthScriptEnvironment())
+                if (createAviSynthScript(out string strAVSError))
                 {
-                    _log.LogEvent("AviSynth script environment opened");
-                    using (AviSynthClip a = env.ParseScript(_avisynthAudioScript))
+                    raiseEvent("Preprocessing...please wait, it may take some time");
+                    su.ResetTime();
+                    using (AviSynthScriptEnvironment env = new AviSynthScriptEnvironment())
                     {
-                        _log.LogEvent("Script loaded");
-                        if (0 == a.ChannelsCount)
-                            throw new ApplicationException("Can't find audio stream");
-
-                        LogItem inputLog = _log.LogEvent("Output Decoder", ImageType.Information);
-                        inputLog.LogValue("Channels", a.ChannelsCount);
-                        inputLog.LogValue("Bits per sample", a.BitsPerSample);
-                        inputLog.LogValue("Sample rate", a.AudioSampleRate);
-
-                        if (audioJob.Settings is FlacSettings)
-                            _encoderCommandLine += " --channels=" + a.ChannelsCount + " --bps=" + a.BitsPerSample + " --sample-rate=" + a.AudioSampleRate;
-
-                        const int MAX_SAMPLES_PER_ONCE = 4096;
-                        int frameSample = 0;
-                        int lastUpdateSample = 0;
-                        int frameBufferTotalSize = MAX_SAMPLES_PER_ONCE * a.ChannelsCount * a.BytesPerSample;
-                        byte[] frameBuffer = new byte[frameBufferTotalSize];
-                        createEncoderProcess(a);
-                        try
+                        _log.LogEvent("AviSynth script environment opened");
+                        using (AviSynthClip a = env.ParseScript(_avisynthAudioScript))
                         {
-                            using (Stream target = _encoderProcess.StandardInput.BaseStream)
+                            _log.LogEvent("Script loaded");
+                            if (0 == a.ChannelsCount)
+                                throw new ApplicationException("Can't find audio stream");
+
+                            LogItem inputLog = _log.LogEvent("Output Decoder", ImageType.Information);
+                            inputLog.LogValue("Channels", a.ChannelsCount);
+                            inputLog.LogValue("Bits per sample", a.BitsPerSample);
+                            inputLog.LogValue("Sample rate", a.AudioSampleRate);
+
+                            if (audioJob.Settings is FlacSettings)
+                                _encoderCommandLine += " --channels=" + a.ChannelsCount + " --bps=" + a.BitsPerSample + " --sample-rate=" + a.AudioSampleRate;
+
+                            const int MAX_SAMPLES_PER_ONCE = 4096;
+                            int frameSample = 0;
+                            int lastUpdateSample = 0;
+                            int frameBufferTotalSize = MAX_SAMPLES_PER_ONCE * a.ChannelsCount * a.BytesPerSample;
+                            byte[] frameBuffer = new byte[frameBufferTotalSize];
+                            createEncoderProcess(a);
+                            try
                             {
-                                // let's write WAV Header
-                                writeHeader(target, a, _sendWavHeaderToEncoderStdIn, -1);
-
-                                _sampleRate = a.AudioSampleRate;
-
-                                bool hasStartedEncoding = false;
-
-                                GCHandle h = GCHandle.Alloc(frameBuffer, GCHandleType.Pinned);
-                                IntPtr address = h.AddrOfPinnedObject();
-                                try
+                                using (Stream target = _encoderProcess.StandardInput.BaseStream)
                                 {
-                                    su.ClipLength = TimeSpan.FromSeconds((double)a.SamplesCount / (double)_sampleRate);
-                                    while (frameSample < a.SamplesCount)
-                                    {
-                                        _mre.WaitOne();
+                                    // let's write WAV Header
+                                    WriteHeader(target, a, _sendWavHeaderToEncoderStdIn, -1);
 
-                                        if (_encoderProcess != null)
+                                    _sampleRate = a.AudioSampleRate;
+
+                                    bool hasStartedEncoding = false;
+
+                                    GCHandle h = GCHandle.Alloc(frameBuffer, GCHandleType.Pinned);
+                                    IntPtr address = h.AddrOfPinnedObject();
+                                    try
+                                    {
+                                        su.ClipLength = TimeSpan.FromSeconds((double)a.SamplesCount / (double)_sampleRate);
+                                        while (frameSample < a.SamplesCount)
                                         {
-                                            if (_encoderProcess.HasExited)
+                                            _mre.WaitOne();
+
+                                            if (_encoderProcess != null)
                                             {
-                                                string strError = WindowUtil.GetErrorText(_encoderProcess.ExitCode);
-                                                throw new ApplicationException("Abnormal encoder termination. Exit code: " + strError);
+                                                if (_encoderProcess.HasExited)
+                                                {
+                                                    string strError = WindowUtil.GetErrorText(_encoderProcess.ExitCode);
+                                                    throw new ApplicationException("Abnormal encoder termination. Exit code: " + strError);
+                                                }
+                                            }
+                                            int nHowMany = Math.Min((int)(a.SamplesCount - frameSample), MAX_SAMPLES_PER_ONCE);
+
+                                            a.ReadAudio(address, frameSample, nHowMany);
+
+                                            _mre.WaitOne();
+                                            if (!hasStartedEncoding)
+                                            {
+                                                t.Abort();
+                                                raiseEvent("Encoding audio...");
+                                                hasStartedEncoding = true;
+                                            }
+
+                                            target.Write(frameBuffer, 0, nHowMany * a.ChannelsCount * a.BytesPerSample);
+                                            target.Flush();
+                                            frameSample += nHowMany;
+                                            if (frameSample - lastUpdateSample > 100000) // 100000 samples per update
+                                            {
+                                                setProgress((decimal)frameSample / (decimal)a.SamplesCount);
+                                                lastUpdateSample = frameSample;
                                             }
                                         }
-                                        int nHowMany = Math.Min((int)(a.SamplesCount - frameSample), MAX_SAMPLES_PER_ONCE);
-
-                                        a.ReadAudio(address, frameSample, nHowMany);
-
-                                        _mre.WaitOne();
-                                        if (!hasStartedEncoding)
-                                        {
-                                            t.Abort();
-                                            raiseEvent("Encoding audio...");
-                                            hasStartedEncoding = true;
-                                        }
-
-                                        target.Write(frameBuffer, 0, nHowMany * a.ChannelsCount * a.BytesPerSample);
-                                        target.Flush();
-                                        frameSample += nHowMany;
-                                        if (frameSample - lastUpdateSample > 100000) // 100000 samples per update
-                                        {
-                                            setProgress((decimal)frameSample / (decimal)a.SamplesCount);
-                                            lastUpdateSample = frameSample;
-                                        }
                                     }
-                                }
-                                finally
-                                {
-                                    h.Free();
-                                }
-                                setProgress(1M);
+                                    finally
+                                    {
+                                        h.Free();
+                                    }
+                                    setProgress(1M);
 
-                                if (_sendWavHeaderToEncoderStdIn != HeaderType.NONE && a.BytesPerSample % 2 == 1)
-                                    target.WriteByte(0);
-                            }
-                            raiseEvent("Finalizing encoder");
-                            while (!_encoderProcess.HasExited) // wait until the process has terminated without locking the GUI
-                                MeGUI.core.util.Util.Wait(100);
-                            _encoderProcess.WaitForExit();
-                            _readFromStdErrThread.Join();
-                            _readFromStdOutThread.Join();
-                            if (0 != _encoderProcess.ExitCode)
-                            {
-                                string strError = WindowUtil.GetErrorText(_encoderProcess.ExitCode);
-                                throw new ApplicationException("Abnormal encoder termination. Exit code: " + strError);
-                            }
-                        }
-                        finally
-                        {
-                            if (!_encoderProcess.HasExited)
-                            {
-                                _encoderProcess.Kill();
+                                    if (_sendWavHeaderToEncoderStdIn != HeaderType.NONE && a.BytesPerSample % 2 == 1)
+                                        target.WriteByte(0);
+                                }
+                                raiseEvent("Finalizing encoder");
                                 while (!_encoderProcess.HasExited) // wait until the process has terminated without locking the GUI
                                     MeGUI.core.util.Util.Wait(100);
                                 _encoderProcess.WaitForExit();
                                 _readFromStdErrThread.Join();
                                 _readFromStdOutThread.Join();
+                                if (0 != _encoderProcess.ExitCode)
+                                {
+                                    string strError = WindowUtil.GetErrorText(_encoderProcess.ExitCode);
+                                    throw new ApplicationException("Abnormal encoder termination. Exit code: " + strError);
+                                }
                             }
-                            _readFromStdErrThread = null;
-                            _readFromStdOutThread = null;
+                            finally
+                            {
+                                if (!_encoderProcess.HasExited)
+                                {
+                                    _encoderProcess.Kill();
+                                    while (!_encoderProcess.HasExited) // wait until the process has terminated without locking the GUI
+                                        MeGUI.core.util.Util.Wait(100);
+                                    _encoderProcess.WaitForExit();
+                                    _readFromStdErrThread.Join();
+                                    _readFromStdOutThread.Join();
+                                }
+                                _readFromStdErrThread = null;
+                                _readFromStdOutThread = null;
 
-                            if (!String.IsNullOrEmpty(audioJob.Output) && File.Exists(audioJob.Output) && (new System.IO.FileInfo(audioJob.Output).Length) == 0)
-                                _log.Error("Output file is empty, nothing was encoded");
+                                if (!String.IsNullOrEmpty(audioJob.Output) && File.Exists(audioJob.Output) && (new System.IO.FileInfo(audioJob.Output).Length) == 0)
+                                    _log.Error("Output file is empty, nothing was encoded");
+                            }
                         }
                     }
+                }
+                else
+                {
+                    _log.LogEvent(strAVSError, ImageType.Error);
+                    su.HasError = true;
                 }
             }
             catch (Exception e)
@@ -607,7 +618,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             }
         }
 
-        private void writeHeader(Stream target, AviSynthClip a, HeaderType headerType, int iChannelMask)
+        private static void WriteHeader(Stream target, AviSynthClip a, HeaderType headerType, int iChannelMask)
         {
             // http://behappy.codeplex.com/
 
@@ -718,7 +729,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             sbOpen = new StringBuilder();
             sbOpen.Append(VideoUtil.getFFMSAudioInputLine(audioJob.Input, null, -1));
             _log.LogEvent("Trying to open the file with FFAudioSource()", ImageType.Information);
-            string strErrorText = String.Empty;
+            string strErrorText;
             if (AudioUtil.AVSScriptHasAudio(sbOpen.ToString(), out strErrorText))
             {
                 _log.LogEvent("Successfully opened the file with FFAudioSource()", ImageType.Information);
@@ -739,7 +750,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             sbOpen = new StringBuilder();
             sbOpen.Append(VideoUtil.getLSMASHAudioInputLine(audioJob.Input, null, -1));
             _log.LogEvent("Trying to open the file with LWLibavAudioSource()", ImageType.Information);
-            string strErrorText = String.Empty;
+            string strErrorText;
             if (AudioUtil.AVSScriptHasAudio(sbOpen.ToString(), out strErrorText))
             {
                 _log.LogEvent("Successfully opened the file with LWLibavAudioSource()", ImageType.Information);
@@ -764,7 +775,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 sbOpen.AppendFormat("LoadPlugin(\"{0}\"){1}", strPluginPath, Environment.NewLine);
                 sbOpen.AppendFormat("BassAudioSource(\"{0}\"){1}", audioJob.Input, Environment.NewLine);
                 _log.LogEvent("Trying to open the file with BassAudioSource()", ImageType.Information);
-                string strErrorText = String.Empty;
+                string strErrorText;
                 if (AudioUtil.AVSScriptHasAudio(sbOpen.ToString(), out strErrorText))
                 {
                     _log.LogEvent("Successfully opened the file with BassAudioSource()", ImageType.Information);
@@ -815,7 +826,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             return false;
         }
 
-        private bool OpenSourceWithImportAVS(out StringBuilder sbOpen, MediaInfoFile oInfo)
+        private bool OpenSourceWithImportAVS(out StringBuilder sbOpen)
         {
             sbOpen = new StringBuilder();
             sbOpen.AppendFormat("Import(\"{0}\"){1}", audioJob.Input, Environment.NewLine);
@@ -968,146 +979,153 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             this.su = su;
         }
 
-        private void createAviSynthScript()
+        private bool createAviSynthScript(out string strError)
         {
-            //let's create avisynth script
+            strError = string.Empty;
+
+            //let's create the avisynth script
             StringBuilder script = new StringBuilder();
 
             string id = _uniqueId;
             string tmp = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), id);
 
-            MediaInfoFile oInfo = new MediaInfoFile(audioJob.Input, ref _log);
-
-            bool bFound = false;
-            if (oInfo.ContainerFileTypeString.Equals("AVS"))
-            {
-                bFound = OpenSourceWithImportAVS(out script, oInfo);
-            }
-            else if (audioJob.Settings.PreferredDecoder == AudioDecodingEngine.NicAudio)
-            {
-                bFound = OpenSourceWithNicAudio(out script, oInfo, false);
-                if (!bFound)
-                    bFound = OpenSourceWithLSMASHAudioSource(out script);
-                if (!bFound)
-                    bFound = OpenSourceWithBassAudio(out script);
-                if (!bFound)
-                    bFound = OpenSourceWithFFAudioSource(out script);
-                if (!bFound)
-                    bFound = OpenSourceWithDirectShow(out script, oInfo);
-            }
-            else if (audioJob.Settings.PreferredDecoder == AudioDecodingEngine.BassAudio)
-            {
-                bFound = OpenSourceWithBassAudio(out script);
-                if (!bFound)
-                    bFound = OpenSourceWithLSMASHAudioSource(out script);
-                if (!bFound)
-                    bFound = OpenSourceWithNicAudio(out script, oInfo, false);
-                if (!bFound)
-                    bFound = OpenSourceWithFFAudioSource(out script);
-                if (!bFound)
-                    bFound = OpenSourceWithDirectShow(out script, oInfo);
-            }
-            else if (audioJob.Settings.PreferredDecoder == AudioDecodingEngine.LWLibavAudioSource)
-            {
-                bFound = OpenSourceWithLSMASHAudioSource(out script);
-                if (!bFound)
-                    bFound = OpenSourceWithNicAudio(out script, oInfo, false);
-                if (!bFound)
-                    bFound = OpenSourceWithBassAudio(out script);
-                if (!bFound)
-                    bFound = OpenSourceWithFFAudioSource(out script);
-                if (!bFound)
-                    bFound = OpenSourceWithDirectShow(out script, oInfo);
-            }
-            else if (audioJob.Settings.PreferredDecoder == AudioDecodingEngine.FFAudioSource)
-            {
-                bFound = OpenSourceWithFFAudioSource(out script);
-                if (!bFound)
-                    bFound = OpenSourceWithLSMASHAudioSource(out script);
-                if (!bFound)
-                    bFound = OpenSourceWithNicAudio(out script, oInfo, false);
-                if (!bFound)
-                    bFound = OpenSourceWithBassAudio(out script);
-                if (!bFound)
-                    bFound = OpenSourceWithDirectShow(out script, oInfo);
-            }
-            else
-            {
-                bFound = OpenSourceWithDirectShow(out script, oInfo);
-                if (!bFound)
-                    bFound = OpenSourceWithLSMASHAudioSource(out script);
-                if (!bFound)
-                    bFound = OpenSourceWithNicAudio(out script, oInfo, false);
-                if (!bFound)
-                    bFound = OpenSourceWithBassAudio(out script);
-                if (!bFound)
-                    bFound = OpenSourceWithFFAudioSource(out script);
-            }
-
-            if (!bFound && oInfo.AudioInfo.Tracks.Count > 0 && oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.DTS && oInfo.AudioInfo.Tracks[0].CodecProfile.Contains("MA"))
-                bFound = OpenSourceWithNicAudio(out script, oInfo, true);
-
-            if (!bFound)
-            {
-                deleteTempFiles();
-                throw new JobRunException("Input file cannot be opened: " + audioJob.Input);
-            }
-
-            if (MainForm.Instance.Settings.PortableAviSynth && MainForm.Instance.Settings.AviSynthPlus)
-            {
-                script.Insert(0, String.Format("ClearAutoloadDirs(){0}AddAutoloadDir(\"{1}\"){0}",
-                    Environment.NewLine,
-                    Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynth.Path), @"plugins")));
-            }
-
-            if (audioJob.Delay != 0)
-                script.AppendFormat("DelayAudio({0}.0/1000.0){1}", audioJob.Delay, Environment.NewLine);
-
-            if (!string.IsNullOrEmpty(audioJob.CutFile))
-            {
-                try
-                {
-                    Cuts cuts = FilmCutter.ReadCutsFromFile(audioJob.CutFile);
-                    script.AppendLine(FilmCutter.GetCutsScript(cuts, true));
-                }
-                catch (FileNotFoundException)
-                {
-                    deleteTempFiles();
-                    throw new MissingFileException(audioJob.CutFile);
-                }
-                catch (Exception)
-                {
-                    deleteTempFiles();
-                    throw new JobRunException("Broken cuts file, " + audioJob.CutFile + ", can't continue.");
-                }
-            }
-
-            // detect audio information
             string strChannelCount = string.Empty;
             string strChannelPositions = string.Empty;
             int iChannelCount = 0;
             int iAVSChannelCount = 0;
             int iAVSAudioSampleRate = 0;
 
-            // get real detected channel count from AVS 
-            using (AvsFile avi = AvsFile.ParseScript(script.ToString()))
+            using (MediaInfoFile oInfo = new MediaInfoFile(audioJob.Input, ref _log))
             {
-                iAVSChannelCount = avi.Clip.ChannelsCount;
-                iAVSAudioSampleRate = avi.Clip.AudioSampleRate;
-            }
 
-            // get the channel information from source file
-            if (oInfo.ContainerFileTypeString.Equals("AVS"))
-            {
-                strChannelCount = AudioUtil.getChannelCountFromAVSFile(audioJob.Input);
-                if (String.IsNullOrEmpty(strChannelCount))
+                bool bFound = false;
+                if (oInfo.ContainerFileTypeString.Equals("AVS"))
+                {
+                    bFound = OpenSourceWithImportAVS(out script);
+                }
+                else if (audioJob.Settings.PreferredDecoder == AudioDecodingEngine.NicAudio)
+                {
+                    bFound = OpenSourceWithNicAudio(out script, oInfo, false);
+                    if (!bFound)
+                        bFound = OpenSourceWithLSMASHAudioSource(out script);
+                    if (!bFound)
+                        bFound = OpenSourceWithBassAudio(out script);
+                    if (!bFound)
+                        bFound = OpenSourceWithFFAudioSource(out script);
+                    if (!bFound)
+                        bFound = OpenSourceWithDirectShow(out script, oInfo);
+                }
+                else if (audioJob.Settings.PreferredDecoder == AudioDecodingEngine.BassAudio)
+                {
+                    bFound = OpenSourceWithBassAudio(out script);
+                    if (!bFound)
+                        bFound = OpenSourceWithLSMASHAudioSource(out script);
+                    if (!bFound)
+                        bFound = OpenSourceWithNicAudio(out script, oInfo, false);
+                    if (!bFound)
+                        bFound = OpenSourceWithFFAudioSource(out script);
+                    if (!bFound)
+                        bFound = OpenSourceWithDirectShow(out script, oInfo);
+                }
+                else if (audioJob.Settings.PreferredDecoder == AudioDecodingEngine.LWLibavAudioSource)
+                {
+                    bFound = OpenSourceWithLSMASHAudioSource(out script);
+                    if (!bFound)
+                        bFound = OpenSourceWithNicAudio(out script, oInfo, false);
+                    if (!bFound)
+                        bFound = OpenSourceWithBassAudio(out script);
+                    if (!bFound)
+                        bFound = OpenSourceWithFFAudioSource(out script);
+                    if (!bFound)
+                        bFound = OpenSourceWithDirectShow(out script, oInfo);
+                }
+                else if (audioJob.Settings.PreferredDecoder == AudioDecodingEngine.FFAudioSource)
+                {
+                    bFound = OpenSourceWithFFAudioSource(out script);
+                    if (!bFound)
+                        bFound = OpenSourceWithLSMASHAudioSource(out script);
+                    if (!bFound)
+                        bFound = OpenSourceWithNicAudio(out script, oInfo, false);
+                    if (!bFound)
+                        bFound = OpenSourceWithBassAudio(out script);
+                    if (!bFound)
+                        bFound = OpenSourceWithDirectShow(out script, oInfo);
+                }
+                else
+                {
+                    bFound = OpenSourceWithDirectShow(out script, oInfo);
+                    if (!bFound)
+                        bFound = OpenSourceWithLSMASHAudioSource(out script);
+                    if (!bFound)
+                        bFound = OpenSourceWithNicAudio(out script, oInfo, false);
+                    if (!bFound)
+                        bFound = OpenSourceWithBassAudio(out script);
+                    if (!bFound)
+                        bFound = OpenSourceWithFFAudioSource(out script);
+                }
+
+                if (!bFound && oInfo.AudioInfo.Tracks.Count > 0 && oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.DTS && oInfo.AudioInfo.Tracks[0].CodecProfile.Contains("MA"))
+                    bFound = OpenSourceWithNicAudio(out script, oInfo, true);
+
+                if (!bFound)
+                {
+                    deleteTempFiles();
+                    strError = "Failed opening the file: " + audioJob.Input;
+                    return false;
+                }
+
+                if (MainForm.Instance.Settings.PortableAviSynth && MainForm.Instance.Settings.AviSynthPlus)
+                {
+                    script.Insert(0, String.Format("ClearAutoloadDirs(){0}AddAutoloadDir(\"{1}\"){0}",
+                        Environment.NewLine,
+                        Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.AviSynth.Path), @"plugins")));
+                }
+
+                if (audioJob.Delay != 0)
+                    script.AppendFormat("DelayAudio({0}.0/1000.0){1}", audioJob.Delay, Environment.NewLine);
+
+                if (!string.IsNullOrEmpty(audioJob.CutFile))
+                {
+                    try
+                    {
+                        Cuts cuts = FilmCutter.ReadCutsFromFile(audioJob.CutFile);
+                        script.AppendLine(FilmCutter.GetCutsScript(cuts, true));
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        deleteTempFiles();
+                        strError = "Required file '" + audioJob.CutFile + "' is missing.";
+                        return false;
+                    }
+                    catch (Exception)
+                    {
+                        deleteTempFiles();
+                        strError = "Broken cuts file, " + audioJob.CutFile + ", can't continue.";
+                        return false;
+                    }
+                }
+
+                // detect audio information
+                // get real detected channel count from AVS 
+                using (AvsFile avi = AvsFile.ParseScript(script.ToString()))
+                {
+                    iAVSChannelCount = avi.Clip.ChannelsCount;
+                    iAVSAudioSampleRate = avi.Clip.AudioSampleRate;
+                }
+
+                // get the channel information from source file
+                if (oInfo.ContainerFileTypeString.Equals("AVS"))
+                {
+                    strChannelCount = AudioUtil.getChannelCountFromAVSFile(audioJob.Input);
+                    if (String.IsNullOrEmpty(strChannelCount))
+                        strChannelCount = oInfo.AudioInfo.Tracks[0].NbChannels;
+                    strChannelPositions = AudioUtil.getChannelPositionsFromAVSFile(audioJob.Input);
+                }
+                else
+                {
                     strChannelCount = oInfo.AudioInfo.Tracks[0].NbChannels;
-                strChannelPositions = AudioUtil.getChannelPositionsFromAVSFile(audioJob.Input);
-            }
-            else
-            {
-                strChannelCount = oInfo.AudioInfo.Tracks[0].NbChannels;
-                strChannelPositions = oInfo.AudioInfo.Tracks[0].ChannelPositions;
+                    strChannelPositions = oInfo.AudioInfo.Tracks[0].ChannelPositions;
+                }
             }
 
             int iCount = 0;
@@ -2091,6 +2109,8 @@ function x_upmixC" + id + @"(clip stereo)
 
             _log.LogValue("AviSynth script", _avisynthAudioScript);
             _log.LogValue("Command line used", _encoderCommandLine);
+
+            return true;
         }
 
         public void start()
