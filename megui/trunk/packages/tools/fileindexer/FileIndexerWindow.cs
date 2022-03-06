@@ -108,10 +108,10 @@ namespace MeGUI
             if (MainForm.Instance.Settings.IsDGIIndexerAvailable() || MainForm.Instance.Settings.IsDGMIndexerAvailable())
             {
                 if (MainForm.Instance.Settings.IsDGIIndexerAvailable())
-                    filter += "|All DGIndexNV supported files|*.264;*.avc;*.h264;*.ifo;*.m2t;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpls;*.mpv;*.mts;*.tp;*.trp;*.ts;*.vc1;*.vob";
+                    filter += "|All DGIndexNV supported files|*.264;*.avc;*.h264;*.265;*.hevc;*.ifo;*.m2t;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpls;*.mpv;*.mts;*.tp;*.trp;*.ts;*.vc1;*.vob";
                 if (MainForm.Instance.Settings.IsDGMIndexerAvailable())
-                    filter += "|All DGIndexIM supported files|*.264;*.avc;*.h264;*.ifo;*.m2t;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpls;*.mpv;*.mts;*.tp;*.trp;*.ts;*.vc1;*.vob";
-                filter += "|All supported files|*.264;*.avc;*.avi;*.flv;*.h264;*.ifo;*.m1v;*.m2t*;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpls;*.mpv;*.mts;*.ogm;*.pva;*.tp;*.trp;*.ts;*.vc1;*.vob;*.vro;*.wmv";
+                    filter += "|All DGIndexIM supported files|*.264;*.avc;*.h264;*.265;*.hevc;*.ifo;*.m2t;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpls;*.mpv;*.mts;*.tp;*.trp;*.ts;*.vc1;*.vob";
+                filter += "|All supported files|*.264;*.265;*.hevc;*.avc;*.avi;*.flv;*.h264;*.265;*.hevc;*.ifo;*.m1v;*.m2t*;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpls;*.mpv;*.mts;*.ogm;*.pva;*.tp;*.trp;*.ts;*.vc1;*.vob;*.vro;*.wmv";
                 filter += "|All files|*.*";
                 input.Filter = filter;
                 if (MainForm.Instance.Settings.IsDGIIndexerAvailable() && MainForm.Instance.Settings.IsDGMIndexerAvailable())
@@ -125,7 +125,7 @@ namespace MeGUI
             }
             else
             {
-                filter += "|All supported files|*.264;*.avc;*.avi;*.flv;*.h264;*.ifo;*.m1v;*.m2t*;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpls;*.mpv;*.mts;*.ogm;*.pva;*.tp;*.trp;*.ts;*.vob;*.vro;*.wmv";
+                filter += "|All supported files|*.264;*.avc;*.avi;*.flv;*.h264;*.265;*.hevc;*.ifo;*.m1v;*.m2t*;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpls;*.mpv;*.mts;*.ogm;*.pva;*.tp;*.trp;*.ts;*.vob;*.vro;*.wmv";
                 filter += "|All files|*.*";
                 input.Filter = filter;
                 input.FilterIndex = 4;

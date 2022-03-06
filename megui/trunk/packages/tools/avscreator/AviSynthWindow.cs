@@ -126,8 +126,8 @@ namespace MeGUI
             {
                 filter += "All AviSynth script files|*.avs";
                 filter += "|All index files|*.d2v;*.dgi;*.ffindex;*.lwi";
-                filter += "|All indexable files|*.264;*.avc;*.avi;*.flv;*.h264;*.ifo;*.m1v;*.m2t;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpls;*.mpv;*.mts;*.ogm;*.pva;*.tp;*.trp;*.ts;*.vc1;*.vob;*.vro;*.wmv";
-                filter += "|All suported files|*.264;*.avc;*.avi;*.avs;*.d2v;*.dgi;*.ffindex;*.flv;*.h264;*.ifo;*.lwi;*.m1v;*.m2t*;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpls;*.mpv;*.mts;*.ogm;*.pva;*.tp;*.trp;*.ts;*.vc1;*.vdr;*.vob;*.vro;*.wmv";
+                filter += "|All indexable files|*.264;*.avc;*.265;*.hevc;*.avi;*.flv;*.h264;*.265;*.hevc;*.ifo;*.m1v;*.m2t;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpls;*.mpv;*.mts;*.ogm;*.pva;*.tp;*.trp;*.ts;*.vc1;*.vob;*.vro;*.wmv";
+                filter += "|All suported files|*.264;*.265;*.hevc;*.avc;*.avi;*.avs;*.d2v;*.dgi;*.ffindex;*.flv;*.h264;*.ifo;*.lwi;*.m1v;*.m2t*;*.m2ts;*.m2v;*.mkv;*.mp4;*.mpeg;*.mpg;*.mpls;*.mpv;*.mts;*.ogm;*.pva;*.tp;*.trp;*.ts;*.vc1;*.vdr;*.vob;*.vro;*.wmv";
             }
             else
             {

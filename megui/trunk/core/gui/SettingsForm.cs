@@ -577,19 +577,6 @@ namespace MeGUI
         {
             if (!useDGIndexNV.Checked)
                 return;
-
-            // check if the license file is available
-            if (!File.Exists(Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexNV.Path), "license.txt")))
-            {
-                if (File.Exists(Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexIM.Path), "license.txt")))
-                {
-                    // license.txt available in the other indexer directory. copy it
-                    Directory.CreateDirectory(Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexNV.Path));
-                    File.Copy(Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexIM.Path), "license.txt"), Path.Combine(Path.GetDirectoryName(MainForm.Instance.Settings.DGIndexNV.Path), "license.txt"));
-                }
-                else
-                    MessageBox.Show("DGIndexNV cannot be used for free. Therefore you have to copy/create the file license.txt into your ..\\tools\\dgindexnv directory manually.", "license.txt for DGIndexNV missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
         }
 
         private void useDGIndexIM_CheckedChanged(object sender, EventArgs e)

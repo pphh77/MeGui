@@ -1507,19 +1507,6 @@ namespace MeGUI
             if (!bUseDGIndexNV)
                 return false;
 
-            // check if the license file is available
-            if (!File.Exists(Path.Combine(Path.GetDirectoryName(dgindexnv.Path), "license.txt")))
-            {
-                if (File.Exists(Path.Combine(Path.GetDirectoryName(dgindexim.Path), "license.txt")))
-                {
-                    // license.txt available in the other indexer directory. copy it
-                    Directory.CreateDirectory(Path.GetDirectoryName(dgindexnv.Path));
-                    File.Copy(Path.Combine(Path.GetDirectoryName(dgindexim.Path), "license.txt"), Path.Combine(Path.GetDirectoryName(dgindexnv.Path), "license.txt"));
-                }
-                else
-                    return false;
-            }
-
             // DGI is not available in a RDP connection
             if (SystemInformation.TerminalServerSession == true)
                 return false;

@@ -1,3 +1,5 @@
+2928 [DGIndexNV]            updated to support the free version. Patch by Donald Graft (#672)
+     [MeGUI]                .NET 4.8 is required now to run MeGUI
 2927 [Audio Encoder]        improved log output
 2926 [Log]                  improved log output of Unicode/extended ASCII characters
 2925 [Updater]              do not try to copy empty redist directories

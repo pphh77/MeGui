@@ -1113,9 +1113,10 @@ namespace MeGUI
             if (!MainForm.Instance.Settings.IsDGIIndexerAvailable())
                 return false;
 
-            // only AVC, VC1 and MPEG2 are supported
+            // only AVC, HEVC, VC1 and MPEG2 are supported
             if (_VideoInfo.Codec != VideoCodec.AVC &&
                 _VideoInfo.Codec != VideoCodec.VC1 &&
+                _VideoInfo.Codec != VideoCodec.HEVC &&
                 _VideoInfo.Codec != VideoCodec.MPEG2)
                 return false;
 
@@ -1128,6 +1129,7 @@ namespace MeGUI
                 !_strContainer.ToUpperInvariant().Equals("MPEG-4") &&
                 !_strContainer.ToUpperInvariant().Equals("VC-1") &&
                 !_strContainer.ToUpperInvariant().Equals("AVC") &&
+                !_strContainer.ToUpperInvariant().Equals("HEVC") &&
                 !_strContainer.ToUpperInvariant().Equals("BDAV") &&
                 !_strContainer.ToUpperInvariant().Equals("BLU-RAY PLAYLIST"))
                 return false;
