@@ -46,13 +46,13 @@ new JobProcessorFactory(new ProcessorFactory(init), "AMGMuxer");
         public AMGMuxer(string executablePath)
         {
             UpdateCacher.CheckPackage("avimux_gui");
-            this.executable = executablePath;
+            this.Executable = executablePath;
         }
         #region setup/start overrides
         protected override void checkJobIO()
         {
-            script_filename = writeScript(job);
-            job.FilesToDelete.Add(script_filename);
+            script_filename = writeScript(Job);
+            Job.FilesToDelete.Add(script_filename);
             
             base.checkJobIO();
         }
@@ -80,7 +80,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AMGMuxer");
             // add the audio streams
             foreach (MuxStream s in settings.AudioStreams)
             {
-                MediaInfoFile oAudioInfo = new MediaInfoFile(s.path, ref log);
+                using (MediaInfoFile oAudioInfo = new MediaInfoFile(s.path, ref log)) { }
 
                 script.AppendFormat("LOAD {1}{0}", Environment.NewLine, s.path);
                 script.AppendLine("SET OUTPUT OPTIONS");
@@ -111,18 +111,18 @@ new JobProcessorFactory(new ProcessorFactory(init), "AMGMuxer");
             // add the video stream if it exists
             if (!string.IsNullOrEmpty(settings.VideoInput))
             {
-                MediaInfoFile oVideoInfo = new MediaInfoFile(settings.VideoInput, ref log);
-                script.AppendFormat("LOAD {1}{0}SELECT FILE {2}{0}ADD VIDEOSOURCE{0}DESELECT FILE {2}{0}", 
-                    Environment.NewLine, settings.VideoInput, fileNum);
+                using (MediaInfoFile oVideoInfo = new MediaInfoFile(settings.VideoInput, ref log)) { }
+                    script.AppendFormat("LOAD {1}{0}SELECT FILE {2}{0}ADD VIDEOSOURCE{0}DESELECT FILE {2}{0}",
+                        Environment.NewLine, settings.VideoInput, fileNum);
                 fileNum++;
             }
 
             // mux in the rest if it exists
             if (!string.IsNullOrEmpty(settings.MuxedInput))
             {
-                MediaInfoFile oVideoInfo = new MediaInfoFile(settings.MuxedInput, ref log);
-                script.AppendFormat("LOAD {1}{0}SELECT FILE {2}{0}ADD VIDEOSOURCE{0}DESELECT FILE {2}{0}",
-                    Environment.NewLine, settings.MuxedInput, fileNum);
+                using (MediaInfoFile oVideoInfo = new MediaInfoFile(settings.MuxedInput, ref log)) { }
+                    script.AppendFormat("LOAD {1}{0}SELECT FILE {2}{0}ADD VIDEOSOURCE{0}DESELECT FILE {2}{0}",
+                        Environment.NewLine, settings.MuxedInput, fileNum);
                 fileNum++;
             }
             

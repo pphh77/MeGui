@@ -76,6 +76,7 @@ namespace MeGUI.packages.video.xvid
             return !(mode == VideoCodecSettings.VideoEncodingMode.CQ ||
                 mode == VideoCodecSettings.VideoEncodingMode.quality);
         }
+
         private void doDropDownAdjustments()
         {
             logfileOpenButton.Enabled = false;
@@ -291,7 +292,7 @@ namespace MeGUI.packages.video.xvid
         #region codec-specific overload functions
         protected override string getCommandline()
         {
-            return XviDEncoder.genCommandline("input", "output", null, Settings as xvidSettings, -1, -1, 0, 1, null, null);
+            return XviDEncoder.genCommandline("input", "output", null, Settings as xvidSettings, -1, -1, null, null);
         }
         /// <summary>
         /// Does all the necessary adjustments after a GUI change has been made.
@@ -351,7 +352,7 @@ namespace MeGUI.packages.video.xvid
                 xs.Quantizer = xvidBitrateQuantizer.Value;
                 xs.BitrateQuantizer = (int)xvidBitrateQuantizer.Value;
 
-                if (!xvidKeyframeInterval.Text.Equals(""))
+                if (!String.IsNullOrEmpty(xvidKeyframeInterval.Text))
                     xs.KeyframeInterval = Int32.Parse(this.xvidKeyframeInterval.Text);
                 xs.NbBframes = (int)xvidNbBFrames.Value;
                 xs.PackedBitstream = xvidPackedBitstream.Checked;
@@ -379,7 +380,7 @@ namespace MeGUI.packages.video.xvid
                 xs.BQuantRatio = (int)xvidBframeQuantRatio.Value;
                 xs.BQuantOffset = (int)xvidBframeQuantOffset.Value;
                 xs.KeyFrameBoost = (int)xvidIframeBoost.Value;
-                if (!xvidKeyframeTreshold.Text.Equals(""))
+                if (!String.IsNullOrEmpty(xvidKeyframeTreshold.Text))
                     xs.KeyframeThreshold = Int32.Parse(xvidKeyframeTreshold.Text);
                 xs.KeyframeReduction = (int)xvidKeyframeReduction.Value;
                 xs.OverflowControlStrength = (int)xvidOverflowControlStrength.Value;
@@ -387,11 +388,11 @@ namespace MeGUI.packages.video.xvid
                 xs.MaxOverflowDegradation = (int)xvidMaxOverflowDegradation.Value;
                 xs.HighBitrateDegradation = (int)xvidHighBitrateDegradation.Value;
                 xs.LowBitrateImprovement = (int)xvidLowBitrateImprovement.Value;
-                if (!xvidRCDelayFactor.Text.Equals(""))
+                if (!String.IsNullOrEmpty(xvidRCDelayFactor.Text))
                     xs.ReactionDelayFactor = Int32.Parse(xvidRCDelayFactor.Text);
-                if (!xvidRCAveragingPeriod.Text.Equals(""))
+                if (!String.IsNullOrEmpty(xvidRCAveragingPeriod.Text))
                     xs.AveragingPeriod = Int32.Parse(xvidRCAveragingPeriod.Text);
-                if (!xvidRCBufferSize.Text.Equals("") && !xvidRCBufferSize.Text.Equals("0"))
+                if (!String.IsNullOrEmpty(xvidRCBufferSize.Text) && !xvidRCBufferSize.Text.Equals("0"))
                     xs.RateControlBuffer = Int32.Parse(xvidRCBufferSize.Text);
                 xs.BframeThreshold = this.xvidBframeThreshold.Value;
                 xs.FrameDropRatio = (int)xvidFrameDropRatio.Value;
@@ -403,6 +404,9 @@ namespace MeGUI.packages.video.xvid
             }
             set
             {
+                if (value == null)
+                    return;
+
                 xvidSettings xs = value;
                 this.xvidTurbo.Checked = xs.Turbo;
                 this.xvidEncodingMode.SelectedIndex = (int)xs.VideoEncodingType;

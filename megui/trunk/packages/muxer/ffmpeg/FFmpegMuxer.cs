@@ -41,7 +41,7 @@ namespace MeGUI
         public FFmpegMuxer(string executablePath)
         {
             UpdateCacher.CheckPackage("ffmpeg");
-            this.executable = executablePath;
+            this.Executable = executablePath;
         }
 
         #region line processing
@@ -67,7 +67,7 @@ namespace MeGUI
 
         protected override void checkJobIO()
         {
-            su.Status = "Muxing ...";
+            Su.Status = "Muxing ...";
             base.checkJobIO();
         }
 
@@ -76,25 +76,26 @@ namespace MeGUI
             get
             {
                 StringBuilder sb = new StringBuilder();
-                MuxSettings settings = job.Settings;
-                
+                MuxSettings settings = Job.Settings;
+
                 string inputFile = settings.VideoInput;
                 if (string.IsNullOrEmpty(settings.VideoInput))
                     inputFile = settings.MuxedInput;
 
-                MediaInfoFile oVideoInfo = new MediaInfoFile(inputFile, ref log);
-
-                // get source FPS
-                System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("en-us");
-                string fpsString = oVideoInfo.VideoInfo.FPS.ToString(ci);
+                string fpsString = String.Empty;
+                using (MediaInfoFile oVideoInfo = new MediaInfoFile(inputFile, ref log))
+                {
+                    // get source FPS
+                    fpsString = oVideoInfo.VideoInfo.FPS.ToString(new System.Globalization.CultureInfo("en-us"));
+                }
                 if (settings.Framerate.HasValue)
-                    fpsString = settings.Framerate.Value.ToString(ci);
+                    fpsString = settings.Framerate.Value.ToString(new System.Globalization.CultureInfo("en-us"));
 
                 string aspect = null;
                 if (settings.DAR.HasValue)
                     aspect = " -aspect " + settings.DAR.Value.X + ":" + settings.DAR.Value.Y;
 
-                sb.Append("-y -i \"" + inputFile + "\" -vcodec copy -vtag XVID -r " + fpsString + aspect + " \"" + job.Output + "\" ");
+                sb.Append("-y -i \"" + inputFile + "\" -vcodec copy -vtag XVID -r " + fpsString + aspect + " \"" + Job.Output + "\" ");
 
                 return sb.ToString();
             }

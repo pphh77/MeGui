@@ -48,7 +48,6 @@ namespace MeGUI
 
         #region variable declaration
         private List<string> filesToDeleteOnClosing = new List<string>();
-        private List<Form> allForms = new List<Form>();
         private List<Form> formsToReopen = new List<Form>();
         private ITaskbarList3 taskbarItem;
         private Icon taskbarIcon;
@@ -272,10 +271,11 @@ namespace MeGUI
         {
             if (jobControl1.IsAnyWorkerRunning)
             {
-                e.Cancel = true; // abort closing
+                if (e != null)
+                    e.Cancel = true; // abort closing
                 MessageBox.Show("Please close running jobs before you close MeGUI.", "Job in progress", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-            if (!e.Cancel)
+            if (e != null && !e.Cancel)
             {
                 if (!CloseSilent())
                     e.Cancel = true; // abort closing
@@ -401,7 +401,8 @@ namespace MeGUI
                     ser = new XmlSerializer(typeof(MeGUISettings));
                     try
                     {
-                        this.settings = (MeGUISettings)ser.Deserialize(s);
+                        using (XmlReader reader = XmlReader.Create(s))
+                            this.settings = (MeGUISettings)ser.Deserialize(reader);
                     }
                     catch
                     {
@@ -476,11 +477,19 @@ namespace MeGUI
                     ProcessStartInfo psi = new ProcessStartInfo(filename);
                     psi.CreateNoWindow = true;
                     psi.UseShellExecute = false;
-                    Process p = new Process();
-                    p.StartInfo = psi;
-                    p.Start();
+                    using (Process p = new Process())
+                    {
+                        p.StartInfo = psi;
+                        p.Start();
+                        while (!p.HasExited) // wait until the process has terminated without locking the GUI
+                            MeGUI.core.util.Util.Wait(100);
+                        p.WaitForExit();
+                    }
                 }
-                catch (Exception ex) { MessageBox.Show("Error when attempting to run after encoding command: " + ex.Message, "Run command failed", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+                catch (Exception ex) 
+                { 
+                    MessageBox.Show("Error when attempting to run after encoding command: " + ex.Message, "Run command failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -523,11 +532,11 @@ namespace MeGUI
         #region menu actions
         private void mnuFileOpen_Click(object sender, EventArgs e)
         {
-            MediaInfoFile oInfo;
             openFileDialog.Filter = "All files|*.*";
             openFileDialog.Title = "Select your input file";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
-                openFile(openFileDialog.FileName, out oInfo);
+                openFile(openFileDialog.FileName);
+
         }
         private void mnuViewMinimizeToTray_Click(object sender, EventArgs e)
         {
@@ -650,9 +659,12 @@ namespace MeGUI
         /// tries to open the selected input file
         /// </summary>
         /// <returns>true if it is a proper video AVS file</returns>
-        public bool openFile(string file, out MediaInfoFile iFile)
+        public bool openFile(string file)
         {
-            iFile = null;
+            MediaInfoFile iFile = null;
+
+            if (String.IsNullOrEmpty(file))
+                return false;
 
             if (Path.GetExtension(file.ToLowerInvariant()).Equals(".zip"))
             {
@@ -668,47 +680,49 @@ namespace MeGUI
                 return false;
             }
 
-            iFile = new MediaInfoFile(file);
-            if (iFile.HasVideo)
+            using (iFile = new MediaInfoFile(file))
             {
-                if (iFile.recommendIndexer(out _))
+                if (iFile.HasVideo)
                 {
-                    openIndexableFile(file);
-                }
-                else
-                {
-                    this.tabControl1.SelectedIndex = 0;
-                    if (iFile.HasAudio)
-                        audioEncodingComponent1.openAudioFile(file);
-                    if (iFile.ContainerFileTypeString.Equals("AVS"))
+                    if (iFile.recommendIndexer(out _))
                     {
-                        Video.openVideoFile(file, iFile);
-                        return true;
+                        openIndexableFile(file);
                     }
                     else
-                        openOtherVideoFile(file);
-                }
-            }
-            else if (iFile.HasAudio)
-            {
-                audioEncodingComponent1.openAudioFile(file);
-                this.tabControl1.SelectedIndex = 0;
-            }
-            else if (Path.GetExtension(iFile.FileName).ToLowerInvariant().Equals(".avs"))
-            {
-                try
-                {
-                    using (AvsFile avi = AvsFile.OpenScriptFile(iFile.FileName))
                     {
+                        this.tabControl1.SelectedIndex = 0;
+                        if (iFile.HasAudio)
+                            audioEncodingComponent1.openAudioFile(file);
+                        if (iFile.ContainerFileTypeString.Equals("AVS"))
+                        {
+                            Video.openVideoFile(file, iFile);
+                            return true;
+                        }
+                        else
+                            openOtherVideoFile(file);
                     }
                 }
-                catch (Exception ex)
+                else if (iFile.HasAudio)
                 {
-                    MessageBox.Show(ex.Message, "Error parsing avs file", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    audioEncodingComponent1.openAudioFile(file);
+                    this.tabControl1.SelectedIndex = 0;
                 }
+                else if (Path.GetExtension(iFile.FileName).ToLowerInvariant().Equals(".avs"))
+                {
+                    try
+                    {
+                        using (AvsFile avi = AvsFile.OpenScriptFile(iFile.FileName))
+                        {
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, "Error parsing avs file", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                else
+                    MessageBox.Show("This file cannot be opened", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            else
-                MessageBox.Show("This file cannot be opened", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return false;
         }
 
@@ -721,14 +735,13 @@ namespace MeGUI
         #region Drag 'n' Drop
         private void MeGUI_DragDrop(object sender, DragEventArgs e)
         {
-            MediaInfoFile oInfo;
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
             Thread openFileThread = new Thread((ThreadStart)delegate 
             {
                 if (this.InvokeRequired)
-                    Invoke(new MethodInvoker(delegate { openFile(files[0], out oInfo); }));
+                    Invoke(new MethodInvoker(delegate { openFile(files[0]); }));
                 else
-                    openFile(files[0], out oInfo); 
+                    openFile(files[0]); 
             });
             openFileThread.Start();
         }
@@ -978,8 +991,6 @@ namespace MeGUI
             PackageSystem.MediaFileTypes.Register(new lsmashFileFactory());     // HandleLevel 13
             PackageSystem.MediaFileTypes.Register(new ffmsFileFactory());       // HandleLevel 12
             PackageSystem.MediaFileTypes.Register(new MediaInfoFileFactory());  // HandleLevel  5
-
-            PackageSystem.JobPreProcessors.Register(BitrateCalculatorPreProcessor.CalculationProcessor);
 
             PackageSystem.JobPostProcessors.Register(d2vIndexJobPostProcessor.PostProcessor);
             PackageSystem.JobPostProcessors.Register(dgmIndexJobPostProcessor.PostProcessor);

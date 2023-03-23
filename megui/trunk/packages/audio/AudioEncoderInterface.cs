@@ -34,8 +34,7 @@ namespace MeGUI
 {
     public sealed class AviSynthAudioEncoder : IJobProcessor // : AudioEncoder
     {
-        public static readonly JobProcessorFactory Factory =
-new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
+        public static readonly JobProcessorFactory Factory = new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
 
         public enum HeaderType : int
         {
@@ -89,7 +88,32 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
 
         private List<string> _tempFiles = new List<string>();
         private readonly string _uniqueId = Guid.NewGuid().ToString("N");
+        private Stopwatch _oLastUpdate = new Stopwatch();
         #endregion
+
+        public AviSynthAudioEncoder(MeGUISettings settings)
+        {
+            _settings = settings;
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // dispose managed resources
+                _encoderProcess.Dispose();
+                _mre.Dispose();
+                stdoutDone.Dispose();
+                stderrDone.Dispose();
+            }
+            // free native resources
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
         #region methods
 
@@ -239,33 +263,18 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 }
                 su.IsComplete = true;
             }
-            if (StatusUpdate != null)
-                StatusUpdate(su);
+            StatusUpdate?.Invoke(su);
         }
 
         private void setProgress(decimal n)
         {
-            su.PercentageDoneExact = n * 100M;
-            su.CurrentFileSize = FileSize.Of2(audioJob.Output);
-            su.FillValues();
-            raiseEvent();
-        }
-
-        private void updateTime()
-        {
-            su.FillValues();
-            raiseEvent();
+            su.PercentageCurrent = n * 100M;
         }
 
         private void raiseEvent(string s)
         {
             su.Status = s;
             raiseEvent();
-        }
-
-        internal AviSynthAudioEncoder(MeGUISettings settings)
-        {
-            _settings = settings;
         }
 
         private void readStdOut()
@@ -381,24 +390,12 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 return;
             }
 
-            Thread t = null;
             try
             {
                 raiseEvent("Opening file....please wait, it may take some time");
-                su.ResetTime();
-                t = new Thread(new ThreadStart(delegate
-                {
-                    while (true)
-                    {
-                        updateTime();
-                        MeGUI.core.util.Util.Wait(1000);
-                    }
-                }));
-                t.Start();
                 if (createAviSynthScript(out string strAVSError))
                 {
                     raiseEvent("Preprocessing...please wait, it may take some time");
-                    su.ResetTime();
                     using (AviSynthScriptEnvironment env = new AviSynthScriptEnvironment())
                     {
                         _log.LogEvent("AviSynth script environment opened");
@@ -418,7 +415,6 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
 
                             const int MAX_SAMPLES_PER_ONCE = 4096;
                             int frameSample = 0;
-                            int lastUpdateSample = 0;
                             int frameBufferTotalSize = MAX_SAMPLES_PER_ONCE * a.ChannelsCount * a.BytesPerSample;
                             byte[] frameBuffer = new byte[frameBufferTotalSize];
                             createEncoderProcess(a);
@@ -428,47 +424,41 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                                 {
                                     // let's write WAV Header
                                     WriteHeader(target, a, _sendWavHeaderToEncoderStdIn, -1);
-
                                     _sampleRate = a.AudioSampleRate;
-
-                                    bool hasStartedEncoding = false;
-
                                     GCHandle h = GCHandle.Alloc(frameBuffer, GCHandleType.Pinned);
                                     IntPtr address = h.AddrOfPinnedObject();
                                     try
                                     {
                                         su.ClipLength = TimeSpan.FromSeconds((double)a.SamplesCount / (double)_sampleRate);
+                                        raiseEvent("Encoding audio...");
+                                        _oLastUpdate.Restart();
                                         while (frameSample < a.SamplesCount)
                                         {
-                                            _mre.WaitOne();
-
-                                            if (_encoderProcess != null)
+                                            su.ClipLength = TimeSpan.FromSeconds((double)a.SamplesCount / (double)_sampleRate);
+                                            while (frameSample < a.SamplesCount)
                                             {
-                                                if (_encoderProcess.HasExited)
+                                                _mre.WaitOne();
+
+                                                if (_encoderProcess != null)
                                                 {
-                                                    string strError = WindowUtil.GetErrorText(_encoderProcess.ExitCode);
-                                                    throw new ApplicationException("Abnormal encoder termination. Exit code: " + strError);
+                                                    if (_encoderProcess.HasExited)
+                                                    {
+                                                        string strError = WindowUtil.GetErrorText(_encoderProcess.ExitCode);
+                                                        throw new ApplicationException("Abnormal encoder termination. Exit code: " + strError);
+                                                    }
                                                 }
-                                            }
-                                            int nHowMany = Math.Min((int)(a.SamplesCount - frameSample), MAX_SAMPLES_PER_ONCE);
+                                                int nHowMany = Math.Min((int)(a.SamplesCount - frameSample), MAX_SAMPLES_PER_ONCE);
 
-                                            a.ReadAudio(address, frameSample, nHowMany);
+                                                a.ReadAudio(address, frameSample, nHowMany);
 
-                                            _mre.WaitOne();
-                                            if (!hasStartedEncoding)
-                                            {
-                                                t.Abort();
-                                                raiseEvent("Encoding audio...");
-                                                hasStartedEncoding = true;
-                                            }
-
-                                            target.Write(frameBuffer, 0, nHowMany * a.ChannelsCount * a.BytesPerSample);
-                                            target.Flush();
-                                            frameSample += nHowMany;
-                                            if (frameSample - lastUpdateSample > 100000) // 100000 samples per update
-                                            {
-                                                setProgress((decimal)frameSample / (decimal)a.SamplesCount);
-                                                lastUpdateSample = frameSample;
+                                                target.Write(frameBuffer, 0, nHowMany * a.ChannelsCount * a.BytesPerSample);
+                                                target.Flush();
+                                                frameSample += nHowMany;
+                                                if (_oLastUpdate.Elapsed.TotalSeconds > 1)
+                                                {
+                                                    setProgress((decimal)frameSample / (decimal)a.SamplesCount);
+                                                    _oLastUpdate.Restart();
+                                                }
                                             }
                                         }
                                     }
@@ -476,11 +466,12 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                                     {
                                         h.Free();
                                     }
-                                    setProgress(1M);
 
+                                    setProgress(1M);
                                     if (_sendWavHeaderToEncoderStdIn != HeaderType.NONE && a.BytesPerSample % 2 == 1)
                                         target.WriteByte(0);
                                 }
+
                                 raiseEvent("Finalizing encoder");
                                 while (!_encoderProcess.HasExited) // wait until the process has terminated without locking the GUI
                                     MeGUI.core.util.Util.Wait(100);
@@ -521,8 +512,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             }
             catch (Exception e)
             {
-                if (t != null && t.IsAlive)
-                    t.Abort();
+                _oLastUpdate.Stop();
                 deleteOutputFile();
                 if (e is ThreadAbortException)
                 {
@@ -555,8 +545,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             }
             finally
             {
-                if (t != null && t.IsAlive)
-                    t.Abort();
+                _oLastUpdate.Stop();
                 deleteTempFiles();
             }
             su.IsComplete = true;
@@ -581,7 +570,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 // {3} means channel count
                 // {4} means samplecount
                 // {5} means size in bytes
-                info.Arguments = string.Format(_encoderCommandLine,
+                info.Arguments = string.Format(new System.Globalization.CultureInfo("en-US"), _encoderCommandLine,
                     audioJob.Output, a.AudioSampleRate, a.BitsPerSample, a.ChannelsCount, a.SamplesCount, a.AudioSizeInBytes);
                 info.FileName = _encoderExecutablePath;
                 _log.LogValue("Job command line", _encoderExecutablePath + " " + info.Arguments);
@@ -729,8 +718,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             sbOpen = new StringBuilder();
             sbOpen.Append(VideoUtil.getFFMSAudioInputLine(audioJob.Input, null, -1));
             _log.LogEvent("Trying to open the file with FFAudioSource()", ImageType.Information);
-            string strErrorText;
-            if (AudioUtil.AVSScriptHasAudio(sbOpen.ToString(), out strErrorText))
+            if (AudioUtil.AVSScriptHasAudio(sbOpen.ToString(), out string strErrorText))
             {
                 _log.LogEvent("Successfully opened the file with FFAudioSource()", ImageType.Information);
                 audioJob.FilesToDelete.Add(audioJob.Input + ".ffindex");
@@ -750,8 +738,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
             sbOpen = new StringBuilder();
             sbOpen.Append(VideoUtil.getLSMASHAudioInputLine(audioJob.Input, null, -1));
             _log.LogEvent("Trying to open the file with LWLibavAudioSource()", ImageType.Information);
-            string strErrorText;
-            if (AudioUtil.AVSScriptHasAudio(sbOpen.ToString(), out strErrorText))
+            if (AudioUtil.AVSScriptHasAudio(sbOpen.ToString(), out string strErrorText))
             {
                 _log.LogEvent("Successfully opened the file with LWLibavAudioSource()", ImageType.Information);
                 audioJob.FilesToDelete.Add(audioJob.Input + ".lwi");
@@ -775,8 +762,7 @@ new JobProcessorFactory(new ProcessorFactory(init), "AviSynthAudioEncoder");
                 sbOpen.AppendFormat("LoadPlugin(\"{0}\"){1}", strPluginPath, Environment.NewLine);
                 sbOpen.AppendFormat("BassAudioSource(\"{0}\"){1}", audioJob.Input, Environment.NewLine);
                 _log.LogEvent("Trying to open the file with BassAudioSource()", ImageType.Information);
-                string strErrorText;
-                if (AudioUtil.AVSScriptHasAudio(sbOpen.ToString(), out strErrorText))
+                if (AudioUtil.AVSScriptHasAudio(sbOpen.ToString(), out string strErrorText))
                 {
                     _log.LogEvent("Successfully opened the file with BassAudioSource()", ImageType.Information);
                     return true;

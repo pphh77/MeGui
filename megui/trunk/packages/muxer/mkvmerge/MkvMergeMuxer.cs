@@ -43,12 +43,12 @@ namespace MeGUI
         public MkvMergeMuxer(string executablePath)
         {
             UpdateCacher.CheckPackage("mkvmerge");
-            this.executable = executablePath;
+            this.Executable = executablePath;
 
             // Exit code 0 = everything was OK
             // Exit code 1 = there were non-fatal warnings
             // Exit code 2 = there was a fatal error
-            this.arrSuccessCodes.Add(1);
+            this.ArrSuccessCodes.Add(1);
         }
 
         #region line processing
@@ -64,7 +64,7 @@ namespace MeGUI
                 int percentageStart = 10;
                 int percentageEnd = line.IndexOf("%");
                 string frameNumber = line.Substring(percentageStart, percentageEnd - percentageStart).Trim();
-                return Int32.Parse(frameNumber);
+                return Int32.Parse(frameNumber, new System.Globalization.CultureInfo("en-US"));
             }
             catch (Exception e)
             {
@@ -76,7 +76,7 @@ namespace MeGUI
 
         protected override void checkJobIO()
         {
-            su.Status = "Muxing MKV...";
+            Su.Status = "Muxing MKV...";
             base.checkJobIO();
         }
 
@@ -84,7 +84,7 @@ namespace MeGUI
         {
             if (line.StartsWith("Progress: ")) //status update
             {
-                su.PercentageDoneExact = getPercentage(line);
+                Su.PercentageCurrent = getPercentage(line);
                 return;
             }
             
@@ -97,7 +97,7 @@ namespace MeGUI
 
         protected override void setProjectedFileSize()
         {
-            if (!job.Settings.MuxAll)
+            if (!Job.Settings.MuxAll)
                 base.setProjectedFileSize();
         }
 
@@ -106,7 +106,7 @@ namespace MeGUI
             get
             {
                 StringBuilder sb = new StringBuilder();
-                MuxSettings settings = job.Settings;
+                MuxSettings settings = Job.Settings;
                 int trackID;
                 
                 sb.Append("--output \"" + settings.MuxedOutput + "\"");
@@ -118,11 +118,13 @@ namespace MeGUI
                         strInput = settings.VideoInput;
                     else if (!string.IsNullOrEmpty(settings.MuxedInput))
                         strInput = settings.MuxedInput;
-                    MediaInfoFile oVideoInfo = new MediaInfoFile(strInput, ref log);
-                    if (oVideoInfo.ContainerFileType == ContainerType.MP4 || oVideoInfo.ContainerFileType == ContainerType.MKV)
-                        trackID = oVideoInfo.VideoInfo.Track.MMGTrackID;
-                    else
-                        trackID = 0;
+                    using (MediaInfoFile oVideoInfo = new MediaInfoFile(strInput, ref log))
+                    {
+                        if (oVideoInfo.ContainerFileType == ContainerType.MP4 || oVideoInfo.ContainerFileType == ContainerType.MKV)
+                            trackID = oVideoInfo.VideoInfo.Track.MMGTrackID;
+                        else
+                            trackID = 0;
+                    }
 
                     sb.Append(" \"" + strInput + "\" --ui-language en");
                     return sb.ToString();
@@ -134,25 +136,27 @@ namespace MeGUI
                     if (string.IsNullOrEmpty(settings.VideoInput))
                         inputFile = settings.MuxedInput;
 
-                    MediaInfoFile oVideoInfo = new MediaInfoFile(inputFile, ref log);
-                    if (oVideoInfo.ContainerFileType == ContainerType.MP4 || oVideoInfo.ContainerFileType == ContainerType.MKV)
-                        trackID = oVideoInfo.VideoInfo.Track.MMGTrackID;
-                    else
-                        trackID = 0;
-
-                    if (settings.DAR.HasValue)
-                        sb.Append(" --aspect-ratio " + trackID + ":" + settings.DAR.Value.X + "/" + settings.DAR.Value.Y);
-                    else
-                        sb.Append(" --engage keep_bitstream_ar_info"); // assuming that SAR info is already in the stream...
-                    if (!string.IsNullOrEmpty(settings.VideoName))
-                        sb.Append(" --track-name \"" + trackID + ":" + settings.VideoName.Replace("\"", "\\\"") + "\"");
-                    if (oVideoInfo.VideoInfo.Codec == VideoCodec.UNKNOWN || oVideoInfo.VideoInfo.Codec != VideoCodec.AVC || oVideoInfo.VideoInfo.ScanType.ToLowerInvariant().Equals("progressive"))
+                    using (MediaInfoFile oVideoInfo = new MediaInfoFile(inputFile, ref log))
                     {
-                        string fpsString = String.Format("{0:##.###}", oVideoInfo.VideoInfo.FPS);
-                        if (settings.Framerate.HasValue)
-                            fpsString = String.Format("{0:##.###}", settings.Framerate.Value);
-                        if (!String.IsNullOrEmpty(fpsString))
-                            sb.Append(" --default-duration " + trackID + ":" + PrettyFormatting.ReplaceFPSValue(fpsString, oVideoInfo.VideoInfo.FPS_N, oVideoInfo.VideoInfo.FPS_D) + "fps");
+                        if (oVideoInfo.ContainerFileType == ContainerType.MP4 || oVideoInfo.ContainerFileType == ContainerType.MKV)
+                            trackID = oVideoInfo.VideoInfo.Track.MMGTrackID;
+                        else
+                            trackID = 0;
+
+                        if (settings.DAR.HasValue)
+                            sb.Append(" --aspect-ratio " + trackID + ":" + settings.DAR.Value.X + "/" + settings.DAR.Value.Y);
+                        else
+                            sb.Append(" --engage keep_bitstream_ar_info"); // assuming that SAR info is already in the stream...
+                        if (!string.IsNullOrEmpty(settings.VideoName))
+                            sb.Append(" --track-name \"" + trackID + ":" + settings.VideoName.Replace("\"", "\\\"") + "\"");
+                        if (oVideoInfo.VideoInfo.Codec == VideoCodec.UNKNOWN || oVideoInfo.VideoInfo.Codec != VideoCodec.AVC || oVideoInfo.VideoInfo.ScanType.ToLowerInvariant().Equals("progressive"))
+                        {
+                            string fpsString = String.Format("{0:##.###}", oVideoInfo.VideoInfo.FPS);
+                            if (settings.Framerate.HasValue)
+                                fpsString = String.Format("{0:##.###}", settings.Framerate.Value);
+                            if (!String.IsNullOrEmpty(fpsString))
+                                sb.Append(" --default-duration " + trackID + ":" + PrettyFormatting.ReplaceFPSValue(fpsString, oVideoInfo.VideoInfo.FPS_N, oVideoInfo.VideoInfo.FPS_D) + "fps");
+                        }
                     }
                     string timeStampFile = inputFile + ".timestamps.txt";
                     if (!String.IsNullOrEmpty(settings.TimeStampFile) || File.Exists(timeStampFile))
@@ -167,28 +171,29 @@ namespace MeGUI
                 foreach (object o in settings.AudioStreams)
                 {
                     MuxStream stream = (MuxStream)o;
-                    MediaInfoFile oAudioInfo = new MediaInfoFile(stream.path, ref log);
-
-                    if (!oAudioInfo.HasAudio)
+                    using (MediaInfoFile oAudioInfo = new MediaInfoFile(stream.path, ref log))
                     {
-                        log.LogEvent("No audio track found: " + stream.path, ImageType.Warning);
-                        continue;
-                    }
+                        if (!oAudioInfo.HasAudio)
+                        {
+                            log.LogEvent("No audio track found: " + stream.path, ImageType.Warning);
+                            continue;
+                        }
 
-                    if (oAudioInfo.ContainerFileType == ContainerType.MP4 || oAudioInfo.ContainerFileType == ContainerType.MKV)
-                        trackID = oAudioInfo.AudioInfo.GetFirstTrackID();
-                    else
-                        trackID = 0;
+                        if (oAudioInfo.ContainerFileType == ContainerType.MP4 || oAudioInfo.ContainerFileType == ContainerType.MKV)
+                            trackID = oAudioInfo.AudioInfo.GetFirstTrackID();
+                        else
+                            trackID = 0;
 
-                    if (oAudioInfo.ContainerFileType == ContainerType.MP4 || oAudioInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.AAC)
-                    {
-                        int heaac_flag = -1;
-                        if (oAudioInfo.AudioInfo.Tracks.Count > 0)
-                            heaac_flag = oAudioInfo.AudioInfo.Tracks[0].AACFlag;
-                        if (heaac_flag == 1)
-                            sb.Append(" --aac-is-sbr " + trackID + ":1");
-                        else if (heaac_flag == 0)
-                            sb.Append(" --aac-is-sbr " + trackID + ":0");
+                        if (oAudioInfo.ContainerFileType == ContainerType.MP4 || oAudioInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.AAC)
+                        {
+                            int heaac_flag = -1;
+                            if (oAudioInfo.AudioInfo.Tracks.Count > 0)
+                                heaac_flag = oAudioInfo.AudioInfo.Tracks[0].AACFlag;
+                            if (heaac_flag == 1)
+                                sb.Append(" --aac-is-sbr " + trackID + ":1");
+                            else if (heaac_flag == 0)
+                                sb.Append(" --aac-is-sbr " + trackID + ":0");
+                        }
                     }
 
                     if (!string.IsNullOrEmpty(stream.language))
@@ -217,9 +222,11 @@ namespace MeGUI
                     trackID = 0;
                     if (File.Exists(stream.path))
                     {
-                        MediaInfoFile oSubtitleInfo = new MediaInfoFile(stream.path, ref log);
-                        if (oSubtitleInfo.ContainerFileType == ContainerType.MP4 || oSubtitleInfo.ContainerFileType == ContainerType.MKV)
-                            trackID = oSubtitleInfo.SubtitleInfo.GetFirstTrackID();
+                        using (MediaInfoFile oSubtitleInfo = new MediaInfoFile(stream.path, ref log))
+                        {
+                            if (oSubtitleInfo.ContainerFileType == ContainerType.MP4 || oSubtitleInfo.ContainerFileType == ContainerType.MKV)
+                                trackID = oSubtitleInfo.SubtitleInfo.GetFirstTrackID();
+                        }
 
                         FileInfo oFileInfo = new FileInfo(stream.path);
                         if (oFileInfo.Length < 20)
@@ -290,7 +297,7 @@ namespace MeGUI
                         }
                         trackID = 0;
                         sb.Append(" --subtitle-tracks ");
-                        foreach (SubtitleInfo strack in subTracks)
+                        for (int i = 0; i < subTracks.Count; i++)
                         {
                             if (trackID > 0)
                                 sb.Append("," + trackID);
@@ -334,7 +341,7 @@ namespace MeGUI
                 {
                     string strChapterFile = Path.Combine(Path.GetDirectoryName(settings.MuxedOutput), Path.GetFileNameWithoutExtension(settings.MuxedOutput) + "_chptmp.txt");
                     settings.ChapterInfo.SaveText(strChapterFile);
-                    job.FilesToDelete.Add(strChapterFile);
+                    Job.FilesToDelete.Add(strChapterFile);
                     sb.Append(" --chapters \"" + strChapterFile + "\"");
                 }
 

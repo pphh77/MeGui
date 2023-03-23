@@ -42,20 +42,17 @@ namespace MeGUI
             return null;
         }
 
-        private int numberOfAudioTracks, numberOfSubtitleTracks;
         private string metaFile = null;
 
         public tsMuxeR(string executablePath)
         {
             UpdateCacher.CheckPackage("tsmuxer");
-            this.executable = executablePath;
+            this.Executable = executablePath;
         }
         #region setup/start overrides
         protected override void checkJobIO()
         {
-            su.Status = "Muxing...";
-            this.numberOfAudioTracks = job.Settings.AudioStreams.Count;
-            this.numberOfSubtitleTracks = job.Settings.SubtitleStreams.Count;
+            Su.Status = "Muxing...";
             generateMetaFile();
             Util.ensureExists(metaFile);
             base.checkJobIO();
@@ -72,7 +69,7 @@ namespace MeGUI
         {
             get
             {
-                return " \"" + metaFile + "\"" + " \"" + job.Output + "\"";
+                return " \"" + metaFile + "\"" + " \"" + Job.Output + "\"";
             }
         }
 
@@ -80,7 +77,7 @@ namespace MeGUI
         {
             if (Regex.IsMatch(line, @"^[0-9]{1,3}\.[0-9]{1}%", RegexOptions.Compiled))
             {
-                su.PercentageDoneExact = getPercentage(line);
+                Su.PercentageCurrent = getPercentage(line);
                 return;
             }
 
@@ -101,7 +98,7 @@ namespace MeGUI
             try
             {
                 string[] strPercentage = line.Split('%')[0].Split('.');
-                return Convert.ToDecimal(strPercentage[0]) + Convert.ToDecimal(strPercentage[1]) / 10;
+                return Convert.ToDecimal(strPercentage[0], new System.Globalization.CultureInfo("en-US")) + Convert.ToDecimal(strPercentage[1], new System.Globalization.CultureInfo("en-US")) / 10;
             }
             catch (Exception e)
             {
@@ -110,30 +107,10 @@ namespace MeGUI
             }
         }
 
-        /// <summary>
-        /// determines if a read line is empty
-        /// </summary>
-        /// <param name="line"></param>
-        /// <returns></returns>
-        private bool isEmptyLine(string line)
-        {
-            char[] characters = line.ToCharArray();
-            bool isEmpty = true;
-            foreach (char c in characters)
-            {
-                if (c != 32)
-                {
-                    isEmpty = false;
-                    break;
-                }
-            }
-            return isEmpty;
-        }
-
         private void generateMetaFile()
         {
-            metaFile = Path.ChangeExtension(job.Output, ".meta");
-            MuxSettings settings = job.Settings;
+            metaFile = Path.ChangeExtension(Job.Output, ".meta");
+            MuxSettings settings = Job.Settings;
             CultureInfo ci = new CultureInfo("en-us");
 
             using (StreamWriter sw = new StreamWriter(metaFile, false, Encoding.Default))
@@ -155,7 +132,7 @@ namespace MeGUI
                     if (settings.ChapterInfo.HasChapters) // chapters are defined
                         sw.Write(" --custom-chapters" + settings.ChapterInfo.GetChapterTimeLine());
 
-                    job.Output = Path.GetDirectoryName(job.Output) + "\\" + Path.GetFileNameWithoutExtension(job.Output); // remove m2ts file extension - use folder name only with this mode
+                    Job.Output = Path.GetDirectoryName(Job.Output) + "\\" + Path.GetFileNameWithoutExtension(Job.Output); // remove m2ts file extension - use folder name only with this mode
                 }
                 sw.Write(" --vbr --vbv-len=500"); // mux options
                 if (settings.SplitSize.HasValue)
@@ -215,27 +192,28 @@ namespace MeGUI
                     MuxStream stream = (MuxStream)o;
                     string acodecID = "";
 
-                    MediaInfoFile oInfo = new MediaInfoFile(stream.path, ref log);
-
-                    if (!oInfo.HasAudio)
+                    using (MediaInfoFile oInfo = new MediaInfoFile(stream.path, ref log))
                     {
-                        log.Error("No audio track found: " + stream.path);
-                        continue;
-                    }
+                        if (!oInfo.HasAudio)
+                        {
+                            log.Error("No audio track found: " + stream.path);
+                            continue;
+                        }
 
-                    if (oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.AC3 || oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.EAC3
-                        || oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.THDAC3)
-                        acodecID = "A_AC3";
-                    else if (oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.AAC)
-                        acodecID = "A_AAC";
-                    else if (oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.DTS)
-                        acodecID = "A_DTS";
-                    else if (oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.PCM)
-                        acodecID = "A_LPCM";
-                    else
-                    {
-                        log.Error("Audio Codec not supported: " + oInfo.AudioInfo.Tracks[0].Codec);
-                        continue;
+                        if (oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.AC3 || oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.EAC3
+                            || oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.THDAC3)
+                            acodecID = "A_AC3";
+                        else if (oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.AAC)
+                            acodecID = "A_AAC";
+                        else if (oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.DTS)
+                            acodecID = "A_DTS";
+                        else if (oInfo.AudioInfo.Tracks[0].AudioCodec == AudioCodec.PCM)
+                            acodecID = "A_LPCM";
+                        else
+                        {
+                            log.Error("Audio Codec not supported: " + oInfo.AudioInfo.Tracks[0].Codec);
+                            continue;
+                        }
                     }
 
                     sw.Write("\n" + acodecID + ", ");
@@ -287,10 +265,12 @@ namespace MeGUI
                             }
                         }
                     }
-                }                
+                }
+                if (oVideoInfo != null)
+                    oVideoInfo.Dispose();
             }
 
-            job.FilesToDelete.Add(metaFile);
+            Job.FilesToDelete.Add(metaFile);
             if (File.Exists(metaFile))
             {
                 string strMuxFile = String.Empty;
