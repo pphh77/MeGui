@@ -261,7 +261,7 @@ namespace MeGUI
                     string fpsString = oVideoInfo.VideoInfo.FPS.ToString(ci);
                     if (settings.Framerate.HasValue)
                         fpsString = settings.Framerate.Value.ToString(ci);
-                    sb.Append(":fps=" + fpsString);
+                    sb.Append(":fps=" + PrettyFormatting.ReplaceFPSValue(fpsString, oVideoInfo.VideoInfo.FPS_N, oVideoInfo.VideoInfo.FPS_D));
 
                     if (oVideoInfo.HasVideo)
                     {
