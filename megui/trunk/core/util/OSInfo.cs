@@ -413,7 +413,11 @@ namespace MeGUI
                                         case 0: // Windows 10
                                             {
                                                 if (osVersionInfo.wProductType == VER_NT_WORKSTATION)
+                                                {
                                                     osName = "Windows 10 ";
+                                                    if (osVersionInfo.dwBuildNumber >= 22000)
+                                                        osName = "Windows 11 ";
+                                                }
                                                 else
                                                     osName = "Windows Server 2016 ";
 
@@ -445,6 +449,8 @@ namespace MeGUI
                                                 try
                                                 {
                                                     release = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", string.Empty);
+                                                    if (release.Equals("2009"))
+                                                        release = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "DisplayVersion", string.Empty);
                                                 }
                                                 catch { }
 
