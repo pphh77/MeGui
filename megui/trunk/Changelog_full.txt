@@ -1,3 +1,30 @@
+2933 [Main]                 improved OS detection
+2932 [Progress Window]      improved number formatting
+2931 [Logger]               improved error handling
+     [Main]                 delete orphaned source detector log files at startup
+2930 [Progress Window]      improved the job progress window in several ways. major ones are:
+                            - processing rate got renamed to speed and is now also showing the current speed
+                            - the current speed is used to calculate the remaining time
+2929 [MP4/MKV Muxer]        use the full fraction of the frame rate (e.g. 24000/1001) when available. Bug #968
+     [MediaInfo]            added the frame rate numerator and denominator to the log output
+2928 [DGIndexNV]            updated to support the free version. Patch by Donald Graft (#672)
+     [MeGUI]                .NET 4.8 is required now to run MeGUI
+2927 [Audio Encoder]        improved log output
+2926 [Log]                  improved log output of Unicode/extended ASCII characters
+2925 [Updater]              do not try to copy empty redist directories
+2924 [OneClick]             fixed missing jobs if the mux job does not contain any subtitles (regression of 2921)
+2923 [AviSynth Profiles]    ensured that every template has the crucial entries for input, crop and resize. Bug #951
+2922 [QAAC]                 fixed not able to encode. Bug #954 (regression of 2914)
+2921 [OneClick]             subsequent jobs in batch mode and the cleanup job will be created in any case
+2920 [Video Encoder]        improved job abort behavior
+2919 [Main]                 improved error handling when copying the redist files
+2918 [Profile Selector]     fixed new profile not available immediately. Bug #953
+2917 [L-SMASH Indexer]      always show source and cachefile (if available)
+2916 [FFmpeg AAC Encoder]   fixed quality mode using the wrong number format (regression of 2904)
+2915 [L-SMASH Indexer]      added support for recent versions
+                            enabled VC-1 decoding support
+                            enabled custom index file locations
+2914 [Audio Encoder]        improved error handling
 2913 [Jobs]                 added in the Options window the possibility to enable/disable standby when jobs are running
 2912 [Chapter Creator]      improved High DPI support
 2911 [OneClick]             fixed an error when switching profile settings. Bug #946
