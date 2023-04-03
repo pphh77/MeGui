@@ -103,7 +103,7 @@ namespace MeGUI
             System.Diagnostics.Process.Start("https://en.wikibooks.org/wiki/MeGUI");
         }
 
-        public MainForm()
+        public MainForm(SplashScreen startForm)
         {
             // Log File Handling
             string strMeGUILogPath = Path.GetDirectoryName(Application.ExecutablePath) + @"\logs";
@@ -159,6 +159,9 @@ namespace MeGUI
             GetChangeLog();
 
             DeleteSourceDetectorLogFiles();
+
+            // close splash screen
+            startForm?.Close();
         }
 
         private void MainForm_Shown(object sender, EventArgs e)
@@ -1021,6 +1024,10 @@ namespace MeGUI
         [STAThread]
         static void Main(string[] args)
         {
+            // open splash screen
+            SplashScreen startForm = new SplashScreen();
+            startForm.Show();
+
             // prevent another instance of MeGUI from the same location
             int iCount = 0;
             foreach (Process oProc in Process.GetProcessesByName(Application.ProductName))
@@ -1034,6 +1041,7 @@ namespace MeGUI
             }
             if (iCount > 1)
             {
+                startForm.Close();
                 MessageBox.Show("There is already another instance of the application running.", "MeGUI Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
@@ -1057,6 +1065,7 @@ namespace MeGUI
                 {
                     try
                     {
+                        startForm.Close();
                         Process p = new Process();
                         p.StartInfo.FileName = Application.ExecutablePath;
                         p.StartInfo.Arguments = "-elevate";
@@ -1069,6 +1078,7 @@ namespace MeGUI
                     }
                 }
 
+                startForm.Close();
                 MessageBox.Show("MeGUI cannot be started as it cannot write to the application directory.\rPlease grant the required permissions or move the application to an unprotected directory.", "MeGUI Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
@@ -1095,16 +1105,7 @@ namespace MeGUI
 
             Application.EnableVisualStyles();
 
-            MainForm mainForm = new MainForm();
-
-            // start MeGUI form if not blocked
-            bool bStart = true;
-            for (int i = 0; i < args.Length; i++)
-            {
-                if (args[i] == "--dont-start")
-                    bStart = false;
-            }
-            if (bStart)
+            using (MainForm mainForm = new MainForm(startForm))
                 Application.Run(mainForm);
         }
 
