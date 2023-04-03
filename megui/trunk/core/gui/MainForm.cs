@@ -1,6 +1,6 @@
 ﻿// ****************************************************************************
 // 
-// Copyright (C) 2005-2018 Doom9 & al
+// Copyright (C) 2005-2023 Doom9 & al
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -571,7 +571,7 @@ namespace MeGUI
         {
             if ((!(sender is System.Windows.Forms.MenuItem)) || (!((sender as MenuItem).Tag is IMuxing)))
                 return;
-            MuxWindow mw = new MuxWindow((IMuxing)((sender as MenuItem).Tag), this);
+            MuxWindow mw = new MuxWindow((IMuxing)((sender as MenuItem).Tag));
             mw.Show();
         }
 
