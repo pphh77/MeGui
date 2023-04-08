@@ -1,6 +1,6 @@
 ﻿// ****************************************************************************
 // 
-// Copyright (C) 2005-2018 Doom9 & al
+// Copyright (C) 2005-2023 Doom9 & al
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -327,12 +327,16 @@ namespace MeGUI
         private void FillInAudioInformation(ref List<AudioJob> arrAudioJobs, List<MuxStream> arrMuxStreams)
         {
             foreach (MuxStream m in arrMuxStreams)
-                m.path = ConvertTrackNumberToFile(m.path, ref m.delay);
+            {
+                m.path = ConvertTrackNumberToFile(m.path, m.delay, out int delay);
+                m.delay = delay;
+            }
 
             List<AudioJob> tempList = new List<AudioJob>();
             foreach (AudioJob a in arrAudioJobs)
             {
-                a.Input = ConvertTrackNumberToFile(a.Input, ref a.Delay);
+                a.Input = ConvertTrackNumberToFile(a.Input, a.Delay, out int delay);
+                a.Delay = delay;
                 if (String.IsNullOrEmpty(a.Output) && !String.IsNullOrEmpty(a.Input))
                     a.Output = FileUtil.AddToFileName(a.Input, "_audio");
                 if (!String.IsNullOrEmpty(a.Input))
@@ -348,8 +352,9 @@ namespace MeGUI
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        private string ConvertTrackNumberToFile(string input, ref int delay)
+        private string ConvertTrackNumberToFile(string input, int delay, out int newDelay)
         {
+            newDelay = delay;
             if (String.IsNullOrEmpty(input))
             {
                 log.Warn("Couldn't find audio file. Skipping track.");
@@ -364,7 +369,7 @@ namespace MeGUI
                     int t = int.Parse(sub);
                     string s = audioFiles[t];
                     if (PrettyFormatting.getDelay(s) != null)
-                        delay = PrettyFormatting.getDelay(s) ?? 0;
+                        newDelay = PrettyFormatting.getDelay(s) ?? 0;
                     return s;
                 }
                 catch (Exception)
@@ -785,8 +790,7 @@ namespace MeGUI
         #region IJobProcessor Members
         public override void stop()
         {
-            if (_sourceDetector != null)
-                _sourceDetector.Stop();
+            _sourceDetector?.Stop();
             base.stop();
         }
 
@@ -813,8 +817,7 @@ namespace MeGUI
         public override void changePriority(WorkerPriorityType priority)
         {
             base.changePriority(priority);
-            if (_sourceDetector != null)
-                _sourceDetector.ChangePriority(priority);
+            _sourceDetector?.ChangePriority(priority);
         }
         #endregion
     }
