@@ -1,6 +1,6 @@
 ﻿// ****************************************************************************
 // 
-// Copyright (C) 2005-2018 Doom9 & al
+// Copyright (C) 2005-2023 Doom9 & al
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -32,7 +32,6 @@ namespace MeGUI.packages.tools.oneclick
         private OneClickWindow oOneClickWindow;
         private string strInput;
         private LogItem _log;
-        private OneClickSettings _oSettings;
         private bool _bAbort;
 
         public OneClickProcessing(OneClickWindow oWindow, String strFileOrFolderName, OneClickSettings oSettings, LogItem oLog)
@@ -40,13 +39,14 @@ namespace MeGUI.packages.tools.oneclick
             this.oOneClickWindow = oWindow;
             this.strInput = strFileOrFolderName;
             this._log = oLog;
-            this._oSettings = oSettings;
             this._bAbort = false;
 
-            if (!getInputDVDorBlurayBased(oSettings))
-                if (this._bAbort || !getInputFolderBased(oSettings))
-                    if (this._bAbort || !getInputFileBased(oSettings))
-                        this.oOneClickWindow.setOpenFailure(this._bAbort);   
+            if (oSettings == null)
+                this.oOneClickWindow.setOpenFailure(this._bAbort);
+            else if (!GetInputDVDorBlurayBased(oSettings))
+                if (this._bAbort || !GetInputFolderBased(oSettings))
+                    if (this._bAbort || !GetInputFileBased(oSettings))
+                        this.oOneClickWindow.setOpenFailure(this._bAbort);
         }
 
         // batch processing
@@ -59,24 +59,37 @@ namespace MeGUI.packages.tools.oneclick
             List<OneClickFilesToProcess> arrFilesToProcessNew = new List<OneClickFilesToProcess>();
             MediaInfoFile iFile = null;
 
-            foreach (OneClickFilesToProcess oFileToProcess in arrFilesToProcess)
+            if (arrFilesToProcess != null)
             {
-                if (iFile == null)
+                foreach (OneClickFilesToProcess oFileToProcess in arrFilesToProcess)
                 {
-                    MediaInfoFile iFileTemp = new MediaInfoFile(oFileToProcess.FilePath, ref _log, oFileToProcess.PGCNumber, oFileToProcess.AngleNumber);
-                    if (iFileTemp.recommendIndexer(oSettings.IndexerPriority))
-                        iFile = iFileTemp;
-                    else if (iFileTemp.ContainerFileTypeString.Equals("AVS"))
+                    if (iFile == null)
                     {
-                        iFile = iFileTemp;
-                        iFile.IndexerToUse = FileIndexerWindow.IndexType.NONE;
+                        MediaInfoFile iFileTemp = new MediaInfoFile(oFileToProcess.FilePath, ref _log, oFileToProcess.PGCNumber, oFileToProcess.AngleNumber);
+                        if (!iFileTemp.MediaInfoOK)
+                        {
+                            _log.LogEvent(oFileToProcess.FilePath + " cannot be processed as MediaInfo is not available. skipping...");
+                        }
+                        else
+                        {
+                            if (oSettings != null && iFileTemp.recommendIndexer(oSettings.IndexerPriority))
+                            {
+                                iFile = iFileTemp;
+                            }
+                            else if (iFileTemp.ContainerFileTypeString.Equals("AVS"))
+                            {
+                                iFile = iFileTemp;
+                                iFile.IndexerToUse = FileIndexerWindow.IndexType.NONE;
+                            }
+                            else
+                                _log.LogEvent(oFileToProcess.FilePath + " cannot be processed as no indexer can be used. skipping...");
+                        }
                     }
                     else
-                        _log.LogEvent(oFileToProcess.FilePath + " cannot be processed as no indexer can be used. skipping...");
+                        arrFilesToProcessNew.Add(oFileToProcess);
                 }
-                else
-                    arrFilesToProcessNew.Add(oFileToProcess);
             }
+
             if (iFile != null)
                 oOneClickWindow.setInputData(iFile, arrFilesToProcessNew);
             else
@@ -87,7 +100,7 @@ namespace MeGUI.packages.tools.oneclick
         /// checks if the files/folders can be processed as DVD/Blu-ray
         /// </summary>
         /// <returns>true if the files/folder can be processed as DVD or Blu-ray, false otherwise</returns>
-        private bool getInputDVDorBlurayBased(OneClickSettings oSettings)
+        private bool GetInputDVDorBlurayBased(OneClickSettings oSettings)
         {
             if (FileUtil.RegExMatch(this.strInput, @"\\playlist\\\d{5}\.mpls\z", true))
             {
@@ -108,9 +121,7 @@ namespace MeGUI.packages.tools.oneclick
                     return false;
 
                 // open the selection window
-                DialogResult dr = DialogResult.OK;
-                dr = frm.ShowDialog();
-
+                DialogResult dr = frm.ShowDialog();
                 if (dr != DialogResult.OK)
                 {
                     // abort as the user clicked not on OK
@@ -168,7 +179,7 @@ namespace MeGUI.packages.tools.oneclick
         /// checks if the input folder can be processed
         /// </summary>
         /// <returns>true if the folder can be processed, false otherwise</returns>
-        private bool getInputFolderBased(OneClickSettings oSettings)
+        private bool GetInputFolderBased(OneClickSettings oSettings)
         {
             List<OneClickFilesToProcess> arrFilesToProcess = new List<OneClickFilesToProcess>();
             MediaInfoFile iFile = null;
@@ -207,23 +218,27 @@ namespace MeGUI.packages.tools.oneclick
         /// checks if the input file can be processed
         /// </summary>
         /// <returns>true if the file can be processed, false otherwise</returns>
-        private bool getInputFileBased(OneClickSettings oSettings)
+        private bool GetInputFileBased(OneClickSettings oSettings)
         {
             if (!File.Exists(this.strInput))
                 return false;
 
-            MediaInfoFile iFile = new MediaInfoFile(this.strInput, ref this._log);
-            if (iFile.recommendIndexer(oSettings.IndexerPriority))
-                return getInputIndexerBased(iFile, oSettings);
-            else if (iFile.ContainerFileTypeString.Equals("AVS"))
+            using (MediaInfoFile iFile = new MediaInfoFile(this.strInput, ref this._log))
             {
-                iFile.IndexerToUse = FileIndexerWindow.IndexType.NONE;
-                return getInputIndexerBased(iFile, oSettings);
+                if (!iFile.MediaInfoOK)
+                    return false;
+                else if (iFile.recommendIndexer(oSettings.IndexerPriority))
+                    return GetInputIndexerBased(iFile);
+                else if (iFile.ContainerFileTypeString.Equals("AVS"))
+                {
+                    iFile.IndexerToUse = FileIndexerWindow.IndexType.NONE;
+                    return GetInputIndexerBased(iFile);
+                }
             }
             return false;
         }
 
-        private bool getInputIndexerBased(MediaInfoFile iFile, OneClickSettings oSettings)
+        private bool GetInputIndexerBased(MediaInfoFile iFile)
         {
             oOneClickWindow.setInputData(iFile, new List<OneClickFilesToProcess>());
             return true;
