@@ -1,6 +1,6 @@
 // ****************************************************************************
 // 
-// Copyright (C) 2005-2018 Doom9 & al
+// Copyright (C) 2005-2023 Doom9 & al
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ namespace MeGUI.packages.tools.cutter
         private Cuts cuts =  new Cuts(TransitionStyle.FADE);
         private string scriptName;
 
-        public Cutter(MainForm mainForm, string scriptName)
+        public Cutter(string scriptName)
         {
             InitializeComponent();
             this.scriptName = scriptName;
@@ -45,13 +45,13 @@ namespace MeGUI.packages.tools.cutter
 
             avsScript.Text += scriptName;
 
-            openPreview(mainForm);
+            OpenPreview();
         }
 
-        private void openPreview(MainForm mainForm)
+        private void OpenPreview()
         {
             player = new VideoPlayer();
-            bool videoLoaded = player.loadVideo(mainForm, scriptName, PREVIEWTYPE.ZONES, false);
+            bool videoLoaded = player.LoadVideo(scriptName, PREVIEWTYPE.ZONES, false);
             if (!videoLoaded)
                 return;
 
@@ -64,7 +64,7 @@ namespace MeGUI.packages.tools.cutter
             player.Show();
             player.SetScreenSize();
             this.TopMost = player.TopMost = true;
-            if (!mainForm.Settings.AlwaysOnTop)
+            if (!MainForm.Instance.Settings.AlwaysOnTop)
                 this.TopMost = player.TopMost = false;
         }
 
@@ -83,15 +83,17 @@ namespace MeGUI.packages.tools.cutter
 
         private void addZoneButton_Click(object sender, EventArgs e)
         {
-            if (addSelectedSection())
-                updateListView();
+            if (AddSelectedSection())
+                UpdateListView();
         }
 
-        private bool addSelectedSection()
+        private bool AddSelectedSection()
         {
-            CutSection s = new CutSection();
-            s.startFrame = (int)startFrame.Value;
-            s.endFrame = (int)endFrame.Value;
+            CutSection s = new CutSection
+            {
+                startFrame = (int)startFrame.Value,
+                endFrame = (int)endFrame.Value
+            };
 
             if (s.endFrame <= s.startFrame)
             {
@@ -107,7 +109,7 @@ namespace MeGUI.packages.tools.cutter
             return true;
         }
 
-        private void updateListView()
+        private void UpdateListView()
         {
             sections.BeginUpdate();
             sections.Items.Clear();
@@ -132,21 +134,21 @@ namespace MeGUI.packages.tools.cutter
                 return;
 
             cuts.Clear();
-            updateListView();
+            UpdateListView();
         }
 
         private void updateZoneButton_Click(object sender, EventArgs e)
         {
             Cuts old = cuts.clone();
-            removeSelectedZones();
+            RemoveSelectedZones();
             
-            if (addSelectedSection())
-                updateListView();
+            if (AddSelectedSection())
+                UpdateListView();
             else
                 cuts = old;
         }
 
-        private void removeSelectedZones()
+        private void RemoveSelectedZones()
         {
             foreach (ListViewItem item in sections.SelectedItems)
             {
@@ -167,8 +169,8 @@ namespace MeGUI.packages.tools.cutter
             if (MessageBox.Show("Are you sure you want to delete the selected sections?", "Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning)
                 != DialogResult.Yes)
                 return;
-            removeSelectedZones();
-            updateListView();
+            RemoveSelectedZones();
+            UpdateListView();
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -213,14 +215,17 @@ namespace MeGUI.packages.tools.cutter
             {
                 MessageBox.Show("At least one section must be created", "No sections created", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
-            } 
-            
-            SaveFileDialog d = new SaveFileDialog();
-            d.Filter = "MeGUI cut list (*.clt)|*.clt";
-            d.Title = "Select a place to save the cut list";
-            if (d.ShowDialog() != DialogResult.OK) return;
+            }
 
-            FilmCutter.WriteCutsToFile(d.FileName, cuts);
+            using (SaveFileDialog d = new SaveFileDialog())
+            {
+                d.Filter = "MeGUI cut list (*.clt)|*.clt";
+                d.Title = "Select a place to save the cut list";
+                if (d.ShowDialog() != DialogResult.OK)
+                    return;
+                FilmCutter.WriteCutsToFile(d.FileName, cuts);
+            }
+
             MessageBox.Show("Cuts written!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -242,15 +247,19 @@ namespace MeGUI.packages.tools.cutter
             if (System.IO.File.Exists(savecutsto))
             {
                 DialogResult result = MessageBox.Show("Cutfile already exists, overwrite?", "Overwrite cutfile", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-                if (result == DialogResult.Cancel) return;
+                if (result == DialogResult.Cancel)
+                    return;
 
                 if (result == DialogResult.No)
                 {
-                    SaveFileDialog d = new SaveFileDialog();
-                    d.Filter = "MeGUI cut list (*.clt)|*.clt";
-                    d.Title = "Select a place to save the cut list";
-                    if (d.ShowDialog() != DialogResult.OK) return;
-                    savecutsto = d.FileName;
+                    using (SaveFileDialog d = new SaveFileDialog())
+                    {
+                        d.Filter = "MeGUI cut list (*.clt)|*.clt";
+                        d.Title = "Select a place to save the cut list";
+                        if (d.ShowDialog() != DialogResult.OK)
+                            return;
+                        savecutsto = d.FileName;
+                    }
                 }
             }
 
@@ -272,6 +281,11 @@ namespace MeGUI.packages.tools.cutter
             startFrame.Value = ((CutSection)sections.SelectedItems[0].Tag).startFrame;
             endFrame.Value = ((CutSection)sections.SelectedItems[0].Tag).endFrame;
         }
+
+        private void Cutter_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            player?.Dispose();
+        }
     }
 
     public class CutterTool : MeGUI.core.plugins.interfaces.ITool
@@ -285,11 +299,14 @@ namespace MeGUI.packages.tools.cutter
 
         public void Run(MainForm info)
         {
-            OpenFileDialog d = new OpenFileDialog();
-            d.Filter = "AviSynth scripts (*.avs)|*.avs";
-            d.Title = "Select the input video";
-            if (d.ShowDialog() != DialogResult.OK) return;
-            (new Cutter(info, d.FileName)).Show();
+            using (OpenFileDialog d = new OpenFileDialog())
+            {
+                d.Filter = "AviSynth scripts (*.avs)|*.avs";
+                d.Title = "Select the input video";
+                if (d.ShowDialog() != DialogResult.OK)
+                    return;
+                new Cutter(d.FileName).Show();
+            }
         }
 
         public Shortcut[] Shortcuts
