@@ -1,6 +1,6 @@
 ﻿// ****************************************************************************
 // 
-// Copyright (C) 2005-2018 Doom9 & al
+// Copyright (C) 2005-2023 Doom9 & al
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -68,8 +68,7 @@ namespace MeGUI
                 StringBuilder strAVSScript = new StringBuilder();
                 MediaInfoFile oInfo = null;
                 strAVSScript.Append(VideoUtil.getLSMASHVideoInputLine(Job.Input, Job.Output, 0, ref oInfo));
-                if (oInfo != null)
-                    oInfo.Dispose();
+                oInfo?.Dispose();
                 base.log.LogValue("AviSynth script", strAVSScript.ToString(), ImageType.Information);
 
                 // check if the script has a video track, also this call will create the index file if there is one
@@ -78,9 +77,8 @@ namespace MeGUI
                 try
                 {
                     strErrorText = String.Empty;
-                    using (AviSynthScriptEnvironment env = new AviSynthScriptEnvironment())
-                        using (AviSynthClip a = env.ParseScript(strAVSScript.ToString(),false, false))
-                            openSuccess = a.HasVideo;
+                    using (AviSynthClip a = AviSynthScriptEnvironment.ParseScript(strAVSScript.ToString(),false, false))
+                        openSuccess = a.HasVideo;
                 }
                 catch (Exception ex)
                 {
@@ -125,8 +123,7 @@ namespace MeGUI
                 strAVSScript.Append(VideoUtil.getLSMASHAudioInputLine(Job.Input, Job.Output, iCurrentTrack));
 
                 // is this an audio track?
-                string strErrorText;
-                if (AudioUtil.AVSScriptHasAudio(strAVSScript.ToString(), out strErrorText) == false)
+                if (AudioUtil.AVSScriptHasAudio(strAVSScript.ToString(), out _) == false)
                     continue;
                 iCurrentAudioTrack++;
 

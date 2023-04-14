@@ -1,6 +1,6 @@
 // ****************************************************************************
 // 
-// Copyright (C) 2005-2018 Doom9 & al
+// Copyright (C) 2005-2023 Doom9 & al
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 
 using System;
 using System.Drawing;
-using System.Windows.Forms;
 
 using MeGUI.core.util;
 
@@ -30,41 +29,36 @@ namespace MeGUI
     {
 
         #region IMediaFileFactory Members
-
         public IMediaFile Open(string file)
         {
             return AvsFile.OpenScriptFile(file, true);
         }
-
         #endregion
 
         #region IMediaFileFactory Members
-
         public int HandleLevel(string file)
         {
-            if (file.ToLowerInvariant().EndsWith(".avs"))
+            if (!String.IsNullOrEmpty(file) && file.ToLowerInvariant().EndsWith(".avs"))
                 return 30;
             return -1;
         }
-
         #endregion
 
         #region IIDable Members
-
         public string ID
         {
             get { return "AviSynth"; }
         }
-
         #endregion
     }
+
     public sealed class AvsFile : IMediaFile
     {
         private AviSynthClip clip = null;
-        private AviSynthScriptEnvironment enviroment = null;
         private IAudioReader audioReader;
         private IVideoReader videoReader;
         private VideoInformation info;
+
         #region construction
         public AviSynthClip Clip
         {
@@ -98,8 +92,7 @@ namespace MeGUI
         {
             try
             {
-                this.enviroment = new AviSynthScriptEnvironment();
-                this.clip = parse ? enviroment.ParseScript(script, bRequireRGB24) : enviroment.OpenScriptFile(script, bRequireRGB24);
+                this.clip = parse ? AviSynthScriptEnvironment.ParseScript(script, bRequireRGB24) : AviSynthScriptEnvironment.OpenScriptFile(script, bRequireRGB24);
 
                 checked
                 {
@@ -124,58 +117,59 @@ namespace MeGUI
             }
             catch (Exception)
             {
-                cleanup();
+                Cleanup();
                 throw;
             }
         }
 
-        private void cleanup()
+        private void Cleanup()
         {
             if (this.clip != null)
             {
                 (this.clip as IDisposable).Dispose();
                 this.clip = null;
             }
-            if (this.enviroment != null)
-            {
-                (this.enviroment as IDisposable).Dispose();
-                this.enviroment = null;
-            }
             GC.SuppressFinalize(this);
         }
         #endregion
+
         #region properties
         public VideoInformation VideoInfo
         {
             get { return info; }
         }
+
         public bool CanReadVideo
         {
             get { return true; }
         }
+
         public bool CanReadAudio
         {
             get { return true; }
         }
         #endregion
+
+        private static object _locker = new object();
         public IAudioReader GetAudioReader(int track)
         {
             if (track != 0 || !clip.HasAudio)
                 throw new Exception(string.Format("Can't read audio track {0}, because it can't be found", track));
             if (audioReader == null)
-                lock (this)
+                lock (_locker)
                 {
                     if (audioReader == null)
                         audioReader = new AvsAudioReader(clip);
                 }
             return audioReader;
         }
+
         public IVideoReader GetVideoReader()
         {
             if (!this.VideoInfo.HasVideo)
                 throw new Exception("Can't get Video Reader, since there is no video stream!");
             if (videoReader == null)
-                lock (this)
+                lock (_locker)
                 {
                     if (videoReader == null)
                         videoReader = new AvsVideoReader(clip, (int)VideoInfo.Width, (int)VideoInfo.Height);
@@ -254,6 +248,7 @@ namespace MeGUI
                 }
             }
         }
+
         sealed class AvsAudioReader : IAudioReader
         {
             public AvsAudioReader(AviSynthClip clip)
@@ -282,13 +277,12 @@ namespace MeGUI
                 return null;
             }
         }
-        #region IDisposable Members
 
+        #region IDisposable Members
         public void Dispose()
         {
-            cleanup();
+            Cleanup();
         }
-
         #endregion
     }
 }
