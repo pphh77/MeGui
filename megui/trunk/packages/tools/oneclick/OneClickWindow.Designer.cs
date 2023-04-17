@@ -1,6 +1,6 @@
 // ****************************************************************************
 // 
-// Copyright (C) 2005-2018 Doom9 & al
+// Copyright (C) 2005-2023 Doom9 & al
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -714,7 +714,7 @@ namespace MeGUI
             this.devicetype.Name = "devicetype";
             this.devicetype.Size = new System.Drawing.Size(95, 21);
             this.devicetype.TabIndex = 44;
-            this.devicetype.SelectedIndexChanged += new System.EventHandler(this.updateChapterSelection);
+            this.devicetype.SelectedIndexChanged += new System.EventHandler(this.UpdateChapterSelection);
             // 
             // deviceLabel
             // 
