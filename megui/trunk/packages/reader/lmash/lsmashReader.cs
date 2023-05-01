@@ -1,6 +1,6 @@
 ﻿// ****************************************************************************
 // 
-// Copyright (C) 2005-2018 Doom9 & al
+// Copyright (C) 2005-2023 Doom9 & al
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -42,7 +42,8 @@ namespace MeGUI
 
         public int HandleLevel(string file)
         {
-            if (file.ToLowerInvariant().EndsWith(".lwi") || File.Exists(file + ".lwi"))
+            if (!String.IsNullOrEmpty(file) 
+                && (file.ToLowerInvariant().EndsWith(".lwi") || File.Exists(file + ".lwi")))
                 return 13;
             return -1;
         }
@@ -78,7 +79,10 @@ namespace MeGUI
             reader = AvsFile.ParseScript(VideoUtil.getLSMASHVideoInputLine(fileName, indexFile, 0, ref oInfo), true);
             info = reader.VideoInfo.Clone();
             if (oInfo != null)
+            {
                 info.DAR = oInfo.VideoInfo.DAR;
+                oInfo.Dispose();
+            }
         }
 
         #region properties
@@ -116,8 +120,7 @@ namespace MeGUI
 
         public void Dispose()
         {
-            if (reader != null)
-                reader.Dispose();
+            reader?.Dispose();
         }
 
         #endregion

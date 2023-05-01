@@ -1,6 +1,6 @@
 ﻿// ****************************************************************************
 // 
-// Copyright (C) 2005-2018 Doom9 & al
+// Copyright (C) 2005-2023 Doom9 & al
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -32,10 +32,12 @@ namespace MeGUI
         public LSMASHIndexJob(string input, string indexFile, int demuxType, List<AudioTrackInfo> audioTracks, bool loadSources) : base()
         {
             Input = input;
+            if (String.IsNullOrEmpty(indexFile))
+                Output = input + ".lwi";
+            else
+                Output = indexFile;
             LoadSources = loadSources;
-            Output = input + ".lwi";
-            OutputFile = indexFile;
-
+ 
             if (audioTracks == null || audioTracks.Count == 0)
             {
                 AudioTracks = new List<AudioTrackInfo>();
@@ -48,13 +50,6 @@ namespace MeGUI
             }
 
             DemuxVideo = false;
-        }
-
-        private string outputFile;
-        public string OutputFile
-        {
-            get { return outputFile; }
-            set { outputFile = value; }
         }
        
         public override string CodecString
